@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - '.github/workflows/build-local-postgres-bundle.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/build-local-postgres-bundle.yml'
   workflow_dispatch:
 
 permissions:
