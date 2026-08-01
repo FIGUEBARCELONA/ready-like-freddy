@@ -34,7 +34,8 @@ jobs:
             'python-multipart>=0.0.9' \
             'pytest>=8,<10' \
             'coverage[toml]>=7.6,<8' \
-            'httpx>=0.27,<1'
+            'httpx>=0.27,<1' \
+            'httpx2>=2,<3'
           find bundle/wheels -maxdepth 1 -type f -name '*.whl' -print0 \
             | sort -z | xargs -0 sha256sum > bundle/SHA256SUMS.txt
           cat > bundle/PROVENANCE.txt <<'EOF'
@@ -42,6 +43,7 @@ jobs:
           Python target: CPython 3.13, Linux x86-64
           Source index: PyPI through GitHub Actions
           Constraint policy: bounded ranges from RLF pyproject.toml v1.24; exact pinning and lockfile remain checklist items 1.2.8 and 1.2.9
+          HTTP client bridge: httpx for older Starlette releases and httpx2 for current Starlette TestClient
           No RLF data, credentials or secrets are included.
           EOF
           python - <<'PY'
