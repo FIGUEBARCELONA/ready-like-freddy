@@ -1,0 +1,63 @@
+name: Build RLF test wheelhouse v1.24
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/build-test-wheelhouse-v1-24.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wheelhouse:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Download runtime and test wheels
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bundle/wheels
+          python -m pip download --only-binary=:all: --dest bundle/wheels \
+            'setuptools>=68' \
+            'wheel' \
+            'fastapi>=0.110' \
+            'uvicorn>=0.29' \
+            'pydantic>=2.6' \
+            'openpyxl>=3.1' \
+            'apscheduler>=3.10' \
+            'python-multipart>=0.0.9' \
+            'pytest>=8,<10' \
+            'coverage[toml]>=7.6,<8' \
+            'httpx>=0.27,<1'
+          find bundle/wheels -maxdepth 1 -type f -name '*.whl' -print0 \
+            | sort -z | xargs -0 sha256sum > bundle/SHA256SUMS.txt
+          cat > bundle/PROVENANCE.txt <<'EOF'
+          Purpose: isolated installation evidence for READY LIKE FREDDY checklist item 1.2.4
+          Python target: CPython 3.13, Linux x86-64
+          Source index: PyPI through GitHub Actions
+          Constraint policy: bounded ranges from RLF pyproject.toml v1.24; exact pinning and lockfile remain checklist items 1.2.8 and 1.2.9
+          No RLF data, credentials or secrets are included.
+          EOF
+          python - <<'PY'
+          from pathlib import Path
+          wheels = sorted(Path('bundle/wheels').glob('*.whl'))
+          assert wheels, 'wheelhouse is empty'
+          print(f'wheels={len(wheels)}')
+          for wheel in wheels:
+              print(wheel.name)
+          PY
+
+      - name: Upload verified wheelhouse
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-test-wheelhouse-py313-linux-x64-v1-24
+          path: bundle
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
