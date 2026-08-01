@@ -1,0 +1,124 @@
+name: Build RLF dependency lock v1.26
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/build-dependency-lock-v1-26.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lock:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Resolve, lock and verify all dependency groups
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bundle/wheels
+          cat > direct-requirements.in <<'EOF'
+          setuptools>=68,<84
+          wheel>=0.47,<1
+          fastapi>=0.110,<1
+          uvicorn>=0.29,<1
+          pydantic>=2.6,<3
+          openpyxl>=3.1,<4
+          python-multipart>=0.0.9,<1
+          apscheduler>=3.10,<4
+          pytest>=8,<10
+          coverage[toml]>=7.6,<8
+          httpx>=0.27,<1
+          httpx2>=2,<3
+          psycopg>=3.2,<4
+          ruff>=0.9,<1
+          mypy>=1.14,<2
+          bandit>=1.8,<2
+          EOF
+
+          python -m pip download --only-binary=:all: --dest bundle/wheels -r direct-requirements.in
+          python -m venv resolver-venv
+          resolver-venv/bin/python -m pip install --no-index --find-links bundle/wheels -r direct-requirements.in
+          resolver-venv/bin/python -m pip check
+
+          resolver-venv/bin/python - <<'PY'
+          from __future__ import annotations
+          import hashlib
+          import json
+          from importlib import metadata
+          from pathlib import Path
+          from packaging.utils import canonicalize_name, parse_wheel_filename
+
+          root = Path('bundle')
+          wheel_dir = root / 'wheels'
+          wheel_index: dict[tuple[str, str], list[tuple[Path, str]]] = {}
+          for path in sorted(wheel_dir.glob('*.whl')):
+              name, version, _, _ = parse_wheel_filename(path.name)
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              wheel_index.setdefault((canonicalize_name(name), str(version)), []).append((path, digest))
+
+          installed: dict[str, str] = {}
+          for dist in metadata.distributions():
+              name = dist.metadata.get('Name')
+              if not name or canonicalize_name(name) == 'pip':
+                  continue
+              installed[canonicalize_name(name)] = dist.version
+
+          lines: list[str] = []
+          records: list[dict[str, object]] = []
+          missing: list[str] = []
+          for name, version in sorted(installed.items()):
+              candidates = wheel_index.get((name, version), [])
+              if not candidates:
+                  missing.append(f'{name}=={version}')
+                  continue
+              hash_args = ' '.join(f'--hash=sha256:{digest}' for _, digest in candidates)
+              lines.append(f'{name}=={version} {hash_args}')
+              records.append({
+                  'distribution': name,
+                  'version': version,
+                  'wheels': [path.name for path, _ in candidates],
+                  'sha256': [digest for _, digest in candidates],
+              })
+          if missing:
+              raise SystemExit('resolved distributions without wheel: ' + ', '.join(missing))
+
+          (root / 'requirements-py313-linux-x64.lock').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          (root / 'resolved-distributions.json').write_text(json.dumps(records, indent=2) + '\n', encoding='utf-8')
+          (root / 'direct-requirements.in').write_text(Path('direct-requirements.in').read_text(), encoding='utf-8')
+          PY
+
+          python -m venv verification-venv
+          verification-venv/bin/python -m pip install --no-index --find-links bundle/wheels --require-hashes -r bundle/requirements-py313-linux-x64.lock
+          verification-venv/bin/python -m pip check
+          verification-venv/bin/python - <<'PY'
+          from importlib import metadata
+          required = ('APScheduler', 'psycopg', 'pytest', 'coverage', 'httpx', 'httpx2', 'ruff', 'mypy', 'bandit')
+          for name in required:
+              print(f'{name}=={metadata.version(name)}')
+          PY
+
+          cat > bundle/PROVENANCE.txt <<'EOF'
+          Purpose: reproducible dependency closure for READY LIKE FREDDY checklist items 1.2.6, 1.2.8 and 1.2.9
+          Python target: CPython 3.13, Linux x86-64
+          Source index: PyPI through GitHub Actions
+          Resolution: bounded direct requirements, frozen exact transitive versions
+          Integrity: pip --require-hashes verified from the generated lockfile
+          No RLF data, credentials, source code or secrets are included.
+          EOF
+          find bundle -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > bundle/SHA256SUMS.txt
+
+      - name: Upload dependency bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-dependency-lock-py313-linux-x64-v1-26
+          path: bundle
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
