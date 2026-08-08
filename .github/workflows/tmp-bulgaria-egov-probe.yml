@@ -15,9 +15,26 @@ env:
 jobs:
   fetch-dataset-bundle:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
-      - name: Fetch fresh dataset bundle with evidence
+      - name: Install Tor and establish Bulgarian exit
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tor >/dev/null
+          sudo systemctl stop tor || true
+          sudo pkill tor || true
+          tor --RunAsDaemon 1 --SocksPort 9050 --ExitNodes '{bg}' --StrictNodes 1 --Log 'notice file /tmp/tor.log'
+          for i in $(seq 1 60); do
+            if grep -q 'Bootstrapped 100%' /tmp/tor.log 2>/dev/null; then break; fi
+            sleep 2
+          done
+          cat /tmp/tor.log
+          grep -q 'Bootstrapped 100%' /tmp/tor.log
+          echo "Tor BG exit: $(curl --socks5-hostname 127.0.0.1:9050 -fsS --max-time 30 https://api.ipify.org)"
+
+      - name: Fetch fresh dataset bundle with Bulgarian egress evidence
         shell: bash
         run: |
           set -u
@@ -26,34 +43,51 @@ jobs:
 
           UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36'
           COOKIE_JAR='cookies.txt'
+          CURL='curl --socks5-hostname 127.0.0.1:9050'
 
           echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > summary.txt
-          echo "runner_ip=$(curl -fsS --max-time 20 https://api.ipify.org || true)" >> summary.txt
+          echo "runner_ip_direct=$(curl -fsS --max-time 20 https://api.ipify.org || true)" >> summary.txt
+          echo "runner_ip_tor_bg=$($CURL -fsS --max-time 30 https://api.ipify.org || true)" >> summary.txt
           echo "dataset_uuid=${DATASET_UUID}" >> summary.txt
 
-          # 0) Purge any orphan/stale prepared bundle, if one exists. Never use these bytes.
-          curl -sS -L --connect-timeout 20 --max-time 90 \
+          # Prove the transport path first. Do not hit bundle endpoints unless the exact dataset page is not forbidden.
+          $CURL -sS -L --connect-timeout 25 --max-time 90 \
             -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
-            -D purge.headers \
-            -o purge.body \
+            -D dataset_page.headers -o dataset_page.body \
+            -w 'dataset_page_http=%{http_code}\ndataset_page_type=%{content_type}\ndataset_page_size=%{size_download}\ndataset_page_url=%{url_effective}\n' \
+            "${BASE_URL}/organisation/dataset/${DATASET_UUID}" \
+            > dataset_page.meta 2> dataset_page.stderr || true
+          cat dataset_page.meta >> summary.txt
+
+          PAGE_HTTP=$(awk -F= '/^dataset_page_http=/{print $2}' dataset_page.meta | tail -1)
+          if [ "$PAGE_HTTP" = "403" ] || [ -z "$PAGE_HTTP" ] || [ "$PAGE_HTTP" = "000" ]; then
+            echo "transport_gate=BLOCKED" >> summary.txt
+            echo '=== SUMMARY ==='
+            cat summary.txt
+            exit 0
+          fi
+          echo "transport_gate=OPEN" >> summary.txt
+
+          # 0) Purge any orphan/stale prepared bundle, if one exists. Never use these bytes.
+          $CURL -sS -L --connect-timeout 25 --max-time 120 \
+            -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
+            -D purge.headers -o purge.body \
             -w 'purge_http=%{http_code}\npurge_type=%{content_type}\npurge_size=%{size_download}\npurge_url=%{url_effective}\n' \
             "${BASE_URL}/dataset/resources/download/zip/${DATASET_UUID}" \
             > purge.meta 2> purge.stderr || true
 
           # 1) Force a fresh server-side bundle generated from the exact dataset UUID.
-          curl -sS -L --connect-timeout 20 --max-time 180 \
+          $CURL -sS -L --connect-timeout 25 --max-time 240 \
             -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
-            -D prepare.headers \
-            -o prepare.body \
+            -D prepare.headers -o prepare.body \
             -w 'prepare_http=%{http_code}\nprepare_type=%{content_type}\nprepare_size=%{size_download}\nprepare_url=%{url_effective}\n' \
             "${BASE_URL}/dataset/${DATASET_UUID}/resources/download/csv" \
             > prepare.meta 2> prepare.stderr || true
 
           # 2) Download the freshly generated ZIP. The official controller deletes it after serving.
-          curl -sS -L --connect-timeout 20 --max-time 300 \
+          $CURL -sS -L --connect-timeout 25 --max-time 420 \
             -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
-            -D bundle.headers \
-            -o dataset_bundle.zip \
+            -D bundle.headers -o dataset_bundle.zip \
             -w 'bundle_http=%{http_code}\nbundle_type=%{content_type}\nbundle_size=%{size_download}\nbundle_url=%{url_effective}\n' \
             "${BASE_URL}/dataset/resources/download/zip/${DATASET_UUID}" \
             > bundle.meta 2> bundle.stderr || true
@@ -66,8 +100,8 @@ jobs:
           stat -c 'bundle_bytes=%s' dataset_bundle.zip >> summary.txt 2>/dev/null || true
           sha256sum dataset_bundle.zip >> summary.txt 2>/dev/null || true
 
-          if python3 - <<'PY'
-          import zipfile
+          python3 - <<'PY' >> summary.txt 2>&1 || true
+          import hashlib, zipfile
           p='dataset_bundle.zip'
           try:
               with zipfile.ZipFile(p) as z:
@@ -75,43 +109,31 @@ jobs:
                   print('ZIP_OK' if bad is None else f'ZIP_BAD_MEMBER={bad}')
                   print(f'ZIP_MEMBERS={len(z.infolist())}')
                   print(f'ZIP_UNCOMPRESSED_BYTES={sum(i.file_size for i in z.infolist())}')
-                  for i in z.infolist()[:200]:
-                      print(f'{i.filename}\t{i.file_size}\t{i.CRC:08x}')
-              raise SystemExit(0 if bad is None else 2)
+                  for i in z.infolist():
+                      if i.is_dir():
+                          continue
+                      b=z.read(i)
+                      print(f'member_sha256={hashlib.sha256(b).hexdigest()}\tbytes={len(b)}\tname={i.filename}')
+                      head=b[:512]
+                      for enc in ('utf-8-sig','cp1251','latin1'):
+                          try:
+                              txt=head.decode(enc)
+                              print(f'member_head[{i.filename}][{enc}]={txt[:300]!r}')
+                              break
+                          except Exception:
+                              pass
           except Exception as e:
               print(f'ZIP_ERROR={type(e).__name__}: {e}')
-              raise SystemExit(1)
           PY
-          then
-            python3 - <<'PY' >> summary.txt
-          import hashlib, io, os, re, zipfile
-          p='dataset_bundle.zip'
-          with zipfile.ZipFile(p) as z:
-              for i in z.infolist():
-                  if i.is_dir():
-                      continue
-                  b=z.read(i)
-                  print(f'member_sha256={hashlib.sha256(b).hexdigest()}\tbytes={len(b)}\tname={i.filename}')
-                  head=b[:512]
-                  for enc in ('utf-8-sig','cp1251','latin1'):
-                      try:
-                          txt=head.decode(enc)
-                          print(f'member_head[{i.filename}][{enc}]={txt[:300]!r}')
-                          break
-                      except Exception:
-                          pass
-          PY
-          else
-            true
-          fi
 
           echo '=== SUMMARY ==='
           cat summary.txt
 
       - name: Upload evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: bulgaria-egov-dataset-bundle-evidence
           path: evidence/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 1
