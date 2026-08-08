@@ -14,19 +14,26 @@ env:
   RESOURCE_UUID: 068c2108-e6b8-4ca4-8bac-3ca79832c72d
 
 jobs:
-  fetch-current-resource:
+  fetch-current-api-data:
     strategy:
       fail-fast: false
+      max-parallel: 10
       matrix:
         include:
-          - label: sofia-http
-            proxy: http://92.247.12.130:9510
-          - label: pleven-socks5
-            proxy: socks5h://31.211.142.115:8192
+          - {label: old-pleven-s5, proxy: 'socks5h://31.211.142.115:8192'}
+          - {label: old-sofia-http, proxy: 'http://92.247.12.130:9510'}
+          - {label: sofia-s4-a, proxy: 'socks4a://91.215.153.137:1080'}
+          - {label: rousse-s4, proxy: 'socks4a://109.160.97.49:4145'}
+          - {label: sofia-h1, proxy: 'http://93.123.16.38:80'}
+          - {label: sofia-h2, proxy: 'http://93.123.16.14:80'}
+          - {label: sofia-h3, proxy: 'http://85.196.179.34:8080'}
+          - {label: burgas-h, proxy: 'http://84.54.156.237:8080'}
+          - {label: sofia-h4, proxy: 'http://213.169.33.7:8001'}
+          - {label: kardzhali-h, proxy: 'http://151.237.86.78:8080'}
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
-      - name: One-shot exact resource download
+      - name: One-shot getResourceData
         shell: bash
         env:
           BG_PROXY: ${{ matrix.proxy }}
@@ -36,48 +43,48 @@ jobs:
           mkdir -p evidence
           cd evidence
           UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36'
-          URL="${BASE_URL}/resource/download/${RESOURCE_UUID}/csv"
+          PAYLOAD="{\"resource_uri\":\"${RESOURCE_UUID}\",\"version\":1}"
           echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > summary.txt
           echo "dataset_uuid=${DATASET_UUID}" >> summary.txt
           echo "resource_uuid=${RESOURCE_UUID}" >> summary.txt
           echo "vintage=2026-07" >> summary.txt
           echo "proxy=${BG_PROXY}" >> summary.txt
-
-          curl -sS -L --proxy "$BG_PROXY" --connect-timeout 10 --max-time 90 \
-            -A "$UA" -H 'Accept: text/csv,*/*;q=0.8' \
-            -D response.headers -o current_2026_07.csv \
+          curl -sS --proxy "$BG_PROXY" --connect-timeout 10 --max-time 100 \
+            -A "$UA" -H 'Accept: application/json' -H 'Content-Type: application/json' \
+            -D response.headers -o response.json \
             -w 'http=%{http_code}\ntype=%{content_type}\nsize=%{size_download}\nurl=%{url_effective}\n' \
-            "$URL" > response.meta 2> response.stderr || true
+            -X POST --data-binary "$PAYLOAD" "${BASE_URL}/api/getResourceData" \
+            > response.meta 2> response.stderr || true
           cat response.meta response.stderr >> summary.txt
-
           python3 - <<'PY' | tee analysis.json >> summary.txt
-          import csv,hashlib,io,json,os
-          p='current_2026_07.csv'
+          import hashlib,json,os
+          p='response.json'
           if not os.path.exists(p):
-              print(json.dumps({'valid_bytes':False,'reason':'missing_file'})); raise SystemExit(0)
-          b=open(p,'rb').read(); low=b.lstrip().lower()
-          if low.startswith(b'<!doctype') or low.startswith(b'<html') or b'<title>403' in low:
-              print(json.dumps({'valid_bytes':False,'reason':'html_or_error','bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})); raise SystemExit(0)
-          text=None; enc=None
-          for e in ('utf-8-sig','utf-8','cp1251'):
-              try: text=b.decode(e); enc=e; break
-              except UnicodeDecodeError: pass
-          if text is None:
-              print(json.dumps({'valid_bytes':False,'reason':'encoding','bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})); raise SystemExit(0)
-          try: delim=csv.Sniffer().sniff('\n'.join(text.splitlines()[:20]),delimiters=',;\t|').delimiter
-          except Exception: delim=';'
-          rows=[r for r in csv.reader(io.StringIO(text),delimiter=delim) if any(c.strip() for c in r)]
-          out={'valid_bytes':bool(rows and len(rows[0])>=3),'sha256':hashlib.sha256(b).hexdigest(),'bytes':len(b),'encoding':enc,'delimiter':delim,'rows_total_including_header':len(rows),'data_rows':max(0,len(rows)-1),'header':rows[0] if rows else [],'sample_widths':sorted({len(r) for r in rows[:1000]}),'first_rows':rows[:4]}
+              print(json.dumps({'valid':False,'reason':'missing'})); raise SystemExit(0)
+          b=open(p,'rb').read(); out={'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()}
+          try: x=json.loads(b.decode('utf-8-sig'))
+          except Exception as e:
+              out.update(valid=False,reason='not_json',error=str(e)); print(json.dumps(out)); raise SystemExit(0)
+          out['top_type']=type(x).__name__
+          if isinstance(x,dict):
+              out['top_keys']=sorted(x.keys())
+              data=x.get('data')
+              out['success']=x.get('success')
+              out['data_type']=type(data).__name__
+              out['data_len']=len(data) if isinstance(data,(list,dict)) else None
+              if isinstance(data,list): out['first_rows']=data[:4]
+              elif isinstance(data,dict): out['first_items']=list(data.items())[:4]
+              out['valid']=bool(x.get('success') and isinstance(data,(list,dict)) and len(data)>1000)
+          else: out['valid']=False
           print(json.dumps(out,ensure_ascii=False,indent=2))
           PY
-          sha256sum current_2026_07.csv > current_2026_07.sha256 2>/dev/null || true
+          sha256sum response.json > response.sha256 2>/dev/null || true
           cat summary.txt
-
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bulgaria-current-2026-07-${{ matrix.label }}
+          name: bulgaria-current-api-${{ matrix.label }}
           path: evidence/
           if-no-files-found: error
           retention-days: 1
