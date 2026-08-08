@@ -14,120 +14,70 @@ env:
   RESOURCE_UUID: 068c2108-e6b8-4ca4-8bac-3ca79832c72d
 
 jobs:
-  download-current-resource:
+  fetch-current-resource:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: sofia-http
+            proxy: http://92.247.12.130:9510
+          - label: pleven-socks5
+            proxy: socks5h://31.211.142.115:8192
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 4
     steps:
-      - name: Download exact July 2026 CSV via current Bulgarian proxies
+      - name: One-shot exact resource download
         shell: bash
+        env:
+          BG_PROXY: ${{ matrix.proxy }}
+          LABEL: ${{ matrix.label }}
         run: |
           set -u
-          mkdir -p evidence/probes
+          mkdir -p evidence
           cd evidence
           UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36'
           URL="${BASE_URL}/resource/download/${RESOURCE_UUID}/csv"
           echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > summary.txt
           echo "dataset_uuid=${DATASET_UUID}" >> summary.txt
           echo "resource_uuid=${RESOURCE_UUID}" >> summary.txt
-          echo "declared_vintage=2026-07" >> summary.txt
+          echo "vintage=2026-07" >> summary.txt
+          echo "proxy=${BG_PROXY}" >> summary.txt
 
-          curl -fsSL --max-time 30 https://cdn.jsdelivr.net/gh/proxyscrape/free-proxy-list@main/proxies/countries/bg/data.json -o bg_proxies.json || true
-          python3 - <<'PY' > proxy_urls.txt
-          import json
-          try: rows=json.load(open('bg_proxies.json',encoding='utf-8'))
-          except Exception: rows=[]
-          preferred=['92.247.12.130:9510','31.211.142.115:8192']
-          def scheme(p): return {'socks5':'socks5h','socks4':'socks4a'}.get(p.get('protocol'),'http')
-          def score(p):
-              hp=f"{p.get('ip')}:{p.get('port')}"
-              try: pref=preferred.index(hp)
-              except ValueError: pref=99
-              return (pref,0 if p.get('ssl') else 1,0 if p.get('anonymity')=='elite' else 1,-(p.get('uptime_percent') or 0),p.get('latency_ms') or 999999)
-          rows.sort(key=score)
-          for p in rows[:20]:
-              print(f"{scheme(p)}://{p['ip']}:{p['port']}\t{p.get('city','')}\t{p.get('anonymity','')}\t{p.get('ssl')}\t{p.get('uptime_percent')}\t{p.get('latency_ms')}")
-          PY
-          echo '--- proxy candidates ---' >> summary.txt
-          cat proxy_urls.txt >> summary.txt || true
+          curl -sS -L --proxy "$BG_PROXY" --connect-timeout 10 --max-time 90 \
+            -A "$UA" -H 'Accept: text/csv,*/*;q=0.8' \
+            -D response.headers -o current_2026_07.csv \
+            -w 'http=%{http_code}\ntype=%{content_type}\nsize=%{size_download}\nurl=%{url_effective}\n' \
+            "$URL" > response.meta 2> response.stderr || true
+          cat response.meta response.stderr >> summary.txt
 
-          FOUND=0
-          N=0
-          while IFS=$'\t' read -r PROXY CITY ANON SSL UPTIME LATENCY; do
-            [ -n "$PROXY" ] || continue
-            N=$((N+1))
-            SAFE=$(echo "$PROXY" | tr '/:.' '____')
-            OUT="probes/p${N}_${SAFE}"
-            curl -sS -L --proxy "$PROXY" --connect-timeout 10 --max-time 150 \
-              -A "$UA" -H 'Accept: text/csv,*/*;q=0.8' \
-              -D "${OUT}.headers" -o "${OUT}.body" \
-              -w 'http=%{http_code}\ntype=%{content_type}\nsize=%{size_download}\nurl=%{url_effective}\n' \
-              "$URL" > "${OUT}.meta" 2> "${OUT}.stderr" || true
-            HTTP=$(awk -F= '/^http=/{print $2}' "${OUT}.meta" | tail -1)
-            SIZE=$(awk -F= '/^size=/{print $2}' "${OUT}.meta" | tail -1)
-            echo "candidate_${N}=${PROXY} city=${CITY} http=${HTTP:-000} size=${SIZE:-0}" >> summary.txt
-            if [ "${HTTP:-000}" = "200" ] && python3 - "${OUT}.body" <<'PY'
-          import sys
-          b=open(sys.argv[1],'rb').read(4096)
-          low=b.lstrip().lower()
-          # Reject portal/error HTML and accept plausible delimited text only.
-          if low.startswith(b'<!doctype') or low.startswith(b'<html') or b'<title>403' in low:
-              raise SystemExit(1)
-          ok=(b';' in b or b',' in b or b'\t' in b) and len(b)>20
-          raise SystemExit(0 if ok else 1)
-          PY
-            then
-              cp "${OUT}.body" current_2026_07.csv
-              cp "${OUT}.headers" current_2026_07.headers
-              cp "${OUT}.meta" current_2026_07.meta
-              echo "selected_proxy=${PROXY}" >> summary.txt
-              FOUND=1
-              break
-            fi
-          done < proxy_urls.txt
-
-          if [ "$FOUND" -ne 1 ]; then
-            echo 'download_gate=NO_VALID_BYTES' >> summary.txt
-            cat summary.txt
-            exit 0
-          fi
-
-          sha256sum current_2026_07.csv | tee current_2026_07.sha256 >> summary.txt
-          stat -c 'byte_size=%s' current_2026_07.csv >> summary.txt
           python3 - <<'PY' | tee analysis.json >> summary.txt
-          import csv,hashlib,io,json,re
-          from pathlib import Path
-          p=Path('current_2026_07.csv'); b=p.read_bytes()
-          enc=None; text=None
+          import csv,hashlib,io,json,os
+          p='current_2026_07.csv'
+          if not os.path.exists(p):
+              print(json.dumps({'valid_bytes':False,'reason':'missing_file'})); raise SystemExit(0)
+          b=open(p,'rb').read(); low=b.lstrip().lower()
+          if low.startswith(b'<!doctype') or low.startswith(b'<html') or b'<title>403' in low:
+              print(json.dumps({'valid_bytes':False,'reason':'html_or_error','bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})); raise SystemExit(0)
+          text=None; enc=None
           for e in ('utf-8-sig','utf-8','cp1251'):
               try: text=b.decode(e); enc=e; break
               except UnicodeDecodeError: pass
-          if text is None: raise SystemExit('encoding failure')
-          sample='\n'.join(text.splitlines()[:20])
-          try: dialect=csv.Sniffer().sniff(sample,delimiters=',;\t|')
-          except Exception:
-              class D: delimiter=';'
-              dialect=D()
-          rows=list(csv.reader(io.StringIO(text),delimiter=dialect.delimiter))
-          nonempty=[r for r in rows if any(c.strip() for c in r)]
-          header=nonempty[0] if nonempty else []
-          widths={len(r) for r in nonempty[:1000]}
-          result={
-            'sha256':hashlib.sha256(b).hexdigest(), 'bytes':len(b), 'encoding':enc,
-            'delimiter':dialect.delimiter, 'rows_total_including_header':len(nonempty),
-            'data_rows':max(0,len(nonempty)-1), 'header':header, 'sample_widths':sorted(widths),
-            'first_rows':nonempty[:4]
-          }
-          print(json.dumps(result,ensure_ascii=False,indent=2))
+          if text is None:
+              print(json.dumps({'valid_bytes':False,'reason':'encoding','bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})); raise SystemExit(0)
+          try: delim=csv.Sniffer().sniff('\n'.join(text.splitlines()[:20]),delimiters=',;\t|').delimiter
+          except Exception: delim=';'
+          rows=[r for r in csv.reader(io.StringIO(text),delimiter=delim) if any(c.strip() for c in r)]
+          out={'valid_bytes':bool(rows and len(rows[0])>=3),'sha256':hashlib.sha256(b).hexdigest(),'bytes':len(b),'encoding':enc,'delimiter':delim,'rows_total_including_header':len(rows),'data_rows':max(0,len(rows)-1),'header':rows[0] if rows else [],'sample_widths':sorted({len(r) for r in rows[:1000]}),'first_rows':rows[:4]}
+          print(json.dumps(out,ensure_ascii=False,indent=2))
           PY
-          echo 'download_gate=BYTES_RECOVERED' >> summary.txt
-          echo '=== SUMMARY ==='
+          sha256sum current_2026_07.csv > current_2026_07.sha256 2>/dev/null || true
           cat summary.txt
 
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bulgaria-current-localisation-units-2026-07
+          name: bulgaria-current-2026-07-${{ matrix.label }}
           path: evidence/
           if-no-files-found: error
           retention-days: 1
