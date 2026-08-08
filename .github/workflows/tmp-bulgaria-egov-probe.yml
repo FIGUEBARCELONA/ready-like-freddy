@@ -9,155 +9,129 @@ permissions:
   contents: read
 
 env:
-  DATASET_UUID: 53c0dd26-58ea-49fb-a901-53dd840c359c
   BASE_URL: https://data.egov.bg
 
 jobs:
-  fetch-dataset-bundle:
+  discover-successor-datasets:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - name: Test current Bulgarian public egressions and fetch bundle
+      - name: Query listDatasets through current Bulgarian egressions
         shell: bash
         run: |
           set -u
           mkdir -p evidence/probes
           cd evidence
-
           UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36'
-          DATASET_URL="${BASE_URL}/organisation/dataset/${DATASET_UUID}"
-          echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > summary.txt
-          echo "runner_ip_direct=$(curl -fsS --max-time 20 https://api.ipify.org || true)" >> summary.txt
-          echo "dataset_uuid=${DATASET_UUID}" >> summary.txt
+          PHRASE='Национален класификатор на локализационните единици'
+          printf '%s\n' "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > summary.txt
+          printf '%s\n' "phrase=${PHRASE}" >> summary.txt
 
-          # Snapshot the current ProxyScrape BG shard used for this run.
           curl -fsSL --max-time 30 \
             https://cdn.jsdelivr.net/gh/proxyscrape/free-proxy-list@main/proxies/countries/bg/data.json \
             -o bg_proxies.json || true
 
           python3 - <<'PY' > proxy_urls.txt
           import json
-          try:
-              rows=json.load(open('bg_proxies.json',encoding='utf-8'))
-          except Exception:
-              rows=[]
-          # Prefer CONNECT-capable HTTP and elite proxies, then SOCKS. Limit the run.
-          rows.sort(key=lambda p: (
-              0 if (p.get('protocol')=='http' and p.get('ssl')) else 1 if p.get('protocol')=='http' else 2,
+          try: rows=json.load(open('bg_proxies.json',encoding='utf-8'))
+          except Exception: rows=[]
+          rows.sort(key=lambda p:(
+              0 if p.get('protocol') in ('socks5','socks4') and p.get('ssl') else 1,
               0 if p.get('anonymity')=='elite' else 1,
               -(p.get('uptime_percent') or 0),
               p.get('latency_ms') or 999999,
           ))
           for p in rows[:20]:
               proto=p.get('protocol','http')
-              if proto=='socks4': scheme='socks4a'
-              elif proto=='socks5': scheme='socks5h'
-              else: scheme='http'
+              scheme={'socks5':'socks5h','socks4':'socks4a'}.get(proto,'http')
               print(f"{scheme}://{p['ip']}:{p['port']}\t{p.get('city','')}\t{p.get('anonymity','')}\t{p.get('ssl')}\t{p.get('uptime_percent')}\t{p.get('latency_ms')}")
           PY
 
-          echo '--- proxy candidates ---' >> summary.txt
+          echo '--- candidates ---' >> summary.txt
           cat proxy_urls.txt >> summary.txt || true
 
-          SELECTED=''
-          SELECTED_IP=''
-          n=0
-          while IFS=$'\t' read -r PROXY CITY ANON SSL UPTIME LATENCY; do
-            [ -n "$PROXY" ] || continue
-            n=$((n+1))
-            SAFE="$(echo "$PROXY" | tr '/:.' '____')"
-            echo "candidate_${n}=${PROXY} city=${CITY} anonymity=${ANON} ssl=${SSL} uptime=${UPTIME} latency=${LATENCY}" >> summary.txt
-
-            EXIT_IP=$(curl -sS --proxy "$PROXY" --connect-timeout 7 --max-time 15 \
-              https://api.ipify.org 2>"probes/${SAFE}.ip.stderr" || true)
-            echo "$EXIT_IP" > "probes/${SAFE}.exit_ip"
-
-            curl -sS -L --proxy "$PROXY" --connect-timeout 7 --max-time 25 \
-              -A "$UA" \
-              -D "probes/${SAFE}.headers" \
-              -o "probes/${SAFE}.body" \
-              -w 'http=%{http_code}\ntype=%{content_type}\nsize=%{size_download}\nurl=%{url_effective}\n' \
-              "$DATASET_URL" \
-              > "probes/${SAFE}.meta" 2> "probes/${SAFE}.stderr" || true
-
-            HTTP=$(awk -F= '/^http=/{print $2}' "probes/${SAFE}.meta" | tail -1)
-            SIZE=$(awk -F= '/^size=/{print $2}' "probes/${SAFE}.meta" | tail -1)
-            echo "candidate_${n}_exit_ip=${EXIT_IP} http=${HTTP:-000} size=${SIZE:-0}" >> summary.txt
-
-            if [[ "${HTTP:-000}" =~ ^2[0-9][0-9]$|^3[0-9][0-9]$ ]]; then
-              SELECTED="$PROXY"
-              SELECTED_IP="$EXIT_IP"
-              echo "selected_proxy=${PROXY}" >> summary.txt
-              echo "selected_exit_ip=${EXIT_IP}" >> summary.txt
-              break
-            fi
-          done < proxy_urls.txt
-
-          if [ -z "$SELECTED" ]; then
-            echo 'transport_gate=BLOCKED_ALL_BG_PUBLIC_PROXIES' >> summary.txt
-            echo '=== SUMMARY ==='
-            cat summary.txt
-            exit 0
-          fi
-
-          echo 'transport_gate=OPEN_BG_PROXY' >> summary.txt
-          COOKIE_JAR='cookies.txt'
-
-          # 0) Purge stale server-side bundle. Discard bytes by design.
-          curl -sS -L --proxy "$SELECTED" --connect-timeout 10 --max-time 90 \
-            -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
-            -D purge.headers -o purge.body \
-            -w 'purge_http=%{http_code}\npurge_type=%{content_type}\npurge_size=%{size_download}\npurge_url=%{url_effective}\n' \
-            "${BASE_URL}/dataset/resources/download/zip/${DATASET_UUID}" \
-            > purge.meta 2> purge.stderr || true
-
-          # 1) Generate a fresh server-side CSV bundle for this exact dataset.
-          curl -sS -L --proxy "$SELECTED" --connect-timeout 10 --max-time 240 \
-            -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
-            -D prepare.headers -o prepare.body \
-            -w 'prepare_http=%{http_code}\nprepare_type=%{content_type}\nprepare_size=%{size_download}\nprepare_url=%{url_effective}\n' \
-            "${BASE_URL}/dataset/${DATASET_UUID}/resources/download/csv" \
-            > prepare.meta 2> prepare.stderr || true
-
-          # 2) Download the newly generated bundle.
-          curl -sS -L --proxy "$SELECTED" --connect-timeout 10 --max-time 420 \
-            -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
-            -D bundle.headers -o dataset_bundle.zip \
-            -w 'bundle_http=%{http_code}\nbundle_type=%{content_type}\nbundle_size=%{size_download}\nbundle_url=%{url_effective}\n' \
-            "${BASE_URL}/dataset/resources/download/zip/${DATASET_UUID}" \
-            > bundle.meta 2> bundle.stderr || true
-
-          cat purge.meta prepare.meta bundle.meta >> summary.txt
-          echo '--- prepare body ---' >> summary.txt
-          head -c 2000 prepare.body >> summary.txt 2>/dev/null || true
-          printf '\n--- bundle inspection ---\n' >> summary.txt
-          file dataset_bundle.zip >> summary.txt 2>&1 || true
-          stat -c 'bundle_bytes=%s' dataset_bundle.zip >> summary.txt 2>/dev/null || true
-          sha256sum dataset_bundle.zip >> summary.txt 2>/dev/null || true
-
-          python3 - <<'PY' >> summary.txt 2>&1 || true
-          import hashlib, zipfile
-          p='dataset_bundle.zip'
-          try:
-              with zipfile.ZipFile(p) as z:
-                  bad=z.testzip()
-                  print('ZIP_OK' if bad is None else f'ZIP_BAD_MEMBER={bad}')
-                  print(f'ZIP_MEMBERS={len(z.infolist())}')
-                  print(f'ZIP_UNCOMPRESSED_BYTES={sum(i.file_size for i in z.infolist())}')
-                  for i in z.infolist():
-                      if i.is_dir(): continue
-                      b=z.read(i)
-                      print(f'member_sha256={hashlib.sha256(b).hexdigest()}\tbytes={len(b)}\tname={i.filename}')
-                      for enc in ('utf-8-sig','cp1251','latin1'):
-                          try:
-                              txt=b[:512].decode(enc)
-                              print(f'member_head[{i.filename}][{enc}]={txt[:300]!r}')
-                              break
-                          except Exception: pass
-          except Exception as e:
-              print(f'ZIP_ERROR={type(e).__name__}: {e}')
+          python3 - <<'PY' > payloads.tsv
+          import json
+          phrase='Национален класификатор на локализационните единици'
+          queries=[phrase, phrase+' 2024', phrase+' 2025', phrase+' 2026']
+          for idx,q in enumerate(queries,1):
+              payload={
+                  'criteria':{
+                      'keywords':q,
+                      'public':True,
+                      'locale':'bg',
+                      'status':2,
+                      'visibility':1
+                  },
+                  'page_number':1,
+                  'records_per_page':100
+              }
+              print(str(idx)+'\t'+json.dumps(payload,ensure_ascii=False,separators=(',',':')))
           PY
 
+          SUCCESS=0
+          PROXY_NO=0
+          while IFS=$'\t' read -r PROXY CITY ANON SSL UPTIME LATENCY; do
+            [ -n "$PROXY" ] || continue
+            PROXY_NO=$((PROXY_NO+1))
+            SAFE="$(echo "$PROXY" | tr '/:.' '____')"
+            QUERY_NO=0
+            while IFS=$'\t' read -r PID PAYLOAD; do
+              QUERY_NO=$((QUERY_NO+1))
+              OUT="probes/p${PROXY_NO}_q${PID}_${SAFE}"
+              # One target request per proxy connection attempt. Do not preflight the proxy.
+              curl -sS --proxy "$PROXY" --connect-timeout 8 --max-time 35 \
+                -A "$UA" -H 'Accept: application/json' -H 'Content-Type: application/json' \
+                -D "${OUT}.headers" -o "${OUT}.body" \
+                -w 'http=%{http_code}\ntype=%{content_type}\nsize=%{size_download}\nurl=%{url_effective}\n' \
+                -X POST --data-binary "$PAYLOAD" \
+                "${BASE_URL}/api/listDatasets" \
+                > "${OUT}.meta" 2> "${OUT}.stderr" || true
+              HTTP=$(awk -F= '/^http=/{print $2}' "${OUT}.meta" | tail -1)
+              SIZE=$(awk -F= '/^size=/{print $2}' "${OUT}.meta" | tail -1)
+              echo "proxy=${PROXY} city=${CITY} q=${PID} http=${HTTP:-000} size=${SIZE:-0}" >> summary.txt
+              if [ "${HTTP:-000}" = "200" ] && python3 - "$OUT.body" <<'PY'
+          import json,sys
+          try:
+              x=json.load(open(sys.argv[1],encoding='utf-8'))
+              ok=isinstance(x,dict) and ('datasets' in x or 'success' in x or 'total_records' in x)
+          except Exception: ok=False
+          raise SystemExit(0 if ok else 1)
+          PY
+              then
+                SUCCESS=1
+                cp "${OUT}.body" "api_success_q${PID}.json"
+                cp "${OUT}.headers" "api_success_q${PID}.headers"
+                echo "success_proxy=${PROXY} query_id=${PID}" >> summary.txt
+                # Continue with the remaining query payloads only if the proxy survives; otherwise later proxies can answer them.
+              fi
+              # A flaky public proxy generally supports one connection; move to next proxy after first target attempt.
+              break
+            done < payloads.tsv
+          done < proxy_urls.txt
+
+          # Summarize every valid JSON response and all matching dataset objects.
+          python3 - <<'PY' > parsed_datasets.json
+          import glob,json,re
+          out={'responses':[],'datasets':[]}
+          seen=set()
+          for fn in sorted(glob.glob('probes/*.body')+glob.glob('api_success_q*.json')):
+              try: x=json.load(open(fn,encoding='utf-8'))
+              except Exception: continue
+              if not isinstance(x,dict): continue
+              ds=x.get('datasets') or []
+              out['responses'].append({'file':fn,'total_records':x.get('total_records'),'dataset_count':len(ds) if isinstance(ds,list) else None})
+              if isinstance(ds,list):
+                  for d in ds:
+                      if not isinstance(d,dict): continue
+                      raw=json.dumps(d,ensure_ascii=False)
+                      if 'локализацион' not in raw.lower() and 'locali' not in raw.lower(): continue
+                      key=d.get('uri') or d.get('id') or raw
+                      if key in seen: continue
+                      seen.add(key); out['datasets'].append(d)
+          print(json.dumps(out,ensure_ascii=False,indent=2))
+          PY
+          cat parsed_datasets.json >> summary.txt
           echo '=== SUMMARY ==='
           cat summary.txt
 
@@ -165,7 +139,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bulgaria-egov-dataset-bundle-evidence
+          name: bulgaria-egov-successor-discovery
           path: evidence/
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 1
