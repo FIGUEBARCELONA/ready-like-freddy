@@ -10,54 +10,124 @@ permissions:
 
 env:
   BASE_URL: https://data.egov.bg
-  BG_PROXY: socks5h://31.211.142.115:8192
+  DATASET_UUID: 9c5f9ff5-b43f-42a9-8055-c7cc84b1b085
+  RESOURCE_UUID: 068c2108-e6b8-4ca4-8bac-3ca79832c72d
 
 jobs:
-  one-shot-live-api:
+  download-current-resource:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 10
     steps:
-      - name: Search annual localisation-unit datasets
+      - name: Download exact July 2026 CSV via current Bulgarian proxies
         shell: bash
         run: |
           set -u
-          mkdir -p evidence
+          mkdir -p evidence/probes
           cd evidence
           UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36'
-          PAYLOAD=$(python3 - <<'PY'
-          import json
-          print(json.dumps({
-            'criteria': {'keywords':'Национален класификатор на локализационните единици'},
-            'page_number':1,
-            'records_per_page':100
-          }, ensure_ascii=False, separators=(',',':')))
-          PY
-          )
+          URL="${BASE_URL}/resource/download/${RESOURCE_UUID}/csv"
           echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > summary.txt
-          echo "proxy=${BG_PROXY}" >> summary.txt
-          curl -sS --proxy "$BG_PROXY" --connect-timeout 10 --max-time 50 \
-            -A "$UA" -H 'Accept: application/json' -H 'Content-Type: application/json' \
-            -D response.headers -o response.json \
-            -w 'http=%{http_code}\ntype=%{content_type}\nsize=%{size_download}\nurl=%{url_effective}\n' \
-            -X POST --data-binary "$PAYLOAD" "${BASE_URL}/api/listDatasets" \
-            > response.meta 2> response.stderr || true
-          cat response.meta response.stderr >> summary.txt
-          python3 - <<'PY' >> summary.txt 2>&1 || true
+          echo "dataset_uuid=${DATASET_UUID}" >> summary.txt
+          echo "resource_uuid=${RESOURCE_UUID}" >> summary.txt
+          echo "declared_vintage=2026-07" >> summary.txt
+
+          curl -fsSL --max-time 30 https://cdn.jsdelivr.net/gh/proxyscrape/free-proxy-list@main/proxies/countries/bg/data.json -o bg_proxies.json || true
+          python3 - <<'PY' > proxy_urls.txt
           import json
-          x=json.load(open('response.json',encoding='utf-8'))
-          print('top_keys=',sorted(x.keys()))
-          print('total_records=',x.get('total_records'))
-          ds=x.get('datasets') or []
-          print('dataset_count=',len(ds))
-          for d in ds:
-              print(json.dumps(d,ensure_ascii=False,sort_keys=True))
+          try: rows=json.load(open('bg_proxies.json',encoding='utf-8'))
+          except Exception: rows=[]
+          preferred=['92.247.12.130:9510','31.211.142.115:8192']
+          def scheme(p): return {'socks5':'socks5h','socks4':'socks4a'}.get(p.get('protocol'),'http')
+          def score(p):
+              hp=f"{p.get('ip')}:{p.get('port')}"
+              try: pref=preferred.index(hp)
+              except ValueError: pref=99
+              return (pref,0 if p.get('ssl') else 1,0 if p.get('anonymity')=='elite' else 1,-(p.get('uptime_percent') or 0),p.get('latency_ms') or 999999)
+          rows.sort(key=score)
+          for p in rows[:20]:
+              print(f"{scheme(p)}://{p['ip']}:{p['port']}\t{p.get('city','')}\t{p.get('anonymity','')}\t{p.get('ssl')}\t{p.get('uptime_percent')}\t{p.get('latency_ms')}")
           PY
+          echo '--- proxy candidates ---' >> summary.txt
+          cat proxy_urls.txt >> summary.txt || true
+
+          FOUND=0
+          N=0
+          while IFS=$'\t' read -r PROXY CITY ANON SSL UPTIME LATENCY; do
+            [ -n "$PROXY" ] || continue
+            N=$((N+1))
+            SAFE=$(echo "$PROXY" | tr '/:.' '____')
+            OUT="probes/p${N}_${SAFE}"
+            curl -sS -L --proxy "$PROXY" --connect-timeout 10 --max-time 150 \
+              -A "$UA" -H 'Accept: text/csv,*/*;q=0.8' \
+              -D "${OUT}.headers" -o "${OUT}.body" \
+              -w 'http=%{http_code}\ntype=%{content_type}\nsize=%{size_download}\nurl=%{url_effective}\n' \
+              "$URL" > "${OUT}.meta" 2> "${OUT}.stderr" || true
+            HTTP=$(awk -F= '/^http=/{print $2}' "${OUT}.meta" | tail -1)
+            SIZE=$(awk -F= '/^size=/{print $2}' "${OUT}.meta" | tail -1)
+            echo "candidate_${N}=${PROXY} city=${CITY} http=${HTTP:-000} size=${SIZE:-0}" >> summary.txt
+            if [ "${HTTP:-000}" = "200" ] && python3 - "${OUT}.body" <<'PY'
+          import sys
+          b=open(sys.argv[1],'rb').read(4096)
+          low=b.lstrip().lower()
+          # Reject portal/error HTML and accept plausible delimited text only.
+          if low.startswith(b'<!doctype') or low.startswith(b'<html') or b'<title>403' in low:
+              raise SystemExit(1)
+          ok=(b';' in b or b',' in b or b'\t' in b) and len(b)>20
+          raise SystemExit(0 if ok else 1)
+          PY
+            then
+              cp "${OUT}.body" current_2026_07.csv
+              cp "${OUT}.headers" current_2026_07.headers
+              cp "${OUT}.meta" current_2026_07.meta
+              echo "selected_proxy=${PROXY}" >> summary.txt
+              FOUND=1
+              break
+            fi
+          done < proxy_urls.txt
+
+          if [ "$FOUND" -ne 1 ]; then
+            echo 'download_gate=NO_VALID_BYTES' >> summary.txt
+            cat summary.txt
+            exit 0
+          fi
+
+          sha256sum current_2026_07.csv | tee current_2026_07.sha256 >> summary.txt
+          stat -c 'byte_size=%s' current_2026_07.csv >> summary.txt
+          python3 - <<'PY' | tee analysis.json >> summary.txt
+          import csv,hashlib,io,json,re
+          from pathlib import Path
+          p=Path('current_2026_07.csv'); b=p.read_bytes()
+          enc=None; text=None
+          for e in ('utf-8-sig','utf-8','cp1251'):
+              try: text=b.decode(e); enc=e; break
+              except UnicodeDecodeError: pass
+          if text is None: raise SystemExit('encoding failure')
+          sample='\n'.join(text.splitlines()[:20])
+          try: dialect=csv.Sniffer().sniff(sample,delimiters=',;\t|')
+          except Exception:
+              class D: delimiter=';'
+              dialect=D()
+          rows=list(csv.reader(io.StringIO(text),delimiter=dialect.delimiter))
+          nonempty=[r for r in rows if any(c.strip() for c in r)]
+          header=nonempty[0] if nonempty else []
+          widths={len(r) for r in nonempty[:1000]}
+          result={
+            'sha256':hashlib.sha256(b).hexdigest(), 'bytes':len(b), 'encoding':enc,
+            'delimiter':dialect.delimiter, 'rows_total_including_header':len(nonempty),
+            'data_rows':max(0,len(nonempty)-1), 'header':header, 'sample_widths':sorted(widths),
+            'first_rows':nonempty[:4]
+          }
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+          echo 'download_gate=BYTES_RECOVERED' >> summary.txt
+          echo '=== SUMMARY ==='
           cat summary.txt
+
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bulgaria-egov-one-shot-live-api
+          name: bulgaria-current-localisation-units-2026-07
           path: evidence/
           if-no-files-found: error
           retention-days: 1
