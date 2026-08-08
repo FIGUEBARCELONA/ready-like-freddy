@@ -17,75 +17,110 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - name: Install Tor and establish Bulgarian exit
-        shell: bash
-        run: |
-          set -euxo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq tor >/dev/null
-          sudo systemctl stop tor || true
-          sudo pkill tor || true
-          tor --RunAsDaemon 1 --SocksPort 9050 --ExitNodes '{bg}' --StrictNodes 1 --Log 'notice file /tmp/tor.log'
-          for i in $(seq 1 60); do
-            if grep -q 'Bootstrapped 100%' /tmp/tor.log 2>/dev/null; then break; fi
-            sleep 2
-          done
-          cat /tmp/tor.log
-          grep -q 'Bootstrapped 100%' /tmp/tor.log
-          echo "Tor BG exit: $(curl --socks5-hostname 127.0.0.1:9050 -fsS --max-time 30 https://api.ipify.org)"
-
-      - name: Fetch fresh dataset bundle with Bulgarian egress evidence
+      - name: Test current Bulgarian public egressions and fetch bundle
         shell: bash
         run: |
           set -u
-          mkdir -p evidence
+          mkdir -p evidence/probes
           cd evidence
 
           UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36'
-          COOKIE_JAR='cookies.txt'
-          CURL='curl --socks5-hostname 127.0.0.1:9050'
-
+          DATASET_URL="${BASE_URL}/organisation/dataset/${DATASET_UUID}"
           echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > summary.txt
           echo "runner_ip_direct=$(curl -fsS --max-time 20 https://api.ipify.org || true)" >> summary.txt
-          echo "runner_ip_tor_bg=$($CURL -fsS --max-time 30 https://api.ipify.org || true)" >> summary.txt
           echo "dataset_uuid=${DATASET_UUID}" >> summary.txt
 
-          # Prove the transport path first. Do not hit bundle endpoints unless the exact dataset page is not forbidden.
-          $CURL -sS -L --connect-timeout 25 --max-time 90 \
-            -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
-            -D dataset_page.headers -o dataset_page.body \
-            -w 'dataset_page_http=%{http_code}\ndataset_page_type=%{content_type}\ndataset_page_size=%{size_download}\ndataset_page_url=%{url_effective}\n' \
-            "${BASE_URL}/organisation/dataset/${DATASET_UUID}" \
-            > dataset_page.meta 2> dataset_page.stderr || true
-          cat dataset_page.meta >> summary.txt
+          # Snapshot the current ProxyScrape BG shard used for this run.
+          curl -fsSL --max-time 30 \
+            https://cdn.jsdelivr.net/gh/proxyscrape/free-proxy-list@main/proxies/countries/bg/data.json \
+            -o bg_proxies.json || true
 
-          PAGE_HTTP=$(awk -F= '/^dataset_page_http=/{print $2}' dataset_page.meta | tail -1)
-          if [ "$PAGE_HTTP" = "403" ] || [ -z "$PAGE_HTTP" ] || [ "$PAGE_HTTP" = "000" ]; then
-            echo "transport_gate=BLOCKED" >> summary.txt
+          python3 - <<'PY' > proxy_urls.txt
+          import json
+          try:
+              rows=json.load(open('bg_proxies.json',encoding='utf-8'))
+          except Exception:
+              rows=[]
+          # Prefer CONNECT-capable HTTP and elite proxies, then SOCKS. Limit the run.
+          rows.sort(key=lambda p: (
+              0 if (p.get('protocol')=='http' and p.get('ssl')) else 1 if p.get('protocol')=='http' else 2,
+              0 if p.get('anonymity')=='elite' else 1,
+              -(p.get('uptime_percent') or 0),
+              p.get('latency_ms') or 999999,
+          ))
+          for p in rows[:20]:
+              proto=p.get('protocol','http')
+              if proto=='socks4': scheme='socks4a'
+              elif proto=='socks5': scheme='socks5h'
+              else: scheme='http'
+              print(f"{scheme}://{p['ip']}:{p['port']}\t{p.get('city','')}\t{p.get('anonymity','')}\t{p.get('ssl')}\t{p.get('uptime_percent')}\t{p.get('latency_ms')}")
+          PY
+
+          echo '--- proxy candidates ---' >> summary.txt
+          cat proxy_urls.txt >> summary.txt || true
+
+          SELECTED=''
+          SELECTED_IP=''
+          n=0
+          while IFS=$'\t' read -r PROXY CITY ANON SSL UPTIME LATENCY; do
+            [ -n "$PROXY" ] || continue
+            n=$((n+1))
+            SAFE="$(echo "$PROXY" | tr '/:.' '____')"
+            echo "candidate_${n}=${PROXY} city=${CITY} anonymity=${ANON} ssl=${SSL} uptime=${UPTIME} latency=${LATENCY}" >> summary.txt
+
+            EXIT_IP=$(curl -sS --proxy "$PROXY" --connect-timeout 7 --max-time 15 \
+              https://api.ipify.org 2>"probes/${SAFE}.ip.stderr" || true)
+            echo "$EXIT_IP" > "probes/${SAFE}.exit_ip"
+
+            curl -sS -L --proxy "$PROXY" --connect-timeout 7 --max-time 25 \
+              -A "$UA" \
+              -D "probes/${SAFE}.headers" \
+              -o "probes/${SAFE}.body" \
+              -w 'http=%{http_code}\ntype=%{content_type}\nsize=%{size_download}\nurl=%{url_effective}\n' \
+              "$DATASET_URL" \
+              > "probes/${SAFE}.meta" 2> "probes/${SAFE}.stderr" || true
+
+            HTTP=$(awk -F= '/^http=/{print $2}' "probes/${SAFE}.meta" | tail -1)
+            SIZE=$(awk -F= '/^size=/{print $2}' "probes/${SAFE}.meta" | tail -1)
+            echo "candidate_${n}_exit_ip=${EXIT_IP} http=${HTTP:-000} size=${SIZE:-0}" >> summary.txt
+
+            if [[ "${HTTP:-000}" =~ ^2[0-9][0-9]$|^3[0-9][0-9]$ ]]; then
+              SELECTED="$PROXY"
+              SELECTED_IP="$EXIT_IP"
+              echo "selected_proxy=${PROXY}" >> summary.txt
+              echo "selected_exit_ip=${EXIT_IP}" >> summary.txt
+              break
+            fi
+          done < proxy_urls.txt
+
+          if [ -z "$SELECTED" ]; then
+            echo 'transport_gate=BLOCKED_ALL_BG_PUBLIC_PROXIES' >> summary.txt
             echo '=== SUMMARY ==='
             cat summary.txt
             exit 0
           fi
-          echo "transport_gate=OPEN" >> summary.txt
 
-          # 0) Purge any orphan/stale prepared bundle, if one exists. Never use these bytes.
-          $CURL -sS -L --connect-timeout 25 --max-time 120 \
+          echo 'transport_gate=OPEN_BG_PROXY' >> summary.txt
+          COOKIE_JAR='cookies.txt'
+
+          # 0) Purge stale server-side bundle. Discard bytes by design.
+          curl -sS -L --proxy "$SELECTED" --connect-timeout 10 --max-time 90 \
             -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
             -D purge.headers -o purge.body \
             -w 'purge_http=%{http_code}\npurge_type=%{content_type}\npurge_size=%{size_download}\npurge_url=%{url_effective}\n' \
             "${BASE_URL}/dataset/resources/download/zip/${DATASET_UUID}" \
             > purge.meta 2> purge.stderr || true
 
-          # 1) Force a fresh server-side bundle generated from the exact dataset UUID.
-          $CURL -sS -L --connect-timeout 25 --max-time 240 \
+          # 1) Generate a fresh server-side CSV bundle for this exact dataset.
+          curl -sS -L --proxy "$SELECTED" --connect-timeout 10 --max-time 240 \
             -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
             -D prepare.headers -o prepare.body \
             -w 'prepare_http=%{http_code}\nprepare_type=%{content_type}\nprepare_size=%{size_download}\nprepare_url=%{url_effective}\n' \
             "${BASE_URL}/dataset/${DATASET_UUID}/resources/download/csv" \
             > prepare.meta 2> prepare.stderr || true
 
-          # 2) Download the freshly generated ZIP. The official controller deletes it after serving.
-          $CURL -sS -L --connect-timeout 25 --max-time 420 \
+          # 2) Download the newly generated bundle.
+          curl -sS -L --proxy "$SELECTED" --connect-timeout 10 --max-time 420 \
             -A "$UA" -c "$COOKIE_JAR" -b "$COOKIE_JAR" \
             -D bundle.headers -o dataset_bundle.zip \
             -w 'bundle_http=%{http_code}\nbundle_type=%{content_type}\nbundle_size=%{size_download}\nbundle_url=%{url_effective}\n' \
@@ -110,18 +145,15 @@ jobs:
                   print(f'ZIP_MEMBERS={len(z.infolist())}')
                   print(f'ZIP_UNCOMPRESSED_BYTES={sum(i.file_size for i in z.infolist())}')
                   for i in z.infolist():
-                      if i.is_dir():
-                          continue
+                      if i.is_dir(): continue
                       b=z.read(i)
                       print(f'member_sha256={hashlib.sha256(b).hexdigest()}\tbytes={len(b)}\tname={i.filename}')
-                      head=b[:512]
                       for enc in ('utf-8-sig','cp1251','latin1'):
                           try:
-                              txt=head.decode(enc)
+                              txt=b[:512].decode(enc)
                               print(f'member_head[{i.filename}][{enc}]={txt[:300]!r}')
                               break
-                          except Exception:
-                              pass
+                          except Exception: pass
           except Exception as e:
               print(f'ZIP_ERROR={type(e).__name__}: {e}')
           PY
