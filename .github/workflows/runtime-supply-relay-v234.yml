@@ -15,20 +15,29 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - name: Acquire exact official WordPress 7.0.3
+      - name: Acquire and verify WordPress 7.0.3
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p supply
           url='https://wordpress.org/wordpress-7.0.3.zip'
           curl --fail --location --retry 4 --retry-all-errors "$url" -o supply/wordpress-7.0.3.zip
-          test "$(stat -c '%s' supply/wordpress-7.0.3.zip)" = '31436439'
-          printf '%s  %s\n' 'b76609b2cdc7b9e9b7dbda951a0cb05e' 'supply/wordpress-7.0.3.zip' | md5sum -c -
-          printf '%s  %s\n' 'ccfd5109f9f87d7639a874e19bcac717b6ad1795e' 'supply/wordpress-7.0.3.zip' | sha1sum -c -
-          unzip -tq supply/wordpress-7.0.3.zip
-          unzip -p supply/wordpress-7.0.3.zip wordpress/wp-includes/version.php | grep -Eq "\\$wp_version[[:space:]]*=[[:space:]]*'7\\.0\\.3'"
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,re,zipfile
+          p=Path('supply/wordpress-7.0.3.zip')
+          assert p.stat().st_size == 31436439
+          b=p.read_bytes()
+          assert hashlib.md5(b).hexdigest() == 'b76609b2cdc7b9e9b7dbda951a0cb05e'
+          assert hashlib.sha1(b).hexdigest() == 'ccfd5109f9f87d7639a874e19bcac717b6ad1795e'
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              v=z.read('wordpress/wp-includes/version.php').decode('utf-8','replace')
+              assert re.search(r"\$wp_version\s*=\s*['\"]7\.0\.3['\"]\s*;",v)
+              z.getinfo('wordpress/wp-load.php')
+          Path('supply/SHA256SUMS.txt').write_text(f"{hashlib.sha256(b).hexdigest()}  {p.name}\n")
+          PY
           printf '%s\n' "$url" > supply/SOURCE_URL.txt
-          sha256sum supply/wordpress-7.0.3.zip > supply/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
           name: rlf-v234-wordpress-7.0.3-official
@@ -41,19 +50,27 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - name: Acquire exact official WooCommerce 11.0.1
+      - name: Acquire and verify WooCommerce 11.0.1
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p supply
           url='https://github.com/woocommerce/woocommerce/releases/download/11.0.1/woocommerce.zip'
           curl --fail --location --retry 4 --retry-all-errors "$url" -o supply/woocommerce.11.0.1.zip
-          test "$(stat -c '%s' supply/woocommerce.11.0.1.zip)" = '20521356'
-          printf '%s  %s\n' '88837ea0504544fdb835078d39c68c6c4abde00cdb4af8f67027255ee8ae494c' 'supply/woocommerce.11.0.1.zip' | sha256sum -c -
-          unzip -tq supply/woocommerce.11.0.1.zip
-          unzip -p supply/woocommerce.11.0.1.zip woocommerce/woocommerce.php | grep -Eq '^[[:space:]]*\\*?[[:space:]]*Version:[[:space:]]*11\\.0\\.1[[:space:]]*$'
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,re,zipfile
+          p=Path('supply/woocommerce.11.0.1.zip')
+          assert p.stat().st_size == 20521356
+          b=p.read_bytes()
+          assert hashlib.sha256(b).hexdigest() == '88837ea0504544fdb835078d39c68c6c4abde00cdb4af8f67027255ee8ae494c'
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              plugin=z.read('woocommerce/woocommerce.php').decode('utf-8','replace')
+              assert re.search(r'(?mi)^\s*\*?\s*Version:\s*11\.0\.1\s*$',plugin)
+          Path('supply/SHA256SUMS.txt').write_text(f"{hashlib.sha256(b).hexdigest()}  {p.name}\n")
+          PY
           printf '%s\n' "$url" > supply/SOURCE_URL.txt
-          sha256sum supply/woocommerce.11.0.1.zip > supply/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
           name: rlf-v234-woocommerce-11.0.1-official
@@ -66,7 +83,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - name: Acquire exact official MariaDB 11.8.8 x86_64
+      - name: Acquire and verify MariaDB 11.8.8 x86_64
         shell: bash
         run: |
           set -euo pipefail
@@ -74,14 +91,25 @@ jobs:
           file='mariadb-11.8.8-linux-systemd-x86_64.tar.gz'
           url="https://downloads.mariadb.org/rest-api/mariadb/11.8.8/${file}"
           curl --fail --location --retry 4 --retry-all-errors "$url" -o "supply/${file}"
-          test "$(stat -c '%s' "supply/${file}")" = '429017672'
-          printf '%s  %s\n' 'fbd4e8d05946c974b0560c94f01ce4c687291b6528074c2e001fb8f35c0d2762' "supply/${file}" | sha256sum -c -
-          tar -tzf "supply/${file}" > supply/TAR_CONTENTS.txt
-          grep -Eq 'mariadb-11\\.8\\.8[^/]*/bin/(mariadbd|mysqld)$' supply/TAR_CONTENTS.txt
-          grep -Eq 'mariadb-11\\.8\\.8[^/]*/bin/(mariadb|mysql)$' supply/TAR_CONTENTS.txt
-          grep -Eq 'mariadb-11\\.8\\.8[^/]*/(scripts|bin)/(mariadb-install-db|mysql_install_db)$' supply/TAR_CONTENTS.txt
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,tarfile
+          p=Path('supply/mariadb-11.8.8-linux-systemd-x86_64.tar.gz')
+          assert p.stat().st_size == 429017672
+          h=hashlib.sha256()
+          with p.open('rb') as f:
+              for chunk in iter(lambda:f.read(1024*1024),b''): h.update(chunk)
+          assert h.hexdigest() == 'fbd4e8d05946c974b0560c94f01ce4c687291b6528074c2e001fb8f35c0d2762'
+          with tarfile.open(p,'r:gz') as t:
+              names=[n.lstrip('./') for n in t.getnames()]
+          prefix='mariadb-11.8.8'
+          assert any(n==prefix or n.startswith(prefix+'/') or n.startswith(prefix+'-') for n in names)
+          assert any(n.endswith('/bin/mariadbd') or n.endswith('/bin/mysqld') for n in names)
+          assert any(n.endswith('/bin/mariadb') or n.endswith('/bin/mysql') for n in names)
+          assert any(n.endswith('/scripts/mariadb-install-db') or n.endswith('/bin/mariadb-install-db') or n.endswith('/scripts/mysql_install_db') or n.endswith('/bin/mysql_install_db') for n in names)
+          Path('supply/SHA256SUMS.txt').write_text(f"{h.hexdigest()}  {p.name}\n")
+          PY
           printf '%s\n' "$url" > supply/SOURCE_URL.txt
-          sha256sum "supply/${file}" > supply/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
           name: rlf-v234-mariadb-11.8.8-linux-x64-official
@@ -94,7 +122,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - name: Acquire exact official WordPress 7.0.3 CA and ES language packs
+      - name: Acquire and verify WordPress 7.0.3 CA and ES language packs
         shell: bash
         run: |
           set -euo pipefail
@@ -103,53 +131,25 @@ jobs:
           es='https://downloads.wordpress.org/translation/core/7.0.3/es_ES.zip'
           curl --fail --location --retry 4 --retry-all-errors "$ca" -o supply/wordpress-core-7.0.3-ca.zip
           curl --fail --location --retry 4 --retry-all-errors "$es" -o supply/wordpress-core-7.0.3-es_ES.zip
-          unzip -tq supply/wordpress-core-7.0.3-ca.zip
-          unzip -tq supply/wordpress-core-7.0.3-es_ES.zip
-          unzip -Z1 supply/wordpress-core-7.0.3-ca.zip > supply/ca-contents.txt
-          unzip -Z1 supply/wordpress-core-7.0.3-es_ES.zip > supply/es_ES-contents.txt
-          grep -Eq '(^|/)ca\\.(mo|po)$' supply/ca-contents.txt
-          grep -Eq '(^|/)es_ES\\.(mo|po)$' supply/es_ES-contents.txt
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,zipfile
+          rows=[('ca','wordpress-core-7.0.3-ca.zip'),('es_ES','wordpress-core-7.0.3-es_ES.zip')]
+          sums=[]
+          for locale,name in rows:
+              p=Path('supply')/name
+              with zipfile.ZipFile(p) as z:
+                  assert z.testzip() is None
+                  names=[Path(n).name for n in z.namelist() if not n.endswith('/')]
+              assert f'{locale}.mo' in names or f'{locale}.po' in names, (locale,names[:30])
+              h=hashlib.sha256(p.read_bytes()).hexdigest()
+              sums.append(f'{h}  {p.name}')
+          Path('supply/SHA256SUMS.txt').write_text('\n'.join(sums)+'\n')
+          PY
           printf '%s\n%s\n' "$ca" "$es" > supply/SOURCE_URLS.txt
-          sha256sum supply/wordpress-core-7.0.3-ca.zip supply/wordpress-core-7.0.3-es_ES.zip > supply/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
           name: rlf-v234-wordpress-7.0.3-languages-ca-es_ES-official
-          path: supply
-          if-no-files-found: error
-          retention-days: 1
-          compression-level: 0
-
-  php_mysql:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - name: Acquire exact official Debian php8.4-mysql package
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p supply
-          file='php8.4-mysql_8.4.23-1~deb13u1_amd64.deb'
-          url="https://ftp.debian.org/debian/pool/main/p/php8.4/${file}"
-          curl --fail --location --retry 4 --retry-all-errors "$url" -o "supply/${file}"
-          test "$(stat -c '%s' "supply/${file}")" = '119688'
-          test "$(dpkg-deb -f "supply/${file}" Package)" = 'php8.4-mysql'
-          test "$(dpkg-deb -f "supply/${file}" Version)" = '8.4.23-1~deb13u1'
-          test "$(dpkg-deb -f "supply/${file}" Architecture)" = 'amd64'
-          dpkg-deb -c "supply/${file}" > supply/PAYLOAD.txt
-          for required in \
-            './usr/lib/php/20240924/mysqli.so' \
-            './usr/lib/php/20240924/mysqlnd.so' \
-            './usr/lib/php/20240924/pdo_mysql.so' \
-            './usr/share/php8.4-mysql/mysql/mysqli.ini' \
-            './usr/share/php8.4-mysql/mysql/mysqlnd.ini' \
-            './usr/share/php8.4-mysql/mysql/pdo_mysql.ini'; do
-            grep -Fq "$required" supply/PAYLOAD.txt
-          done
-          printf '%s\n' "$url" > supply/SOURCE_URL.txt
-          sha256sum "supply/${file}" > supply/SHA256SUMS.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: rlf-v234-php8.4-mysql-8.4.23-debian13-amd64-official
           path: supply
           if-no-files-found: error
           retention-days: 1
