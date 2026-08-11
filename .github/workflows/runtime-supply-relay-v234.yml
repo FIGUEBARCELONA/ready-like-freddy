@@ -1,0 +1,38 @@
+name: RLF v2.34 runtime supply relay
+
+on:
+  push:
+    branches:
+      - runtime-supply-relay-20260811
+    paths:
+      - '.github/workflows/runtime-supply-relay-v234.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  wpcli:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Acquire exact official WP-CLI 2.12.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p supply
+          url='https://github.com/wp-cli/wp-cli/releases/download/v2.12.0/wp-cli-2.12.0.phar'
+          curl --fail --location --retry 4 --retry-all-errors "$url" -o supply/wp-cli.phar
+          test "$(stat -c '%s' supply/wp-cli.phar)" = '7142777'
+          printf '%s  %s\n' 'ce34ddd838f7351d6759068d09793f26755463b4a4610a5a5c0a97b68220d85c' 'supply/wp-cli.phar' | sha256sum -c -
+          test "$(php supply/wp-cli.phar --version | awk '{print $2}')" = '2.12.0'
+          printf '%s\n' "$url" > supply/SOURCE_URL.txt
+          sha256sum supply/wp-cli.phar > supply/SHA256SUMS.txt
+          stat -c '%n %s' supply/wp-cli.phar > supply/SIZES.txt
+      - name: Upload verified WP-CLI asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-v234-wpcli-2.12.0-official
+          path: supply
+          if-no-files-found: error
+          retention-days: 2
+          compression-level: 0
