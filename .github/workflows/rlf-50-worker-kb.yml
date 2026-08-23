@@ -33,7 +33,7 @@ env:
 
 concurrency:
   group: rlf-kb-50-workers-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   prepare:
