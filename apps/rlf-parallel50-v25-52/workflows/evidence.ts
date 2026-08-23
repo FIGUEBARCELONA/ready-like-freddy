@@ -13,22 +13,35 @@ async function fetchResource(url:string):Promise<Resource> {
   try {
     const response=await fetch(url,{redirect:'follow',signal:AbortSignal.timeout(14000),headers:{accept:'text/html,application/json,application/xml;q=.9,*/*;q=.8','accept-language':'en-US,en;q=.8','user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36'}});
     const bytes=new Uint8Array(await response.arrayBuffer());
-    const raw=new TextDecoder().decode(bytes);
-    return {url:canonical(response.url||url),status:response.status,contentType:response.headers.get('content-type'),bytes,text:strip(raw).slice(0,90000),raw:raw.slice(0,160000),sha256:hash(bytes),length:bytes.byteLength,error:null};
+    const decoded=new TextDecoder().decode(bytes);
+    return {url:canonical(response.url||url),status:response.status,contentType:response.headers.get('content-type'),bytes,text:strip(decoded).slice(0,110000),raw:decoded.slice(0,260000),sha256:hash(bytes),length:bytes.byteLength,error:null};
   } catch(error) {
     return {url:canonical(url),status:null,contentType:null,bytes:new Uint8Array(),text:'',raw:'',sha256:null,length:0,error:error instanceof Error?error.name:'FETCH_ERROR'};
   }
 }
 
 function legalPaths(input:DiscoverInput) {
-  const common=['/policies/terms-of-service','/pages/contact','/contact'];
+  const common=['/pages/impressum','/impressum','/pages/legal-notice','/policies/legal-notice','/legal-notice','/policies/terms-of-service','/terms-and-conditions','/terms','/pages/contact','/contact'];
   const byCountry:Record<string,string[]>={
-    DE:['/pages/impressum','/impressum','/policies/legal-notice'],AT:['/pages/impressum','/impressum','/policies/legal-notice'],
-    FR:['/pages/mentions-legales','/mentions-legales','/policies/legal-notice'],BE:['/pages/mentions-legales','/mentions-legales','/policies/legal-notice'],LU:['/pages/mentions-legales','/mentions-legales'],
-    ES:['/pages/aviso-legal','/aviso-legal','/policies/legal-notice'],IT:['/pages/contatti','/contatti','/policies/terms-of-service'],PT:['/pages/contactos','/contactos','/policies/terms-of-service'],
-    PL:['/pages/regulamin','/regulamin','/policies/terms-of-service'],RO:['/policies/terms-of-service','/pages/contact','/contact'],NL:['/pages/contact','/policies/terms-of-service'],
+    DE:['/pages/impressum','/impressum','/anbieterkennzeichnung'],AT:['/pages/impressum','/impressum','/firmenbuch'],
+    FR:['/pages/mentions-legales','/mentions-legales','/conditions-generales-de-vente'],BE:['/pages/mentions-legales','/mentions-legales','/algemene-voorwaarden'],LU:['/pages/mentions-legales','/mentions-legales'],
+    ES:['/pages/aviso-legal','/aviso-legal','/terminos-y-condiciones'],IT:['/pages/contatti','/contatti','/note-legali','/termini-e-condizioni'],PT:['/pages/contactos','/contactos','/termos-e-condicoes'],
+    PL:['/pages/regulamin','/regulamin','/kontakt'],RO:['/policies/terms-of-service','/termeni-si-conditii','/pages/contact','/contact'],NL:['/pages/contact','/algemene-voorwaarden','/over-ons'],
+    SE:['/pages/kontakt','/pages/frakt-retur','/kontakt','/kopvillkor'],DK:['/pages/kontakt','/handelsbetingelser','/kontakt'],FI:['/pages/yhteystiedot','/toimitusehdot'],
+    CZ:['/obchodni-podminky','/kontakt'],SK:['/obchodne-podmienky','/kontakt'],HU:['/altalanos-szerzodesi-feltetelek','/kapcsolat'],
+    SI:['/splosni-pogoji','/kontakt'],HR:['/uvjeti-poslovanja','/kontakt'],EE:['/muugitingimused','/kontakt'],LV:['/noteikumi','/kontakti'],LT:['/taisykles','/kontaktai'],
+    GR:['/oroi-xrisis','/epikoinonia'],BG:['/obshti-usloviya','/kontakti'],IE:['/terms-and-conditions','/contact-us'],MT:['/terms-and-conditions','/contact'],CY:['/terms-and-conditions','/contact-us'],
   };
   return [...(byCountry[input.lane.countryCode]??[]),...common].filter((value,index,array)=>array.indexOf(value)===index);
+}
+
+function linkedLegalPaths(raw:string) {
+  const output:string[]=[];
+  for(const match of raw.matchAll(/href\s*=\s*["']([^"']+)["']/gi)) {
+    const href=match[1];
+    if(/impressum|legal|mentions-legales|aviso-legal|terms|conditions|regulamin|kontakt|contact|retur|refund|company|about/i.test(href)) output.push(href);
+  }
+  return [...new Set(output)].slice(0,12);
 }
 
 export function evidence(resource:Resource,role:EvidenceRecord['role']):EvidenceRecord {
@@ -49,7 +62,7 @@ export async function fetchBundle(result:SearchItem,input:DiscoverInput):Promise
     const suggest=new URL('/search/suggest.json',rootUrl);
     suggest.searchParams.set('q','Fred Perry');
     suggest.searchParams.set('resources[type]','product');
-    suggest.searchParams.set('resources[limit]','12');
+    suggest.searchParams.set('resources[limit]','20');
     shopifyResource=await fetchResource(suggest.toString());
     if(shopifyResource.status===200) {
       try {
@@ -64,13 +77,18 @@ export async function fetchBundle(result:SearchItem,input:DiscoverInput):Promise
     }
   }
 
-  const baseText=`${target.text} ${home?.text??''}`.toLowerCase();
   let legal:Resource|null=null;
-  if(!LEGAL.some(term=>baseText.includes(term))) {
-    for(const path of legalPaths(input).slice(0,5)) {
-      const resource=await fetchResource(new URL(path,rootUrl).toString());
-      if(resource.status===200&&resource.length>250) {legal=resource;break;}
-    }
+  const candidates=[...linkedLegalPaths(combinedRaw),...legalPaths(input)];
+  const seen=new Set<string>();
+  for(const candidate of candidates.slice(0,10)) {
+    let url:string;
+    try {url=new URL(candidate,rootUrl).toString();} catch {continue;}
+    if(seen.has(url)) continue;
+    seen.add(url);
+    const resource=await fetchResource(url);
+    const legalHits=LEGAL.filter(term=>resource.text.toLowerCase().includes(term)).length;
+    if(resource.status===200&&resource.length>300&&(legalHits>0||/impressum|legal|terms|conditions|contact|kontakt|retur/i.test(resource.url))) {legal=resource;break;}
   }
+
   return {target,home,legal,shopify:shopifyResource,shopifyProducts};
 }
