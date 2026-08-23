@@ -1,0 +1,60 @@
+name: TEMP RLF label fetch v6.17 PR2
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Fetch verified originals and recovery probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/original evidence/pages evidence/reports evidence/probes
+          UA='Mozilla/5.0 (compatible; RLF-Label-Audit/6.17; +https://github.com/FIGUEBARCELONA/ready-like-freddy)'
+          fetch_required() {
+            curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 \
+              --user-agent "$UA" --header 'Accept: */*' "$1" --output "$2"
+          }
+          probe() {
+            local url="$1" name="$2"
+            curl --location --connect-timeout 20 --max-time 120 --user-agent "$UA" \
+              --dump-header "evidence/probes/${name}.headers" --output "evidence/probes/${name}.body" \
+              --write-out '%{http_code}\n%{url_effective}\n%{content_type}\n%{size_download}\n' "$url" \
+              > "evidence/probes/${name}.meta" || true
+          }
+          fetch_required 'https://i.etsystatic.com/16508531/r/il/4849ca/7718745157/il_794xN.7718745157_7aji.jpg' 'evidence/original/RLF-EXT-018_neck.jpg'
+          fetch_required 'https://i.etsystatic.com/16508531/r/il/49f133/7718745109/il_794xN.7718745109_rejz.jpg' 'evidence/original/RLF-EXT-018_technical.jpg'
+          fetch_required 'https://i.etsystatic.com/16508531/r/il/9478c2/7670789328/il_794xN.7670789328_t0cw.jpg' 'evidence/original/RLF-EXT-018_composition.jpg'
+          probe 'https://wearethinkvintage.com/cdn/shop/files/8de2b333-2995-4810-bbd5-2c2904671e26.jpg?v=1757677798&width=1080' 'CAND-079_ALT_001'
+          probe 'https://wearethinkvintage.com/cdn/shop/files/794fd78c-b778-4bac-8d9d-2672ee633366.jpg?v=1757677797&width=1080' 'CAND-079_ALT_002'
+          probe 'https://wearethinkvintage.com/cdn/shop/files/adda00ce-4f5e-411b-b58c-e072957d0d6e.jpg?v=1757677798&width=1080' 'CAND-079_ALT_003'
+          probe 'https://wearethinkvintage.com/products/fred-perry-pleated-tennis-skirt' 'CAND-079_ALT_source'
+          probe 'https://www.etsy.com/uk/listing/4451707172/fred-perry-reissues-knitted-polo-black' 'RLF-EXT-018_source'
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME_AND_DIMENSIONS.txt
+          python - <<'PY'
+          import json, pathlib, hashlib
+          root=pathlib.Path('evidence')
+          rows=[]
+          for p in sorted(root.rglob('*')):
+              if not p.is_file() or p.name=='manifest.json':
+                  continue
+              b=p.read_bytes()
+              rows.append({'path':p.as_posix(),'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v617-fetch-v2','files':rows},indent=2),encoding='utf-8')
+          PY
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-label-evidence-v617-pr2
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
