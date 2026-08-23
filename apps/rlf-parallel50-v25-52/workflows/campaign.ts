@@ -77,7 +77,7 @@ export async function parallel50Campaign(input:CampaignInput):Promise<CampaignRe
     allResults.push(...await Promise.all(
       LANES.map(lane=>discoverLaneCycle({lane,cycle,maxCandidates:input.maxCandidatesPerLaneCycle})),
     ));
-    if(cycle<input.cycles-1) await sleep(input.interval);
+    if(cycle<input.cycles-1) await sleep(input.intervalMs);
   }
   return finalize(input.campaignId,startedAt,await timestampStep(),input.cycles,allResults);
 }
