@@ -17,31 +17,35 @@ jobs:
 
       - name: Prepare browser automation
         run: |
+          set -euo pipefail
           mkdir -p downloaded diagnostics
           npm init -y >/dev/null 2>&1
           npm install playwright@1.55.0
           npx playwright install chromium --with-deps
 
-      - name: Fetch package
+      - name: Open public UploadNow share and recover package
         env:
-          TARGET_URL: https://uploadnow.io/files/mFyDB1H
+          TARGET_URL: https://uploadnow.io/f/mFyDB1H
         run: node tools/fetch-uploadnow.cjs
 
-      - name: Inventory and hash downloaded bytes
+      - name: Inventory and hash recovered bytes
         if: always()
         run: |
+          set -euo pipefail
           find downloaded -type f -printf '%P\t%s bytes\n' | sort | tee diagnostics/download-inventory.tsv
           if find downloaded -type f -print -quit | grep -q .; then
             find downloaded -type f -print0 | sort -z | xargs -0 sha256sum | tee diagnostics/SHA256SUMS.txt
           fi
+          find diagnostics -type f -printf '%P\t%s bytes\n' | sort > diagnostics/diagnostics-inventory.tsv
 
-      - name: Upload fetched package and diagnostics
+      - name: Upload recovered package and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: uploadnow-mFyDB1H-fetched
+          name: uploadnow-mFyDB1H-public-route-pr
           path: |
             downloaded/**
             diagnostics/**
-          if-no-files-found: warn
-          retention-days: 3
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
