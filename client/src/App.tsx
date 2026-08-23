@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import ExecutionDashboard from "./pages/ExecutionDashboard";
 import DashboardLayout from "./components/DashboardLayout";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ControlSection from "./pages/ControlSection";
@@ -15,6 +16,7 @@ function Router() {
     <DashboardLayout>
       <Switch>
         <Route path={"/"} component={Home} />
+        <Route path={"/execution"} component={ExecutionDashboard} />
         <Route path={"/queue"}>{() => <ControlSection section="queue" />}</Route>
         <Route path={"/partitions"}>{() => <ControlSection section="partitions" />}</Route>
         <Route path={"/cache"}>{() => <ControlSection section="cache" />}</Route>

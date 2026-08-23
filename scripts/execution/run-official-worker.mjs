@@ -1,9 +1,8 @@
-import { appendFile, mkdir } from "node:fs/promises";
+import { appendFile, mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import {
   decodeHtmlEntities,
   extractAttribute,
-  fetchBounded,
   isAllowedUrl,
   normalizeUrl,
   readJson,
@@ -12,6 +11,8 @@ import {
   stripTags,
   writeJson,
 } from "./common.mjs";
+import { extractProductLinkCandidates } from "./product-extraction.mjs";
+import { fetchEvidenceSource } from "./source-transport.mjs";
 
 const args = Object.fromEntries(
   process.argv.slice(2).map(arg => {
@@ -35,72 +36,21 @@ if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
   throw new Error(`Invalid per-worker limit: ${limit}`);
 }
 await mkdir(outDir, { recursive: true });
-const ndjsonPath = `${outDir}/records.ndjson`;
+const recordsPath = `${outDir}/records.ndjson`;
+const productLinksPath = `${outDir}/product-links.ndjson`;
+await writeFile(recordsPath, "", "utf8");
+await writeFile(productLinksPath, "", "utf8");
 const records = [];
+const productLinks = [];
 
-function readerUrlFor(rawUrl) {
-  const url = new URL(rawUrl);
-  return `https://r.jina.ai/http://${url.host}${url.pathname}${url.search}`;
-}
-
-function responseMetadata(response) {
-  return {
-    httpStatus: response.status,
-    finalUrl: response.finalUrl,
-    contentType: response.contentType,
-    sourceBytes: response.body.length,
-    sourceSha256: sha256(response.body),
-  };
-}
-
-function isChallengeResponse(response) {
-  if (![403, 429, 503].includes(response.status)) return false;
-  const sample = response.body.toString("utf8", 0, Math.min(response.body.length, 100_000));
-  return /just a moment|cloudflare|cf-chl|attention required/i.test(sample);
-}
-
-async function fetchEvidenceSource(originUrl) {
-  const direct = await fetchBounded(originUrl, { maxBytes: queue.plan.maxResponseBytes });
-  if (direct.ok) {
-    return {
-      response: direct,
-      sourceTransport: "DIRECT_OFFICIAL_HTTP",
-      sourceFetchUrl: direct.finalUrl,
-      originResponse: null,
-    };
-  }
-
-  if (!isChallengeResponse(direct)) {
-    return {
-      response: direct,
-      sourceTransport: "DIRECT_OFFICIAL_HTTP_BLOCKED",
-      sourceFetchUrl: direct.finalUrl,
-      originResponse: responseMetadata(direct),
-    };
-  }
-
-  const sourceFetchUrl = readerUrlFor(originUrl);
+function assetClassFor(url) {
   try {
-    const reader = await fetchBounded(sourceFetchUrl, {
-      maxBytes: queue.plan.maxResponseBytes,
-      timeoutMs: 60_000,
-    });
-    return {
-      response: reader,
-      sourceTransport: reader.ok
-        ? "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE"
-        : "JINA_READER_TRANSFORM_FAILED",
-      sourceFetchUrl,
-      originResponse: responseMetadata(direct),
-    };
-  } catch (error) {
-    return {
-      response: direct,
-      sourceTransport: "DIRECT_OFFICIAL_HTTP_BLOCKED_READER_FAILED",
-      sourceFetchUrl,
-      originResponse: responseMetadata(direct),
-      fallbackError: error instanceof Error ? error.message : String(error),
-    };
+    const path = new URL(url).pathname.toLowerCase();
+    if (path.includes("/media/catalog/product/")) return "PRODUCT_MEDIA";
+    if (path.includes("/media/")) return "EDITORIAL_OR_SITE_MEDIA";
+    return "PAGE_ASSET";
+  } catch {
+    return "UNKNOWN_ASSET";
   }
 }
 
@@ -136,12 +86,13 @@ function collectImageUrls(content, baseUrl, allowedHosts, isHtml) {
   }
 
   return [...new Set(values)]
-    .slice(0, 40)
+    .slice(0, 250)
     .map(url => ({
       sourceUrl: url,
       rightsStatus: "UNKNOWN",
       ingestionStatus: "NOT_INGESTED",
       hostAllowed: isAllowedUrl(url, allowedHosts),
+      assetClass: assetClassFor(url),
     }));
 }
 
@@ -187,7 +138,9 @@ for (const entry of assignment.urls.slice(0, limit)) {
   const startedAt = new Date().toISOString();
   let record;
   try {
-    const fetched = await fetchEvidenceSource(entry.url);
+    const fetched = await fetchEvidenceSource(entry.url, {
+      maxBytes: queue.plan.maxResponseBytes,
+    });
     const response = fetched.response;
     const content = response.body.toString("utf8");
     const isHtml = /html/i.test(response.contentType) || /<html[\s>]/i.test(content.slice(0, 10_000));
@@ -211,12 +164,12 @@ for (const entry of assignment.urls.slice(0, limit)) {
       ...new Set(
         [
           ...entry.url.toUpperCase().matchAll(
-            /(?:^|[-_/])([A-Z]{1,4}\d{3,6})(?=[-_/?.]|$)/g,
+            /(?:^|[-_/])([A-Z]{1,5}\d{3,6}(?:-[A-Z])?)(?=[-_/?.]|$)/g,
           ),
-          ...textSample.toUpperCase().matchAll(/\b([A-Z]{1,4}\d{3,6})\b/g),
+          ...textSample.toUpperCase().matchAll(/\b([A-Z]{1,5}\d{3,6}(?:-[A-Z])?)\b/g),
         ].map(match => match[1]),
       ),
-    ].slice(0, 30);
+    ].slice(0, 100);
     const modelName =
       typeof product?.name === "string"
         ? product.name.trim()
@@ -237,12 +190,39 @@ for (const entry of assignment.urls.slice(0, limit)) {
       isHtml,
     );
     const fetchOk = response.ok;
+    const pageSha256 = sha256(response.body);
+    const extractedProductLinks = fetchOk
+      ? extractProductLinkCandidates({
+          content,
+          baseUrl: entry.url,
+          isHtml,
+          allowedHosts: queue.allowedHosts ?? ["www.fredperry.com", "fredperry.com"],
+          imageReferences: images,
+          sourcePageUrl: entry.url,
+          sourceSha256: pageSha256,
+          sourceTransport: fetched.sourceTransport,
+          observedAt: startedAt,
+          queueId: queue.queueId,
+          queueSha256: queue.queueSha256,
+          slot,
+        })
+      : [];
+    productLinks.push(...extractedProductLinks);
+    if (extractedProductLinks.length) {
+      await appendFile(
+        productLinksPath,
+        `${extractedProductLinks.map(candidate => JSON.stringify(candidate)).join("\n")}\n`,
+        "utf8",
+      );
+    }
+
     record = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       queueId: queue.queueId,
       queueSha256: queue.queueSha256,
       slot,
       sourceSeedLocale: entry.seedLocale,
+      discoveryMethod: entry.discoveryMethod ?? null,
       requestedUrl: entry.url,
       finalUrl: entry.url,
       canonicalUrl,
@@ -252,7 +232,7 @@ for (const entry of assignment.urls.slice(0, limit)) {
       fetchOk,
       contentType: response.contentType,
       sourceBytes: response.body.length,
-      sourceSha256: sha256(response.body),
+      sourceSha256: pageSha256,
       originResponse: fetched.originResponse,
       fallbackError: fetched.fallbackError ?? null,
       observedAt: startedAt,
@@ -263,8 +243,10 @@ for (const entry of assignment.urls.slice(0, limit)) {
       colourName,
       structuredProductEvidence: Boolean(product),
       imageReferences: images,
+      productLinkCandidateCount: extractedProductLinks.length,
+      productMediaReferenceCount: images.filter(image => image.assetClass === "PRODUCT_MEDIA").length,
       uniquenessStatus: fetchOk
-        ? "CANDIDATE_REQUIRES_DEDUPLICATION"
+        ? "SOURCE_PAGE_REQUIRES_PRODUCT_LEVEL_EXPANSION"
         : "NOT_EVALUATED",
       evidenceStatus: fetchOk
         ? fetched.sourceTransport === "DIRECT_OFFICIAL_HTTP"
@@ -274,7 +256,7 @@ for (const entry of assignment.urls.slice(0, limit)) {
     };
   } catch (error) {
     record = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       queueId: queue.queueId,
       queueSha256: queue.queueSha256,
       slot,
@@ -287,12 +269,13 @@ for (const entry of assignment.urls.slice(0, limit)) {
     };
   }
   records.push(record);
-  await appendFile(ndjsonPath, `${JSON.stringify(record)}\n`, "utf8");
+  await appendFile(recordsPath, `${JSON.stringify(record)}\n`, "utf8");
   await sleep(queue.plan.requestDelayMs ?? 750);
 }
 
+const uniqueProductLinks = new Map(productLinks.map(candidate => [candidate.productUrl, candidate]));
 const summary = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   queueId: queue.queueId,
   queueSha256: queue.queueSha256,
   slot,
@@ -317,6 +300,12 @@ const summary = {
     (sum, record) => sum + (record.imageReferences?.length ?? 0),
     0,
   ),
+  productMediaReferenceCount: records.reduce(
+    (sum, record) => sum + (record.productMediaReferenceCount ?? 0),
+    0,
+  ),
+  productLinkCandidateCount: productLinks.length,
+  uniqueProductUrlCount: uniqueProductLinks.size,
   completedAt: new Date().toISOString(),
 };
 summary.summarySha256 = sha256(Buffer.from(JSON.stringify(summary)));

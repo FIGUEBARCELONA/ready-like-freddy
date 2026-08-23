@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import { executionRouter } from "./routers/executionRouter";
 import { workstreamRouter } from "./routers/workstreamRouter";
 
 export const appRouter = router({
@@ -18,6 +19,7 @@ export const appRouter = router({
     }),
   }),
   workstream: workstreamRouter,
+  execution: executionRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({

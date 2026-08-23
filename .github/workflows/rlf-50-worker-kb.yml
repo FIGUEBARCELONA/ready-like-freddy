@@ -9,18 +9,18 @@ on:
       - 'scripts/execution/**'
       - 'data/execution/rlf-kb-official-seeds.json'
       - 'data/execution/rlf-kb-run-plan.json'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/rlf-50-worker-kb.yml'
-      - 'scripts/execution/**'
-      - 'data/execution/rlf-kb-official-seeds.json'
-      - 'data/execution/rlf-kb-run-plan.json'
+      - 'server/executionStatus.ts'
+      - 'server/routers/workstreamRouter.ts'
+      - 'client/src/pages/WorkstreamView.tsx'
   workflow_dispatch:
     inputs:
       per_worker_limit:
-        description: 'Maximum official pages fetched by each worker'
+        description: 'Maximum official category pages fetched by each discovery worker'
+        required: true
+        default: '5'
+        type: string
+      product_per_worker_limit:
+        description: 'Maximum individual product pages fetched by each product worker'
         required: true
         default: '5'
         type: string
@@ -50,7 +50,7 @@ jobs:
         with:
           node-version: '22'
       - id: queue
-        name: Discover official Fred Perry URLs
+        name: Discover official Fred Perry entry points
         shell: bash
         run: |
           set -euo pipefail
@@ -58,71 +58,22 @@ jobs:
           printf 'queue_sha256=%s\n' "$(node -p "require('./execution/queue/queue.json').queueSha256")" >> "$GITHUB_OUTPUT"
           printf 'queue_id=%s\n' "$(node -p "require('./execution/queue/queue.json').queueId")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: rlf-official-queue
           path: execution/queue
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 14
 
-  worker:
-    name: Worker ${{ matrix.slot }}
+  discovery_worker:
+    name: Discovery ${{ matrix.slot }}
     needs: prepare
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       max-parallel: 50
       matrix:
-        slot:
-          - F01
-          - F02
-          - F03
-          - F04
-          - F05
-          - F06
-          - F07
-          - F08
-          - F09
-          - F10
-          - F11
-          - F12
-          - F13
-          - F14
-          - F15
-          - F16
-          - F17
-          - F18
-          - F19
-          - F20
-          - F21
-          - F22
-          - F23
-          - F24
-          - F25
-          - F26
-          - F27
-          - F28
-          - F29
-          - F30
-          - F31
-          - F32
-          - F33
-          - F34
-          - F35
-          - F36
-          - F37
-          - F38
-          - F39
-          - F40
-          - F41
-          - F42
-          - F43
-          - F44
-          - F45
-          - F46
-          - F47
-          - F48
-          - F49
-          - F50
+        slot: [F01, F02, F03, F04, F05, F06, F07, F08, F09, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33, F34, F35, F36, F37, F38, F39, F40, F41, F42, F43, F44, F45, F46, F47, F48, F49, F50]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -134,7 +85,7 @@ jobs:
         with:
           name: rlf-official-queue
           path: execution/queue
-      - name: Execute factual shard
+      - name: Capture category evidence and extract product links
         shell: bash
         env:
           RLF_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.per_worker_limit || '1' }}
@@ -145,18 +96,22 @@ jobs:
             --queue=execution/queue/queue.json \
             --out=execution/workers/${{ matrix.slot }}
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: rlf-worker-${{ matrix.slot }}
+          name: rlf-discovery-worker-${{ matrix.slot }}
           path: execution/workers/${{ matrix.slot }}
           if-no-files-found: error
           retention-days: 14
 
-  consolidate:
-    name: Consolidate and persist evidence
+  consolidate_discovery:
+    name: Consolidate product URL frontier
     needs:
       - prepare
-      - worker
+      - discovery_worker
     runs-on: ubuntu-24.04
+    outputs:
+      frontier_sha256: ${{ steps.frontier.outputs.frontier_sha256 }}
+      unique_product_urls: ${{ steps.frontier.outputs.unique_product_urls }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -170,50 +125,177 @@ jobs:
           path: execution/queue
       - uses: actions/download-artifact@v4
         with:
-          pattern: rlf-worker-*
+          pattern: rlf-discovery-worker-*
           path: execution/downloaded-workers
-      - name: Consolidate 50 worker outputs
-        run: node scripts/execution/consolidate-worker-results.mjs --input=execution/downloaded-workers --queue=execution/queue/queue.json --out=execution/consolidated
-      - name: Generate SHA-256 evidence manifest
+      - id: frontier
+        name: Consolidate 50 discovery outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/execution/consolidate-worker-results.mjs \
+            --input=execution/downloaded-workers \
+            --queue=execution/queue/queue.json \
+            --out=execution/consolidated
+          printf 'frontier_sha256=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').frontierSha256")" >> "$GITHUB_OUTPUT"
+          printf 'unique_product_urls=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').uniqueProductUrlCount")" >> "$GITHUB_OUTPUT"
+      - name: Generate discovery SHA-256 evidence manifest
         shell: bash
         run: |
           set -euo pipefail
           find execution/queue execution/downloaded-workers execution/consolidated -type f -print0 \
-            | sort -z | xargs -0 sha256sum > execution/EVIDENCE_SHA256SUMS.txt
+            | sort -z | xargs -0 sha256sum > execution/DISCOVERY_EVIDENCE_SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: rlf-kb-official-discovery-${{ github.run_id }}
           path: |
             execution/consolidated
-            execution/EVIDENCE_SHA256SUMS.txt
-          if-no-files-found: error
+            execution/DISCOVERY_EVIDENCE_SHA256SUMS.txt
+          if-no-files-found: warn
           retention-days: 30
-      - name: Assert useful source transport
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-product-frontier
+          path: execution/consolidated/product-frontier.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Assert factual 50-lane discovery and non-empty product frontier
         shell: bash
         run: |
           set -euo pipefail
           node - <<'NODE'
           const manifest = require('./execution/consolidated/manifest.json');
           if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
-            throw new Error('The consolidated manifest does not contain exactly 50 workers');
+            throw new Error('Discovery manifest does not contain exactly 50 workers');
           }
-          if (!manifest.qualityGatePassed || manifest.totals.successfulFetchCount < 1) {
-            throw new Error(`No usable source was captured: ${JSON.stringify(manifest.totals)}`);
+          if (!manifest.qualityGatePassed || manifest.totals.uniqueProductUrlCount < 50) {
+            throw new Error(`Product frontier is insufficient: ${JSON.stringify(manifest.totals)}`);
           }
           NODE
-      - name: Persist compact run manifest in the development branch
-        if: github.event_name != 'pull_request'
+      - name: Persist discovery checkpoint
         shell: bash
         run: |
           set -euo pipefail
+          git pull --rebase origin "${SOURCE_BRANCH}"
           destination="data/execution/runs/${GITHUB_RUN_ID}"
           mkdir -p "$destination"
           cp execution/consolidated/manifest.json "$destination/manifest.json"
           cp execution/consolidated/product-candidates.ndjson "$destination/product-candidates.ndjson"
-          cp execution/consolidated/canonical-duplicate-groups.json "$destination/canonical-duplicate-groups.json"
-          cp execution/EVIDENCE_SHA256SUMS.txt "$destination/EVIDENCE_SHA256SUMS.txt"
+          cp execution/consolidated/product-frontier.json "$destination/product-frontier.json"
+          cp execution/consolidated/duplicate-product-urls.json "$destination/duplicate-product-urls.json"
+          cp execution/DISCOVERY_EVIDENCE_SHA256SUMS.txt "$destination/DISCOVERY_EVIDENCE_SHA256SUMS.txt"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$destination"
-          git commit -m "Persist RLF 50-worker discovery run ${GITHUB_RUN_ID}"
+          git commit -m "Persist RLF product frontier run ${GITHUB_RUN_ID}"
+          git push origin "HEAD:${SOURCE_BRANCH}"
+
+  product_worker:
+    name: Product ${{ matrix.slot }}
+    needs: consolidate_discovery
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix:
+        slot: [F01, F02, F03, F04, F05, F06, F07, F08, F09, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33, F34, F35, F36, F37, F38, F39, F40, F41, F42, F43, F44, F45, F46, F47, F48, F49, F50]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_BRANCH }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: rlf-product-frontier
+          path: execution/product-frontier
+      - name: Capture individual official product page
+        shell: bash
+        env:
+          RLF_PRODUCT_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.product_per_worker_limit || '1' }}
+        run: |
+          set -euo pipefail
+          node scripts/execution/run-product-worker.mjs \
+            --slot=${{ matrix.slot }} \
+            --frontier=execution/product-frontier/product-frontier.json \
+            --out=execution/product-workers/${{ matrix.slot }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rlf-product-worker-${{ matrix.slot }}
+          path: execution/product-workers/${{ matrix.slot }}
+          if-no-files-found: error
+          retention-days: 14
+
+  consolidate_products:
+    name: Consolidate individual product evidence
+    needs:
+      - consolidate_discovery
+      - product_worker
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_BRANCH }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: rlf-product-frontier
+          path: execution/product-frontier
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rlf-product-worker-*
+          path: execution/downloaded-product-workers
+      - name: Consolidate 50 product worker outputs
+        run: |
+          node scripts/execution/consolidate-product-results.mjs \
+            --input=execution/downloaded-product-workers \
+            --frontier=execution/product-frontier/product-frontier.json \
+            --out=execution/products-consolidated
+      - name: Generate product SHA-256 evidence manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          find execution/product-frontier execution/downloaded-product-workers execution/products-consolidated -type f -print0 \
+            | sort -z | xargs -0 sha256sum > execution/PRODUCT_EVIDENCE_SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rlf-kb-product-pages-${{ github.run_id }}
+          path: |
+            execution/products-consolidated
+            execution/PRODUCT_EVIDENCE_SHA256SUMS.txt
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Assert factual 50-lane product capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const manifest = require('./execution/products-consolidated/product-manifest.json');
+          if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
+            throw new Error('Product manifest does not contain exactly 50 workers');
+          }
+          if (!manifest.qualityGatePassed || manifest.totals.successfulProductFetchCount < 50) {
+            throw new Error(`Product capture gate failed: ${JSON.stringify(manifest.totals)}`);
+          }
+          NODE
+      - name: Persist product evidence checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --rebase origin "${SOURCE_BRANCH}"
+          destination="data/execution/runs/${GITHUB_RUN_ID}"
+          mkdir -p "$destination"
+          cp execution/products-consolidated/product-manifest.json "$destination/product-manifest.json"
+          cp execution/products-consolidated/product-records.ndjson "$destination/product-records.ndjson"
+          cp execution/products-consolidated/image-manifest.ndjson "$destination/image-manifest.ndjson"
+          cp execution/PRODUCT_EVIDENCE_SHA256SUMS.txt "$destination/PRODUCT_EVIDENCE_SHA256SUMS.txt"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$destination"
+          git commit -m "Persist RLF product evidence run ${GITHUB_RUN_ID}"
           git push origin "HEAD:${SOURCE_BRANCH}"
