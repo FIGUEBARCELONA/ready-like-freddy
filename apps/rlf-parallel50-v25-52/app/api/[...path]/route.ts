@@ -41,7 +41,7 @@ async function startSweep() {
 
 async function startMonitor() {
   const id=campaignId('RLF-P50-MONITOR');
-  const run=await start(parallel50Campaign,[{campaignId:id,cycles:6,interval:'4h',maxCandidatesPerLaneCycle:4}]);
+  const run=await start(parallel50Campaign,[{campaignId:id,cycles:6,intervalMs:14400000,maxCandidatesPerLaneCycle:4}]);
   return {campaignId:id,runId:run.runId};
 }
 
