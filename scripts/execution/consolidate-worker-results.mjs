@@ -3,6 +3,7 @@ import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { readJson, sha256, writeJson } from "./common.mjs";
+import { loadProgressLedger } from "./progress-ledger.mjs";
 
 const args = Object.fromEntries(
   process.argv.slice(2).map(arg => {
@@ -13,18 +14,12 @@ const args = Object.fromEntries(
 const inputRoot = resolve(args.input ?? "execution/downloaded-workers");
 const queuePath = resolve(args.queue ?? "execution/queue/queue.json");
 const progressPath = resolve(args.progress ?? "data/execution/product-progress.json");
+const progressDeltasDir = resolve(
+  args.progressDeltas ?? "data/execution/progress-deltas",
+);
 const outDir = resolve(args.out ?? "execution/consolidated");
 const queue = await readJson(queuePath);
 await mkdir(outDir, { recursive: true });
-
-async function readOptionalJson(path) {
-  try {
-    return await readJson(path);
-  } catch (error) {
-    if (error?.code === "ENOENT") return null;
-    throw error;
-  }
-}
 
 async function walk(path) {
   const entries = await readdir(path, { withFileTypes: true });
@@ -173,10 +168,13 @@ const productIdentityCandidates = [...identityGroups.entries()]
   })
   .sort((a, b) => a.identityKey.localeCompare(b.identityKey));
 
-const progress = await readOptionalJson(progressPath);
-const completedIdentityKeys = new Set(progress?.completed?.identityKeys ?? []);
+const progress = await loadProgressLedger({
+  basePath: progressPath,
+  deltasDir: progressDeltasDir,
+});
+const completedIdentityKeys = new Set(progress.completed.identityKeys);
 const retryIdentityKeys = new Set(
-  (progress?.retry?.identities ?? []).map(item => item.identityKey).filter(Boolean),
+  progress.retry.identities.map(item => item.identityKey).filter(Boolean),
 );
 const remainingIdentityCandidates = productIdentityCandidates.filter(
   candidate => !completedIdentityKeys.has(candidate.identityKey),
@@ -198,9 +196,8 @@ const productAssignments = Array.from({ length: 50 }, (_, index) => ({
   products: selectedIdentityCandidates.filter((_, productIndex) => productIndex % 50 === index),
 }));
 const expectedProductCaptureCount = selectedIdentityCandidates.length;
-const progressSha256 = progress ? sha256(Buffer.from(JSON.stringify(progress))) : null;
 const productFrontier = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   frontierId: `${queue.queueId}-PRODUCTS`,
   createdAt: new Date().toISOString(),
   sourceQueueId: queue.queueId,
@@ -217,7 +214,8 @@ const productFrontier = {
   selectedIdentityCount: selectedIdentityCandidates.length,
   expectedProductCaptureCount,
   selectedIdentitySha256: sha256(Buffer.from(selectedIdentityCandidates.map(item => item.identityKey).join("\n"))),
-  progressSha256,
+  progressSha256: progress.ledgerSha256,
+  progressDeltaCount: progress.deltaCount,
   assignments: productAssignments,
 };
 productFrontier.frontierSha256 = sha256(Buffer.from(JSON.stringify(productFrontier)));
@@ -258,7 +256,7 @@ const qualityGatePassed =
   totals.uniqueProductIdentityCount >= 50 &&
   expectedProductCaptureCount >= minimumBatch;
 const consolidated = {
-  schemaVersion: 5,
+  schemaVersion: 6,
   runId: process.env.GITHUB_RUN_ID ?? args.runId ?? "LOCAL",
   runAttempt: process.env.GITHUB_RUN_ATTEMPT ?? "1",
   repository: process.env.GITHUB_REPOSITORY ?? null,
@@ -275,7 +273,9 @@ const consolidated = {
   productFrontierSha256: productFrontier.frontierSha256,
   productStatus: "CODE_COLOUR_IDENTITY_CANDIDATES_NOT_GLOBAL_CANONICAL_PRODUCTS",
   imageStatus: "OFFICIAL_SOURCE_URLS_ONLY_RIGHTS_UNKNOWN_NOT_INGESTED",
-  progressStatus: progress ? "CUMULATIVE_PROGRESS_APPLIED" : "NO_PRIOR_PROGRESS",
+  progressStatus: "APPEND_ONLY_LEDGER_APPLIED",
+  progressLedgerSha256: progress.ledgerSha256,
+  progressDeltaCount: progress.deltaCount,
   completedAt: new Date().toISOString(),
 };
 consolidated.manifestSha256 = sha256(Buffer.from(JSON.stringify(consolidated)));
