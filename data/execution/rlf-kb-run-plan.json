@@ -1,11 +1,14 @@
 {
-  "schemaVersion": 4,
-  "planId": "RLF-KB-OFFICIAL-DISCOVERY-20260823-PILOT",
-  "pilotRunSequence": 5,
+  "schemaVersion": 5,
+  "planId": "RLF-KB-GLOBAL-MARKET-EXPANSION-20260823",
+  "pilotRunSequence": 6,
+  "phaseId": "CURRENT_GLOBAL_MARKET_EXPANSION_01",
   "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
   "periodStart": "1940-01-01",
   "periodEnd": "2026-08-31",
   "geographyScope": "GLOBAL",
+  "targetMarkets": ["GB", "ES", "DE", "FR", "IT", "PT", "AE", "EG", "ID", "AU"],
+  "targetRegionGroups": ["EUROPE", "MIDDLE_EAST", "SOUTHEAST_ASIA", "OCEANIA"],
   "workerCount": 50,
   "pilotPerWorkerLimit": 1,
   "manualDefaultPerWorkerLimit": 5,
@@ -13,6 +16,12 @@
   "productManualDefaultPerWorkerLimit": 5,
   "requestDelayMs": 750,
   "maxResponseBytes": 8388608,
+  "discoveryPolicy": {
+    "strategy": "OFFICIAL_SITEMAP_MARKET_SCOPE_STRATIFICATION",
+    "scopeOrder": ["MEN_CORE", "WOMEN_CORE", "COLLABORATIONS", "HERITAGE", "ACCESSORIES_KIDS"],
+    "exactlyFiftyNonEmptyLanesRequired": true,
+    "retailMarketMustNeverInferFactory": true
+  },
   "transportPolicy": {
     "directAttempts": 2,
     "readerAttemptsPerScheme": 3,
@@ -31,15 +40,12 @@
     "preserveAliasUrls": true,
     "fetchPreferredUrlThenAliases": true,
     "completedIdentityLedger": "data/execution/product-progress.json",
+    "appendOnlyDeltaDirectory": "data/execution/progress-deltas",
     "globalCanonicalProductRequiresCrossSourceEvidence": true
-  },
-  "uniquenessPolicy": {
-    "candidateOnly": true,
-    "canonicalProductRequiresEvidence": true,
-    "deduplicateBy": ["productCode", "colourCode", "modelName", "sourceSha256"]
   },
   "stageGates": {
     "discoveryRequiresUniqueProductIdentities": 50,
+    "discoveryRequiresNewIdentities": 1,
     "productStageRequiresAllSelectedIdentities": true,
     "canonicalProductsRemainZeroUntilCrossSourceDeduplication": true,
     "factoryVerifiedCountRemainsZeroWithoutIndependentEvidence": true
