@@ -18,7 +18,7 @@ jobs:
       - name: Prepare browser automation
         run: |
           set -euo pipefail
-          mkdir -p downloaded diagnostics
+          mkdir -p downloaded diagnostics recovered-small reconstructed
           npm init -y >/dev/null 2>&1
           npm install playwright@1.55.0
           npx playwright install chromium --with-deps
@@ -31,6 +31,9 @@ jobs:
 
       - name: Inventory the remote ZIP through HTTP byte ranges
         run: python tools/inventory-remote-zip.py
+
+      - name: Recover small canonical files and reconstruct the workstream backup
+        run: python tools/extract-remote-zip.py
 
       - name: Remove ephemeral signed URLs from retained diagnostics
         if: always()
@@ -58,17 +61,21 @@ jobs:
         run: |
           set -euo pipefail
           find downloaded -type f -printf '%P\t%s bytes\n' | sort | tee diagnostics/download-inventory.tsv
+          find recovered-small reconstructed -type f -printf '%p\t%s bytes\n' | sort > diagnostics/recovered-files-inventory.tsv
+          find diagnostics recovered-small reconstructed -type f ! -name EVIDENCE_SHA256SUMS.txt -print0 \
+            | sort -z | xargs -0 sha256sum > diagnostics/EVIDENCE_SHA256SUMS.txt
           find diagnostics -type f -printf '%P\t%s bytes\n' | sort > diagnostics/diagnostics-inventory.tsv
-          find diagnostics -type f ! -name EVIDENCE_SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > diagnostics/EVIDENCE_SHA256SUMS.txt
 
-      - name: Upload remote ZIP inventory and diagnostics
+      - name: Upload verified selective recovery and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: uploadnow-mFyDB1H-remote-zip-inventory-pr
+          name: uploadnow-mFyDB1H-selective-recovery-pr
           path: |
             downloaded/**
             diagnostics/**
+            recovered-small/**
+            reconstructed/**
           if-no-files-found: error
           retention-days: 7
           compression-level: 6
