@@ -2,6 +2,14 @@ import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { loadProductProgressLedger } from "./progressLedger";
 
+interface LaneProfile {
+  vectorKey?: string;
+  market?: string;
+  locale?: string;
+  regionGroup?: string;
+  scope?: string;
+}
+
 interface WorkerSummary {
   slot: string;
   attemptedUrlCount?: number;
@@ -16,6 +24,14 @@ interface WorkerSummary {
   aliasFallbackSuccessCount?: number;
   imageReferenceCount?: number;
   completedAt?: string;
+  laneProfile?: LaneProfile;
+  sourceMarket?: string;
+  sourceLocale?: string;
+  sourceRegionGroup?: string;
+  sourceDiscoveryScope?: string;
+  sourceMarkets?: string[];
+  sourceRegionGroups?: string[];
+  sourceDiscoveryScopes?: string[];
 }
 
 interface ExecutionManifest {
@@ -32,6 +48,8 @@ interface ExecutionManifest {
   factoryStatus?: string;
   manifestSha256?: string;
   completedAt?: string;
+  sourceMarketCounts?: Record<string, number>;
+  sourceScopeCounts?: Record<string, number>;
 }
 
 async function readOptionalJson<T>(path: string): Promise<T | null> {
@@ -98,8 +116,16 @@ export async function loadLatestExecutionStatus() {
       const slot = `F${String(index + 1).padStart(2, "0")}`;
       const discoveryWorker = discoveryWorkers.get(slot) ?? null;
       const productWorker = productWorkers.get(slot) ?? null;
+      const lane = discoveryWorker?.laneProfile ?? {
+        vectorKey: null,
+        market: discoveryWorker?.sourceMarket ?? null,
+        locale: discoveryWorker?.sourceLocale ?? null,
+        regionGroup: discoveryWorker?.sourceRegionGroup ?? null,
+        scope: discoveryWorker?.sourceDiscoveryScope ?? null,
+      };
       return {
         slot,
+        lane,
         discovery: discoveryWorker
           ? {
               status: (discoveryWorker.successfulFetchCount ?? 0) > 0 ? "COMPLETE" : "FAILED",
@@ -121,6 +147,9 @@ export async function loadLatestExecutionStatus() {
               failed: productWorker.failedProductFetchCount ?? 0,
               aliasFallbackSuccesses: productWorker.aliasFallbackSuccessCount ?? 0,
               images: productWorker.imageReferenceCount ?? 0,
+              sourceMarkets: productWorker.sourceMarkets ?? [],
+              sourceRegionGroups: productWorker.sourceRegionGroups ?? [],
+              sourceDiscoveryScopes: productWorker.sourceDiscoveryScopes ?? [],
               completedAt: productWorker.completedAt ?? null,
             }
           : null,
@@ -163,6 +192,8 @@ export async function loadLatestExecutionStatus() {
         qualityGatePassed: Boolean(discovery.qualityGatePassed),
         completedWorkers: discoveryCompleteWorkers,
         totals: discoveryTotals,
+        sourceMarketCounts: discovery.sourceMarketCounts ?? {},
+        sourceScopeCounts: discovery.sourceScopeCounts ?? {},
         manifestSha256: discovery.manifestSha256 ?? null,
         completedAt: discovery.completedAt ?? null,
       },
@@ -232,8 +263,7 @@ export async function loadLatestExecutionStatus() {
       productIdentityCandidates: progress.frontier?.candidateIdentityCount ?? 0,
       aliasProductUrls: Math.max(
         0,
-        Number(progress.frontier?.candidateUrlCount ?? 0) -
-          Number(progress.frontier?.candidateIdentityCount ?? 0),
+        Number(progress.frontier?.candidateUrlCount ?? 0) - Number(progress.frontier?.candidateIdentityCount ?? 0),
       ),
       productPagesCaptured: progress.completed.productUrlCaptureCount,
       productIdentitiesCaptured: progress.completed.identityCount,
