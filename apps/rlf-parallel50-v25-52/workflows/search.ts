@@ -5,10 +5,8 @@ export type SearchItem={title:string;url:string;snippet:string;provider:string};
 type Provider={name:string;url:(query:string,language:string)=>string;rss?:boolean};
 
 const PROVIDERS:Provider[]=[
-  {name:'yahoo',url:query=>`https://search.yahoo.com/search?p=${encodeURIComponent(query)}&n=30`},
-  {name:'bing-rss',rss:true,url:(query,language)=>`https://www.bing.com/search?format=rss&q=${encodeURIComponent(query)}&count=30&setlang=${encodeURIComponent(language.split('-')[0])}`},
-  {name:'bing-html',url:(query,language)=>`https://www.bing.com/search?q=${encodeURIComponent(query)}&count=30&setlang=${encodeURIComponent(language.split('-')[0])}`},
-  {name:'google',url:(query,language)=>`https://www.google.com/search?q=${encodeURIComponent(query)}&num=30&hl=${encodeURIComponent(language.split('-')[0])}`},
+  {name:'bing-rss',rss:true,url:(query,language)=>`https://www.bing.com/search?format=rss&q=${encodeURIComponent(query)}&count=40&setlang=${encodeURIComponent(language.split('-')[0])}`},
+  {name:'yahoo',url:query=>`https://search.yahoo.com/search?p=${encodeURIComponent(query)}&n=40`},
 ];
 
 const decode=(value:string)=>String(value||'').replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&#39;',"'").replaceAll('&lt;','<').replaceAll('&gt;','>');
@@ -33,12 +31,8 @@ function clean(raw:string,provider:string) {
   const value=decode(raw);
   try {
     if(/^(javascript:|mailto:|tel:|#)/i.test(value)) return '';
-    const base=provider==='google'?'https://www.google.com':provider==='yahoo'?'https://search.yahoo.com':'https://www.bing.com';
+    const base=provider==='yahoo'?'https://search.yahoo.com':'https://www.bing.com';
     const url=new URL(value,base);
-    if(provider==='google'&&url.pathname==='/url') {
-      const redirected=url.searchParams.get('q')||url.searchParams.get('url');
-      if(redirected) return canonical(decodeURIComponent(redirected));
-    }
     if(provider==='yahoo') {
       const match=value.match(/\/RU=([^/]+)\/RK=/i);
       if(match) return canonical(decodeURIComponent(match[1]));
@@ -85,7 +79,7 @@ function rssResults(xml:string,provider:string,limit:number) {
 async function searchProvider(provider:Provider,query:string,language:string,limit:number) {
   const started=Date.now();
   try {
-    const response=await fetch(provider.url(query,language),{redirect:'follow',signal:AbortSignal.timeout(16000),headers:{accept:provider.rss?'application/rss+xml,application/xml,text/xml;q=.9,*/*;q=.8':'text/html,*/*;q=.8','accept-language':language,'user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131 Safari/537.36'}});
+    const response=await fetch(provider.url(query,language),{redirect:'follow',signal:AbortSignal.timeout(13000),headers:{accept:provider.rss?'application/rss+xml,application/xml,text/xml;q=.9,*/*;q=.8':'text/html,*/*;q=.8','accept-language':language,'user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131 Safari/537.36'}});
     const body=await response.text();
     const results=response.ok?(provider.rss?rssResults(body,provider.name,limit):htmlResults(body,provider.name,limit)):[];
     const attempt:ProviderAttempt={name:provider.name,status:response.status,bodyLength:body.length,linkCount:results.length,challenge:/captcha|unusual traffic|verify you are human|access denied|error getting results|automated queries/i.test(body),durationMs:Date.now()-started,error:null};
@@ -100,18 +94,17 @@ export async function searchAll(query:string,input:DiscoverInput) {
   const attempts:ProviderAttempt[]=[];
   const results:SearchItem[]=[];
   const seen=new Set<string>();
-  const primary=PROVIDERS.slice(0,3);
-  const pivot=input.lane.index%primary.length;
-  const rotated=[...primary.slice(pivot),...primary.slice(0,pivot),PROVIDERS[3]];
+  const pivot=input.lane.index%PROVIDERS.length;
+  const rotated=[...PROVIDERS.slice(pivot),...PROVIDERS.slice(0,pivot)];
   for(const provider of rotated) {
-    const response=await searchProvider(provider,query,input.lane.language,Math.max(input.maxCandidates*4,20));
+    const response=await searchProvider(provider,query,input.lane.language,Math.max(input.maxCandidates*5,30));
     attempts.push(response.attempt);
     for(const item of response.results) {
       const domain=domainOf(item.url);
       if(!domain||MARKETPLACES.some(rule=>domain.includes(rule))||seen.has(item.url)) continue;
       seen.add(item.url);results.push(item);
     }
-    if(results.length>=input.maxCandidates*3) break;
+    if(results.length>=input.maxCandidates*4) break;
   }
-  return {attempts,results:results.slice(0,Math.max(input.maxCandidates*4,20))};
+  return {attempts,results:results.slice(0,Math.max(input.maxCandidates*5,30))};
 }
