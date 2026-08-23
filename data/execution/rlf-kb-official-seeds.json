@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "purpose": "RLF_KB_DOCUMENTARY_OFFICIAL_DISCOVERY",
+  "observedAt": "2026-08-23",
+  "allowedHosts": [
+    "www.fredperry.com",
+    "fredperry.com"
+  ],
+  "seeds": [
+    {"locale":"en-GB","url":"https://www.fredperry.com/site-map"},
+    {"locale":"en-US","url":"https://www.fredperry.com/us/site-map"},
+    {"locale":"es-ES","url":"https://www.fredperry.com/eu-es/site-map"},
+    {"locale":"de-DE","url":"https://www.fredperry.com/eu-de/site-map"},
+    {"locale":"fr-FR","url":"https://www.fredperry.com/eu-fr/site-map"},
+    {"locale":"it-IT","url":"https://www.fredperry.com/eu-it/site-map"},
+    {"locale":"pt-PT","url":"https://www.fredperry.com/eu-pt/site-map"},
+    {"locale":"en-AE","url":"https://www.fredperry.com/ae-en/site-map"},
+    {"locale":"en-EG","url":"https://www.fredperry.com/eg-en/site-map"},
+    {"locale":"en-ID","url":"https://www.fredperry.com/id-en/site-map"}
+  ]
+}
