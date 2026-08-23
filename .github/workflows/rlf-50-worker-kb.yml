@@ -4,7 +4,17 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - '.github/workflows/rlf-50-worker-kb.yml'
+      - 'scripts/execution/**'
+      - 'data/execution/rlf-kb-official-seeds.json'
       - 'data/execution/rlf-kb-run-plan.json'
+      - 'data/execution/product-progress.json'
+      - 'server/executionStatus.ts'
+      - 'server/routers/executionRouter.ts'
+      - 'server/routers.ts'
+      - 'client/src/pages/ExecutionDashboard.tsx'
+      - 'client/src/App.tsx'
+      - 'client/src/components/DashboardLayout.tsx'
   workflow_dispatch:
     inputs:
       per_worker_limit:
