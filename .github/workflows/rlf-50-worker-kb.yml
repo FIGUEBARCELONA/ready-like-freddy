@@ -10,8 +10,25 @@ on:
       - 'data/execution/rlf-kb-official-seeds.json'
       - 'data/execution/rlf-kb-run-plan.json'
       - 'server/executionStatus.ts'
-      - 'server/routers/workstreamRouter.ts'
-      - 'client/src/pages/WorkstreamView.tsx'
+      - 'server/routers/executionRouter.ts'
+      - 'server/routers.ts'
+      - 'client/src/pages/ExecutionDashboard.tsx'
+      - 'client/src/App.tsx'
+      - 'client/src/components/DashboardLayout.tsx'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/rlf-50-worker-kb.yml'
+      - 'scripts/execution/**'
+      - 'data/execution/rlf-kb-official-seeds.json'
+      - 'data/execution/rlf-kb-run-plan.json'
+      - 'server/executionStatus.ts'
+      - 'server/routers/executionRouter.ts'
+      - 'server/routers.ts'
+      - 'client/src/pages/ExecutionDashboard.tsx'
+      - 'client/src/App.tsx'
+      - 'client/src/components/DashboardLayout.tsx'
   workflow_dispatch:
     inputs:
       per_worker_limit:
@@ -173,6 +190,7 @@ jobs:
           }
           NODE
       - name: Persist discovery checkpoint
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
@@ -284,6 +302,7 @@ jobs:
           }
           NODE
       - name: Persist product evidence checkpoint
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
