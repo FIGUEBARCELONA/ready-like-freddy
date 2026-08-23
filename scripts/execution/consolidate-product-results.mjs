@@ -3,6 +3,7 @@ import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { readJson, sha256, writeJson } from "./common.mjs";
+import { isOfficialProductMedia } from "./product-extraction.mjs";
 
 const args = Object.fromEntries(
   process.argv.slice(2).map(arg => {
@@ -14,6 +15,7 @@ const inputRoot = resolve(args.input ?? "execution/downloaded-product-workers");
 const frontierPath = resolve(args.frontier ?? "execution/product-frontier/product-frontier.json");
 const outDir = resolve(args.out ?? "execution/products-consolidated");
 const frontier = await readJson(frontierPath);
+const allowedHosts = ["www.fredperry.com", "fredperry.com"];
 await mkdir(outDir, { recursive: true });
 
 async function walk(path) {
@@ -77,6 +79,10 @@ const imageManifest = uniqueRecords.flatMap(record =>
     ...image,
   })),
 );
+const invalidImages = imageManifest.filter(image => !isOfficialProductMedia(image.sourceUrl, allowedHosts));
+if (invalidImages.length) {
+  throw new Error(`Non-product or non-official image references reached consolidation: ${invalidImages.length}`);
+}
 const totals = {
   frontierProductCount: frontier.uniqueProductUrlCount,
   attemptedProductCount: records.length,
@@ -86,12 +92,14 @@ const totals = {
   directSourceCount: records.filter(record => record.sourceTransport === "DIRECT_OFFICIAL_HTTP" && record.fetchOk).length,
   transformedReaderSourceCount: records.filter(record => record.sourceTransport === "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE" && record.fetchOk).length,
   imageReferenceCount: imageManifest.length,
-  allowedImageReferenceCount: imageManifest.filter(image => image.hostAllowed).length,
+  officialProductImageReferenceCount: imageManifest.length,
+  rejectedImageReferenceCount: invalidImages.length,
   materialEvidenceCount: records.reduce((sum, record) => sum + (record.materialSnippets?.length ?? 0), 0),
-  originEvidenceCount: records.reduce((sum, record) => sum + (record.originSnippets?.length ?? 0), 0),
+  manufacturingClaimCount: records.reduce((sum, record) => sum + (record.originSnippets?.length ?? 0), 0),
+  factoryVerifiedCount: records.filter(record => record.factoryStatus === "VERIFIED").length,
 };
 const manifest = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   runId: process.env.GITHUB_RUN_ID ?? args.runId ?? "LOCAL",
   runAttempt: process.env.GITHUB_RUN_ATTEMPT ?? "1",
   repository: process.env.GITHUB_REPOSITORY ?? null,
@@ -101,10 +109,12 @@ const manifest = {
   workerCount: 50,
   orchestrationStatus: "FIFTY_OF_FIFTY_PRODUCT_WORKERS_CONSOLIDATED",
   transportStatus: totals.successfulProductFetchCount > 0 ? "USABLE_PRODUCT_SOURCES_CAPTURED" : "NO_USABLE_PRODUCT_SOURCES",
-  qualityGatePassed: summaries.length === 50 && totals.successfulProductFetchCount > 0,
+  contaminationStatus: invalidImages.length === 0 ? "OFFICIAL_PRODUCT_MEDIA_ONLY" : "CONTAMINATION_DETECTED",
+  qualityGatePassed: summaries.length === 50 && totals.successfulProductFetchCount > 0 && invalidImages.length === 0,
   totals,
   productStatus: "PRODUCT_PAGE_EVIDENCE_CANDIDATES_NOT_CANONICAL_UNIQUE_PRODUCTS",
-  imageStatus: "SOURCE_URLS_ONLY_RIGHTS_UNKNOWN_NOT_INGESTED",
+  factoryStatus: "TEXTUAL_CLAIMS_ONLY_NO_FACTORY_VERIFICATION",
+  imageStatus: "OFFICIAL_SOURCE_URLS_ONLY_RIGHTS_UNKNOWN_NOT_INGESTED",
   workerSummaries: summaries.sort((a, b) => a.slot.localeCompare(b.slot)),
   completedAt: new Date().toISOString(),
 };
