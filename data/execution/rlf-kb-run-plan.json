@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "planId": "RLF-KB-OFFICIAL-DISCOVERY-20260823-PILOT",
-  "pilotRunSequence": 1,
+  "pilotRunSequence": 2,
   "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
   "periodStart": "1940-01-01",
   "periodEnd": "2026-08-31",
@@ -9,6 +9,8 @@
   "workerCount": 50,
   "pilotPerWorkerLimit": 1,
   "manualDefaultPerWorkerLimit": 5,
+  "productPilotPerWorkerLimit": 1,
+  "productManualDefaultPerWorkerLimit": 5,
   "requestDelayMs": 750,
   "maxResponseBytes": 8388608,
   "imagePolicy": {
@@ -21,5 +23,10 @@
     "candidateOnly": true,
     "canonicalProductRequiresEvidence": true,
     "deduplicateBy": ["canonicalUrl", "productCode", "modelName", "colourName", "sourceSha256"]
+  },
+  "stageGates": {
+    "discoveryRequiresUniqueProductUrls": 50,
+    "productStageRequiresSuccessfulCaptures": 50,
+    "canonicalProductsRemainZeroUntilCrossSourceDeduplication": true
   }
 }
