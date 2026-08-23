@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "planId": "RLF-KB-OFFICIAL-DISCOVERY-20260823-PILOT",
+  "pilotRunSequence": 1,
   "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
   "periodStart": "1940-01-01",
   "periodEnd": "2026-08-31",
