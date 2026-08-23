@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "planId": "RLF-KB-OFFICIAL-DISCOVERY-20260823-PILOT",
-  "pilotRunSequence": 3,
+  "pilotRunSequence": 4,
   "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
   "periodStart": "1940-01-01",
   "periodEnd": "2026-08-31",
@@ -10,31 +10,38 @@
   "pilotPerWorkerLimit": 1,
   "manualDefaultPerWorkerLimit": 5,
   "productPilotPerWorkerLimit": 5,
-  "productManualDefaultPerWorkerLimit": 10,
+  "productManualDefaultPerWorkerLimit": 5,
   "requestDelayMs": 750,
   "maxResponseBytes": 8388608,
+  "transportPolicy": {
+    "directAttempts": 2,
+    "readerAttemptsPerScheme": 3,
+    "readerSchemes": ["https", "http"],
+    "retryableReaderStatuses": [401, 408, 425, 429, 500, 502, 503, 504]
+  },
   "imagePolicy": {
     "storeBinary": false,
     "recordSourceUrls": true,
-    "allowedProductMediaPath": "/media/catalog/product/",
+    "allowedAssetPathPrefix": "/media/catalog/product/",
     "defaultRightsStatus": "UNKNOWN",
-    "defaultIngestionStatus": "NOT_INGESTED",
-    "rejectTrackingPixels": true
+    "defaultIngestionStatus": "NOT_INGESTED"
   },
-  "manufacturingPolicy": {
-    "textualCountryClaimIsNotFactoryVerification": true,
-    "factoryRequiresIndependentEvidence": true,
-    "salesRegionMustNeverInferFactory": true
+  "identityPolicy": {
+    "candidateKey": ["productCode", "colourCode"],
+    "preserveAliasUrls": true,
+    "fetchPreferredUrlThenAliases": true,
+    "completedIdentityLedger": "data/execution/product-progress.json",
+    "globalCanonicalProductRequiresCrossSourceEvidence": true
   },
   "uniquenessPolicy": {
     "candidateOnly": true,
     "canonicalProductRequiresEvidence": true,
-    "deduplicateBy": ["canonicalUrl", "productCode", "modelName", "colourName", "sourceSha256"]
+    "deduplicateBy": ["productCode", "colourCode", "modelName", "sourceSha256"]
   },
   "stageGates": {
-    "discoveryRequiresUniqueProductUrls": 50,
-    "productStageRequiresSuccessfulCaptures": 250,
-    "productStageRejectsNonOfficialMedia": true,
-    "canonicalProductsRemainZeroUntilCrossSourceDeduplication": true
+    "discoveryRequiresUniqueProductIdentities": 50,
+    "productStageRequiresAllSelectedIdentities": true,
+    "canonicalProductsRemainZeroUntilCrossSourceDeduplication": true,
+    "factoryVerifiedCountRemainsZeroWithoutIndependentEvidence": true
   }
 }
