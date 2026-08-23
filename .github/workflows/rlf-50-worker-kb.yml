@@ -188,6 +188,19 @@ jobs:
             execution/EVIDENCE_SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
+      - name: Assert useful source transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const manifest = require('./execution/consolidated/manifest.json');
+          if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
+            throw new Error('The consolidated manifest does not contain exactly 50 workers');
+          }
+          if (!manifest.qualityGatePassed || manifest.totals.successfulFetchCount < 1) {
+            throw new Error(`No usable source was captured: ${JSON.stringify(manifest.totals)}`);
+          }
+          NODE
       - name: Persist compact run manifest in the development branch
         if: github.event_name != 'pull_request'
         shell: bash
