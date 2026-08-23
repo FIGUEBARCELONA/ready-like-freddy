@@ -1,0 +1,80 @@
+name: RLF code and ledger validation
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-code-validation.yml'
+      - '.github/workflows/rlf-50-worker-kb.yml'
+      - 'scripts/execution/**'
+      - 'server/**'
+      - 'client/**'
+      - 'data/execution/product-progress.json'
+      - 'data/execution/progress-deltas/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rlf-code-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Enable pinned pnpm
+        run: corepack enable
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Validate execution script syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          find scripts/execution -name '*.mjs' -print0 | sort -z | xargs -0 -n1 node --check
+      - name: Validate canonical JSON inputs
+        run: |
+          node - <<'NODE'
+          const { readFileSync } = require('node:fs');
+          const paths = [
+            'data/execution/rlf-kb-official-seeds.json',
+            'data/execution/rlf-kb-run-plan.json',
+            'data/execution/product-progress.json',
+            'data/execution/progress-deltas/32657304668.json',
+          ];
+          for (const path of paths) JSON.parse(readFileSync(path, 'utf8'));
+          NODE
+      - name: Rebuild and assert append-only ledger
+        run: |
+          node --input-type=module - <<'NODE'
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          const state = await loadProgressLedger();
+          if (state.completed.identityCount < 531) throw new Error(`Identity ledger regressed: ${state.completed.identityCount}`);
+          if (state.retry.identityCount !== 0) throw new Error(`Unexpected retries: ${state.retry.identityCount}`);
+          if (state.counters.factoryVerifiedCount !== 0) throw new Error('Factory count must remain zero without independent evidence');
+          if (state.counters.globalCanonicalProductCount !== 0) throw new Error('Global canonical count must remain zero before cross-source review');
+          console.log(JSON.stringify({
+            identities: state.completed.identityCount,
+            urls: state.completed.productUrlCaptureCount,
+            images: state.counters.officialProductImageReferenceCount,
+            materials: state.counters.materialEvidenceCount,
+            manufacturingClaims: state.counters.manufacturingClaimCount,
+            retries: state.retry.identityCount,
+            deltas: state.deltaCount,
+            ledgerSha256: state.ledgerSha256,
+          }, null, 2));
+          NODE
+      - name: Typecheck
+        run: pnpm check
+      - name: Production build
+        run: pnpm build
