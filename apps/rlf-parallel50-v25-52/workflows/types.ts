@@ -10,7 +10,24 @@ export type ProviderAttempt={
   error:string|null;
 };
 
-export type CandidateStatus='QUALIFIED_PROVISIONAL'|'EVIDENCE_INCOMPLETE'|'REJECT_MARKETPLACE'|'REJECT_UK'|'FETCH_FAILED';
+export type EvidenceRecord={
+  role:'TARGET'|'HOME'|'LEGAL'|'SHOPIFY_SEARCH';
+  url:string;
+  status:number|null;
+  contentType:string|null;
+  sha256:string|null;
+  length:number;
+};
+
+export type CandidateStatus=
+  |'QUALIFIED_PROVISIONAL'
+  |'DUPLICATE_KNOWN'
+  |'EVIDENCE_INCOMPLETE'
+  |'REJECT_MARKETPLACE'
+  |'REJECT_NOT_PRELOVED'
+  |'REJECT_UK'
+  |'REJECT_NON_EU'
+  |'FETCH_FAILED';
 
 export type Candidate={
   slot:string;
@@ -18,13 +35,15 @@ export type Candidate={
   countryCode:string;
   country:string;
   query:string;
+  queryTemplate:number;
+  searchProviders:string[];
   title:string;
   url:string;
   domain:string;
   httpStatus:number|null;
   status:CandidateStatus;
   score:number;
-  supplierEvidence:'READY_TO_REVIEW'|'INCOMPLETE';
+  supplierEvidence:'READY_TO_REVIEW'|'DUPLICATE'|'INCOMPLETE';
   productEvidence:'DIRECT_PRODUCT_PROVISIONAL'|'SUPPLIER_EVIDENCE_ONLY';
   fredPerryEvidence:boolean;
   prelovedEvidence:boolean;
@@ -32,7 +51,12 @@ export type Candidate={
   directPurchaseSignal:boolean;
   legalSignal:boolean;
   uniqueProductPathSignal:boolean;
+  euEvidence:boolean;
+  detectedCountryCode:string|null;
+  knownDuplicate:boolean;
   priceSignal:string|null;
+  availableProductSignals:number;
+  evidence:EvidenceRecord[];
   checkedAt:string;
 };
 
@@ -42,6 +66,7 @@ export type LaneCycleResult={
   countryCode:string;
   country:string;
   query:string;
+  queryTemplate:number;
   searchedAt:string;
   searchStatus:number|null;
   candidates:Candidate[];
@@ -64,13 +89,17 @@ export type CampaignResult={
   uniqueCandidates:number;
   uniqueDomains:number;
   qualifiedProvisional:number;
+  duplicateKnown:number;
   directProductProvisional:number;
   evidenceIncomplete:number;
   rejectedMarketplaces:number;
+  rejectedNotPreloved:number;
   rejectedUK:number;
+  rejectedNonEU:number;
   fetchFailed:number;
   searchErrors:number;
   zeroResultLanes:number;
+  evidenceRecords:number;
   providerStats:ProviderStats;
   candidates:Candidate[];
 };
