@@ -5,12 +5,10 @@ import { createInterface } from "node:readline";
 import { readJson, sha256, writeJson } from "./common.mjs";
 import { isOfficialProductMedia } from "./product-extraction.mjs";
 
-const args = Object.fromEntries(
-  process.argv.slice(2).map(arg => {
-    const [key, ...rest] = arg.replace(/^--/, "").split("=");
-    return [key, rest.join("=") || "true"];
-  }),
-);
+const args = Object.fromEntries(process.argv.slice(2).map(arg => {
+  const [key, ...rest] = arg.replace(/^--/, "").split("=");
+  return [key, rest.join("=") || "true"];
+}));
 const inputRoot = resolve(args.input ?? "execution/downloaded-product-workers");
 const frontierPath = resolve(args.frontier ?? "execution/product-frontier/product-frontier.json");
 const outDir = resolve(args.out ?? "execution/products-consolidated");
@@ -83,8 +81,10 @@ const invalidImages = imageManifest.filter(image => !isOfficialProductMedia(imag
 if (invalidImages.length) {
   throw new Error(`Non-product or non-official image references reached consolidation: ${invalidImages.length}`);
 }
+const expectedProductCaptureCount = Number(frontier.expectedProductCaptureCount ?? 50);
 const totals = {
   frontierProductCount: frontier.uniqueProductUrlCount,
+  expectedProductCaptureCount,
   attemptedProductCount: records.length,
   successfulProductFetchCount: records.filter(record => record.fetchOk).length,
   failedProductFetchCount: records.filter(record => !record.fetchOk).length,
@@ -98,8 +98,14 @@ const totals = {
   manufacturingClaimCount: records.reduce((sum, record) => sum + (record.originSnippets?.length ?? 0), 0),
   factoryVerifiedCount: records.filter(record => record.factoryStatus === "VERIFIED").length,
 };
+const qualityGatePassed =
+  summaries.length === 50 &&
+  totals.attemptedProductCount === expectedProductCaptureCount &&
+  totals.successfulProductFetchCount === expectedProductCaptureCount &&
+  totals.uniqueCapturedProductUrlCount === expectedProductCaptureCount &&
+  invalidImages.length === 0;
 const manifest = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   runId: process.env.GITHUB_RUN_ID ?? args.runId ?? "LOCAL",
   runAttempt: process.env.GITHUB_RUN_ATTEMPT ?? "1",
   repository: process.env.GITHUB_REPOSITORY ?? null,
@@ -110,7 +116,7 @@ const manifest = {
   orchestrationStatus: "FIFTY_OF_FIFTY_PRODUCT_WORKERS_CONSOLIDATED",
   transportStatus: totals.successfulProductFetchCount > 0 ? "USABLE_PRODUCT_SOURCES_CAPTURED" : "NO_USABLE_PRODUCT_SOURCES",
   contaminationStatus: invalidImages.length === 0 ? "OFFICIAL_PRODUCT_MEDIA_ONLY" : "CONTAMINATION_DETECTED",
-  qualityGatePassed: summaries.length === 50 && totals.successfulProductFetchCount > 0 && invalidImages.length === 0,
+  qualityGatePassed,
   totals,
   productStatus: "PRODUCT_PAGE_EVIDENCE_CANDIDATES_NOT_CANONICAL_UNIQUE_PRODUCTS",
   factoryStatus: "TEXTUAL_CLAIMS_ONLY_NO_FACTORY_VERIFICATION",
@@ -120,20 +126,7 @@ const manifest = {
 };
 manifest.manifestSha256 = sha256(Buffer.from(JSON.stringify(manifest)));
 await writeJson(`${outDir}/product-manifest.json`, manifest);
-await writeFile(
-  `${outDir}/product-records.ndjson`,
-  uniqueRecords.length ? `${uniqueRecords.map(record => JSON.stringify(record)).join("\n")}\n` : "",
-  "utf8",
-);
-await writeFile(
-  `${outDir}/image-manifest.ndjson`,
-  imageManifest.length ? `${imageManifest.map(record => JSON.stringify(record)).join("\n")}\n` : "",
-  "utf8",
-);
-await writeJson(
-  `${outDir}/duplicate-product-captures.json`,
-  [...byUrl.entries()]
-    .filter(([, group]) => group.length > 1)
-    .map(([productUrl, group]) => ({ productUrl, captures: group })),
-);
+await writeFile(`${outDir}/product-records.ndjson`, uniqueRecords.length ? `${uniqueRecords.map(record => JSON.stringify(record)).join("\n")}\n` : "", "utf8");
+await writeFile(`${outDir}/image-manifest.ndjson`, imageManifest.length ? `${imageManifest.map(record => JSON.stringify(record)).join("\n")}\n` : "", "utf8");
+await writeJson(`${outDir}/duplicate-product-captures.json`, [...byUrl.entries()].filter(([, group]) => group.length > 1).map(([productUrl, group]) => ({ productUrl, captures: group })));
 console.log(JSON.stringify(manifest, null, 2));
