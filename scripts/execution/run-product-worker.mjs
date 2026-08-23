@@ -1,7 +1,7 @@
 import { appendFile, mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { decodeHtmlEntities, isAllowedUrl, normalizeUrl, readJson, sha256, sleep, writeJson } from "./common.mjs";
-import { extractProductPageFields } from "./product-extraction.mjs";
+import { decodeHtmlEntities, normalizeUrl, readJson, sha256, sleep, writeJson } from "./common.mjs";
+import { extractProductPageFields, isOfficialProductMedia } from "./product-extraction.mjs";
 import { fetchEvidenceSource } from "./source-transport.mjs";
 
 const args = Object.fromEntries(
@@ -21,12 +21,13 @@ if (!assignment) throw new Error(`No product assignment found for ${slot}`);
 const limit = Number(args.limit ?? process.env.RLF_PRODUCT_PER_WORKER_LIMIT ?? 1);
 if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error(`Invalid product limit: ${limit}`);
 const maxBytes = Number(args.maxBytes ?? process.env.RLF_MAX_RESPONSE_BYTES ?? 8 * 1024 * 1024);
+const allowedHosts = ["www.fredperry.com", "fredperry.com"];
 await mkdir(outDir, { recursive: true });
 const recordsPath = `${outDir}/product-records.ndjson`;
 await writeFile(recordsPath, "", "utf8");
 const records = [];
 
-function collectProductImages(content, productCode, colourCode, allowedHosts) {
+function collectProductImages(content, productCode, colourCode) {
   const values = [];
   for (const match of content.matchAll(/!\[[^\]]*\]\((https?:\/\/[^)\s]+)(?:\s+[^)]*)?\)/gi)) {
     values.push(decodeHtmlEntities(match[1]));
@@ -44,13 +45,14 @@ function collectProductImages(content, productCode, colourCode, allowedHosts) {
   return [...new Set(values)]
     .map(value => normalizeUrl(value, "https://www.fredperry.com/"))
     .filter(Boolean)
-    .filter(url => !identityPattern || identityPattern.test(decodeURIComponent(url)))
+    .filter(url => isOfficialProductMedia(url, allowedHosts))
+    .filter(url => !identityPattern || identityPattern.test(decodeURIComponent(new URL(url).pathname)))
     .slice(0, 30)
     .map(sourceUrl => ({
       sourceUrl,
       rightsStatus: "UNKNOWN",
       ingestionStatus: "NOT_INGESTED",
-      hostAllowed: isAllowedUrl(sourceUrl, allowedHosts),
+      hostAllowed: true,
       assetClass: "PRODUCT_MEDIA",
     }));
 }
@@ -64,14 +66,9 @@ for (const candidate of assignment.products.slice(0, limit)) {
     const content = response.body.toString("utf8");
     const isHtml = /html/i.test(response.contentType) || /<html[\s>]/i.test(content.slice(0, 10_000));
     const fields = extractProductPageFields(content, candidate.productUrl, isHtml);
-    const imageReferences = collectProductImages(
-      content,
-      fields.productCode,
-      fields.colourCode,
-      ["www.fredperry.com", "fredperry.com"],
-    );
+    const imageReferences = collectProductImages(content, fields.productCode, fields.colourCode);
     record = {
-      schemaVersion: 1,
+      schemaVersion: 2,
       frontierId: frontier.frontierId,
       frontierSha256: frontier.frontierSha256,
       slot,
@@ -84,6 +81,7 @@ for (const candidate of assignment.products.slice(0, limit)) {
       description: fields.description,
       materialSnippets: fields.materialSnippets,
       originSnippets: fields.originSnippets,
+      originEvidenceStatus: fields.originEvidenceStatus,
       imageReferences,
       sourceTransport: fetched.sourceTransport,
       sourceFetchUrl: fetched.sourceFetchUrl,
@@ -99,11 +97,12 @@ for (const candidate of assignment.products.slice(0, limit)) {
       observedAt,
       uniquenessStatus: "PRODUCT_PAGE_CAPTURED_REQUIRES_CROSS_SOURCE_DEDUPLICATION",
       canonicalStatus: "NOT_CANONICAL",
-      imageStatus: "SOURCE_URLS_ONLY_RIGHTS_UNKNOWN_NOT_INGESTED",
+      factoryStatus: "NOT_VERIFIED",
+      imageStatus: "OFFICIAL_SOURCE_URLS_ONLY_RIGHTS_UNKNOWN_NOT_INGESTED",
     };
   } catch (error) {
     record = {
-      schemaVersion: 1,
+      schemaVersion: 2,
       frontierId: frontier.frontierId,
       frontierSha256: frontier.frontierSha256,
       slot,
@@ -114,6 +113,7 @@ for (const candidate of assignment.products.slice(0, limit)) {
       fetchOk: false,
       error: error instanceof Error ? error.message : String(error),
       canonicalStatus: "NOT_EVALUATED",
+      factoryStatus: "NOT_EVALUATED",
     };
   }
   records.push(record);
@@ -122,7 +122,7 @@ for (const candidate of assignment.products.slice(0, limit)) {
 }
 
 const summary = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   frontierId: frontier.frontierId,
   frontierSha256: frontier.frontierSha256,
   slot,
@@ -134,7 +134,8 @@ const summary = {
   transformedReaderSourceCount: records.filter(record => record.sourceTransport === "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE" && record.fetchOk).length,
   imageReferenceCount: records.reduce((sum, record) => sum + (record.imageReferences?.length ?? 0), 0),
   materialEvidenceCount: records.reduce((sum, record) => sum + (record.materialSnippets?.length ?? 0), 0),
-  originEvidenceCount: records.reduce((sum, record) => sum + (record.originSnippets?.length ?? 0), 0),
+  manufacturingClaimCount: records.reduce((sum, record) => sum + (record.originSnippets?.length ?? 0), 0),
+  factoryVerifiedCount: 0,
   completedAt: new Date().toISOString(),
 };
 summary.summarySha256 = sha256(Buffer.from(JSON.stringify(summary)));
