@@ -68,6 +68,20 @@ function Metric({
   );
 }
 
+function CoverageList({ values }: { values: Record<string, number> }) {
+  const entries = Object.entries(values).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) return <p className="text-xs text-stone-500">Pendent del pròxim manifest global.</p>;
+  return (
+    <div className="flex flex-wrap gap-2">
+      {entries.map(([key, count]) => (
+        <Badge key={key} variant="outline" className="rounded-full border-stone-200 bg-white text-[10px] text-stone-700">
+          {key.replaceAll("_", " ")} · {count}
+        </Badge>
+      ))}
+    </div>
+  );
+}
+
 export default function ExecutionDashboard() {
   const status = trpc.execution.status.useQuery(undefined, {
     refetchInterval: 10_000,
@@ -116,9 +130,9 @@ export default function ExecutionDashboard() {
               Dashboard verificable de 50 paral·lelitzacions
             </h1>
             <p className="mt-3 max-w-4xl text-sm leading-6 text-stone-300">
-              Descoberta oficial, agrupació d’aliases, frontera per identitat
-              codi–color, captura de fitxes i evidència visual. Les URLs repetides
-              no incrementen el recompte de productes i cap identitat es declara
+              Vectors independents per mercat i àmbit, agrupació d’aliases,
+              frontera per identitat codi–color i captura de fitxes. Les URLs
+              repetides no incrementen el recompte i cap identitat es declara
               canònica global sense deduplicació transversal.
             </p>
           </div>
@@ -183,6 +197,25 @@ export default function ExecutionDashboard() {
 
       <Card className="border-stone-200">
         <CardHeader className="border-b border-stone-100">
+          <CardTitle className="font-serif text-2xl">Cobertura del darrer frontier global</CardTitle>
+          <CardDescription>
+            Identitats observades per mercat i per àmbit; no són inferències de fàbrica ni recompte canònic.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-5 p-5 lg:grid-cols-2">
+          <div>
+            <p className="mb-3 text-[10px] font-bold tracking-[0.16em] text-stone-500">MERCATS</p>
+            <CoverageList values={data.discovery?.sourceMarketCounts ?? {}} />
+          </div>
+          <div>
+            <p className="mb-3 text-[10px] font-bold tracking-[0.16em] text-stone-500">ÀMBITS</p>
+            <CoverageList values={data.discovery?.sourceScopeCounts ?? {}} />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-stone-200">
+        <CardHeader className="border-b border-stone-100">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
             <div className="space-y-2">
               <div className="flex flex-wrap gap-2">
@@ -192,10 +225,10 @@ export default function ExecutionDashboard() {
                 <Tone value={data.progress?.status ?? "PROGRESS_NOT_PERSISTED"} />
               </div>
               <CardTitle className="font-serif text-2xl">
-                Manifestos, progrés acumulatiu i bloquejos
+                Manifestos, ledger append-only i bloquejos
               </CardTitle>
               <CardDescription>
-                Últim checkpoint persistit: run {data.latestRunId ?? "no disponible"}.
+                Últim checkpoint: run {data.latestRunId ?? "no disponible"}. Deltes immutables: {data.progress?.deltaCount ?? 0}.
               </CardDescription>
             </div>
             <div className="flex gap-2">
@@ -216,28 +249,16 @@ export default function ExecutionDashboard() {
         <CardContent className="grid gap-5 p-5 xl:grid-cols-[1fr_1fr]">
           <div className="space-y-3">
             <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
-              <p className="text-[10px] font-bold tracking-[0.16em] text-stone-500">
-                SHA-256 DESCOBERTA
-              </p>
-              <p className="mt-2 break-all font-mono text-[10px] leading-5">
-                {data.discovery?.manifestSha256 ?? "pendent"}
-              </p>
+              <p className="text-[10px] font-bold tracking-[0.16em] text-stone-500">SHA-256 DESCOBERTA</p>
+              <p className="mt-2 break-all font-mono text-[10px] leading-5">{data.discovery?.manifestSha256 ?? "pendent"}</p>
             </div>
             <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
-              <p className="text-[10px] font-bold tracking-[0.16em] text-stone-500">
-                SHA-256 PRODUCTE
-              </p>
-              <p className="mt-2 break-all font-mono text-[10px] leading-5">
-                {data.product?.manifestSha256 ?? "pendent"}
-              </p>
+              <p className="text-[10px] font-bold tracking-[0.16em] text-stone-500">SHA-256 PRODUCTE</p>
+              <p className="mt-2 break-all font-mono text-[10px] leading-5">{data.product?.manifestSha256 ?? "pendent"}</p>
             </div>
             <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
-              <p className="text-[10px] font-bold tracking-[0.16em] text-stone-500">
-                SHA-256 PROGRÉS ACUMULATIU
-              </p>
-              <p className="mt-2 break-all font-mono text-[10px] leading-5">
-                {data.progress?.progressSha256 ?? "pendent"}
-              </p>
+              <p className="text-[10px] font-bold tracking-[0.16em] text-stone-500">SHA-256 LEDGER</p>
+              <p className="mt-2 break-all font-mono text-[10px] leading-5">{data.progress?.progressSha256 ?? "pendent"}</p>
             </div>
             <div className="grid grid-cols-2 gap-3 text-xs text-stone-600">
               <p><b>Materials:</b> {counters.materialEvidence}</p>
@@ -252,14 +273,10 @@ export default function ExecutionDashboard() {
               BLOQUEJOS OBERTS
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              {data.blockers.map((blocker: string) => (
-                <Tone key={blocker} value={blocker} />
-              ))}
+              {data.blockers.map((blocker: string) => <Tone key={blocker} value={blocker} />)}
             </div>
             <p className="mt-4 text-xs leading-5 text-amber-900">
-              Els reclams “Made in” són evidència textual, no verificació d’una
-              fàbrica. La regió comercial no s’utilitza mai per inferir lloc de
-              fabricació. Les imatges continuen en quarantena de drets.
+              Els reclams “Made in” són evidència textual, no verificació d’una fàbrica. La regió comercial no s’utilitza mai per inferir fabricació. Les imatges continuen en quarantena de drets.
             </p>
           </div>
         </CardContent>
@@ -267,12 +284,9 @@ export default function ExecutionDashboard() {
 
       <Card className="border-stone-200">
         <CardHeader className="border-b border-stone-100">
-          <CardTitle className="font-serif text-2xl">
-            F01–F50: descoberta i identitat de producte
-          </CardTitle>
+          <CardTitle className="font-serif text-2xl">F01–F50: vectors independents</CardTitle>
           <CardDescription>
-            Estat llegit dels manifestos persistits. “Partial” significa que la
-            pista va conservar evidència útil però manté algun reintent o gate obert.
+            Cada pista conserva mercat, regió i àmbit. “Partial” manté evidència útil però deixa algun gate o reintent obert.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4">
@@ -283,8 +297,11 @@ export default function ExecutionDashboard() {
                   <span className="font-serif text-xl">{worker.slot}</span>
                   <Tone value={`DISCOVERY_${worker.discovery?.status ?? "PENDING"}`} />
                 </div>
-                <div className="mt-2">
-                  <Tone value={`PRODUCT_${worker.product?.status ?? "PENDING"}`} />
+                <div className="mt-2"><Tone value={`PRODUCT_${worker.product?.status ?? "PENDING"}`} /></div>
+                <div className="mt-3 rounded-lg bg-stone-50 px-2.5 py-2 text-[10px] leading-4 text-stone-600">
+                  <b className="text-stone-900">{worker.lane?.market ?? "MERCAT PENDENT"}</b>
+                  <br />
+                  {worker.lane?.regionGroup ?? "REGIÓ PENDENT"} · {(worker.lane?.scope ?? "ÀMBIT PENDENT").replaceAll("_", " ")}
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2 text-[10px] text-stone-500">
                   <span>URLs <b className="text-stone-800">{worker.discovery?.productUrls ?? 0}</b></span>
