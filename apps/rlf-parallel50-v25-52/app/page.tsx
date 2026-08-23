@@ -15,18 +15,19 @@ export default function Page() {
   const sweep=status?.sweep?.summary??{};
   const cards:[string,unknown][]=[
     ['Canònics',funnel.qualifiedSuppliers],
+    ['Ready-to-merge',funnel.readyToMerge],
     ['Projectats',funnel.projectedQualified],
     ['Dominis sweep',sweep.uniqueDomains],
-    ['Provisionals',sweep.qualifiedProvisional],
-    ['Producte directe',sweep.directProductProvisional],
+    ['Provisionals sweep',sweep.qualifiedProvisional],
     ['ACCEPTED_4K',funnel.acceptedPool],
   ];
   return (
     <main style={{width:'min(1280px,calc(100% - 32px))',margin:'auto',padding:'36px 0'}}>
-      <small style={{color:'#d6ff45',letterSpacing:2}}>READY LIKE FREDDY · RLF_REAL_ONLY_V1</small>
+      <small style={{color:'#d6ff45',letterSpacing:2}}>READY LIKE FREDDY · RLF_REAL_ONLY_V1 · DELTA 0048</small>
       <h1 style={{fontSize:'clamp(52px,9vw,100px)',lineHeight:.85,margin:'14px 0'}}>PARALLEL50</h1>
       <h2>{String(deployment.activeWorkers??0)}/50 monitor durable · sweep {String(deployment.latestSweepStatus??'—')}</h2>
-      <p>Workflow 4.4.0 pinat · UE-27 · zero simulacions</p>
+      <p>Workflow 4.4.0 pinat · UE-27 · zero simulacions · bootstrap {String(deployment.sweepBootstrap??'—')}</p>
+      <p style={{fontFamily:'monospace',overflowWrap:'anywhere'}}>Últim SWEEP50: {String(deployment.latestSweepRunId??'—')}</p>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12}}>
         {cards.map(([label,value])=><article key={label} style={{padding:18,border:'1px solid #2d343e',borderRadius:12,background:'#151a20'}}><small>{label}</small><strong style={{display:'block',fontSize:42}}>{String(value??0)}</strong></article>)}
       </div>
