@@ -88,6 +88,10 @@ jobs:
             --slot=${{ matrix.slot }} \
             --queue=execution/queue/queue.json \
             --out=execution/workers/${{ matrix.slot }}
+          node scripts/execution/enrich-discovery-lane.mjs \
+            --slot=${{ matrix.slot }} \
+            --queue=execution/queue/queue.json \
+            --dir=execution/workers/${{ matrix.slot }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -130,6 +134,8 @@ jobs:
             --progress=data/execution/product-progress.json \
             --progressDeltas=data/execution/progress-deltas \
             --out=execution/consolidated
+          node scripts/execution/enrich-product-frontier.mjs \
+            --dir=execution/consolidated
           printf 'frontier_sha256=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').frontierSha256")" >> "$GITHUB_OUTPUT"
           printf 'unique_product_identities=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').uniqueProductIdentityCount")" >> "$GITHUB_OUTPUT"
           printf 'selected_identities=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').selectedIdentityCount")" >> "$GITHUB_OUTPUT"
@@ -192,6 +198,10 @@ jobs:
             --slot=${{ matrix.slot }} \
             --frontier=execution/product-frontier/product-frontier.json \
             --out=execution/product-workers/${{ matrix.slot }}
+          node scripts/execution/enrich-product-worker.mjs \
+            --slot=${{ matrix.slot }} \
+            --frontier=execution/product-frontier/product-frontier.json \
+            --dir=execution/product-workers/${{ matrix.slot }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
