@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-23T13:53:56Z",
+  "sourceRunId": "32643321764",
+  "sourceProductManifestSha256": "c38457745ae522cc913f8029196e645b6c2f76a236b0b18ea061be1a0a13cd42",
+  "sourceDiscoveryManifestSha256": "dcd2269737e59e236f9fa459fc807ec9069938f45a5be19c070e43d7f659c489",
+  "frontier": {
+    "candidateUrlCount": 1119,
+    "candidateIdentityCount": 533,
+    "aliasUrlCount": 586
+  },
+  "completed": {
+    "identityCount": 176,
+    "productUrlCaptureCount": 243,
+    "identityKeys": [
+      "B4334|254", "B6311|567", "B6312|567", "B6312|T31", "D3600|350", "G3600|200", "J1330|198", "J1331|608", "J2317|297", "J2321|28A", "J2323|D09", "J2330|102", "J2660|148", "J2660|248", "J2660|350", "J2660|W19", "J3310|102", "J3318|37C", "J3318|X21", "J3319|69D", "J3330|M37", "J3331|28A", "J3341|70D", "J4620|198", "J7320|102", "J7320|795", "J7412|102", "J7536|198", "J7536|795", "J8535|220", "J8535|Q20", "J8546|33C", "K9551|198", "K9600|198", "K9600|795", "K9601|198", "K9601|795", "K9725|Q20", "K9748|102", "L1179|83A", "L1179|D57", "L1179|Z50", "L1400|774", "L2166|774", "L2168|635", "L2168|D57", "L2169|774", "L2177|102", "L2178|102", "L2179|102", "L3339|102", "L3339|X21", "L3341|102", "L3341|X21", "L3343|102", "L3346|102", "L7255|635", "L7255|81A", "L7255|83A", "L7255|D57", "L7255|J89", "L7255|R82", "L7255|Z50", "L7260|774", "L7311|774", "L8257|D57", "L8258|D57", "L8298|D57", "L9256|81A", "L9256|83A", "L9256|D57", "M1212|157", "M1588|100", "M1588|795", "M2475|608", "M2480|102", "M2480|129", "M2643|102", "M2643|248", "M3519|100", "M3519|102", "M3519|608", "M3574|102", "M3574|608", "M3574|93B", "M3600|200", "M3600|238", "M3600|350", "M3600|597", "M3600|T50", "M3600|T55", "M3636|238", "M3636|350", "M3636|597", "M3636|T50", "M3636|T55", "M3636|T60", "M4580|100", "M4580|102", "M4620|102", "M4620|129", "M4620|266", "M6000|100", "M6000|597", "M6000|T50", "M6581|102", "M6581|Z18", "M7535|184", "M7535|248", "MS2714|774", "MS4717|480", "MS8705|480", "S8505|608", "SB1331|102", "SB1331|225", "SB1345|102", "SB1345|597", "SB8355|102", "SB8355|597", "SG8182|102", "SJ1131|102", "SJ1132|102", "SJ1133|102", "SJ2115|102", "SJ2116|41C", "SJ2165|608", "SJ2166|102", "SK1136|Z38", "SM1138|48B", "SM1139|78A", "SM1142|76A", "SM1143|A03", "SM1144|102", "SM2110|100", "SM2111|100", "SM2117|C40", "SM2118|102", "SM2118|40C", "SM2124|75B", "SM2125|78A", "SM2126|76B", "SM2150-R|143", "SM2151-R|129", "SM2151-R|143", "SM2151-R|Z16", "SM2151-R|Z19", "SM2160|102", "SM2160|608", "SM2161|560", "SM2162|644", "SM2163|X21", "SM2164|102", "SM3115-R|92D", "SM3115-R|93D", "SM7182|N11", "SY1225|T55", "SY1225|T60", "SY3637|350", "SY3660|02C", "SY3660|03B", "SY3660|07B", "SY3660|102", "SY3660|68C", "SY3660|71C", "SY3660|80B", "SY3660|82B", "SY3660|82C", "SY3660|85B", "SY3660|89A", "SY3660|95A", "SY3660|T55", "SY3660|T60", "SY3660|U98", "T5505|102", "T5505|608", "T5510|102"
+    ]
+  },
+  "retry": {
+    "identityCount": 4,
+    "identities": [
+      {"identityKey":"J1331|102","productCode":"J1331","colourCode":"102","failedUrls":["https://www.fredperry.com/us/men/coats-jackets/twill-tennis-bomber-jacket-j1331-102.html"],"statuses":[401],"transports":["JINA_READER_TRANSFORM_FAILED"],"alreadyCapturedViaAlias":false},
+      {"identityKey":"J4620|885","productCode":"J4620","colourCode":"885","failedUrls":["https://www.fredperry.com/us/baseline-men/taped-track-jacket-j4620-885.html"],"statuses":[503],"transports":["JINA_READER_TRANSFORM_FAILED"],"alreadyCapturedViaAlias":false},
+      {"identityKey":"M6000|608","productCode":"M6000","colourCode":"608","failedUrls":["https://www.fredperry.com/us/baseline-men/m6000-m6000-608.html"],"statuses":[401],"transports":["JINA_READER_TRANSFORM_FAILED"],"alreadyCapturedViaAlias":false},
+      {"identityKey":"MS1324|Y18","productCode":"MS1324","colourCode":"Y18","failedUrls":["https://www.fredperry.com/us/gifting/spinning-laurel-wreath-keyring-ms1324-y18.html"],"statuses":[401],"transports":["JINA_READER_TRANSFORM_FAILED"],"alreadyCapturedViaAlias":false}
+    ]
+  },
+  "redundantAliasFailures": [
+    {"identityKey":"L7255|R82","productCode":"L7255","colourCode":"R82","failedUrls":["https://www.fredperry.com/us/men/barrel-bag-l7255-r82.html"],"statuses":[503],"transports":["JINA_READER_TRANSFORM_FAILED"],"alreadyCapturedViaAlias":true},
+    {"identityKey":"L8258|D57","productCode":"L8258","colourCode":"D57","failedUrls":["https://www.fredperry.com/us/men/bags/classic-side-bag-l8258-d57.html"],"statuses":[401],"transports":["JINA_READER_TRANSFORM_FAILED"],"alreadyCapturedViaAlias":true},
+    {"identityKey":"SM2124|75B","productCode":"SM2124","colourCode":"75B","failedUrls":["https://www.fredperry.com/us/collaborations/overprint-long-sleeve-henley-polo-shirt-sm2124-75b.html"],"statuses":[401],"transports":["JINA_READER_TRANSFORM_FAILED"],"alreadyCapturedViaAlias":true}
+  ],
+  "counters": {
+    "officialProductImageReferenceCount": 2271,
+    "materialEvidenceCount": 293,
+    "manufacturingClaimCount": 42,
+    "factoryVerifiedCount": 0,
+    "globalCanonicalProductCount": 0
+  },
+  "artifact": {
+    "productArtifactId": 9494294711,
+    "productArtifactName": "rlf-kb-product-pages-32643321764",
+    "productArtifactDigest": "sha256:df379a03bb10105808a9fca212eb55395b1c5aa3fcafbd97b5a8a1f6af947ebc",
+    "productArtifactExpiresAt": "2026-09-22T13:53:55Z",
+    "discoveryArtifactId": 9494254245,
+    "discoveryArtifactName": "rlf-kb-official-discovery-32643321764",
+    "discoveryArtifactDigest": "sha256:1b748f0608ea26ded3cd9a62ea7bdbe1c457c1e7ad436ee4edebf297aa598b36",
+    "discoveryArtifactExpiresAt": "2026-09-22T13:50:47Z"
+  },
+  "status": "PARTIAL_BATCH_ACCEPTED_AS_EVIDENCE_NOT_CANONICAL"
+}
