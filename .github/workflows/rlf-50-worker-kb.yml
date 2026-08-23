@@ -1,20 +1,12 @@
 name: RLF 50-worker KB official discovery
 
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
     paths:
-      - '.github/workflows/rlf-50-worker-kb.yml'
-      - 'scripts/execution/**'
       - 'data/execution/rlf-kb-official-seeds.json'
       - 'data/execution/rlf-kb-run-plan.json'
-      - 'data/execution/product-progress.json'
-      - 'server/executionStatus.ts'
-      - 'server/routers/executionRouter.ts'
-      - 'server/routers.ts'
-      - 'client/src/pages/ExecutionDashboard.tsx'
-      - 'client/src/App.tsx'
-      - 'client/src/components/DashboardLayout.tsx'
   workflow_dispatch:
     inputs:
       per_worker_limit:
@@ -35,7 +27,7 @@ env:
   SOURCE_BRANCH: feature/rlf-execution-backend-20260823
 
 concurrency:
-  group: rlf-kb-50-workers-${{ github.ref }}
+  group: rlf-kb-50-workers
   cancel-in-progress: true
 
 jobs:
@@ -48,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.SOURCE_BRANCH }}
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -80,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.SOURCE_BRANCH }}
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -115,7 +107,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.SOURCE_BRANCH }}
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -136,6 +128,7 @@ jobs:
             --input=execution/downloaded-workers \
             --queue=execution/queue/queue.json \
             --progress=data/execution/product-progress.json \
+            --progressDeltas=data/execution/progress-deltas \
             --out=execution/consolidated
           printf 'frontier_sha256=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').frontierSha256")" >> "$GITHUB_OUTPUT"
           printf 'unique_product_identities=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').uniqueProductIdentityCount")" >> "$GITHUB_OUTPUT"
@@ -170,23 +163,6 @@ jobs:
             throw new Error(`Identity frontier is insufficient: ${JSON.stringify(manifest.totals)}`);
           }
           NODE
-      - name: Persist discovery checkpoint
-        if: github.event_name != 'pull_request'
-        run: |
-          set -euo pipefail
-          git pull --rebase origin "${SOURCE_BRANCH}"
-          destination="data/execution/runs/${GITHUB_RUN_ID}"
-          mkdir -p "$destination"
-          cp execution/consolidated/manifest.json "$destination/manifest.json"
-          cp execution/consolidated/product-frontier.json "$destination/product-frontier.json"
-          cp execution/consolidated/product-identities.ndjson "$destination/product-identities.ndjson"
-          cp execution/consolidated/product-identity-aliases.json "$destination/product-identity-aliases.json"
-          cp execution/DISCOVERY_EVIDENCE_SHA256SUMS.txt "$destination/DISCOVERY_EVIDENCE_SHA256SUMS.txt"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$destination"
-          git commit -m "Persist RLF identity frontier run ${GITHUB_RUN_ID}"
-          git push origin "HEAD:${SOURCE_BRANCH}"
 
   product_worker:
     name: Product ${{ matrix.slot }}
@@ -200,7 +176,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.SOURCE_BRANCH }}
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -231,7 +207,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.SOURCE_BRANCH }}
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -274,24 +250,22 @@ jobs:
             throw new Error(`Identity capture gate failed: ${JSON.stringify(totals)}`);
           }
           NODE
-      - name: Persist product evidence and cumulative progress
-        if: github.event_name != 'pull_request'
+      - name: Persist immutable run checkpoint
+        if: github.event_name == 'workflow_dispatch'
         run: |
           set -euo pipefail
           git pull --rebase origin "${SOURCE_BRANCH}"
           destination="data/execution/runs/${GITHUB_RUN_ID}"
-          mkdir -p "$destination"
+          delta_destination="data/execution/progress-deltas/${GITHUB_RUN_ID}.json"
+          mkdir -p "$destination" "$(dirname "$delta_destination")"
           cp execution/products-consolidated/product-manifest.json "$destination/product-manifest.json"
           cp execution/products-consolidated/product-records.ndjson "$destination/product-records.ndjson"
           cp execution/products-consolidated/image-manifest.ndjson "$destination/image-manifest.ndjson"
           cp execution/products-consolidated/product-progress-delta.json "$destination/product-progress-delta.json"
+          cp execution/products-consolidated/product-progress-delta.json "$delta_destination"
           cp execution/PRODUCT_EVIDENCE_SHA256SUMS.txt "$destination/PRODUCT_EVIDENCE_SHA256SUMS.txt"
-          node scripts/execution/merge-product-progress.mjs \
-            --progress=data/execution/product-progress.json \
-            --delta=execution/products-consolidated/product-progress-delta.json \
-            --out=data/execution/product-progress.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$destination" data/execution/product-progress.json
-          git commit -m "Persist RLF identity evidence run ${GITHUB_RUN_ID}"
+          git add "$destination" "$delta_destination"
+          git commit -m "Persist immutable RLF evidence run ${GITHUB_RUN_ID}"
           git push origin "HEAD:${SOURCE_BRANCH}"
