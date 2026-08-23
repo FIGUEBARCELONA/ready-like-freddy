@@ -1,0 +1,37 @@
+name: TEMP RLF CAND-079 fetch v6.17 PR3
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Fetch current Think Vintage image bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/original evidence/reports
+          UA='Mozilla/5.0 (compatible; RLF-Label-Audit/6.17; +https://github.com/FIGUEBARCELONA/ready-like-freddy)'
+          fetch() {
+            curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 \
+              --user-agent "$UA" --header 'Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8' "$1" --output "$2"
+          }
+          fetch 'https://wearethinkvintage.com/cdn/shop/files/Fred-Perry-Pleated-Tennis-Skirt-S-Think-Vintage-ltd-60456304509268.jpg?v=1768980495&width=1800' 'evidence/original/CAND-079_ALT_front.jpg'
+          fetch 'https://wearethinkvintage.com/cdn/shop/files/Fred-Perry-Pleated-Tennis-Skirt-S-Think-Vintage-ltd-60456304542036.jpg?v=1768980495&width=1800' 'evidence/original/CAND-079_ALT_back.jpg'
+          fetch 'https://wearethinkvintage.com/cdn/shop/files/Fred-Perry-Pleated-Tennis-Skirt-S-Think-Vintage-ltd-60456304574804.jpg?v=1768980495&width=1800' 'evidence/original/CAND-079_ALT_label.jpg'
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME_AND_DIMENSIONS.txt
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-cand079-evidence-v617-pr3
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
