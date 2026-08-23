@@ -41,7 +41,9 @@ function collectProductImages(content, productCode, colourCode) {
     values.push(decodeHtmlEntities(match[1]));
   }
   const codePattern = productCode ? productCode.replaceAll("-", "[-_]") : null;
-  const identityPattern = codePattern && colourCode ? new RegExp(`${codePattern}[-_]${colourCode}(?:[-_.]|$)`, "i") : null;
+  const identityPattern = codePattern && colourCode
+    ? new RegExp(`${codePattern}[-_]${colourCode}(?:[-_.]|$)`, "i")
+    : null;
   return [...new Set(values)]
     .map(value => normalizeUrl(value, "https://www.fredperry.com/"))
     .filter(Boolean)
@@ -57,25 +59,62 @@ function collectProductImages(content, productCode, colourCode) {
     }));
 }
 
+async function fetchIdentityCandidate(candidate) {
+  const urls = [...new Set([candidate.preferredProductUrl, candidate.productUrl, ...(candidate.aliasUrls ?? [])].filter(Boolean))];
+  const aliasAttempts = [];
+  let last = null;
+
+  for (const productUrl of urls) {
+    const fetched = await fetchEvidenceSource(productUrl, {
+      maxBytes,
+      directAttempts: 2,
+      readerAttempts: 3,
+    });
+    aliasAttempts.push({
+      productUrl,
+      fetchOk: fetched.response.ok,
+      sourceTransport: fetched.sourceTransport,
+      transportHttpStatus: fetched.response.status,
+      sourceFetchUrl: fetched.sourceFetchUrl,
+      transportAttempts: fetched.transportAttempts ?? [],
+    });
+    last = { productUrl, fetched };
+    if (fetched.response.ok) return { productUrl, fetched, aliasAttempts };
+  }
+
+  return { productUrl: last?.productUrl ?? candidate.productUrl, fetched: last?.fetched ?? null, aliasAttempts };
+}
+
 for (const candidate of assignment.products.slice(0, limit)) {
   const observedAt = new Date().toISOString();
   let record;
   try {
-    const fetched = await fetchEvidenceSource(candidate.productUrl, { maxBytes });
+    const result = await fetchIdentityCandidate(candidate);
+    if (!result.fetched) throw new Error(`No source transport result for ${candidate.identityKey ?? candidate.candidateKey}`);
+    const { fetched, productUrl, aliasAttempts } = result;
     const response = fetched.response;
     const content = response.body.toString("utf8");
     const isHtml = /html/i.test(response.contentType) || /<html[\s>]/i.test(content.slice(0, 10_000));
-    const fields = extractProductPageFields(content, candidate.productUrl, isHtml);
-    const imageReferences = collectProductImages(content, fields.productCode, fields.colourCode);
+    const fields = extractProductPageFields(content, productUrl, isHtml);
+    const productCode = fields.productCode ?? candidate.productCode;
+    const colourCode = fields.colourCode ?? candidate.colourCode;
+    const identityKey = candidate.identityKey ?? `${productCode}|${colourCode}`;
+    const imageReferences = response.ok ? collectProductImages(content, productCode, colourCode) : [];
     record = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       frontierId: frontier.frontierId,
       frontierSha256: frontier.frontierSha256,
       slot,
       candidateKey: candidate.candidateKey,
-      productUrl: candidate.productUrl,
-      productCode: fields.productCode ?? candidate.productCode,
-      colourCode: fields.colourCode ?? candidate.colourCode,
+      identityKey,
+      requestedProductUrl: candidate.preferredProductUrl ?? candidate.productUrl,
+      productUrl,
+      preferredProductUrl: candidate.preferredProductUrl ?? candidate.productUrl,
+      aliasUrls: candidate.aliasUrls ?? [candidate.productUrl],
+      aliasAttempts,
+      aliasFallbackUsed: productUrl !== (candidate.preferredProductUrl ?? candidate.productUrl),
+      productCode,
+      colourCode,
       displayName: fields.title ?? candidate.displayName,
       observedPrice: fields.observedPrice ?? candidate.observedPrice ?? null,
       description: fields.description,
@@ -85,6 +124,7 @@ for (const candidate of assignment.products.slice(0, limit)) {
       imageReferences,
       sourceTransport: fetched.sourceTransport,
       sourceFetchUrl: fetched.sourceFetchUrl,
+      transportAttempts: fetched.transportAttempts ?? [],
       transportHttpStatus: response.status,
       fetchOk: response.ok,
       contentType: response.contentType,
@@ -95,18 +135,24 @@ for (const candidate of assignment.products.slice(0, limit)) {
       sourceCategoryPages: candidate.sourcePageUrls ?? [candidate.sourcePageUrl],
       sourceSlots: candidate.sourceSlots ?? [candidate.slot],
       observedAt,
-      uniquenessStatus: "PRODUCT_PAGE_CAPTURED_REQUIRES_CROSS_SOURCE_DEDUPLICATION",
-      canonicalStatus: "NOT_CANONICAL",
+      uniquenessStatus: response.ok
+        ? "CODE_COLOUR_IDENTITY_CAPTURED_REQUIRES_GLOBAL_REVIEW"
+        : "IDENTITY_NOT_CAPTURED",
+      canonicalStatus: "NOT_GLOBAL_CANONICAL",
       factoryStatus: "NOT_VERIFIED",
       imageStatus: "OFFICIAL_SOURCE_URLS_ONLY_RIGHTS_UNKNOWN_NOT_INGESTED",
     };
   } catch (error) {
     record = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       frontierId: frontier.frontierId,
       frontierSha256: frontier.frontierSha256,
       slot,
+      candidateKey: candidate.candidateKey,
+      identityKey: candidate.identityKey ?? `${candidate.productCode}|${candidate.colourCode}`,
+      requestedProductUrl: candidate.preferredProductUrl ?? candidate.productUrl,
       productUrl: candidate.productUrl,
+      aliasUrls: candidate.aliasUrls ?? [candidate.productUrl],
       productCode: candidate.productCode,
       colourCode: candidate.colourCode,
       observedAt,
@@ -122,7 +168,7 @@ for (const candidate of assignment.products.slice(0, limit)) {
 }
 
 const summary = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   frontierId: frontier.frontierId,
   frontierSha256: frontier.frontierSha256,
   slot,
@@ -132,6 +178,7 @@ const summary = {
   attemptedProductCount: records.length,
   successfulProductFetchCount: records.filter(record => record.fetchOk).length,
   failedProductFetchCount: records.filter(record => !record.fetchOk).length,
+  aliasFallbackSuccessCount: records.filter(record => record.fetchOk && record.aliasFallbackUsed).length,
   directSourceCount: records.filter(record => record.sourceTransport === "DIRECT_OFFICIAL_HTTP" && record.fetchOk).length,
   transformedReaderSourceCount: records.filter(record => record.sourceTransport === "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE" && record.fetchOk).length,
   imageReferenceCount: records.reduce((sum, record) => sum + (record.imageReferences?.length ?? 0), 0),
