@@ -1,5 +1,6 @@
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { loadProductProgressLedger } from "./progressLedger";
 
 interface WorkerSummary {
   slot: string;
@@ -33,34 +34,6 @@ interface ExecutionManifest {
   completedAt?: string;
 }
 
-interface ProductProgress {
-  sourceRunId?: string;
-  frontier?: {
-    candidateUrlCount?: number;
-    candidateIdentityCount?: number;
-    aliasUrlCount?: number;
-  };
-  completed?: {
-    identityCount?: number;
-    productUrlCaptureCount?: number;
-    identityKeys?: string[];
-    productUrls?: string[];
-  };
-  retry?: {
-    identityCount?: number;
-    identities?: Array<{ identityKey: string }>;
-  };
-  counters?: {
-    officialProductImageReferenceCount?: number;
-    materialEvidenceCount?: number;
-    manufacturingClaimCount?: number;
-    factoryVerifiedCount?: number;
-    globalCanonicalProductCount?: number;
-  };
-  progressSha256?: string;
-  status?: string;
-}
-
 async function readOptionalJson<T>(path: string): Promise<T | null> {
   try {
     return JSON.parse(await readFile(path, "utf8")) as T;
@@ -82,6 +55,14 @@ function productWorkerStatus(worker: WorkerSummary) {
   return "COMPLETE";
 }
 
+function emptyWorkers() {
+  return Array.from({ length: 50 }, (_, index) => ({
+    slot: `F${String(index + 1).padStart(2, "0")}`,
+    discovery: null,
+    product: null,
+  }));
+}
+
 export async function loadLatestExecutionStatus() {
   const executionRoot = resolve(
     process.env.RLF_EXECUTION_DATA_DIR ?? resolve(process.cwd(), "data/execution"),
@@ -89,9 +70,7 @@ export async function loadLatestExecutionStatus() {
   const runsRoot = resolve(
     process.env.RLF_EXECUTION_RUNS_DIR ?? resolve(executionRoot, "runs"),
   );
-  const progress = await readOptionalJson<ProductProgress>(
-    resolve(executionRoot, "product-progress.json"),
-  );
+  const progress = await loadProductProgressLedger(executionRoot);
 
   let runIds: string[] = [];
   try {
@@ -106,13 +85,9 @@ export async function loadLatestExecutionStatus() {
 
   for (const runId of runIds) {
     const runRoot = resolve(runsRoot, runId);
-    const discovery = await readOptionalJson<ExecutionManifest>(
-      resolve(runRoot, "manifest.json"),
-    );
+    const discovery = await readOptionalJson<ExecutionManifest>(resolve(runRoot, "manifest.json"));
     if (!discovery) continue;
-    const product = await readOptionalJson<ExecutionManifest>(
-      resolve(runRoot, "product-manifest.json"),
-    );
+    const product = await readOptionalJson<ExecutionManifest>(resolve(runRoot, "product-manifest.json"));
     const discoveryWorkers = new Map(
       (discovery.workerSummaries ?? []).map(worker => [worker.slot, worker]),
     );
@@ -127,8 +102,7 @@ export async function loadLatestExecutionStatus() {
         slot,
         discovery: discoveryWorker
           ? {
-              status:
-                (discoveryWorker.successfulFetchCount ?? 0) > 0 ? "COMPLETE" : "FAILED",
+              status: (discoveryWorker.successfulFetchCount ?? 0) > 0 ? "COMPLETE" : "FAILED",
               attempted: discoveryWorker.attemptedUrlCount ?? 0,
               successful: discoveryWorker.successfulFetchCount ?? 0,
               failed: discoveryWorker.failedFetchCount ?? 0,
@@ -155,15 +129,10 @@ export async function loadLatestExecutionStatus() {
 
     const discoveryTotals = discovery.totals ?? {};
     const productTotals = product?.totals ?? {};
-    const retryIdentityCount =
-      progress?.retry?.identityCount ?? progress?.retry?.identities?.length ?? 0;
+    const retryIdentityCount = progress.retry.identityCount;
     const blockers = new Set<string>();
-    if ((discoveryTotals.directSourceCount ?? 0) === 0) {
-      blockers.add("ORIGIN_CLOUDFLARE_BLOCKED");
-    }
-    if ((discoveryTotals.transformedReaderSourceCount ?? 0) > 0) {
-      blockers.add("TRANSFORMED_READER_ONLY");
-    }
+    if ((discoveryTotals.directSourceCount ?? 0) === 0) blockers.add("ORIGIN_CLOUDFLARE_BLOCKED");
+    if ((discoveryTotals.transformedReaderSourceCount ?? 0) > 0) blockers.add("TRANSFORMED_READER_ONLY");
     if (!product) blockers.add("PRODUCT_STAGE_NOT_PERSISTED");
     if (product && !product.qualityGatePassed) blockers.add("LATEST_PRODUCT_BATCH_PARTIAL");
     if (retryIdentityCount > 0) blockers.add("PRODUCT_IDENTITY_RETRIES_PENDING");
@@ -174,44 +143,17 @@ export async function loadLatestExecutionStatus() {
     blockers.add("HISTORICAL_COVERAGE_INCOMPLETE");
     blockers.add("FACTORY_VERIFICATION_INCOMPLETE");
 
-    const discoveryCompleteWorkers = workers.filter(
-      worker => worker.discovery?.status === "COMPLETE",
-    ).length;
-    const productCompleteWorkers = workers.filter(
-      worker => worker.product?.status === "COMPLETE",
-    ).length;
-    const productPartialWorkers = workers.filter(
-      worker => worker.product?.status === "PARTIAL",
-    ).length;
+    const discoveryCompleteWorkers = workers.filter(worker => worker.discovery?.status === "COMPLETE").length;
+    const productCompleteWorkers = workers.filter(worker => worker.product?.status === "COMPLETE").length;
+    const productPartialWorkers = workers.filter(worker => worker.product?.status === "PARTIAL").length;
     const backendOperational =
-      discovery.workerCount === 50 &&
-      discoveryCompleteWorkers === 50 &&
-      Boolean(discovery.qualityGatePassed);
+      discovery.workerCount === 50 && discoveryCompleteWorkers === 50 && Boolean(discovery.qualityGatePassed);
     const latestBatchHealthy = !product || Boolean(product.qualityGatePassed);
-
-    const productUrlCandidates =
-      discoveryTotals.uniqueProductUrlCount ?? progress?.frontier?.candidateUrlCount ?? 0;
-    const productIdentityCandidates =
-      discoveryTotals.uniqueProductIdentityCount ??
-      progress?.frontier?.candidateIdentityCount ??
-      0;
-    const aliasProductUrls =
-      discoveryTotals.aliasProductUrlCount ?? progress?.frontier?.aliasUrlCount ?? 0;
-    const productPagesCaptured =
-      progress?.completed?.productUrlCaptureCount ??
-      productTotals.uniqueCapturedProductUrlCount ??
-      productTotals.successfulProductFetchCount ??
-      0;
-    const productIdentitiesCaptured =
-      progress?.completed?.identityCount ??
-      productTotals.successfulIdentityCaptureCount ??
-      0;
 
     return {
       backendConnected: true,
-      backendStatus:
-        backendOperational && latestBatchHealthy ? "OPERATIONAL" : "DEGRADED",
-      provider: "GITHUB_ACTIONS_PERSISTED_MANIFEST",
+      backendStatus: backendOperational && latestBatchHealthy ? "OPERATIONAL" : "DEGRADED",
+      provider: "GITHUB_ACTIONS_APPEND_ONLY_LEDGER",
       latestRunId: runId,
       runUrl: `https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/${runId}`,
       discovery: {
@@ -236,41 +178,30 @@ export async function loadLatestExecutionStatus() {
             completedAt: product.completedAt ?? null,
           }
         : null,
-      progress: progress
-        ? {
-            sourceRunId: progress.sourceRunId ?? null,
-            status: progress.status ?? null,
-            progressSha256: progress.progressSha256 ?? null,
-            retryIdentityCount,
-          }
-        : null,
+      progress: {
+        sourceRunId: progress.sourceRunId ?? null,
+        status: progress.status ?? null,
+        progressSha256: progress.progressSha256,
+        retryIdentityCount,
+        deltaCount: progress.deltaCount,
+        deltaRunIds: progress.deltaRunIds,
+      },
       workers,
       counters: {
-        productUrlCandidates,
-        productIdentityCandidates,
-        aliasProductUrls,
-        productPagesCaptured,
-        productIdentitiesCaptured,
+        productUrlCandidates: discoveryTotals.uniqueProductUrlCount ?? progress.frontier?.candidateUrlCount ?? 0,
+        productIdentityCandidates:
+          discoveryTotals.uniqueProductIdentityCount ?? progress.frontier?.candidateIdentityCount ?? 0,
+        aliasProductUrls:
+          discoveryTotals.aliasProductUrlCount ??
+          Math.max(0, Number(progress.frontier?.candidateUrlCount ?? 0) - Number(progress.frontier?.candidateIdentityCount ?? 0)),
+        productPagesCaptured: progress.completed.productUrlCaptureCount,
+        productIdentitiesCaptured: progress.completed.identityCount,
         retryIdentityCount,
-        imageReferences:
-          progress?.counters?.officialProductImageReferenceCount ??
-          productTotals.officialProductImageReferenceCount ??
-          discoveryTotals.productCandidateImageReferenceCount ??
-          0,
-        materialEvidence:
-          progress?.counters?.materialEvidenceCount ??
-          productTotals.materialEvidenceCount ??
-          0,
-        manufacturingClaims:
-          progress?.counters?.manufacturingClaimCount ??
-          productTotals.manufacturingClaimCount ??
-          0,
-        factoryVerified:
-          progress?.counters?.factoryVerifiedCount ??
-          productTotals.factoryVerifiedCount ??
-          0,
-        canonicalUniqueProducts:
-          progress?.counters?.globalCanonicalProductCount ?? 0,
+        imageReferences: progress.counters.officialProductImageReferenceCount,
+        materialEvidence: progress.counters.materialEvidenceCount,
+        manufacturingClaims: progress.counters.manufacturingClaimCount,
+        factoryVerified: progress.counters.factoryVerifiedCount,
+        canonicalUniqueProducts: progress.counters.globalCanonicalProductCount,
       },
       blockers: [...blockers],
       productStatus: product?.productStatus ?? discovery.productStatus ?? null,
@@ -282,40 +213,38 @@ export async function loadLatestExecutionStatus() {
   return {
     backendConnected: false,
     backendStatus: "NOT_CONNECTED",
-    provider: null,
+    provider: "APPEND_ONLY_LEDGER_WITHOUT_PERSISTED_RUN",
     latestRunId: null,
     runUrl: null,
     discovery: null,
     product: null,
-    progress: progress
-      ? {
-          sourceRunId: progress.sourceRunId ?? null,
-          status: progress.status ?? null,
-          progressSha256: progress.progressSha256 ?? null,
-          retryIdentityCount:
-            progress.retry?.identityCount ?? progress.retry?.identities?.length ?? 0,
-        }
-      : null,
-    workers: Array.from({ length: 50 }, (_, index) => ({
-      slot: `F${String(index + 1).padStart(2, "0")}`,
-      discovery: null,
-      product: null,
-    })),
-    counters: {
-      productUrlCandidates: progress?.frontier?.candidateUrlCount ?? 0,
-      productIdentityCandidates: progress?.frontier?.candidateIdentityCount ?? 0,
-      aliasProductUrls: progress?.frontier?.aliasUrlCount ?? 0,
-      productPagesCaptured: progress?.completed?.productUrlCaptureCount ?? 0,
-      productIdentitiesCaptured: progress?.completed?.identityCount ?? 0,
-      retryIdentityCount:
-        progress?.retry?.identityCount ?? progress?.retry?.identities?.length ?? 0,
-      imageReferences: progress?.counters?.officialProductImageReferenceCount ?? 0,
-      materialEvidence: progress?.counters?.materialEvidenceCount ?? 0,
-      manufacturingClaims: progress?.counters?.manufacturingClaimCount ?? 0,
-      factoryVerified: progress?.counters?.factoryVerifiedCount ?? 0,
-      canonicalUniqueProducts: progress?.counters?.globalCanonicalProductCount ?? 0,
+    progress: {
+      sourceRunId: progress.sourceRunId ?? null,
+      status: progress.status ?? null,
+      progressSha256: progress.progressSha256,
+      retryIdentityCount: progress.retry.identityCount,
+      deltaCount: progress.deltaCount,
+      deltaRunIds: progress.deltaRunIds,
     },
-    blockers: ["EXECUTION_MANIFEST_NOT_FOUND"],
+    workers: emptyWorkers(),
+    counters: {
+      productUrlCandidates: progress.frontier?.candidateUrlCount ?? 0,
+      productIdentityCandidates: progress.frontier?.candidateIdentityCount ?? 0,
+      aliasProductUrls: Math.max(
+        0,
+        Number(progress.frontier?.candidateUrlCount ?? 0) -
+          Number(progress.frontier?.candidateIdentityCount ?? 0),
+      ),
+      productPagesCaptured: progress.completed.productUrlCaptureCount,
+      productIdentitiesCaptured: progress.completed.identityCount,
+      retryIdentityCount: progress.retry.identityCount,
+      imageReferences: progress.counters.officialProductImageReferenceCount,
+      materialEvidence: progress.counters.materialEvidenceCount,
+      manufacturingClaims: progress.counters.manufacturingClaimCount,
+      factoryVerified: progress.counters.factoryVerifiedCount,
+      canonicalUniqueProducts: progress.counters.globalCanonicalProductCount,
+    },
+    blockers: ["EXECUTION_MANIFEST_NOT_FOUND", "GLOBAL_CANONICAL_DEDUPLICATION_PENDING"],
     productStatus: null,
     imageStatus: null,
     factoryStatus: null,
