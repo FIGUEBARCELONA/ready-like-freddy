@@ -1,20 +1,6 @@
 name: RLF 50-worker KB official discovery
 
 on:
-  push:
-    branches:
-      - feature/rlf-execution-backend-20260823
-    paths:
-      - '.github/workflows/rlf-50-worker-kb.yml'
-      - 'scripts/execution/**'
-      - 'data/execution/rlf-kb-official-seeds.json'
-      - 'data/execution/rlf-kb-run-plan.json'
-      - 'server/executionStatus.ts'
-      - 'server/routers/executionRouter.ts'
-      - 'server/routers.ts'
-      - 'client/src/pages/ExecutionDashboard.tsx'
-      - 'client/src/App.tsx'
-      - 'client/src/components/DashboardLayout.tsx'
   pull_request:
     branches:
       - main
