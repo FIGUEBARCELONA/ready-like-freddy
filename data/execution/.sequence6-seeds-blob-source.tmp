@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 3,
+  "manifestId": "RLF-OFFICIAL-GLOBAL-MARKETS-20260823-S6",
+  "purpose": "CURRENT_OFFICIAL_CATALOG_DISCOVERY",
+  "allowedHosts": ["www.fredperry.com", "fredperry.com"],
+  "verificationPolicy": {
+    "officialDomainRequired": true,
+    "siteMapMustExist": true,
+    "retailMarketMustNeverInferFactory": true,
+    "individualProductEvidenceRequiredBeforeIdentityAcceptance": true
+  },
+  "seeds": [
+    {"market":"GB","locale":"en-GB","regionGroup":"EUROPE","pathPrefix":"/","url":"https://www.fredperry.com/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"},
+    {"market":"ES","locale":"es-ES","regionGroup":"EUROPE","pathPrefix":"/eu-es/","url":"https://www.fredperry.com/eu-es/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"},
+    {"market":"DE","locale":"de-DE","regionGroup":"EUROPE","pathPrefix":"/eu-de/","url":"https://www.fredperry.com/eu-de/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"},
+    {"market":"FR","locale":"fr-FR","regionGroup":"EUROPE","pathPrefix":"/eu-fr/","url":"https://www.fredperry.com/eu-fr/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"},
+    {"market":"IT","locale":"it-IT","regionGroup":"EUROPE","pathPrefix":"/eu-it/","url":"https://www.fredperry.com/eu-it/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"},
+    {"market":"PT","locale":"pt-PT","regionGroup":"EUROPE","pathPrefix":"/eu-pt/","url":"https://www.fredperry.com/eu-pt/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"},
+    {"market":"AE","locale":"en-AE","regionGroup":"MIDDLE_EAST","pathPrefix":"/ae-en/","url":"https://www.fredperry.com/ae-en/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"},
+    {"market":"EG","locale":"en-EG","regionGroup":"MIDDLE_EAST","pathPrefix":"/eg-en/","url":"https://www.fredperry.com/eg-en/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"},
+    {"market":"ID","locale":"en-ID","regionGroup":"SOUTHEAST_ASIA","pathPrefix":"/id-en/","url":"https://www.fredperry.com/id-en/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"},
+    {"market":"AU","locale":"en-AU","regionGroup":"OCEANIA","pathPrefix":"/au-en/","url":"https://www.fredperry.com/au-en/site-map","sourceClass":"OFFICIAL_SITE_MAP","verificationStatus":"VERIFIED_OFFICIAL","verifiedAt":"2026-08-23"}
+  ]
+}
