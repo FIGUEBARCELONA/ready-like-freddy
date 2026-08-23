@@ -9,6 +9,14 @@ on:
       - 'scripts/execution/**'
       - 'data/execution/rlf-kb-official-seeds.json'
       - 'data/execution/rlf-kb-run-plan.json'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/rlf-50-worker-kb.yml'
+      - 'scripts/execution/**'
+      - 'data/execution/rlf-kb-official-seeds.json'
+      - 'data/execution/rlf-kb-run-plan.json'
   workflow_dispatch:
     inputs:
       per_worker_limit:
@@ -181,6 +189,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
       - name: Persist compact run manifest in the development branch
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
