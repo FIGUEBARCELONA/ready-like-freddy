@@ -1,0 +1,1 @@
+ALTER TABLE `forensic_decisions` ADD `evidenceRef` varchar(1024) NOT NULL;
