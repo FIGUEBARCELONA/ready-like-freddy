@@ -2,28 +2,18 @@ name: RLF 50-worker KB official discovery
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
     paths:
-      - '.github/workflows/rlf-50-worker-kb.yml'
-      - 'scripts/execution/**'
-      - 'data/execution/rlf-kb-official-seeds.json'
       - 'data/execution/rlf-kb-run-plan.json'
-      - 'server/executionStatus.ts'
-      - 'server/routers/executionRouter.ts'
-      - 'server/routers.ts'
-      - 'client/src/pages/ExecutionDashboard.tsx'
-      - 'client/src/App.tsx'
-      - 'client/src/components/DashboardLayout.tsx'
   workflow_dispatch:
     inputs:
       per_worker_limit:
-        description: 'Maximum official category pages fetched by each discovery worker'
+        description: Maximum official category pages fetched by each discovery worker
         required: true
         default: '5'
         type: string
       product_per_worker_limit:
-        description: 'Maximum individual product pages fetched by each product worker'
+        description: Maximum code-colour identities fetched by each product worker
         required: true
         default: '5'
         type: string
@@ -89,11 +79,9 @@ jobs:
           name: rlf-official-queue
           path: execution/queue
       - name: Capture category evidence and extract product links
-        shell: bash
         env:
           RLF_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.per_worker_limit || '1' }}
         run: |
-          set -euo pipefail
           node scripts/execution/run-official-worker.mjs \
             --slot=${{ matrix.slot }} \
             --queue=execution/queue/queue.json \
@@ -107,14 +95,13 @@ jobs:
           retention-days: 14
 
   consolidate_discovery:
-    name: Consolidate product URL frontier
-    needs:
-      - prepare
-      - discovery_worker
+    name: Consolidate code-colour identity frontier
+    needs: [prepare, discovery_worker]
     runs-on: ubuntu-24.04
     outputs:
       frontier_sha256: ${{ steps.frontier.outputs.frontier_sha256 }}
-      unique_product_urls: ${{ steps.frontier.outputs.unique_product_urls }}
+      unique_product_identities: ${{ steps.frontier.outputs.unique_product_identities }}
+      selected_identities: ${{ steps.frontier.outputs.selected_identities }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -138,13 +125,13 @@ jobs:
           node scripts/execution/consolidate-worker-results.mjs \
             --input=execution/downloaded-workers \
             --queue=execution/queue/queue.json \
+            --progress=data/execution/product-progress.json \
             --out=execution/consolidated
           printf 'frontier_sha256=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').frontierSha256")" >> "$GITHUB_OUTPUT"
-          printf 'unique_product_urls=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').uniqueProductUrlCount")" >> "$GITHUB_OUTPUT"
+          printf 'unique_product_identities=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').uniqueProductIdentityCount")" >> "$GITHUB_OUTPUT"
+          printf 'selected_identities=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').selectedIdentityCount")" >> "$GITHUB_OUTPUT"
       - name: Generate discovery SHA-256 evidence manifest
-        shell: bash
         run: |
-          set -euo pipefail
           find execution/queue execution/downloaded-workers execution/consolidated -type f -print0 \
             | sort -z | xargs -0 sha256sum > execution/DISCOVERY_EVIDENCE_SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
@@ -162,36 +149,33 @@ jobs:
           path: execution/consolidated/product-frontier.json
           if-no-files-found: error
           retention-days: 14
-      - name: Assert factual 50-lane discovery and non-empty product frontier
-        shell: bash
+      - name: Assert factual 50-lane discovery and identity frontier
         run: |
-          set -euo pipefail
           node - <<'NODE'
           const manifest = require('./execution/consolidated/manifest.json');
           if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
             throw new Error('Discovery manifest does not contain exactly 50 workers');
           }
-          if (!manifest.qualityGatePassed || manifest.totals.uniqueProductUrlCount < 50) {
-            throw new Error(`Product frontier is insufficient: ${JSON.stringify(manifest.totals)}`);
+          if (!manifest.qualityGatePassed || manifest.totals.uniqueProductIdentityCount < 50 || manifest.totals.selectedIdentityCount < 1) {
+            throw new Error(`Identity frontier is insufficient: ${JSON.stringify(manifest.totals)}`);
           }
           NODE
       - name: Persist discovery checkpoint
         if: github.event_name != 'pull_request'
-        shell: bash
         run: |
           set -euo pipefail
           git pull --rebase origin "${SOURCE_BRANCH}"
           destination="data/execution/runs/${GITHUB_RUN_ID}"
           mkdir -p "$destination"
           cp execution/consolidated/manifest.json "$destination/manifest.json"
-          cp execution/consolidated/product-candidates.ndjson "$destination/product-candidates.ndjson"
           cp execution/consolidated/product-frontier.json "$destination/product-frontier.json"
-          cp execution/consolidated/duplicate-product-urls.json "$destination/duplicate-product-urls.json"
+          cp execution/consolidated/product-identities.ndjson "$destination/product-identities.ndjson"
+          cp execution/consolidated/product-identity-aliases.json "$destination/product-identity-aliases.json"
           cp execution/DISCOVERY_EVIDENCE_SHA256SUMS.txt "$destination/DISCOVERY_EVIDENCE_SHA256SUMS.txt"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$destination"
-          git commit -m "Persist RLF product frontier run ${GITHUB_RUN_ID}"
+          git commit -m "Persist RLF identity frontier run ${GITHUB_RUN_ID}"
           git push origin "HEAD:${SOURCE_BRANCH}"
 
   product_worker:
@@ -214,12 +198,10 @@ jobs:
         with:
           name: rlf-product-frontier
           path: execution/product-frontier
-      - name: Capture individual official product page
-        shell: bash
+      - name: Capture individual official product identity
         env:
           RLF_PRODUCT_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.product_per_worker_limit || '1' }}
         run: |
-          set -euo pipefail
           node scripts/execution/run-product-worker.mjs \
             --slot=${{ matrix.slot }} \
             --frontier=execution/product-frontier/product-frontier.json \
@@ -233,10 +215,8 @@ jobs:
           retention-days: 14
 
   consolidate_products:
-    name: Consolidate individual product evidence
-    needs:
-      - consolidate_discovery
-      - product_worker
+    name: Consolidate identity evidence
+    needs: [consolidate_discovery, product_worker]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -260,9 +240,7 @@ jobs:
             --frontier=execution/product-frontier/product-frontier.json \
             --out=execution/products-consolidated
       - name: Generate product SHA-256 evidence manifest
-        shell: bash
         run: |
-          set -euo pipefail
           find execution/product-frontier execution/downloaded-product-workers execution/products-consolidated -type f -print0 \
             | sort -z | xargs -0 sha256sum > execution/PRODUCT_EVIDENCE_SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
@@ -274,22 +252,20 @@ jobs:
             execution/PRODUCT_EVIDENCE_SHA256SUMS.txt
           if-no-files-found: warn
           retention-days: 30
-      - name: Assert factual 50-lane product capture
-        shell: bash
+      - name: Assert complete identity batch
         run: |
-          set -euo pipefail
           node - <<'NODE'
           const manifest = require('./execution/products-consolidated/product-manifest.json');
+          const totals = manifest.totals;
           if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
             throw new Error('Product manifest does not contain exactly 50 workers');
           }
-          if (!manifest.qualityGatePassed || manifest.totals.successfulProductFetchCount < 50) {
-            throw new Error(`Product capture gate failed: ${JSON.stringify(manifest.totals)}`);
+          if (!manifest.qualityGatePassed || totals.successfulIdentityCaptureCount !== totals.expectedProductCaptureCount) {
+            throw new Error(`Identity capture gate failed: ${JSON.stringify(totals)}`);
           }
           NODE
-      - name: Persist product evidence checkpoint
+      - name: Persist product evidence and cumulative progress
         if: github.event_name != 'pull_request'
-        shell: bash
         run: |
           set -euo pipefail
           git pull --rebase origin "${SOURCE_BRANCH}"
@@ -298,9 +274,14 @@ jobs:
           cp execution/products-consolidated/product-manifest.json "$destination/product-manifest.json"
           cp execution/products-consolidated/product-records.ndjson "$destination/product-records.ndjson"
           cp execution/products-consolidated/image-manifest.ndjson "$destination/image-manifest.ndjson"
+          cp execution/products-consolidated/product-progress-delta.json "$destination/product-progress-delta.json"
           cp execution/PRODUCT_EVIDENCE_SHA256SUMS.txt "$destination/PRODUCT_EVIDENCE_SHA256SUMS.txt"
+          node scripts/execution/merge-product-progress.mjs \
+            --progress=data/execution/product-progress.json \
+            --delta=execution/products-consolidated/product-progress-delta.json \
+            --out=data/execution/product-progress.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$destination"
-          git commit -m "Persist RLF product evidence run ${GITHUB_RUN_ID}"
+          git add "$destination" data/execution/product-progress.json
+          git commit -m "Persist RLF identity evidence run ${GITHUB_RUN_ID}"
           git push origin "HEAD:${SOURCE_BRANCH}"
