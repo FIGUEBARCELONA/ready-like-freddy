@@ -23,29 +23,52 @@ jobs:
           npm install playwright@1.55.0
           npx playwright install chromium --with-deps
 
-      - name: Open public UploadNow share and recover package
+      - name: Capture the public package download URL without downloading 23 GB
         env:
           TARGET_URL: https://uploadnow.io/f/mFyDB1H
+          CAPTURE_DOWNLOAD_URL_ONLY: '1'
         run: node tools/fetch-uploadnow.cjs
 
-      - name: Inventory and hash recovered bytes
+      - name: Inventory the remote ZIP through HTTP byte ranges
+        run: python tools/inventory-remote-zip.py
+
+      - name: Remove ephemeral signed URLs from retained diagnostics
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from urllib.parse import urlsplit, urlunsplit
+
+          root = Path('diagnostics')
+          source = root / 'download-candidates.json'
+          if source.is_file():
+              records = json.loads(source.read_text(encoding='utf-8'))
+              for record in records:
+                  url = record.get('url')
+                  if url:
+                      parts = urlsplit(url)
+                      record['url'] = urlunsplit((parts.scheme, parts.netloc, parts.path, 'REDACTED', ''))
+              source.write_text(json.dumps(records, indent=2) + '\n', encoding='utf-8')
+          (root / 'download-url.txt').unlink(missing_ok=True)
+          PY
+
+      - name: Inventory and hash retained evidence
         if: always()
         run: |
           set -euo pipefail
           find downloaded -type f -printf '%P\t%s bytes\n' | sort | tee diagnostics/download-inventory.tsv
-          if find downloaded -type f -print -quit | grep -q .; then
-            find downloaded -type f -print0 | sort -z | xargs -0 sha256sum | tee diagnostics/SHA256SUMS.txt
-          fi
           find diagnostics -type f -printf '%P\t%s bytes\n' | sort > diagnostics/diagnostics-inventory.tsv
+          find diagnostics -type f ! -name EVIDENCE_SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > diagnostics/EVIDENCE_SHA256SUMS.txt
 
-      - name: Upload recovered package and diagnostics
+      - name: Upload remote ZIP inventory and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: uploadnow-mFyDB1H-public-route-pr
+          name: uploadnow-mFyDB1H-remote-zip-inventory-pr
           path: |
             downloaded/**
             diagnostics/**
           if-no-files-found: error
           retention-days: 7
-          compression-level: 0
+          compression-level: 6
