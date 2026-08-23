@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "planId": "RLF-KB-GLOBAL-MARKET-EXPANSION-20260823",
-  "pilotRunSequence": 6,
-  "phaseId": "CURRENT_GLOBAL_MARKET_EXPANSION_01",
+  "pilotRunSequence": 7,
+  "phaseId": "CURRENT_GLOBAL_MARKET_EXPANSION_01_INSTRUMENTED",
   "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
   "periodStart": "1940-01-01",
   "periodEnd": "2026-08-31",
@@ -20,7 +20,8 @@
     "strategy": "OFFICIAL_SITEMAP_MARKET_SCOPE_STRATIFICATION",
     "scopeOrder": ["MEN_CORE", "WOMEN_CORE", "COLLABORATIONS", "HERITAGE", "ACCESSORIES_KIDS"],
     "exactlyFiftyNonEmptyLanesRequired": true,
-    "retailMarketMustNeverInferFactory": true
+    "retailMarketMustNeverInferFactory": true,
+    "runPointerRequired": true
   },
   "transportPolicy": {
     "directAttempts": 2,
