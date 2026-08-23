@@ -29,7 +29,7 @@ async function resolveHost(host:string){
     const json=JSON.parse(asText(suggest.bytes));
     const rows=json?.resources?.results?.products??[];
     for(const row of rows){
-      const path=row.url??row.handle&&`/products/${row.handle}`;
+      const path=row.url??(row.handle?`/products/${row.handle}`:null);
       if(!path) continue;
       const productUrl=new URL(path,base).toString();
       const page=await getBytes(productUrl);
