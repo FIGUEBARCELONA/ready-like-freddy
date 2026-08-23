@@ -49,7 +49,7 @@ export type LaneCycleResult={
   searchAttempts:ProviderAttempt[];
 };
 
-export type CampaignInput={campaignId:string;cycles:number;interval:string;maxCandidatesPerLaneCycle:number};
+export type CampaignInput={campaignId:string;cycles:number;intervalMs:number;maxCandidatesPerLaneCycle:number};
 export type SweepInput={campaignId:string;cycle:number;maxCandidatesPerLaneCycle:number};
 export type ProviderStats=Record<string,{attempts:number;http200:number;relevantLinks:number;challenges:number;errors:number;durationMs:number}>;
 
