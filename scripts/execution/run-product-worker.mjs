@@ -18,7 +18,9 @@ const frontier = await readJson(frontierPath);
 if (frontier.workerCount !== 50) throw new Error(`Frontier workerCount must be 50, got ${frontier.workerCount}`);
 const assignment = frontier.assignments.find(entry => entry.slot === slot);
 if (!assignment) throw new Error(`No product assignment found for ${slot}`);
-const limit = Number(args.limit ?? process.env.RLF_PRODUCT_PER_WORKER_LIMIT ?? 1);
+const requestedLimit = Number(args.limit ?? process.env.RLF_PRODUCT_PER_WORKER_LIMIT ?? 1);
+const frontierLimit = Number(frontier.productPerWorkerLimit ?? 1);
+const limit = Math.max(requestedLimit, frontierLimit);
 if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error(`Invalid product limit: ${limit}`);
 const maxBytes = Number(args.maxBytes ?? process.env.RLF_MAX_RESPONSE_BYTES ?? 8 * 1024 * 1024);
 const allowedHosts = ["www.fredperry.com", "fredperry.com"];
@@ -39,9 +41,7 @@ function collectProductImages(content, productCode, colourCode) {
     values.push(decodeHtmlEntities(match[1]));
   }
   const codePattern = productCode ? productCode.replaceAll("-", "[-_]") : null;
-  const identityPattern = codePattern && colourCode
-    ? new RegExp(`${codePattern}[-_]${colourCode}(?:[-_.]|$)`, "i")
-    : null;
+  const identityPattern = codePattern && colourCode ? new RegExp(`${codePattern}[-_]${colourCode}(?:[-_.]|$)`, "i") : null;
   return [...new Set(values)]
     .map(value => normalizeUrl(value, "https://www.fredperry.com/"))
     .filter(Boolean)
@@ -126,7 +126,9 @@ const summary = {
   frontierId: frontier.frontierId,
   frontierSha256: frontier.frontierSha256,
   slot,
+  configuredProductLimit: frontierLimit,
   assignedProductCount: assignment.products.length,
+  expectedProductCount: Math.min(frontierLimit, assignment.products.length),
   attemptedProductCount: records.length,
   successfulProductFetchCount: records.filter(record => record.fetchOk).length,
   failedProductFetchCount: records.filter(record => !record.fetchOk).length,
