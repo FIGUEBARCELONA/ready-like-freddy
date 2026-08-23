@@ -8,9 +8,8 @@ export const maxDuration=60;
 export const preferredRegion='fra1';
 
 const OWNER_HASH='e942da2df116775a1f9caba47b5870a19a1058612a8a18c15fa168d28d3afec2';
-const SWEEP_BOOTSTRAP_HASH='5974d9cd57b6c40f889010a0080950e16103b2b8943078c2bb812c9ad1b9798b';
 const MONITOR_RUN_ID='wrun_01M0Q8981CTB61S3DJJ06JZ2FW';
-const LATEST_SWEEP_RUN_ID='';
+const LATEST_SWEEP_RUN_ID='wrun_01M0QED8R4PHBR97F10N22HE36';
 
 const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{'cache-control':'no-store'}});
 const digest=(value:string)=>createHash('sha256').update(value).digest();
@@ -45,32 +44,26 @@ async function startMonitor() {
   return {campaignId:id,runId:run.runId};
 }
 
-export async function GET(request:Request,{params}:{params:Promise<{path:string[]}>}) {
+export async function GET(_request:Request,{params}:{params:Promise<{path:string[]}>}) {
   const parts=(await params).path??[];
   const path=parts.join('/');
-  const url=new URL(request.url);
 
   if(path==='health') return json({
     ok:true,
-    version:'25.52.2',
+    version:'25.52.4',
     workflowVersion:'4.4.0_PINNED',
     executionBackend:'VERCEL_WORKFLOW',
     queue:'VERCEL_QUEUES_MANAGED',
     persistence:'WORKFLOW_EVENT_LOG',
     parallelism:50,
     currentMonitorRunId:MONITOR_RUN_ID,
-    latestSweepRunId:LATEST_SWEEP_RUN_ID||null,
+    latestSweepRunId:LATEST_SWEEP_RUN_ID,
+    sweepBootstrap:'CLOSED',
     simulatedWorkersStarted:0,
     checkedAt:new Date().toISOString(),
   });
 
-  if(path==='sweep-bootstrap') {
-    if(!secureEqual(url.searchParams.get('token')??'',SWEEP_BOOTSTRAP_HASH)) return json({ok:false,code:'NOT_FOUND'},404);
-    const started=await startSweep();
-    return json({ok:true,state:'SWEEP_STARTED',...started,parallelism:50,simulatedWorkersStarted:0},202);
-  }
-
-  if(path==='bootstrap') return json({ok:false,code:'BOOTSTRAP_CLOSED'},410);
+  if(path==='sweep-bootstrap'||path==='bootstrap') return json({ok:false,code:'BOOTSTRAP_CLOSED'},410);
 
   if(path==='status') {
     const [monitor,sweep]=await Promise.all([runState(MONITOR_RUN_ID),runState(LATEST_SWEEP_RUN_ID,true)]);
@@ -80,10 +73,10 @@ export async function GET(request:Request,{params}:{params:Promise<{path:string[
       deployment:{
         executionBackend:'CONNECTED',scheduler:'VERCEL_WORKFLOW',durableQueue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',
         activeWorkers:monitor.active,activeLanes:monitor.active,currentRunId:MONITOR_RUN_ID,currentRunStatus:monitor.status,
-        latestSweepRunId:LATEST_SWEEP_RUN_ID||null,latestSweepStatus:sweep.status,simulatedWorkersStarted:0,
+        latestSweepRunId:LATEST_SWEEP_RUN_ID,latestSweepStatus:sweep.status,sweepBootstrap:'CLOSED',simulatedWorkersStarted:0,
       },
       sweep:{summary:sweep.output?{...sweep.output,candidates:undefined}:null},
-      funnel:{qualifiedSuppliers:151,readyToMerge:7,projectedQualified:158,remainingTo10000:9842,acceptedPool:0,liveSelection:0,reserves:0},
+      funnel:{qualifiedSuppliers:151,readyToMerge:9,projectedQualified:160,remainingTo10000:9840,acceptedPool:0,liveSelection:0,reserves:0},
     });
   }
 
@@ -98,7 +91,7 @@ export async function GET(request:Request,{params}:{params:Promise<{path:string[
 
   if(path==='results/latest') {
     const state=await runState(LATEST_SWEEP_RUN_ID,true);
-    return state.status==='completed'?json({ok:true,runId:LATEST_SWEEP_RUN_ID,result:state.output}):json({ok:false,code:'SWEEP_NOT_COMPLETED',runId:LATEST_SWEEP_RUN_ID||null,status:state.status},409);
+    return state.status==='completed'?json({ok:true,runId:LATEST_SWEEP_RUN_ID,result:state.output}):json({ok:false,code:'SWEEP_NOT_COMPLETED',runId:LATEST_SWEEP_RUN_ID,status:state.status},409);
   }
 
   return json({ok:false,code:'NOT_FOUND'},404);
