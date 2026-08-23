@@ -8,9 +8,8 @@ export const maxDuration=60;
 export const preferredRegion='fra1';
 
 const OWNER_HASH='e942da2df116775a1f9caba47b5870a19a1058612a8a18c15fa168d28d3afec2';
-const SWEEP_BOOTSTRAP_HASH='6dbbe53b2ab3fd1a74c186e27d894518c2a0fb6406b1e8d27109fafb167e34d0';
 const MONITOR_RUN_ID='wrun_01M0Q8981CTB61S3DJJ06JZ2FW';
-const LATEST_SWEEP_RUN_ID='wrun_01M0QED8R4PHBR97F10N22HE36';
+const LATEST_SWEEP_RUN_ID='wrun_01M0QTVFR2J9Y7MK4N5G9D40VC';
 
 const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{'cache-control':'no-store'}});
 const digest=(value:string)=>createHash('sha256').update(value).digest();
@@ -32,57 +31,34 @@ async function runState(id:string,includeOutput=false) {
 }
 
 const campaignId=(prefix:string)=>`${prefix}-${new Date().toISOString().replace(/[-:.TZ]/g,'').slice(0,14)}-${randomUUID().slice(0,8)}`;
-
 async function startSweep() {
-  const id=campaignId('RLF-P50-SWEEP-V2553');
-  const run=await start(parallel50Sweep,[{campaignId:id,cycle:1,maxCandidatesPerLaneCycle:6}]);
+  const id=campaignId('RLF-P50-SWEEP-V25531');
+  const run=await start(parallel50Sweep,[{campaignId:id,cycle:2,maxCandidatesPerLaneCycle:6}]);
   return {campaignId:id,runId:run.runId};
 }
-
 async function startMonitor() {
-  const id=campaignId('RLF-P50-MONITOR-V2553');
+  const id=campaignId('RLF-P50-MONITOR-V25531');
   const run=await start(parallel50Campaign,[{campaignId:id,cycles:12,intervalMs:7200000,maxCandidatesPerLaneCycle:5}]);
   return {campaignId:id,runId:run.runId};
 }
 
-export async function GET(request:Request,{params}:{params:Promise<{path:string[]}>}) {
+export async function GET(_request:Request,{params}:{params:Promise<{path:string[]}>}) {
   const parts=(await params).path??[];
   const path=parts.join('/');
-  const url=new URL(request.url);
-
-  if(path==='health') return json({
-    ok:true,version:'25.53.0',workflowVersion:'4.4.0_PINNED',executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,
-    currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'ONE_TIME_OPEN',searchProfile:'EU27_LOCALIZED_V2',simulatedWorkersStarted:0,checkedAt:new Date().toISOString(),
-  });
-
-  if(path==='sweep-bootstrap') {
-    if(!secureEqual(url.searchParams.get('token')??'',SWEEP_BOOTSTRAP_HASH)) return json({ok:false,code:'NOT_FOUND'},404);
-    const started=await startSweep();
-    return json({ok:true,state:'SWEEP_STARTED',...started,parallelism:50,cycle:1,maxCandidatesPerLane:6,simulatedWorkersStarted:0},202);
-  }
-
-  if(path==='bootstrap') return json({ok:false,code:'BOOTSTRAP_CLOSED'},410);
-
+  if(path==='health') return json({ok:true,version:'25.53.1',workflowVersion:'4.4.0_PINNED',executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'CLOSED',searchProfile:'EU27_LEGAL_COUNTRY_V3',simulatedWorkersStarted:0,checkedAt:new Date().toISOString()});
+  if(path==='sweep-bootstrap'||path==='bootstrap') return json({ok:false,code:'BOOTSTRAP_CLOSED'},410);
   if(path==='status') {
     const [monitor,sweep]=await Promise.all([runState(MONITOR_RUN_ID),runState(LATEST_SWEEP_RUN_ID,true)]);
-    return json({
-      ok:true,generatedAt:new Date().toISOString(),
-      deployment:{executionBackend:'CONNECTED',scheduler:'VERCEL_WORKFLOW',durableQueue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',activeWorkers:monitor.active,activeLanes:monitor.active,currentRunId:MONITOR_RUN_ID,currentRunStatus:monitor.status,latestSweepRunId:LATEST_SWEEP_RUN_ID,latestSweepStatus:sweep.status,sweepBootstrap:'ONE_TIME_OPEN',searchProfile:'EU27_LOCALIZED_V2',simulatedWorkersStarted:0},
-      sweep:{summary:sweep.output?{...sweep.output,candidates:undefined}:null},
-      funnel:{qualifiedSuppliers:151,readyToMerge:9,projectedQualified:160,remainingTo10000:9840,acceptedPool:0,liveSelection:0,reserves:0},
-    });
+    return json({ok:true,generatedAt:new Date().toISOString(),deployment:{executionBackend:'CONNECTED',scheduler:'VERCEL_WORKFLOW',durableQueue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',activeWorkers:monitor.active,activeLanes:monitor.active,currentRunId:MONITOR_RUN_ID,currentRunStatus:monitor.status,latestSweepRunId:LATEST_SWEEP_RUN_ID,latestSweepStatus:sweep.status,sweepBootstrap:'CLOSED',searchProfile:'EU27_LEGAL_COUNTRY_V3',simulatedWorkersStarted:0},sweep:{summary:sweep.output?{...sweep.output,candidates:undefined}:null},funnel:{qualifiedSuppliers:151,readyToMerge:9,projectedQualified:160,remainingTo10000:9840,acceptedPool:0,liveSelection:0,reserves:0}});
   }
-
   if(parts[0]==='run'&&parts[1]) {
     const state=await runState(parts[1],true);
     return json({ok:state.status!=='unavailable',runId:parts[1],status:state.status,activeWorkers:state.active,activeLanes:state.active,executionSemantics:['running','pending'].includes(state.status)?'DURABLE_RUNNING_OR_SCHEDULED':'TERMINAL',summary:state.output?{...state.output,candidates:undefined}:null,result:state.output,error:state.error},state.status==='unavailable'?404:200);
   }
-
   if(path==='results/latest') {
     const state=await runState(LATEST_SWEEP_RUN_ID,true);
     return state.status==='completed'?json({ok:true,runId:LATEST_SWEEP_RUN_ID,result:state.output}):json({ok:false,code:'SWEEP_NOT_COMPLETED',runId:LATEST_SWEEP_RUN_ID,status:state.status},409);
   }
-
   return json({ok:false,code:'NOT_FOUND'},404);
 }
 
