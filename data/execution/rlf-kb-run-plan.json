@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "planId": "RLF-KB-OFFICIAL-DISCOVERY-20260823-PILOT",
+  "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
+  "periodStart": "1940-01-01",
+  "periodEnd": "2026-08-31",
+  "geographyScope": "GLOBAL",
+  "workerCount": 50,
+  "pilotPerWorkerLimit": 1,
+  "manualDefaultPerWorkerLimit": 5,
+  "requestDelayMs": 750,
+  "maxResponseBytes": 8388608,
+  "imagePolicy": {
+    "storeBinary": false,
+    "recordSourceUrls": true,
+    "defaultRightsStatus": "UNKNOWN",
+    "defaultIngestionStatus": "NOT_INGESTED"
+  },
+  "uniquenessPolicy": {
+    "candidateOnly": true,
+    "canonicalProductRequiresEvidence": true,
+    "deduplicateBy": ["canonicalUrl", "productCode", "modelName", "colourName", "sourceSha256"]
+  }
+}
