@@ -162,8 +162,8 @@ export async function loadProductProgressLedger(executionRoot: string) {
     );
   }
 
-  const identityKeys = [...completed].sort();
-  const retryIdentities = [...retry.values()].sort((a, b) =>
+  const identityKeys = Array.from(completed).sort();
+  const retryIdentities = Array.from(retry.values()).sort((a, b) =>
     a.identityKey.localeCompare(b.identityKey),
   );
   const latestDelta = deltas.at(-1);
