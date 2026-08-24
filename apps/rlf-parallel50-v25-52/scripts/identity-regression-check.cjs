@@ -41,6 +41,7 @@ for(const[domain,text]of falseVatFixtures){const{result}=analyze(domain,text);as
 const validVatFixtures=[
   ['shop.mt','Company address 12 Main Street. VAT Reg No: MT 1724-3326','MT17243326'],
   ['shop.de','GmbH address 12 Hauptstraße. VAT: DE 123 456 789','DE123456789'],
+  ['96casual.de','Unternehmen address Bergstraße 11 Germany. Umsatzsteuer-ID DE452397519','DE452397519'],
   ['shop.pt','Empresa address Rua 12. VAT PT 198 687 974','PT198687974'],
   ['shop.fr','SAS address 12 rue Exemple. TVA FR 43 507 928 935','FR43507928935'],
   ['shop.nl','BV company address 12 Street. VAT NL 123456789 B 01','NL123456789B01'],
@@ -52,6 +53,7 @@ const registrationFixtures=[
   ['shop.pl','Company address ul. Testowa 12. NIP: 882-213-42-74','PL-NIP:8822134274'],
   ['shop.fr','SAS address 12 rue Exemple. SIRET: 50792893500109','FR-SIRET:50792893500109'],
   ['shop.cz','s.r.o. address Ulice 12. IČO: 14416042','CZ-ICO:14416042'],
+  ['rodekorsgenbrug.dk','Røde Kors. Company address Blegdamsvej 27, 2100 København Denmark. CVR: 20700211.','DK-CVR:20700211'],
   ['shop.ro','SRL address Strada 12. CUI: RO 41820792','RO-CUI:41820792'],
   ['shop.it','SRL address Via Roma 12. Partita IVA: 07431160485','IT-PIVA:07431160485'],
   ['vintagie.com','Company address Amsterdam Netherlands. KVK: 85882623','NL-KVK:85882623'],
@@ -81,6 +83,7 @@ const residualFalseIdentityFixtures=[
   ['shop.es','Empresa address Calle Mayor 12 Spain. No VAT or registration identifier is published.','ES'],
   ['fajneciuchy24.pl','Company address Warsaw Poland. Company number 12157706. Terms supplied by Judge.me.','PL'],
   ['shop.at','GmbH company address Vienna Austria. Registration number 11116145.','AT'],
+  ['shop.dk','Company address København Denmark. CVR: 2070021.','DK'],
 ];
 for(const[domain,text,expectedCountry]of residualFalseIdentityFixtures){const{country,result}=analyze(domain,text);if(expectedCountry!=='NONE')assert(country.code===expectedCountry,`Residual fixture country mismatch for ${domain}: ${country.code}`);assert(result.identityKey===null,`Residual false identity accepted for ${domain}: ${result.identityKey}`);assert(result.vatId===null,`Residual false VAT accepted for ${domain}: ${result.vatId}`);assert(result.registrationId===null,`Residual false registration accepted for ${domain}: ${result.registrationId}`);}
 
