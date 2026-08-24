@@ -9,31 +9,28 @@ export const runtime='nodejs';
 export const maxDuration=60;
 export const preferredRegion='fra1';
 const OWNER_HASH='e942da2df116775a1f9caba47b5870a19a1058612a8a18c15fa168d28d3afec2';
-const ONE_SHOT_SWEEP_HASH='e19e7132943b7c18dcbd140b3f9a2859cb560068bc818462b6960c2caf87ded6';
 const MONITOR_RUN_ID='wrun_01M0Q8981CTB61S3DJJ06JZ2FW';
-const LATEST_SWEEP_RUN_ID='wrun_01M0QYYYJ1QK4YABW0594V3EZX';
+const LATEST_SWEEP_RUN_ID='wrun_01M0T9ZY5Y14T9QJPY984YS38P';
 const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{'cache-control':'no-store'}});
 const digest=(value:string)=>createHash('sha256').update(value).digest();
 function secureEqual(value:string,expectedHex:string){try{return timingSafeEqual(digest(value),Buffer.from(expectedHex,'hex'));}catch{return false;}}
 async function runState(id:string,includeOutput=false){if(!id)return{status:'not_started',active:0,output:null as CampaignResult|null,error:null as string|null};try{const run=await getRun(id);const status=await run.status;const output=status==='completed'&&includeOutput?await run.returnValue as CampaignResult:null;return{status,active:['running','pending'].includes(status)?50:0,output,error:null as string|null};}catch(error){return{status:'unavailable',active:0,output:null,error:error instanceof Error?error.message:'run error'};}}
 const campaignId=(prefix:string)=>`${prefix}-${new Date().toISOString().replace(/[-:.TZ]/g,'').slice(0,14)}-${randomUUID().slice(0,8)}`;
-async function startSweep(){const id=campaignId('RLF-P50-SWEEP-V25556');const run=await start(parallel50Sweep,[{campaignId:id,cycle:6,maxCandidatesPerLaneCycle:8}]);return{campaignId:id,runId:run.runId};}
-async function startMonitor(){const id=campaignId('RLF-P50-MONITOR-V25556');const run=await start(parallel50Campaign,[{campaignId:id,cycles:12,intervalMs:7200000,maxCandidatesPerLaneCycle:6}]);return{campaignId:id,runId:run.runId};}
+async function startSweep(){const id=campaignId('RLF-P50-SWEEP-V25557');const run=await start(parallel50Sweep,[{campaignId:id,cycle:7,maxCandidatesPerLaneCycle:8}]);return{campaignId:id,runId:run.runId};}
+async function startMonitor(){const id=campaignId('RLF-P50-MONITOR-V25557');const run=await start(parallel50Campaign,[{campaignId:id,cycles:12,intervalMs:7200000,maxCandidatesPerLaneCycle:6}]);return{campaignId:id,runId:run.runId};}
 
 export async function GET(request:Request,{params}:{params:Promise<{path:string[]}>}){
   const parts=(await params).path??[];const path=parts.join('/');void request;
-  const base={version:'25.55.6',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_IDENTITY_DEDUP_QUARANTINE_V7',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0}};
-  if(path==='health')return json({ok:true,...base,executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'CLOSED',oneShotSweep:'ARMED',replacementEngineVersion:REPLACEMENT_POLICY.version,replacementSourcePool:REPLACEMENT_POLICY.sourcePool,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0,checkedAt:new Date().toISOString()});
+  const base={version:'25.55.7',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_IDENTITY_DEDUP_QUARANTINE_V7',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0}};
+  if(path==='health')return json({ok:true,...base,executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'CLOSED',oneShotSweep:'CLOSED',replacementEngineVersion:REPLACEMENT_POLICY.version,replacementSourcePool:REPLACEMENT_POLICY.sourcePool,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0,checkedAt:new Date().toISOString()});
   if(path==='replacement/policy')return json({ok:true,policy:REPLACEMENT_POLICY,activationState:'FAIL_CLOSED_EMPTY_ACCEPTED_4K'});
   if(path==='sweep-bootstrap'||path==='bootstrap')return json({ok:false,code:'BOOTSTRAP_CLOSED'},410);
-  if(parts[0]==='control'&&parts[1]==='sweep-once'&&parts[2]){
-    if(!secureEqual(parts[2],ONE_SHOT_SWEEP_HASH))return json({ok:false,code:'NOT_FOUND'},404);
-    const started=await startSweep();
-    return json({ok:true,state:'SWEEP_STARTED_ONCE',...started,parallelism:50,simulatedWorkersStarted:0},202);
-  }
   if(path==='status'){
     const[monitor,sweep]=await Promise.all([runState(MONITOR_RUN_ID),runState(LATEST_SWEEP_RUN_ID,true)]);
-    return json({ok:true,generatedAt:new Date().toISOString(),deployment:{...base,executionBackend:'CONNECTED',scheduler:'VERCEL_WORKFLOW',durableQueue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',activeWorkers:monitor.active,activeLanes:monitor.active,currentRunId:MONITOR_RUN_ID,currentRunStatus:monitor.status,latestSweepRunId:LATEST_SWEEP_RUN_ID,latestSweepStatus:sweep.status,sweepBootstrap:'CLOSED',oneShotSweep:'ARMED',replacementEngineVersion:REPLACEMENT_POLICY.version,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0},sweep:{summary:sweep.output?{...sweep.output,candidates:undefined}:null},funnel:{qualifiedSuppliers:151,readyToMerge:12,projectedQualified:163,remainingTo10000:9837,acceptedPool:0,liveSelection:0,reserves:0}});
+    const activeWorkers=Math.max(monitor.active,sweep.active);
+    const activeRunId=sweep.active?LATEST_SWEEP_RUN_ID:monitor.active?MONITOR_RUN_ID:null;
+    const activeRunStatus=sweep.active?sweep.status:monitor.active?monitor.status:'idle';
+    return json({ok:true,generatedAt:new Date().toISOString(),deployment:{...base,executionBackend:'CONNECTED',scheduler:'VERCEL_WORKFLOW',durableQueue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',activeWorkers,activeLanes:activeWorkers,currentRunId:activeRunId,currentRunStatus:activeRunStatus,monitorRunId:MONITOR_RUN_ID,monitorRunStatus:monitor.status,latestSweepRunId:LATEST_SWEEP_RUN_ID,latestSweepStatus:sweep.status,sweepBootstrap:'CLOSED',oneShotSweep:'CLOSED',replacementEngineVersion:REPLACEMENT_POLICY.version,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0},sweep:{summary:sweep.output?{...sweep.output,candidates:undefined}:null},funnel:{qualifiedSuppliers:151,readyToMerge:12,projectedQualified:163,remainingTo10000:9837,acceptedPool:0,liveSelection:0,reserves:0}});
   }
   if(parts[0]==='run'&&parts[1]){const state=await runState(parts[1],true);return json({ok:state.status!=='unavailable',runId:parts[1],status:state.status,activeWorkers:state.active,activeLanes:state.active,executionSemantics:['running','pending'].includes(state.status)?'DURABLE_RUNNING_OR_SCHEDULED':'TERMINAL',summary:state.output?{...state.output,candidates:undefined}:null,result:state.output,error:state.error},state.status==='unavailable'?404:200);}
   if(path==='results/latest'){const state=await runState(LATEST_SWEEP_RUN_ID,true);return state.status==='completed'?json({ok:true,runId:LATEST_SWEEP_RUN_ID,result:state.output}):json({ok:false,code:'SWEEP_NOT_COMPLETED',runId:LATEST_SWEEP_RUN_ID,status:state.status},409);}
