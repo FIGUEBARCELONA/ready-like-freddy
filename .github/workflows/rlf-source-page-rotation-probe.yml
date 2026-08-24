@@ -1,0 +1,43 @@
+name: RLF source page rotation probe
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-source-page-rotation-probe.yml'
+
+permissions:
+  actions: read
+  checks: read
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/rlf-execution-backend-20260823
+          fetch-depth: 0
+      - name: Resolve preflight run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: 3a4a905d3f851336158dac839defafc5c55d3d1d
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api /repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}\&event=push\&per_page=50 > /tmp/runs.json
+          gh api /repos/${GITHUB_REPOSITORY}/commits/${TARGET_SHA}/check-runs?per_page=100 > /tmp/checks.json
+          jq -n --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg targetSha "$TARGET_SHA" --slurpfile runs /tmp/runs.json --slurpfile checks /tmp/checks.json '{schemaVersion:1,capturedAt:$capturedAt,targetSha:$targetSha,matchingRuns:[$runs[0].workflow_runs[]|select(.name=="RLF source page rotation validation")|{id,run_number,run_attempt,status,conclusion,head_sha,created_at,updated_at,html_url}],checkRuns:[$checks[0].check_runs[]|{id,name,status,conclusion,started_at,completed_at,details_url}]}' > data/execution/source-page-rotation-run-probe.json
+      - name: Publish probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/source-page-rotation-run-probe.json
+          git commit -m 'Resolve source page rotation preflight run'
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
+          git push origin HEAD:feature/rlf-execution-backend-20260823
