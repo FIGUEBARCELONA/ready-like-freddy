@@ -6,6 +6,7 @@ on:
       - feature/rlf-execution-backend-20260823
     paths:
       - '.github/workflows/rlf-validation-proof.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -50,6 +51,10 @@ jobs:
               .filter(name => name.endsWith('.json'))
               .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
               .map(name => `data/execution/source-page-deltas/${name}`),
+            ...readdirSync('data/execution/source-page-delta-audits')
+              .filter(name => name.endsWith('.json'))
+              .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
+              .map(name => `data/execution/source-page-delta-audits/${name}`),
           ];
           for (const path of paths) JSON.parse(readFileSync(path, 'utf8'));
           console.log(JSON.stringify({ validatedJsonFiles: paths.length, paths }, null, 2));
@@ -63,25 +68,27 @@ jobs:
           const sourcePageState = await loadSourcePageLedger();
 
           const expectedIdentity = {
-            completedIdentityCount: 1241,
-            productUrlCaptureCount: 2013,
-            officialProductImageReferenceCount: 10787,
-            materialEvidenceCount: 1605,
+            completedIdentityCount: 1348,
+            productUrlCaptureCount: 2144,
+            officialProductImageReferenceCount: 11626,
+            materialEvidenceCount: 1737,
             manufacturingClaimCount: 63,
-            descriptionMissingIdentityCount: 710,
-            priceMissingIdentityCount: 654,
+            descriptionMissingIdentityCount: 817,
+            priceMissingIdentityCount: 761,
             materialMissingIdentityCount: 86,
             retryIdentityKeys: [
               'G3636|Z77',
               'HW2300|843',
               'M1588|81B',
               'M1588|84B',
+              'M4613|41A',
               'SY3660|46A',
             ],
-            deltaCount: 6,
-            latestRunId: '32758087459',
+            deltaCount: 7,
+            latestRunId: '32777623316',
             factoryVerifiedCount: 0,
             globalCanonicalProductCount: 0,
+            ledgerSha256: 'c57080c5befb8df5d00f8403b3a2b8c384017ed975441523498062b4f8b1edf9',
           };
           const actualIdentity = {
             completedIdentityCount: identityState.completed.identityCount,
@@ -101,10 +108,10 @@ jobs:
           };
 
           const expectedSourcePages = {
-            deltaCount: 4,
-            attemptedObservationCount: 782,
-            uniqueAttemptedSourcePageCount: 497,
-            ledgerSha256: 'f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347',
+            deltaCount: 5,
+            attemptedObservationCount: 979,
+            uniqueAttemptedSourcePageCount: 694,
+            ledgerSha256: 'f1733b93b06210411820a9feb94bbc0492f8da3b1a4f21e78811664ee0402efd',
           };
           const actualSourcePages = {
             deltaCount: sourcePageState.deltaCount,
@@ -140,10 +147,37 @@ jobs:
           if (!completed.has('B2328|560')) {
             mismatches.push(['identity.resolvedRetry.B2328|560', false, true]);
           }
+          const sequence12Delta = identityState.deltas.find(
+            delta => String(delta.runId) === '32777623316',
+          );
+          if (!sequence12Delta || sequence12Delta.completedIdentityKeys.length !== 107) {
+            mismatches.push([
+              'identity.sequence12CompletedIdentityCount',
+              sequence12Delta?.completedIdentityKeys?.length ?? null,
+              107,
+            ]);
+          }
+          const sequence12SourceDelta = sourcePageState.deltas.find(
+            delta => String(delta.runId) === '32777623316',
+          );
+          if (!sequence12SourceDelta || sequence12SourceDelta.attemptedSourcePageCount !== 197) {
+            mismatches.push([
+              'sourcePages.sequence12AttemptedSourcePageCount',
+              sequence12SourceDelta?.attemptedSourcePageCount ?? null,
+              197,
+            ]);
+          }
+          if (sequence12SourceDelta?.sourcePageDeltaSha256 !== '75ac3ad8894d8a13ed6a6eb544abd8f301d68e3cd5da54cb9c6e2e9b4207fdd0') {
+            mismatches.push([
+              'sourcePages.sequence12DeltaSha256',
+              sequence12SourceDelta?.sourcePageDeltaSha256 ?? null,
+              '75ac3ad8894d8a13ed6a6eb544abd8f301d68e3cd5da54cb9c6e2e9b4207fdd0',
+            ]);
+          }
 
           const checkpoint = {
-            schemaVersion: 3,
-            sourceRunId: '32758087459',
+            schemaVersion: 4,
+            sourceRunId: '32777623316',
             generatedAt: new Date().toISOString(),
             expected: {
               identity: expectedIdentity,
@@ -152,6 +186,12 @@ jobs:
             actual: {
               identity: actualIdentity,
               sourcePages: actualSourcePages,
+            },
+            sequence12: {
+              completedIdentityCount: sequence12Delta?.completedIdentityKeys?.length ?? null,
+              failedIdentityCount: sequence12Delta?.failedIdentities?.length ?? null,
+              attemptedSourcePageCount: sequence12SourceDelta?.attemptedSourcePageCount ?? null,
+              sourcePageDeltaSha256: sequence12SourceDelta?.sourcePageDeltaSha256 ?? null,
             },
             mismatches,
             passed: mismatches.length === 0,
@@ -183,7 +223,7 @@ jobs:
             ? JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json', 'utf8'))
             : null;
           const proof = {
-            schemaVersion: 4,
+            schemaVersion: 5,
             recordedAt: new Date().toISOString(),
             sourceCommitSha: process.env.GITHUB_SHA,
             runId: process.env.GITHUB_RUN_ID,
@@ -195,9 +235,13 @@ jobs:
             requiredChecks: [
               'pnpm_install_frozen_lockfile',
               'execution_script_syntax',
-              'canonical_json_six_identity_deltas_four_source_page_deltas',
-              'exact_sequence_11_identity_and_source_page_ledgers',
+              'canonical_json_seven_identity_deltas_five_source_page_deltas',
+              'exact_sequence_12_identity_and_source_page_ledgers',
+              'sequence12_107_complete_4_retry_no_overlap',
+              'sequence12_197_unique_source_pages_no_overlap',
               'resolved_retry_b2328_560',
+              'factory_verified_zero',
+              'global_canonical_products_zero',
               'typescript_no_emit',
               'production_build'
             ]
@@ -213,7 +257,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/validation-proof.json
-          git commit -m "Persist RLF validation proof ${GITHUB_RUN_ID}"
+          git commit -m "Persist RLF sequence 12 validation proof ${GITHUB_RUN_ID}"
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
