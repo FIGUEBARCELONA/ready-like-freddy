@@ -1,14 +1,33 @@
 {
-  "schemaVersion": 8,
-  "planId": "RLF-KB-GLOBAL-MARKET-EXPANSION-20260824-DEEP-CATEGORY",
-  "pilotRunSequence": 9,
-  "phaseId": "CURRENT_GLOBAL_MARKET_EXPANSION_03_DEEP_CATEGORY",
+  "schemaVersion": 9,
+  "planId": "RLF-KB-OFFICIAL-ARCHIVE-HERITAGE-20260824-S10",
+  "pilotRunSequence": 10,
+  "phaseId": "OFFICIAL_ARCHIVE_HERITAGE_EXPANSION_01",
   "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
   "periodStart": "1940-01-01",
   "periodEnd": "2026-08-31",
   "geographyScope": "GLOBAL",
-  "targetMarkets": ["GB", "US", "ES", "DE", "FR", "IT", "PT", "AE", "EG", "SA", "ID", "AU"],
-  "targetRegionGroups": ["EUROPE", "NORTH_AMERICA", "MIDDLE_EAST", "SOUTHEAST_ASIA", "OCEANIA"],
+  "targetMarkets": [
+    "GB",
+    "US",
+    "ES",
+    "DE",
+    "FR",
+    "IT",
+    "PT",
+    "AE",
+    "EG",
+    "SA",
+    "ID",
+    "AU"
+  ],
+  "targetRegionGroups": [
+    "EUROPE",
+    "NORTH_AMERICA",
+    "MIDDLE_EAST",
+    "SOUTHEAST_ASIA",
+    "OCEANIA"
+  ],
   "workerCount": 50,
   "pilotPerWorkerLimit": 5,
   "manualDefaultPerWorkerLimit": 5,
@@ -17,19 +36,43 @@
   "requestDelayMs": 750,
   "maxResponseBytes": 8388608,
   "discoveryPolicy": {
-    "strategy": "OFFICIAL_SITEMAP_MARKET_SCOPE_STRATIFICATION_DEEP_CATEGORY",
-    "scopeOrder": ["MEN_CORE", "WOMEN_CORE", "COLLABORATIONS", "HERITAGE", "ACCESSORIES_KIDS", "OTHER_CATALOG"],
+    "strategy": "VERIFIED_PRIORITY_ENTRYPOINTS_PLUS_OFFICIAL_SITEMAP_MARKET_SCOPE_STRATIFICATION",
+    "scopeOrder": [
+      "MEN_CORE",
+      "WOMEN_CORE",
+      "COLLABORATIONS",
+      "HERITAGE",
+      "ACCESSORIES_KIDS",
+      "OTHER_CATALOG"
+    ],
     "exactlyFiftyNonEmptyLanesRequired": true,
     "maximumCategoryPagesPerRun": 250,
+    "requiredPriorityEntryPointCount": 23,
+    "priorityEntryPointsMustBeInjectedExactlyOnce": true,
+    "globalQueueUrlsMustBeUnique": true,
     "prioritizeBackCatalogueCollaborationsAndMadeInEngland": true,
+    "archivePageMustNeverInferManufactureDate": true,
+    "currentAvailabilityMustNeverBoundHistoricalUniverse": true,
     "retailMarketMustNeverInferFactory": true,
     "runPointerRequired": true
   },
   "transportPolicy": {
     "directAttempts": 2,
     "readerAttemptsPerScheme": 3,
-    "readerSchemes": ["https", "http"],
-    "retryableReaderStatuses": [401, 408, 425, 429, 500, 502, 503, 504]
+    "readerSchemes": [
+      "https",
+      "http"
+    ],
+    "retryableReaderStatuses": [
+      401,
+      408,
+      425,
+      429,
+      500,
+      502,
+      503,
+      504
+    ]
   },
   "imagePolicy": {
     "storeBinary": false,
@@ -40,7 +83,10 @@
     "defaultIngestionStatus": "NOT_INGESTED"
   },
   "identityPolicy": {
-    "candidateKey": ["productCode", "colourCode"],
+    "candidateKey": [
+      "productCode",
+      "colourCode"
+    ],
     "preserveAliasUrls": true,
     "fetchPreferredUrlThenAliases": true,
     "continueAcrossAliasesUntilStrictCapture": true,
@@ -48,17 +94,31 @@
     "quarantineTransformedReaderPrices": true,
     "completedIdentityLedger": "data/execution/product-progress.json",
     "appendOnlyDeltaDirectory": "data/execution/progress-deltas",
+    "canonicalLedgerDeltaGenerator": "scripts/execution/generate-ledger-delta.mjs",
+    "requireSourceManifestFrontierAndDeltaHashAgreement": true,
+    "rejectCompletedIdentityOverlapBeforePersistence": true,
     "prioritizePendingRetries": true,
+    "maximumPersistentRetryAttemptsPerRun": 1,
     "deduplicateAgainstCompletedBeforeAssignment": true,
     "globalCanonicalProductRequiresCrossSourceEvidence": true
   },
   "stageGates": {
     "discoveryRequiresUniqueProductIdentities": 50,
     "discoveryRequiresNewIdentities": 1,
-    "productStageRequiresAllSelectedIdentities": true,
+    "discoveryRequiresAllPriorityEntryPointsAccountedFor": true,
+    "productStageRequiresAllSelectedIdentitiesAccountedFor": true,
     "partialStrictBatchMayPersistSuccessfulIdentitiesAndRetries": true,
+    "canonicalLedgerDeltaAuditRequiredBeforePersistence": true,
     "canonicalProductsRemainZeroUntilCrossSourceDeduplication": true,
     "factoryVerifiedCountRemainsZeroWithoutIndependentEvidence": true
+  },
+  "historicalPolicy": {
+    "backCatalogueClass": "OFFICIAL_ARCHIVE_PREVIOUS_COLLECTIONS",
+    "madeInEnglandCategoryClass": "OFFICIAL_HERITAGE_CATEGORY",
+    "collaborationCategoryClass": "OFFICIAL_COLLABORATION_CURRENT_OR_ARCHIVAL_ENTRY",
+    "categoryPresenceDoesNotProveProductManufactureYear": true,
+    "productPageEvidenceRequiredForIdentityAcceptance": true,
+    "historicalCoverageTarget": "1940S_THROUGH_2026_08"
   },
   "phaseSeparation": {
     "productIdentityEvidence": "ACTIVE",
