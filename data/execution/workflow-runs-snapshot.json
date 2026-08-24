@@ -1,31 +1,31 @@
 {
-  "schemaVersion": 14,
-  "capturedAt": "2026-08-24T22:10:36Z",
-  "targetSha": "288aaaeec22e1527179175e4ecf6861064ce20f6",
+  "schemaVersion": 15,
+  "capturedAt": "2026-08-24T22:12:03Z",
+  "targetSha": "e612a0fe69fd26ffee01a49e14a210c8b1f7e1f4",
   "targetRuns": [
     {
-      "conclusion": null,
-      "created_at": "2026-08-24T22:09:59Z",
+      "conclusion": "failure",
+      "created_at": "2026-08-24T22:11:36Z",
       "event": "push",
-      "head_sha": "288aaaeec22e1527179175e4ecf6861064ce20f6",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32783305467",
-      "id": 32783305467,
-      "name": "RLF sequence 15 eligible exclusion recalibration",
+      "head_sha": "e612a0fe69fd26ffee01a49e14a210c8b1f7e1f4",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32783443892",
+      "id": 32783443892,
+      "name": "RLF source page rotation validation",
       "run_attempt": 1,
-      "run_number": 1,
-      "status": "in_progress",
-      "updated_at": "2026-08-24T22:10:03Z"
+      "run_number": 11,
+      "status": "completed",
+      "updated_at": "2026-08-24T22:11:54Z"
     }
   ],
   "targetChecks": [
     {
-      "completed_at": null,
-      "conclusion": null,
-      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32783305467/job/97609847867",
-      "id": 97609847867,
-      "name": "recalibrate",
-      "started_at": "2026-08-24T22:10:03Z",
-      "status": "in_progress"
+      "completed_at": "2026-08-24T22:11:54Z",
+      "conclusion": "failure",
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32783443892/job/97610269973",
+      "id": 97610269973,
+      "name": "validate",
+      "started_at": "2026-08-24T22:11:40Z",
+      "status": "completed"
     }
   ]
 }
