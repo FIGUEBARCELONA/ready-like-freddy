@@ -17,9 +17,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  TARGET_SHA: 'eb3475bc790e993c1b3df0f25ebff32a701ff577'
-  TARGET_WORKFLOW: 'RLF connect entry-point prioritizer'
-  OUTPUT_PATH: 'data/execution/entrypoint-connector-fixed-run-probe.json'
+  TARGET_SHA: 'cdd8e0cd0521ebd5dce8b9599db36698ab8ab1c5'
+  TARGET_WORKFLOW: 'RLF 50-worker KB official discovery'
+  OUTPUT_PATH: 'data/execution/sequence10-run-probe.json'
 
 jobs:
   probe:
@@ -45,7 +45,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$OUTPUT_PATH"
-          git commit -m 'Resolve fixed entry-point connector run'
+          git commit -m 'Resolve sequence 10 workflow run'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
