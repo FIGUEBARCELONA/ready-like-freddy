@@ -10,11 +10,13 @@ type RegistrationMatch={keyPrefix:string;id:string;countryCode:string|null};
 const LEGAL_FORM=/\b(gmbh|ug\b|gbr\b|s\.r\.l\.?|srl\b|s\.r\.o\.?|sp\. z o\.o\.|sas\b|sarl\b|e\.u\.|einzelunternehmer|aktiebolag|ltd\b|limited|societ[aà]|empresa|unternehmen|company|sole trader|proprietor|innehaber|owner|unipessoal|soc\. coop\.)\b/i;
 const NAMED_OPERATOR=/\b(impressum|legal notice|mentions légales|aviso legal|terms of service|terms and conditions|contracting party|innehaber|owner|proprietor|unternehmen|company|titular|ragione sociale|denominazione)\b/i;
 const ADDRESS=/\b(address|anschrift|adresse|sitz|registered office|return address|returadress|domicilio|sede|ul\.|straße|strasse|street|road|avenue|gade|gata|gatve|calle|carrer|via|rue|οδός|ул\.)\b/i;
+const ADDRESS_MARKER=/\b(?:company address|business address|postal address|registered office|return address|head office|principal office|address|anschrift|adresse|sitz|returadress|domicilio|sede|ul\.|straße|strasse|street|road|avenue|gade|gata|gatve|calle|carrer|via|rue|οδός|ул\.)\s*:?\s*/gi;
 const BAD_NAME_LINE=/\b(agreement|arbitrat|dispute|privacy|refund|cookie|terms of use|terms and conditions|bank|credit card|skip to content|shipping|delivery|free shipping|bestellwert|versandkostenfrei|collection|clothing)\b/i;
 const UK_COMPANY_DECLARATION=/\b(?:company\s+registered\s+in\s+(?:england(?:\s+and\s+wales)?|scotland|northern\s+ireland)|registered\s+in\s+(?:england\s+and\s+wales|scotland|northern\s+ireland)|incorporated\s+in\s+(?:england(?:\s+and\s+wales)?|scotland|northern\s+ireland)|companies\s+house|registered\s+office\s+(?:is\s+)?in\s+the\s+united\s+kingdom)\b/i;
 const UK_CONTEXTUAL_POSTCODE=/\b(?:registered office|company address|business address|head office|principal office)[^.;|]{0,180}\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i;
 const compact=(value:string)=>String(value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
 const norm=(value:string)=>String(value||'').replace(/\s+/g,' ').trim();
+const escaped=(value:string)=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 
 const VAT_PATTERNS:RegExp[]=[
   /\bAT[\s.-]*U(?:[\s.-]*\d){8}\b/i,/\bBE(?:[\s.-]*\d){10}\b/i,/\bBG(?:[\s.-]*\d){9,10}\b/i,
@@ -60,6 +62,19 @@ function registration(text:string,country:CountryDetection):RegistrationMatch|nu
   return null;
 }
 
+function countryFromAddressContext(text:string):string|null {
+  const normalized=norm(text);ADDRESS_MARKER.lastIndex=0;
+  for(const match of normalized.matchAll(ADDRESS_MARKER)) {
+    const start=(match.index??0)+match[0].length;
+    const remainder=normalized.slice(start,start+280);
+    const chunk=remainder.split(/[.;|]/,1)[0];
+    let best:{code:string;index:number}|null=null;
+    for(const[code,names]of Object.entries(COUNTRY_NAMES))for(const name of names){const found=chunk.search(new RegExp(`\\b${escaped(name)}\\b`,'i'));if(found>=0&&(!best||found<best.index))best={code,index:found};}
+    if(best)return best.code;
+  }
+  return null;
+}
+
 export function detectCountry(domain:string,legalText:string):CountryDetection {
   const parts=domain.toLowerCase().split('.');const suffix=parts.slice(-2).join('.');const tld=parts.at(-1)??'';const euTld=EU_TLDS.has(tld);
   if(NON_EU_TLDS.has(suffix)||NON_EU_TLDS.has(tld))return{code:'NON_EU',basis:'NON_EU_TLD'};
@@ -68,7 +83,7 @@ export function detectCountry(domain:string,legalText:string):CountryDetection {
   if(euTld)return{code:tld.toUpperCase(),basis:'EU_TLD'};
   const vat=findEuVat(legalText);if(vat)return{code:vatCountry(vat),basis:'VAT'};
   const local=registration(legalText,{code:null,basis:'NONE'});if(local?.countryCode)return{code:local.countryCode,basis:'LEGAL_COUNTRY'};
-  if(LEGAL_FORM.test(legalText)&&ADDRESS.test(legalText))for(const[code,names]of Object.entries(COUNTRY_NAMES))if(names.some(name=>new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`,'i').test(legalText)))return{code,basis:'LEGAL_COUNTRY'};
+  const contextualCountry=countryFromAddressContext(legalText);if(contextualCountry)return{code:contextualCountry,basis:'LEGAL_COUNTRY'};
   return{code:null,basis:'NONE'};
 }
 
