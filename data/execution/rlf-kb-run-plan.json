@@ -1,25 +1,27 @@
 {
-  "schemaVersion": 7,
-  "planId": "RLF-KB-GLOBAL-MARKET-EXPANSION-20260824-STRICT",
-  "pilotRunSequence": 8,
-  "phaseId": "CURRENT_GLOBAL_MARKET_EXPANSION_02_STRICT_CAPTURE",
+  "schemaVersion": 8,
+  "planId": "RLF-KB-GLOBAL-MARKET-EXPANSION-20260824-DEEP-CATEGORY",
+  "pilotRunSequence": 9,
+  "phaseId": "CURRENT_GLOBAL_MARKET_EXPANSION_03_DEEP_CATEGORY",
   "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
   "periodStart": "1940-01-01",
   "periodEnd": "2026-08-31",
   "geographyScope": "GLOBAL",
-  "targetMarkets": ["GB", "ES", "DE", "FR", "IT", "PT", "AE", "EG", "ID", "AU"],
-  "targetRegionGroups": ["EUROPE", "MIDDLE_EAST", "SOUTHEAST_ASIA", "OCEANIA"],
+  "targetMarkets": ["GB", "US", "ES", "DE", "FR", "IT", "PT", "AE", "EG", "SA", "ID", "AU"],
+  "targetRegionGroups": ["EUROPE", "NORTH_AMERICA", "MIDDLE_EAST", "SOUTHEAST_ASIA", "OCEANIA"],
   "workerCount": 50,
-  "pilotPerWorkerLimit": 1,
+  "pilotPerWorkerLimit": 5,
   "manualDefaultPerWorkerLimit": 5,
   "productPilotPerWorkerLimit": 5,
   "productManualDefaultPerWorkerLimit": 5,
   "requestDelayMs": 750,
   "maxResponseBytes": 8388608,
   "discoveryPolicy": {
-    "strategy": "OFFICIAL_SITEMAP_MARKET_SCOPE_STRATIFICATION",
-    "scopeOrder": ["MEN_CORE", "WOMEN_CORE", "COLLABORATIONS", "HERITAGE", "ACCESSORIES_KIDS"],
+    "strategy": "OFFICIAL_SITEMAP_MARKET_SCOPE_STRATIFICATION_DEEP_CATEGORY",
+    "scopeOrder": ["MEN_CORE", "WOMEN_CORE", "COLLABORATIONS", "HERITAGE", "ACCESSORIES_KIDS", "OTHER_CATALOG"],
     "exactlyFiftyNonEmptyLanesRequired": true,
+    "maximumCategoryPagesPerRun": 250,
+    "prioritizeBackCatalogueCollaborationsAndMadeInEngland": true,
     "retailMarketMustNeverInferFactory": true,
     "runPointerRequired": true
   },
@@ -47,6 +49,7 @@
     "completedIdentityLedger": "data/execution/product-progress.json",
     "appendOnlyDeltaDirectory": "data/execution/progress-deltas",
     "prioritizePendingRetries": true,
+    "deduplicateAgainstCompletedBeforeAssignment": true,
     "globalCanonicalProductRequiresCrossSourceEvidence": true
   },
   "stageGates": {
@@ -56,5 +59,11 @@
     "partialStrictBatchMayPersistSuccessfulIdentitiesAndRetries": true,
     "canonicalProductsRemainZeroUntilCrossSourceDeduplication": true,
     "factoryVerifiedCountRemainsZeroWithoutIndependentEvidence": true
+  },
+  "phaseSeparation": {
+    "productIdentityEvidence": "ACTIVE",
+    "metadataEnrichment": "SEPARATE_FUTURE_STAGE",
+    "factoryEvidence": "SEPARATE_INDEPENDENT_CORPUS",
+    "globalCanonicalization": "BLOCKED_UNTIL_CROSS_SOURCE_REVIEW"
   }
 }
