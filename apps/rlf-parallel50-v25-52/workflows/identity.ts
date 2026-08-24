@@ -11,6 +11,8 @@ const LEGAL_FORM=/\b(gmbh|ug\b|gbr\b|s\.r\.l\.?|srl\b|s\.r\.o\.?|sp\. z o\.o\.|s
 const NAMED_OPERATOR=/\b(impressum|legal notice|mentions légales|aviso legal|terms of service|terms and conditions|contracting party|innehaber|owner|proprietor|unternehmen|company|titular|ragione sociale|denominazione)\b/i;
 const ADDRESS=/\b(address|anschrift|adresse|sitz|registered office|return address|returadress|domicilio|sede|ul\.|straße|strasse|street|road|avenue|gade|gata|gatve|calle|carrer|via|rue|οδός|ул\.)\b/i;
 const BAD_NAME_LINE=/\b(agreement|arbitrat|dispute|privacy|refund|cookie|terms of use|terms and conditions|bank|credit card|skip to content)\b/i;
+const UK_EXPLICIT=/\b(united kingdom|england|scotland|wales|northern ireland|company registered in england|companies house)\b/i;
+const UK_CONTEXTUAL_POSTCODE=/\b(?:registered office|return address|business address|postal address|based in|located in)[^.;|]{0,180}\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i;
 const compact=(value:string)=>String(value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
 const norm=(value:string)=>String(value||'').replace(/\s+/g,' ').trim();
 
@@ -107,9 +109,9 @@ export function detectCountry(domain:string,legalText:string):CountryDetection {
   const parts=domain.toLowerCase().split('.');
   const suffix=parts.slice(-2).join('.');
   const tld=parts.at(-1)??'';
-  if(EU_TLDS.has(tld)) return {code:tld.toUpperCase(),basis:'EU_TLD'};
   if(NON_EU_TLDS.has(suffix)||NON_EU_TLDS.has(tld)) return {code:'NON_EU',basis:'NON_EU_TLD'};
-  if(/\b(united kingdom|england|scotland|wales|northern ireland|company registered in england|companies house)\b/i.test(legalText)||/\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i.test(legalText)) return {code:'NON_EU',basis:'UK_LEGAL'};
+  if(UK_EXPLICIT.test(legalText)||UK_CONTEXTUAL_POSTCODE.test(legalText)) return {code:'NON_EU',basis:'UK_LEGAL'};
+  if(EU_TLDS.has(tld)) return {code:tld.toUpperCase(),basis:'EU_TLD'};
   const vat=findEuVat(legalText);
   if(vat) return {code:vatCountry(vat),basis:'VAT'};
   const local=registration(legalText,{code:null,basis:'NONE'});
