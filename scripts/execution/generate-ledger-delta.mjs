@@ -188,7 +188,7 @@ const ledgerDelta = {
     productManifestSha256: productManifestLogicalSha256,
     productManifestFileSha256,
     sourceProgressDeltaSha256: sourceDeltaLogicalSha256,
-    sourceProgressDeltaFileSha256,
+    sourceProgressDeltaFileSha256: sourceDeltaFileSha256,
     frontierFileSha256,
   },
   frontier: {
