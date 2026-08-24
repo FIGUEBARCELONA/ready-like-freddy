@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-24T23:07:47.985Z",
+  "runId": "32787830678",
+  "runAttempt": "1",
+  "sourceCommitSha": "4f32079e45b2870faf85c9f7d46608f9f9aa1d87",
+  "targetSequence": 17,
+  "phaseId": "EXACT_OFFICIAL_MEDIA_API_PROBE_01",
+  "frontierId": "RLF-SEQUENCE17-MEDIA-PROBE-32787830678",
+  "frontierSha256": "c669290df38d002ada380a2f36898aa4625a2009e0c9afb369aea9cfcbe0d05e",
+  "selectedIdentitySha256": "af5c06fbcb2fdea5be542b5c93527bb20bda95d996682ad0a2e1ee8942eeb728",
+  "priorRunId": "32784949243",
+  "priorLedgerSha256": "0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7",
+  "priorDeltaCount": 11,
+  "workerCount": 50,
+  "activeLaneCount": 3,
+  "auditedIdleLaneCount": 47,
+  "selectedIdentityCount": 3,
+  "attemptedProbeCount": 10,
+  "httpSuccessProbeCount": 0,
+  "parsedJsonProbeCount": 0,
+  "graphqlErrorProbeCount": 0,
+  "exactItemProbeCount": 0,
+  "rejectedMediaCount": 0,
+  "exactImageReferenceCount": 0,
+  "responseStatusCounts": {
+    "403": 6,
+    "404": 4
+  },
+  "recoveredCandidateIdentityKeys": [],
+  "unresolvedIdentityKeys": [
+    "HW2300|843",
+    "M1588|81B",
+    "M1588|84B"
+  ],
+  "exactMediaEvidence": [
+    {
+      "identityKey": "HW2300|843",
+      "imageReferences": []
+    },
+    {
+      "identityKey": "M1588|81B",
+      "imageReferences": []
+    },
+    {
+      "identityKey": "M1588|84B",
+      "imageReferences": []
+    }
+  ],
+  "recordsFileSha256": "6647c2337d87cb3567513649678e7b60875584b3ec75a8f928bdc5031b59a970",
+  "nextAction": "NO_EXACT_OFFICIAL_MEDIA_FOUND_RETRIES_RETAINED",
+  "factoryVerifiedCount": 0,
+  "globalCanonicalProductCount": 0,
+  "ledgerMutationCount": 0,
+  "passed": true,
+  "reportSha256": "44bd875825b969ab6b55c748b41e88f8536745493a46891f6084e85415c27762"
+}
