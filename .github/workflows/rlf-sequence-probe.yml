@@ -13,9 +13,9 @@ permissions:
   contents: write
 
 env:
-  TARGET_SHA: '77661d411e42e5ab678018b4bacde4ddb1786b36'
-  TARGET_WORKFLOW: 'RLF validation proof'
-  OUTPUT_PATH: 'data/execution/validation-run-probe.json'
+  TARGET_SHA: '9b3030223cdd6763dfe3de80e676408ab2eeb29d'
+  TARGET_WORKFLOW: 'RLF code and ledger validation'
+  OUTPUT_PATH: 'data/execution/discovery-depth-validation-probe.json'
 
 jobs:
   probe:
@@ -31,12 +31,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$(dirname "$OUTPUT_PATH")"
-          gh api \
-            -H 'Accept: application/vnd.github+json' \
+          gh api -H 'Accept: application/vnd.github+json' \
             "/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&event=push&per_page=50" \
             > /tmp/runs.json
-          gh api \
-            -H 'Accept: application/vnd.github+json' \
+          gh api -H 'Accept: application/vnd.github+json' \
             "/repos/${GITHUB_REPOSITORY}/commits/${TARGET_SHA}/check-runs?per_page=100" \
             > /tmp/checks.json
           jq -n \
@@ -63,9 +61,10 @@ jobs:
       - name: Publish probe result
         run: |
           set -euo pipefail
-          git pull --rebase origin feature/rlf-execution-backend-20260823
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$OUTPUT_PATH"
-          git commit -m 'Resolve exact sequence 8 validation run'
+          git commit -m 'Resolve discovery-depth workflow validation run'
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
