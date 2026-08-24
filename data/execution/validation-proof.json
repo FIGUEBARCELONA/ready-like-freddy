@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-08-24T15:40:09.503Z",
+  "sourceCommitSha": "7d38163da56cb4d522852859ac664403d5b05657",
+  "runId": "32746208117",
+  "runAttempt": 1,
+  "validationOutcome": "success",
+  "nodeVersion": "v22.23.2",
+  "logSha256": "a7958930c94e5aed542f322e625989726d0489c7a9b6ec528159408cd84141e5",
+  "requiredChecks": [
+    "pnpm_install_frozen_lockfile",
+    "execution_script_syntax",
+    "canonical_json_and_delta_parse",
+    "append_only_ledger_invariants",
+    "typescript_no_emit",
+    "production_build"
+  ]
+}
