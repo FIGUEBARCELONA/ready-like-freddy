@@ -179,12 +179,38 @@ jobs:
         run: |
           node - <<'NODE'
           const manifest = require('./execution/consolidated/manifest.json');
+          const queue = require('./execution/queue/queue.json');
+          const plan = require('./data/execution/rlf-kb-run-plan.json');
+          const terminalMode = plan.discoveryPolicy?.terminalFrontierExhaustionMode === true;
+          const perWorkerLimit = Number(plan.pilotPerWorkerLimit ?? 5);
+          const allQueueUrls = queue.assignments.flatMap(assignment => assignment.urls);
+          const scheduledUrls = queue.assignments.flatMap(assignment => assignment.urls.slice(0, perWorkerLimit));
+          const terminalFrontierExhausted =
+            terminalMode &&
+            scheduledUrls.length === allQueueUrls.length &&
+            manifest.totals.attemptedUrlCount === allQueueUrls.length &&
+            manifest.totals.successfulFetchCount === allQueueUrls.length &&
+            manifest.totals.failedFetchCount === 0 &&
+            manifest.totals.duplicateSourcePageCount === 0;
           if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
             throw new Error('Discovery manifest does not contain exactly 50 workers');
           }
-          if (!manifest.qualityGatePassed || manifest.totals.uniqueProductIdentityCount < 50 || manifest.totals.selectedIdentityCount < 1) {
+          if (!manifest.qualityGatePassed) {
+            throw new Error(`Discovery quality gate failed: ${JSON.stringify(manifest.totals)}`);
+          }
+          if (!terminalMode && (manifest.totals.uniqueProductIdentityCount < 50 || manifest.totals.selectedIdentityCount < 1)) {
             throw new Error(`Identity frontier is insufficient: ${JSON.stringify(manifest.totals)}`);
           }
+          if (terminalMode && manifest.totals.selectedIdentityCount < 1 && !terminalFrontierExhausted) {
+            throw new Error(`Zero-identity frontier is only valid after complete terminal exhaustion: ${JSON.stringify(manifest.totals)}`);
+          }
+          console.log(JSON.stringify({
+            terminalMode,
+            terminalFrontierExhausted,
+            sourcePages: manifest.totals.sourcePageCount,
+            uniqueProductIdentities: manifest.totals.uniqueProductIdentityCount,
+            selectedIdentities: manifest.totals.selectedIdentityCount,
+          }, null, 2));
           NODE
       - name: Generate canonical append-only source-page delta
         env:
@@ -325,7 +351,20 @@ jobs:
           const sourceDelta = require('./execution/products-consolidated/product-progress-delta.json');
           const ledgerDelta = require('./execution/products-consolidated/ledger-delta.json');
           const audit = require('./execution/products-consolidated/ledger-delta-audit.json');
+          const plan = require('./data/execution/rlf-kb-run-plan.json');
           const totals = manifest.totals;
+          const terminalMode = plan.discoveryPolicy?.terminalFrontierExhaustionMode === true;
+          const terminalZeroBatch =
+            terminalMode &&
+            totals.expectedProductCaptureCount === 0 &&
+            totals.attemptedIdentityCount === 0 &&
+            totals.successfulIdentityCaptureCount === 0 &&
+            totals.failedIdentityCaptureCount === 0 &&
+            sourceDelta.completedIdentityKeys.length === 0 &&
+            sourceDelta.failedIdentities.length === 0 &&
+            ledgerDelta.completedIdentityKeys.length === 0 &&
+            audit.batch.selectedIdentityCount === 0 &&
+            audit.batch.expectedProductCaptureCount === 0;
           if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
             throw new Error('Product manifest does not contain exactly 50 workers');
           }
@@ -335,8 +374,11 @@ jobs:
           if (totals.successfulIdentityCaptureCount + totals.failedIdentityCaptureCount !== totals.expectedProductCaptureCount) {
             throw new Error(`Selected identities are not fully accounted for: ${JSON.stringify(totals)}`);
           }
-          if (totals.successfulIdentityCaptureCount < 1) {
-            throw new Error('No strict identity evidence was captured');
+          if (!terminalZeroBatch && totals.successfulIdentityCaptureCount < 1) {
+            throw new Error('No strict identity evidence was captured outside an audited terminal zero batch');
+          }
+          if (terminalZeroBatch && (!manifest.qualityGatePassed || !sourceDelta.qualityGatePassed || !ledgerDelta.strictQualityGatePassed)) {
+            throw new Error('Audited terminal zero batch did not pass all strict gates');
           }
           if (totals.rejectedImageReferenceCount !== 0) {
             throw new Error(`Rejected images reached consolidation: ${totals.rejectedImageReferenceCount}`);
@@ -352,6 +394,7 @@ jobs:
             acceptance: ledgerDelta.acceptance,
             strictSuccesses: totals.successfulIdentityCaptureCount,
             retries: totals.failedIdentityCaptureCount,
+            terminalZeroBatch,
             ledgerDeltaSha256: ledgerDelta.ledgerDeltaSha256,
           }, null, 2));
           NODE
