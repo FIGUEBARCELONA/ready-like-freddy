@@ -1,0 +1,93 @@
+name: Deploy RLF Parallel50 v25.55.5
+
+on:
+  pull_request:
+    branches: [rlf-v2555-deploy-base-fixed]
+    paths:
+      - '.github/deploy/RLF_V25_55_5_DEPLOY_PR'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rlf-parallel50-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-production:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'rlf-parallel50-v25-55-deploy-fixed-candidate-2'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      VERCEL_ORG_ID: team_fhf0Woa7HxognliF2TaI3zsq
+      VERCEL_PROJECT_ID: prj_KIU3Yvscq5uryndAt1VH3u2oP4gu
+      VERCEL_SCOPE: jordifiguerassolerpersonal-2224s-projects
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      PROD_URL: https://rlf-parallel50-runtime.vercel.app
+    defaults:
+      run:
+        working-directory: apps/rlf-parallel50-v25-52
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Enforce sentinel-only candidate
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          printf '%s\n' "$FILES"
+          test "$FILES" = '.github/deploy/RLF_V25_55_5_DEPLOY_PR'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install verified dependency graph
+        run: npm install --ignore-scripts --no-fund
+      - name: Re-run strict gates and manifest contract
+        shell: bash
+        run: |
+          set -o pipefail
+          npx tsc --noEmit
+          npm run build 2>&1 | tee workflow-build.log
+          grep -F '6 steps, 2 workflows' workflow-build.log
+          npm audit --audit-level=moderate
+      - name: Detect already-published release
+        id: current
+        run: |
+          ALREADY=false
+          if curl --fail --silent --show-error "$PROD_URL/api/health" -o current-health.json; then
+            if node -e "const h=require('./current-health.json');process.exit(h.version==='25.55.5'&&h.delta==='0051'&&h.sweepBootstrap==='CLOSED'&&h.parallelism===50&&h.dependencyAudit?.total===0?0:1)"; then
+              ALREADY=true
+            fi
+          fi
+          echo "already=$ALREADY" >> "$GITHUB_OUTPUT"
+      - name: Require deployment credential
+        if: steps.current.outputs.already != 'true'
+        run: test -n "$VERCEL_TOKEN" || { echo '::error::VERCEL_TOKEN secret is not configured'; exit 1; }
+      - name: Pull production project settings
+        if: steps.current.outputs.already != 'true'
+        run: npx vercel@58.4.4 pull --yes --environment=production --token="$VERCEL_TOKEN" --scope="$VERCEL_SCOPE"
+      - name: Build Vercel production output
+        if: steps.current.outputs.already != 'true'
+        run: npx vercel@58.4.4 build --prod --token="$VERCEL_TOKEN" --scope="$VERCEL_SCOPE"
+      - name: Deploy prebuilt output to production
+        if: steps.current.outputs.already != 'true'
+        run: |
+          npx vercel@58.4.4 deploy --prebuilt --prod --token="$VERCEL_TOKEN" --scope="$VERCEL_SCOPE" | tail -n 1 | tee deployment-url.txt
+      - name: Verify production truth boundary
+        run: |
+          curl --fail --silent --show-error "$PROD_URL/api/health" -o health.json
+          node -e "const h=require('./health.json');if(h.version!=='25.55.5'||h.delta!=='0051'||h.sweepBootstrap!=='CLOSED'||h.parallelism!==50||h.dependencyAudit?.total!==0)process.exit(1);"
+          CODE=$(curl --silent --output bootstrap.json --write-out '%{http_code}' "$PROD_URL/api/sweep-bootstrap")
+          test "$CODE" = '410'
+          test -f deployment-url.txt || printf '%s\n' "$PROD_URL" > deployment-url.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-v2555-production-deployment
+          path: |
+            apps/rlf-parallel50-v25-52/deployment-url.txt
+            apps/rlf-parallel50-v25-52/health.json
+            apps/rlf-parallel50-v25-52/bootstrap.json
+            apps/rlf-parallel50-v25-52/workflow-build.log
+          retention-days: 14
