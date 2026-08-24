@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 6,
-  "planId": "RLF-KB-GLOBAL-MARKET-EXPANSION-20260823",
-  "pilotRunSequence": 7,
-  "phaseId": "CURRENT_GLOBAL_MARKET_EXPANSION_01_INSTRUMENTED",
+  "schemaVersion": 7,
+  "planId": "RLF-KB-GLOBAL-MARKET-EXPANSION-20260824-STRICT",
+  "pilotRunSequence": 8,
+  "phaseId": "CURRENT_GLOBAL_MARKET_EXPANSION_02_STRICT_CAPTURE",
   "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
   "periodStart": "1940-01-01",
   "periodEnd": "2026-08-31",
@@ -33,6 +33,7 @@
     "storeBinary": false,
     "recordSourceUrls": true,
     "allowedAssetPathPrefix": "/media/catalog/product/",
+    "requireMatchingOfficialProductImageForCompletion": true,
     "defaultRightsStatus": "UNKNOWN",
     "defaultIngestionStatus": "NOT_INGESTED"
   },
@@ -40,14 +41,19 @@
     "candidateKey": ["productCode", "colourCode"],
     "preserveAliasUrls": true,
     "fetchPreferredUrlThenAliases": true,
+    "continueAcrossAliasesUntilStrictCapture": true,
+    "rejectSoft404Responses": true,
+    "quarantineTransformedReaderPrices": true,
     "completedIdentityLedger": "data/execution/product-progress.json",
     "appendOnlyDeltaDirectory": "data/execution/progress-deltas",
+    "prioritizePendingRetries": true,
     "globalCanonicalProductRequiresCrossSourceEvidence": true
   },
   "stageGates": {
     "discoveryRequiresUniqueProductIdentities": 50,
     "discoveryRequiresNewIdentities": 1,
     "productStageRequiresAllSelectedIdentities": true,
+    "partialStrictBatchMayPersistSuccessfulIdentitiesAndRetries": true,
     "canonicalProductsRemainZeroUntilCrossSourceDeduplication": true,
     "factoryVerifiedCountRemainsZeroWithoutIndependentEvidence": true
   }
