@@ -10,202 +10,171 @@ fs.mkdirSync(diagDir, { recursive: true });
 
 const target = {
   id: 'RLF-EXT-020',
-  exactCode: 'J1518/A25/01975/336',
-  expectedOrigin: 'MADE IN VIETNAM',
-  sourcePage: 'https://www.instagram.com/p/DVvOqMrAh5i/',
-  query: '"J1518/A25/01975/336" "FRED PERRY"',
+  code: 'J1518/A25/01975/336',
+  origin: 'MADE IN VIETNAM',
+  listingId: '29492494',
+  sourcePage: 'https://us.vestiairecollective.com/men-clothing/jackets/fred-perry/burgundy-cotton-fred-perry-jacket-29492494.shtml',
+  directImage: 'https://images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg',
+  queries: [
+    'burgundy cotton Fred Perry jacket 29492494 label',
+    'Vestiaire 29492494 J1518 336',
+  ],
 };
 
-const sha256 = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex');
+const sha256 = (b) => crypto.createHash('sha256').update(b).digest('hex');
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-function mimeFromMagic(buffer) {
-  if (buffer.length >= 12 && buffer.subarray(0, 4).toString('hex') === '52494646' && buffer.subarray(8, 12).toString() === 'WEBP') return 'image/webp';
-  if (buffer.length >= 8 && buffer.subarray(0, 8).toString('hex') === '89504e470d0a1a0a') return 'image/png';
-  if (buffer.length >= 3 && buffer.subarray(0, 3).toString('hex') === 'ffd8ff') return 'image/jpeg';
+function magicMime(b) {
+  if (b.length >= 12 && b.subarray(0, 4).toString('hex') === '52494646' && b.subarray(8, 12).toString() === 'WEBP') return 'image/webp';
+  if (b.length >= 8 && b.subarray(0, 8).toString('hex') === '89504e470d0a1a0a') return 'image/png';
+  if (b.length >= 3 && b.subarray(0, 3).toString('hex') === 'ffd8ff') return 'image/jpeg';
   return 'application/octet-stream';
 }
+function ext(m) { return m === 'image/webp' ? 'webp' : m === 'image/png' ? 'png' : m === 'image/jpeg' ? 'jpg' : 'bin'; }
 
-function extForMime(mime) {
-  return mime === 'image/webp' ? 'webp' : mime === 'image/png' ? 'png' : mime === 'image/jpeg' ? 'jpg' : 'bin';
-}
+const report = {
+  schema: 'rlf-v625b-exact-vestiaire-recovery-v1',
+  policy: 'APPEND_ONLY_FAIL_CLOSED',
+  generatedAt: new Date().toISOString(),
+  target,
+  attempts: [],
+  preserved: [],
+  exactIdentityVerified: false,
+  canonicalPromotion: false,
+};
+const seen = new Set();
 
-const seenHashes = new Set();
-const candidates = [];
-
-function preserveCandidate(buffer, provenance) {
-  const mime = mimeFromMagic(buffer);
-  const digest = sha256(buffer);
-  const acceptedBinary = /^image\/(jpeg|png|webp)$/.test(mime) && buffer.length >= 1024;
-  const record = {
-    ...provenance,
-    bytes: buffer.length,
-    sha256: digest,
-    magicMime: mime,
-    acceptedBinary,
-    exactIdentityVerified: false,
-    admission: acceptedBinary ? 'CANDIDATE_ONLY_MANUAL_VISUAL_GATE' : 'REJECT_BINARY_GATE',
-  };
-  if (acceptedBinary && !seenHashes.has(digest)) {
-    seenHashes.add(digest);
-    const ordinal = String(candidates.filter((x) => x.acceptedBinary).length + 1).padStart(2, '0');
-    const file = `${target.id}_J1518_01975_336_candidate_${ordinal}.${extForMime(mime)}`;
-    fs.writeFileSync(path.join(outDir, file), buffer);
-    record.file = file;
+function preserve(b, label, provenance) {
+  const mime = magicMime(b);
+  const hash = sha256(b);
+  const binaryPass = /^image\/(jpeg|png|webp)$/.test(mime) && b.length >= 1024;
+  const row = { label, ...provenance, bytes: b.length, sha256: hash, magicMime: mime, binaryPass };
+  if (binaryPass && !seen.has(hash)) {
+    seen.add(hash);
+    const file = `${target.id}_${target.code.replace(/[^A-Za-z0-9]+/g, '_')}_${label}.${ext(mime)}`;
+    fs.writeFileSync(path.join(outDir, file), b);
+    row.file = file;
+    row.admission = 'CANDIDATE_ONLY_MANUAL_VISUAL_GATE';
+    report.preserved.push(row);
+  } else {
+    row.admission = binaryPass ? 'DUPLICATE_SHA' : 'REJECT_BINARY_GATE';
   }
-  candidates.push(record);
-  return record;
+  report.attempts.push(row);
+  return row;
 }
 
-async function fetchUrl(request, url, provenance) {
+async function fetchCandidate(request, url, label, provenance = {}) {
   if (!url || !/^https?:\/\//i.test(url)) return null;
   try {
     const response = await request.get(url, {
-      timeout: 120000,
+      timeout: 45000,
       failOnStatusCode: false,
-      headers: { Referer: target.sourcePage },
+      headers: {
+        Referer: provenance.referer || target.sourcePage,
+        Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+      },
     });
     const body = await response.body();
-    return preserveCandidate(body, {
+    return preserve(body, label, {
       ...provenance,
       url,
       status: response.status(),
       headerContentType: response.headers()['content-type'] || '',
     });
   } catch (error) {
-    candidates.push({ ...provenance, url, error: String(error), acceptedBinary: false, admission: 'REQUEST_ERROR' });
+    report.attempts.push({ label, ...provenance, url, error: String(error), admission: 'REQUEST_ERROR' });
     return null;
   }
 }
 
-async function collectPageImages(page, stage) {
-  const images = await page.locator('img').evaluateAll((nodes) => nodes.map((node, index) => ({
-    index,
-    src: node.currentSrc || node.src || '',
-    srcset: node.srcset || '',
-    alt: node.alt || '',
-    naturalWidth: node.naturalWidth || 0,
-    naturalHeight: node.naturalHeight || 0,
-    visible: Boolean(node.offsetWidth || node.offsetHeight || node.getClientRects().length),
-  }))).catch(() => []);
-  fs.writeFileSync(path.join(diagDir, `${stage}_images.json`), JSON.stringify(images, null, 2));
-
-  const urls = new Set();
-  for (const image of images) {
-    if (image.src) urls.add(image.src);
-    for (const part of String(image.srcset || '').split(',')) {
-      const url = part.trim().split(/\s+/)[0];
-      if (url) urls.add(url);
-    }
-  }
-  let ordinal = 0;
-  for (const url of urls) {
-    ordinal += 1;
-    await fetchUrl(page.context().request, url, { mode: 'page_img_request', stage, ordinal });
-  }
-  return images;
-}
-
-async function inspectInstagram(context, report) {
+async function directAndSource(context) {
+  await fetchCandidate(context.request, target.directImage, 'vestiaire_direct', { mode: 'direct', referer: target.sourcePage });
   const page = await context.newPage();
-  const networkImageUrls = new Set();
-  page.on('response', (response) => {
-    const ct = response.headers()['content-type'] || '';
-    const url = response.url();
-    if (/^image\//i.test(ct) && /(cdninstagram|fbcdn|instagram)/i.test(url)) networkImageUrls.add(url);
-  });
-
   try {
     const nav = await page.goto(target.sourcePage, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await sleep(15000);
-    report.instagram = {
-      status: nav ? nav.status() : null,
-      finalUrl: page.url(),
-      title: await page.title(),
-    };
-    await page.screenshot({ path: path.join(diagDir, 'instagram_full_page.png'), fullPage: true });
-
-    const meta = await page.evaluate(() => {
-      const value = (selector, attribute = 'content') => document.querySelector(selector)?.getAttribute(attribute) || '';
-      return {
-        ogImage: value('meta[property="og:image"]'),
-        ogDescription: value('meta[property="og:description"]'),
-        description: value('meta[name="description"]'),
-        canonical: value('link[rel="canonical"]', 'href'),
-        bodyText: (document.body?.innerText || '').slice(0, 30000),
-      };
-    }).catch((error) => ({ error: String(error) }));
-    fs.writeFileSync(path.join(diagDir, 'instagram_metadata.json'), JSON.stringify(meta, null, 2));
-    if (meta.bodyText) fs.writeFileSync(path.join(diagDir, 'instagram_body_text.txt'), meta.bodyText);
-    if (meta.ogImage) await fetchUrl(context.request, meta.ogImage, { mode: 'instagram_og_image' });
-
-    await collectPageImages(page, 'instagram_slide_00');
-
-    for (let slide = 1; slide <= 10; slide += 1) {
-      const selectors = [
-        'button[aria-label="Next"]',
-        'button[aria-label="Següent"]',
-        'button[aria-label="Siguiente"]',
-        'button:has(svg[aria-label="Next"])',
-      ];
-      let clicked = false;
-      for (const selector of selectors) {
-        const button = page.locator(selector).last();
-        if (await button.isVisible().catch(() => false)) {
-          await button.click({ timeout: 10000 }).catch(() => {});
-          clicked = true;
-          break;
-        }
-      }
-      if (!clicked) break;
-      await sleep(2500);
-      const stage = `instagram_slide_${String(slide).padStart(2, '0')}`;
-      await page.screenshot({ path: path.join(diagDir, `${stage}.png`), fullPage: false });
-      await collectPageImages(page, stage);
-    }
-
-    let netOrdinal = 0;
-    for (const url of networkImageUrls) {
-      netOrdinal += 1;
-      await fetchUrl(context.request, url, { mode: 'instagram_network_image', ordinal: netOrdinal });
+    await sleep(12000);
+    await page.screenshot({ path: path.join(diagDir, 'vestiaire_source_full.png'), fullPage: true });
+    const data = await page.evaluate(() => ({
+      title: document.title,
+      url: location.href,
+      bodyText: (document.body?.innerText || '').slice(0, 20000),
+      ogImage: document.querySelector('meta[property="og:image"]')?.content || '',
+      images: [...document.images].map((img, index) => ({
+        index,
+        src: img.currentSrc || img.src || '',
+        srcset: img.srcset || '',
+        alt: img.alt || '',
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+      })),
+    })).catch((error) => ({ error: String(error) }));
+    fs.writeFileSync(path.join(diagDir, 'vestiaire_source.json'), JSON.stringify({ status: nav?.status(), ...data }, null, 2));
+    if (data.ogImage) await fetchCandidate(context.request, data.ogImage, 'vestiaire_og', { mode: 'source_og' });
+    for (const image of (data.images || []).filter((x) => String(x.src + x.srcset).includes(target.listingId)).slice(0, 12)) {
+      if (image.src) await fetchCandidate(context.request, image.src, `vestiaire_dom_${String(image.index).padStart(2, '0')}`, { mode: 'source_dom', alt: image.alt });
     }
   } catch (error) {
-    report.instagram = { ...(report.instagram || {}), error: String(error) };
+    report.attempts.push({ label: 'vestiaire_source', error: String(error), admission: 'PAGE_ERROR' });
   } finally {
     await page.close();
   }
 }
 
-async function inspectBing(context, report) {
+async function exactBing(context, query, queryIndex) {
   const page = await context.newPage();
   try {
-    const url = `https://www.bing.com/images/search?q=${encodeURIComponent(target.query)}`;
+    const url = `https://www.bing.com/images/search?q=${encodeURIComponent(query)}`;
     const nav = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
     await sleep(10000);
-    report.bing = { status: nav ? nav.status() : null, finalUrl: page.url(), title: await page.title() };
-    await page.screenshot({ path: path.join(diagDir, 'bing_exact_query_full_page.png'), fullPage: true });
-
-    const tiles = await page.locator('a.iusc').evaluateAll((nodes) => nodes.slice(0, 40).map((node, index) => {
+    await page.screenshot({ path: path.join(diagDir, `bing_${queryIndex}_full.png`), fullPage: true });
+    const tiles = await page.locator('a.iusc').evaluateAll((nodes) => nodes.map((node, index) => {
       let metadata = {};
       try { metadata = JSON.parse(node.getAttribute('m') || '{}'); } catch (_) {}
-      return { index, href: node.href || '', metadata };
+      const image = node.querySelector('img.mimg');
+      return {
+        index,
+        metadata,
+        thumbSrc: image?.currentSrc || image?.src || '',
+        thumbAlt: image?.alt || '',
+        width: image?.naturalWidth || 0,
+        height: image?.naturalHeight || 0,
+      };
     })).catch(() => []);
-    fs.writeFileSync(path.join(diagDir, 'bing_exact_query_tiles.json'), JSON.stringify(tiles, null, 2));
+    fs.writeFileSync(path.join(diagDir, `bing_${queryIndex}_tiles.json`), JSON.stringify({ status: nav?.status(), query, tiles }, null, 2));
 
-    let ordinal = 0;
-    for (const tile of tiles) {
-      const mediaUrl = tile.metadata?.murl || tile.metadata?.turl || '';
-      if (!mediaUrl) continue;
-      ordinal += 1;
-      await fetchUrl(context.request, mediaUrl, {
-        mode: 'bing_exact_query_media',
-        ordinal,
-        sourcePage: tile.metadata?.purl || '',
-        title: tile.metadata?.t || '',
-      });
+    const exact = tiles.filter((tile) => {
+      const text = JSON.stringify(tile).toLowerCase();
+      return text.includes(target.listingId) || text.includes('burgundy-cotton-fred-perry-jacket-29492494-7_1');
+    });
+    report.attempts.push({ label: `bing_${queryIndex}_exact_matches`, query, matches: exact.length, admission: exact.length ? 'MATCHES_FOUND' : 'NO_MATCH' });
+
+    let matchOrdinal = 0;
+    for (const tile of exact) {
+      matchOrdinal += 1;
+      const locator = page.locator('a.iusc').nth(tile.index).locator('img.mimg').first();
+      if (await locator.isVisible().catch(() => false)) {
+        const temp = path.join(diagDir, `bing_${queryIndex}_match_${matchOrdinal}_rendered.png`);
+        await locator.screenshot({ path: temp, timeout: 30000 });
+        preserve(fs.readFileSync(temp), `bing_${queryIndex}_match_${matchOrdinal}_rendered`, {
+          mode: 'rendered_search_element', query, sourcePage: tile.metadata?.purl || '', originalUrl: tile.metadata?.murl || '',
+        });
+      }
+      const urls = [
+        ['murl', tile.metadata?.murl],
+        ['turl', tile.metadata?.turl],
+        ['thumb', tile.thumbSrc],
+      ];
+      for (const [kind, candidateUrl] of urls) {
+        if (candidateUrl) await fetchCandidate(context.request, candidateUrl, `bing_${queryIndex}_match_${matchOrdinal}_${kind}`, {
+          mode: `bing_${kind}`,
+          query,
+          sourcePage: tile.metadata?.purl || '',
+          title: tile.metadata?.t || '',
+          referer: url,
+        });
+      }
     }
   } catch (error) {
-    report.bing = { ...(report.bing || {}), error: String(error) };
+    report.attempts.push({ label: `bing_${queryIndex}`, query, error: String(error), admission: 'PAGE_ERROR' });
   } finally {
     await page.close();
   }
@@ -215,36 +184,18 @@ async function main() {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     locale: 'en-US',
-    viewport: { width: 1440, height: 1400 },
+    viewport: { width: 1440, height: 1200 },
     userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36',
   });
 
-  const report = {
-    schema: 'rlf-v625-exact-instagram-recovery-v1',
-    policy: 'APPEND_ONLY_FAIL_CLOSED',
-    target,
-    generatedAt: new Date().toISOString(),
-    instagram: null,
-    bing: null,
-  };
-
-  await inspectInstagram(context, report);
-  await inspectBing(context, report);
+  await directAndSource(context);
+  for (let i = 0; i < target.queries.length; i += 1) await exactBing(context, target.queries[i], i + 1);
   await browser.close();
 
-  const files = fs.readdirSync(outDir).sort().map((file) => {
-    const buffer = fs.readFileSync(path.join(outDir, file));
-    return { file, bytes: buffer.length, sha256: sha256(buffer), magicMime: mimeFromMagic(buffer) };
-  });
-  report.candidates = candidates;
-  report.preservedFiles = files;
-  report.exactIdentityVerified = false;
-  report.canonicalPromotion = false;
-  report.nextGate = 'Manual visual inspection must confirm exact J1518/A25/01975/336 and MADE IN VIETNAM on a same-piece physical label.';
-
-  fs.writeFileSync(path.join(diagDir, 'rlf-v625-instagram-recovery-report.json'), JSON.stringify(report, null, 2));
-  fs.writeFileSync(path.join(diagDir, 'RLF_V625_SHA256SUMS.txt'), files.map((item) => `${item.sha256}  ${item.file}`).join('\n') + '\n');
-  console.log(JSON.stringify({ preservedCandidates: files.length, files, canonicalPromotion: false }, null, 2));
+  report.nextGate = 'Manually verify that a preserved image visibly contains FRED PERRY, MADE IN VIETNAM and exact code J1518/A25/01975/336; then run global SHA and perceptual deduplication.';
+  fs.writeFileSync(path.join(diagDir, 'rlf-v625b-exact-vestiaire-report.json'), JSON.stringify(report, null, 2));
+  fs.writeFileSync(path.join(diagDir, 'RLF_V625B_SHA256SUMS.txt'), report.preserved.map((x) => `${x.sha256}  ${x.file}`).join('\n') + '\n');
+  console.log(JSON.stringify({ preserved: report.preserved.length, files: report.preserved, canonicalPromotion: false }, null, 2));
 }
 
 main().catch((error) => {
