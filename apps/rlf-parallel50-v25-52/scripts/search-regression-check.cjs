@@ -30,18 +30,23 @@ const search=evaluate(searchFile,(id)=>{
   throw new Error(`Unexpected search import: ${id}`);
 });
 
-const input={cycle:15,maxCandidates:8,lane:{slot:'F06',countryCode:'CZ',country:'Czechia',language:'cs-CZ,cs;q=.9,en;q=.7',tld:'cz',localSecondhand:'použité oblečení',index:5}};
-const recovery=search.contextualRecoveryQuery(input);
+const input={cycle:16,maxCandidates:8,lane:{slot:'F06',countryCode:'CZ',country:'Czechia',language:'cs-CZ,cs;q=.9,en;q=.7',tld:'cz',localSecondhand:'použité oblečení',index:5}};
+const primary=search.primaryCommerceQuery(input);
+const alternate=search.alternateCommerceQuery(input);
 const fixtures=[
-  [search.shouldRunContextualRecovery(0,0),true,'both primary paths empty trigger recovery'],
-  [search.shouldRunContextualRecovery(1,0),false,'primary result suppresses recovery'],
-  [search.shouldRunContextualRecovery(0,1),false,'identity result suppresses recovery'],
-  [recovery.includes('Fred Perry'),true,'recovery keeps brand constraint'],
-  [recovery.includes('.cz')||recovery.includes('Czechia'),true,'recovery keeps country constraint'],
+  [search.shouldRunAlternateSearch(0),true,'empty primary search triggers one alternate'],
+  [search.shouldRunAlternateSearch(1),false,'one primary result suppresses alternate'],
+  [primary.query.includes('Fred Perry'),true,'primary keeps brand constraint'],
+  [primary.query.includes('.cz')||primary.query.includes('Czechia'),true,'primary keeps country constraint'],
+  [alternate.query.includes('Fred Perry'),true,'alternate keeps brand constraint'],
+  [alternate.query.includes('Czechia'),true,'alternate keeps country constraint'],
+  [Number.isInteger(primary.index)&&primary.index>=0&&primary.index<8,true,'primary template index bounded'],
+  [Number.isInteger(alternate.index)&&alternate.index>=0&&alternate.index<8,true,'alternate template index bounded'],
   [search.eligibleSearchDomain('new-vintage-store.cz'),true,'new professional candidate remains eligible'],
   [search.eligibleSearchDomain('96casual.de'),false,'known supplier excluded before fetch'],
   [search.eligibleSearchDomain('toms-paderborn.de'),false,'known rejection excluded before fetch'],
   [search.eligibleSearchDomain('careofcarl.fi'),false,'new retail excluded before fetch'],
+  [search.eligibleSearchDomain('hof.sk'),false,'HOF new retail excluded before fetch'],
   [search.eligibleSearchDomain('skroutz.gr'),false,'marketplace excluded before fetch'],
   [search.relevant('Fred Perry vintage polo','https://shop.example/item'),true,'Fred Perry relevant'],
   [search.relevant('FRED economic data','https://fred.stlouisfed.org/series/X'),false,'Federal Reserve noise rejected'],
