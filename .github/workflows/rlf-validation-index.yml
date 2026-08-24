@@ -39,10 +39,7 @@ jobs:
           set -euo pipefail
           run_json=''
           for attempt in $(seq 1 36); do
-            run_json="$(gh api \
-              -H 'Accept: application/vnd.github+json' \
-              "/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${GITHUB_SHA}&event=push&per_page=20" \
-              --jq '[.workflow_runs[] | select(.name == "RLF code and ledger validation")][0] // empty')"
+            run_json="$(gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${GITHUB_SHA}&event=push&per_page=20" --jq '[.workflow_runs[] | select(.name == "RLF code and ledger validation")][0] // empty')"
             if [[ -n "$run_json" ]]; then break; fi
             sleep 5
           done
@@ -60,10 +57,7 @@ jobs:
           set -euo pipefail
           run_id="${{ steps.resolve.outputs.run_id }}"
           for attempt in $(seq 1 120); do
-            gh api \
-              -H 'Accept: application/vnd.github+json' \
-              "/repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" \
-              > /tmp/validation-run.json
+            gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" > /tmp/validation-run.json
             status="$(jq -r '.status' /tmp/validation-run.json)"
             if [[ "$status" == 'completed' ]]; then break; fi
             sleep 5
@@ -78,7 +72,7 @@ jobs:
           const fs = require('node:fs');
           const run = JSON.parse(fs.readFileSync('/tmp/validation-run.json', 'utf8'));
           const pointer = {
-            schemaVersion: 1,
+            schemaVersion: 2,
             indexedAt: new Date().toISOString(),
             sourceCommitSha: process.env.GITHUB_SHA,
             workflowName: run.name,
@@ -97,10 +91,14 @@ jobs:
           };
           fs.writeFileSync('data/execution/live-validation.json', `${JSON.stringify(pointer, null, 2)}\n`);
           NODE
-          git pull --rebase origin feature/rlf-execution-backend-20260823
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/live-validation.json
-          if git diff --cached --quiet; then exit 0; fi
+          if git diff --cached --quiet; then
+            echo 'Validation pointer already current'
+            exit 0
+          fi
           git commit -m "Index RLF validation run ${{ steps.resolve.outputs.run_id }}"
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
