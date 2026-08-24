@@ -1,0 +1,490 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-24T17:42:41Z",
+  "targetSha": "65f70f1448470a1ccdc680f9df5083444999b76e",
+  "matchingRuns": [
+    {
+      "id": 32758087459,
+      "run_number": 58,
+      "run_attempt": 1,
+      "status": "queued",
+      "conclusion": null,
+      "head_sha": "65f70f1448470a1ccdc680f9df5083444999b76e",
+      "created_at": "2026-08-24T17:41:35Z",
+      "updated_at": "2026-08-24T17:41:57Z",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459",
+      "jobs_url": "https://api.github.com/repos/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/jobs",
+      "artifacts_url": "https://api.github.com/repos/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/artifacts"
+    }
+  ],
+  "checkRuns": [
+    {
+      "id": 97530273532,
+      "name": "Discovery F40",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:57Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273532"
+    },
+    {
+      "id": 97530273514,
+      "name": "Discovery F48",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:57Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273514"
+    },
+    {
+      "id": 97530273479,
+      "name": "Discovery F50",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:57Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273479"
+    },
+    {
+      "id": 97530273469,
+      "name": "Discovery F49",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:57Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273469"
+    },
+    {
+      "id": 97530273421,
+      "name": "Discovery F43",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273421"
+    },
+    {
+      "id": 97530273381,
+      "name": "Discovery F47",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:57Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273381"
+    },
+    {
+      "id": 97530273372,
+      "name": "Discovery F44",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273372"
+    },
+    {
+      "id": 97530273367,
+      "name": "Discovery F30",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:57Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273367"
+    },
+    {
+      "id": 97530273353,
+      "name": "Discovery F39",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273353"
+    },
+    {
+      "id": 97530273315,
+      "name": "Discovery F42",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273315"
+    },
+    {
+      "id": 97530273310,
+      "name": "Discovery F33",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273310"
+    },
+    {
+      "id": 97530273309,
+      "name": "Discovery F35",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273309"
+    },
+    {
+      "id": 97530273299,
+      "name": "Discovery F41",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273299"
+    },
+    {
+      "id": 97530273297,
+      "name": "Discovery F45",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273297"
+    },
+    {
+      "id": 97530273296,
+      "name": "Discovery F46",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:58Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273296"
+    },
+    {
+      "id": 97530273263,
+      "name": "Discovery F25",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273263"
+    },
+    {
+      "id": 97530273226,
+      "name": "Discovery F32",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273226"
+    },
+    {
+      "id": 97530273220,
+      "name": "Discovery F21",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273220"
+    },
+    {
+      "id": 97530273213,
+      "name": "Discovery F27",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273213"
+    },
+    {
+      "id": 97530273200,
+      "name": "Discovery F29",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273200"
+    },
+    {
+      "id": 97530273197,
+      "name": "Discovery F38",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273197"
+    },
+    {
+      "id": 97530273195,
+      "name": "Discovery F37",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273195"
+    },
+    {
+      "id": 97530273189,
+      "name": "Discovery F36",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273189"
+    },
+    {
+      "id": 97530273185,
+      "name": "Discovery F24",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273185"
+    },
+    {
+      "id": 97530273181,
+      "name": "Discovery F31",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273181"
+    },
+    {
+      "id": 97530273176,
+      "name": "Discovery F01",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273176"
+    },
+    {
+      "id": 97530273172,
+      "name": "Discovery F18",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273172"
+    },
+    {
+      "id": 97530273169,
+      "name": "Discovery F13",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273169"
+    },
+    {
+      "id": 97530273158,
+      "name": "Discovery F09",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273158"
+    },
+    {
+      "id": 97530273153,
+      "name": "Discovery F23",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273153"
+    },
+    {
+      "id": 97530273151,
+      "name": "Discovery F03",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273151"
+    },
+    {
+      "id": 97530273149,
+      "name": "Discovery F06",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273149"
+    },
+    {
+      "id": 97530273138,
+      "name": "Discovery F20",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:42:00Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273138"
+    },
+    {
+      "id": 97530273132,
+      "name": "Discovery F34",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": "2026-08-24T17:42:40Z",
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273132"
+    },
+    {
+      "id": 97530273130,
+      "name": "Discovery F26",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": "2026-08-24T17:42:35Z",
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273130"
+    },
+    {
+      "id": 97530273127,
+      "name": "Discovery F16",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273127"
+    },
+    {
+      "id": 97530273125,
+      "name": "Discovery F22",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:58Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273125"
+    },
+    {
+      "id": 97530273123,
+      "name": "Discovery F12",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273123"
+    },
+    {
+      "id": 97530273120,
+      "name": "Discovery F28",
+      "status": "queued",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:56Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273120"
+    },
+    {
+      "id": 97530273115,
+      "name": "Discovery F10",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273115"
+    },
+    {
+      "id": 97530273090,
+      "name": "Discovery F17",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273090"
+    },
+    {
+      "id": 97530273089,
+      "name": "Discovery F08",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:58Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273089"
+    },
+    {
+      "id": 97530273083,
+      "name": "Discovery F15",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:42:00Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273083"
+    },
+    {
+      "id": 97530273082,
+      "name": "Discovery F19",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273082"
+    },
+    {
+      "id": 97530273081,
+      "name": "Discovery F11",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273081"
+    },
+    {
+      "id": 97530273071,
+      "name": "Discovery F14",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:58Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273071"
+    },
+    {
+      "id": 97530273049,
+      "name": "Discovery F05",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273049"
+    },
+    {
+      "id": 97530273047,
+      "name": "Discovery F07",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:59Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273047"
+    },
+    {
+      "id": 97530273033,
+      "name": "Discovery F04",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:58Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273033"
+    },
+    {
+      "id": 97530273020,
+      "name": "Discovery F02",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T17:41:58Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530273020"
+    },
+    {
+      "id": 97530171976,
+      "name": "Prepare verified official queue",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-08-24T17:41:38Z",
+      "completed_at": "2026-08-24T17:41:56Z",
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087459/job/97530171976"
+    },
+    {
+      "id": 97530171847,
+      "name": "index",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-08-24T17:41:38Z",
+      "completed_at": "2026-08-24T17:41:47Z",
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32758087416/job/97530171847"
+    }
+  ]
+}
