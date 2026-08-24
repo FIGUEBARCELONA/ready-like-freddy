@@ -5,7 +5,7 @@ export const MARKETPLACES=[
   'grailed.com','vestiairecollective.','shpock.','olx.','allegro.','leboncoin.fr','2dehands.','marktplaats.nl','kleinanzeigen.de','catawiki.','tradera.',
   'finn.no','tori.fi','willhaben.at','marketplace.','poshmark.com','subito.it','carousell.','mercari.','rakuten.','chrono24.','vendora.bg','bazar.bg','jolicloset.com',
   'wikipedia.org','yelp.','thelabelfinder.','worthpoint.com','bazos.','plick.','adverts.ie','goldenpages.','gem.app','glami.','therealreal.com',
-  'sprzedajemy.pl','milanuncios.com','miravia.es','index.hr','jofogas.hu','vatera.hu','segunda-mano.pro','showroom.pl',
+  'sprzedajemy.pl','milanuncios.com','miravia.es','index.hr','jofogas.hu','vatera.hu','segunda-mano.pro','showroom.pl','skroutz.',
 ];
 
 export const NEW_RETAIL=[
@@ -13,7 +13,7 @@ export const NEW_RETAIL=[
   'mainlinemenswear.com','arnotts.ie','boozt.com','miinto.','bstn.com','size.co.uk','flannels.com','julesb.co.uk','kingpinclothingstore.com',
   'stockmann.','luc.pt','sportus.nl','elcorteingles.','laredoute.','rihu.pt','saros.pt','kuantokusta.pt','kurpirkt.lv',
   'careofcarl.','jdsports.','sokos.','spartoo.','kastner-oehler.','peek-cloppenburg.',
-  'excelclothing.ie','rebirthofcool.ie','thegentlemensvault.nl','pointcarre.be','suitable.be','shop.maniet.be','fratellirossishop.it','zedstore.it','inno.be','espacemode.be','aukia.fi','atticadps.gr','jame.pt','olondon.fr','xtreme.pt','bstrongoutlet.pt','factoryoutlet.gr','hansvoortman.nl','the-gentlemen-store.de','streetwear.sk','footshop.',
+  'excelclothing.ie','rebirthofcool.ie','thegentlemensvault.nl','pointcarre.be','suitable.be','shop.maniet.be','fratellirossishop.it','zedstore.it','inno.be','espacemode.be','aukia.fi','atticadps.gr','jame.pt','olondon.fr','xtreme.pt','bstrongoutlet.pt','factoryoutlet.gr','hansvoortman.nl','the-gentlemen-store.de','streetwear.sk','footshop.','deblauwezebra.be',
   'stockverkopen.nl','comparer.be','web2.cylex.de','validate.perfdrive.com','odjeca.hr','nextdirect.com','next.ie','next.pl','next.com.mt','outletaholic.com',
   'shoes.fr','sportino.pt','marquessoares.pt','maufeitio.pt',
 ];
@@ -24,7 +24,7 @@ export const PRELOVED=['vintage','second hand','secondhand','preloved','pre-love
 export const PROFESSIONAL=['add to cart','add to bag','basket','checkout','shop now','buy now','shipping','delivery','returns','return policy','terms and conditions','contact us','about us','ajouter au panier','in den warenkorb','aggiungi al carrello','añadir al carrito','adicionar ao carrinho','toevoegen aan winkelwagen','lägg i varukorg','dodaj do koszyka','tilføj til kurv','retour','versand','spedizione','livrare','plată','zahlung','refund policy','shipping policy'];
 export const LEGAL=['vat','iva','nif','cif','p.iva','partita iva','btw','kvk','siret','siren','ust-id','ust-idnr','ust-idnr.','company number','registration number','impressum','legal notice','mentions légales','aviso legal','privacy policy','regulamin','cui','registrul comerțului','firmenbuch','uid-nummer','geschäftsführer','amtsgericht','organisationsnummer','aktiebolag','limited company','s.r.o.','sp. z o.o.','srl','s.r.l.','gmbh'];
 export const PURCHASE=['add to cart','add to bag','buy now','checkout','ajouter au panier','in den warenkorb','aggiungi al carrello','añadir al carrito','adicionar ao carrinho','dodaj do koszyka','toevoegen aan winkelwagen','adaugă în coș'];
-export const NEGATIVE='-ebay -vinted -wallapop -depop -etsy -amazon -poshmark -subito -grailed -vestiaire -leboncoin -olx -marktplaats -2dehands -kleinanzeigen -catawiki -reddit -wikipedia -yelp -zalando -asos -farfetch -vendora -bazar -pappers -pagesjaunes -kuantokusta -kurpirkt -linktree -jolicloset -milanuncios -miravia -sprzedajemy -jofogas -vatera -showroom -pirs -bizi';
+export const NEGATIVE='-ebay -vinted -wallapop -depop -etsy -amazon -poshmark -subito -grailed -vestiaire -leboncoin -olx -marktplaats -2dehands -kleinanzeigen -catawiki -reddit -wikipedia -yelp -zalando -asos -farfetch -vendora -bazar -pappers -pagesjaunes -kuantokusta -kurpirkt -linktree -jolicloset -milanuncios -miravia -sprzedajemy -jofogas -vatera -showroom -pirs -bizi -aboutyou -jdsports -nextdirect -elcorteingles -laredoute -skroutz -comparer -factoryoutlet -fredperryoutlet';
 
 export const EU_TLDS=new Set(['at','be','bg','hr','cy','cz','dk','ee','fi','fr','de','gr','hu','ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se']);
 export const NON_EU_TLDS=new Set(['uk','co.uk','com.au','ca','ch','no','us','co.nz']);
