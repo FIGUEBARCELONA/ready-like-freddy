@@ -1,0 +1,217 @@
+name: RLF sequence 12 source-page delta
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence12-source-page-delta.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: rlf-sequence12-source-page-delta
+  cancel-in-progress: false
+
+env:
+  SOURCE_BRANCH: feature/rlf-execution-backend-20260823
+  SOURCE_RUN_ID: '32777623316'
+  SOURCE_ARTIFACT_ID: '9538670301'
+  SOURCE_ARTIFACT_NAME: rlf-kb-official-discovery-32777623316
+  SOURCE_ARTIFACT_DIGEST: sha256:abba93dce9bd9a70fe6167ec321402ff723970a64234b7b154430a94f8992fdd
+
+jobs:
+  persist:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download audited discovery artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p execution/sequence12-discovery
+          gh run download "$SOURCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$SOURCE_ARTIFACT_NAME" \
+            --dir execution/sequence12-discovery
+          test -f execution/sequence12-discovery/consolidated/records.ndjson
+          test -f execution/sequence12-discovery/consolidated/manifest.json
+      - name: Generate append-only source-page delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFile, writeFile, mkdir } from 'node:fs/promises';
+          import { sha256 } from './scripts/execution/common.mjs';
+          import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
+
+          function stableValue(value) {
+            if (Array.isArray(value)) return value.map(stableValue);
+            if (!value || typeof value !== 'object') return value;
+            return Object.fromEntries(
+              Object.keys(value).sort().map(key => [key, stableValue(value[key])]),
+            );
+          }
+
+          const artifactRoot = 'execution/sequence12-discovery';
+          const manifest = JSON.parse(
+            await readFile(`${artifactRoot}/consolidated/manifest.json`, 'utf8'),
+          );
+          const rows = (await readFile(`${artifactRoot}/consolidated/records.ndjson`, 'utf8'))
+            .split('\n')
+            .filter(Boolean)
+            .map(line => JSON.parse(line));
+
+          if (String(manifest.runId) !== process.env.SOURCE_RUN_ID) {
+            throw new Error(`Discovery manifest run mismatch: ${manifest.runId}`);
+          }
+          if (!manifest.qualityGatePassed || manifest.workerCount !== 50) {
+            throw new Error('Discovery manifest did not pass the 50-worker quality gate');
+          }
+          if (rows.length !== 197 || manifest.totals.attemptedUrlCount !== 197) {
+            throw new Error(`Unexpected sequence 12 source-page count: ${rows.length}`);
+          }
+
+          const prior = await loadSourcePageLedger();
+          const expectedPrior = {
+            deltaCount: 4,
+            attemptedObservationCount: 782,
+            uniqueAttemptedSourcePageCount: 497,
+            ledgerSha256: 'f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347',
+          };
+          for (const [key, value] of Object.entries(expectedPrior)) {
+            if (prior[key] !== value) {
+              throw new Error(`Prior source-page ledger mismatch for ${key}: ${prior[key]} != ${value}`);
+            }
+          }
+
+          const attemptedSourcePages = rows.map(record => ({
+            url: record.requestedUrl,
+            sourceSha256: record.sourceSha256,
+            slot: record.slot,
+            fetchOk: Boolean(record.fetchOk),
+            observedAt: record.observedAt ?? null,
+            sourceTransport: record.sourceTransport ?? null,
+            sourceMarket: record.sourceMarket ?? null,
+            sourceScope: record.sourceDiscoveryScope ?? null,
+            productLinkCandidateCount: Number(record.productLinkCandidateCount ?? 0),
+          }));
+          const uniqueUrls = new Set(attemptedSourcePages.map(page => page.url));
+          const overlap = attemptedSourcePages
+            .map(page => page.url)
+            .filter(url => prior.attemptedUrlSet.has(url));
+          if (uniqueUrls.size !== attemptedSourcePages.length) {
+            throw new Error('Sequence 12 discovery contains duplicate attempted source pages');
+          }
+          if (overlap.length) {
+            throw new Error(`Sequence 12 source-page overlap: ${JSON.stringify(overlap)}`);
+          }
+          if (attemptedSourcePages.some(page => !page.fetchOk)) {
+            throw new Error('Sequence 12 delta contains a failed source-page capture');
+          }
+          for (const page of attemptedSourcePages) {
+            if (!page.url?.startsWith('https://')) throw new Error(`Invalid source URL: ${page.url}`);
+            if (!/^[a-f0-9]{64}$/.test(page.sourceSha256 ?? '')) {
+              throw new Error(`Invalid source SHA-256: ${page.url}`);
+            }
+          }
+
+          const delta = {
+            schemaVersion: 1,
+            runId: process.env.SOURCE_RUN_ID,
+            acceptedAt: '2026-08-24T21:10:16.000Z',
+            sourceArtifact: {
+              artifactId: Number(process.env.SOURCE_ARTIFACT_ID),
+              artifactDigest: process.env.SOURCE_ARTIFACT_DIGEST,
+              artifactName: process.env.SOURCE_ARTIFACT_NAME,
+            },
+            attemptedSourcePageCount: attemptedSourcePages.length,
+            uniqueSourcePageCount: uniqueUrls.size,
+            successfulSourcePageCount: attemptedSourcePages.filter(page => page.fetchOk).length,
+            attemptedSourcePages,
+          };
+          delta.sourcePageDeltaSha256 = sha256(
+            Buffer.from(JSON.stringify(stableValue(delta))),
+          );
+
+          await mkdir('data/execution/source-page-deltas', { recursive: true });
+          const deltaPath = `data/execution/source-page-deltas/${process.env.SOURCE_RUN_ID}.json`;
+          await writeFile(deltaPath, `${JSON.stringify(delta, null, 2)}\n`);
+
+          const projected = await loadSourcePageLedger();
+          const expectedProjected = {
+            deltaCount: 5,
+            attemptedObservationCount: 979,
+            uniqueAttemptedSourcePageCount: 694,
+          };
+          for (const [key, value] of Object.entries(expectedProjected)) {
+            if (projected[key] !== value) {
+              throw new Error(`Projected source-page ledger mismatch for ${key}: ${projected[key]} != ${value}`);
+            }
+          }
+
+          const audit = {
+            schemaVersion: 1,
+            runId: process.env.SOURCE_RUN_ID,
+            generatedAt: new Date().toISOString(),
+            sourceCommitSha: process.env.GITHUB_SHA,
+            sourceArtifact: delta.sourceArtifact,
+            prior: expectedPrior,
+            batch: {
+              attemptedSourcePageCount: delta.attemptedSourcePageCount,
+              uniqueSourcePageCount: delta.uniqueSourcePageCount,
+              successfulSourcePageCount: delta.successfulSourcePageCount,
+              overlapWithPrior: overlap,
+              sourcePageDeltaSha256: delta.sourcePageDeltaSha256,
+            },
+            projected: {
+              ...expectedProjected,
+              ledgerSha256: projected.ledgerSha256,
+            },
+            passed: true,
+          };
+          await writeFile(
+            `data/execution/source-page-delta-audits/${process.env.SOURCE_RUN_ID}.json`,
+            `${JSON.stringify(audit, null, 2)}\n`,
+          ).catch(async error => {
+            if (error?.code !== 'ENOENT') throw error;
+            await mkdir('data/execution/source-page-delta-audits', { recursive: true });
+            await writeFile(
+              `data/execution/source-page-delta-audits/${process.env.SOURCE_RUN_ID}.json`,
+              `${JSON.stringify(audit, null, 2)}\n`,
+            );
+          });
+          console.log(JSON.stringify(audit, null, 2));
+          NODE
+      - name: Publish immutable source-page checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="$SOURCE_BRANCH"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            "data/execution/source-page-deltas/${SOURCE_RUN_ID}.json" \
+            "data/execution/source-page-delta-audits/${SOURCE_RUN_ID}.json"
+          git commit -m "Persist sequence 12 source-page delta ${SOURCE_RUN_ID}"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          echo 'Unable to publish sequence 12 source-page delta after five rebases' >&2
+          exit 1
