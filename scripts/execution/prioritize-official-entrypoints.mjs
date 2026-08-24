@@ -195,6 +195,48 @@ for (const target of emptyAssignments) {
   });
 }
 
+const batchLimit = Number(queue.plan?.pilotPerWorkerLimit ?? 5);
+const balancedLaneTransfers = [];
+const vectorKeyForEntry = entry => `${entry.market}|${entry.discoveryScope}`;
+const sparseAssignments = queue.assignments
+  .filter(assignment => assignment.urls.length > 0 && assignment.urls.length < batchLimit)
+  .sort((a, b) => a.urls.length - b.urls.length || a.slot.localeCompare(b.slot));
+for (const target of sparseAssignments) {
+  const targetVectorKey = vectorKeyForEntry(target.urls[0]);
+  if (!target.urls.every(entry => vectorKeyForEntry(entry) === targetVectorKey)) continue;
+  while (target.urls.length < batchLimit) {
+    const donorCandidates = queue.assignments
+      .filter(assignment => assignment.slot !== target.slot && assignment.urls.length > batchLimit)
+      .map(assignment => {
+        let candidateIndex = -1;
+        for (let index = assignment.urls.length - 1; index >= 0; index -= 1) {
+          if (vectorKeyForEntry(assignment.urls[index]) === targetVectorKey) {
+            candidateIndex = index;
+            break;
+          }
+        }
+        return { assignment, candidateIndex };
+      })
+      .filter(item => item.candidateIndex >= 0)
+      .sort(
+        (a, b) =>
+          b.assignment.urls.length - a.assignment.urls.length ||
+          a.assignment.slot.localeCompare(b.assignment.slot),
+      );
+    const donorCandidate = donorCandidates[0];
+    if (!donorCandidate) break;
+    const [movedEntry] = donorCandidate.assignment.urls.splice(donorCandidate.candidateIndex, 1);
+    target.urls.push(movedEntry);
+    balancedLaneTransfers.push({
+      slot: target.slot,
+      donorSlot: donorCandidate.assignment.slot,
+      market: movedEntry.market,
+      scope: movedEntry.discoveryScope,
+      url: movedEntry.url,
+    });
+  }
+}
+
 if (queue.assignments.some(assignment => assignment.urls.length === 0)) {
   const emptySlots = queue.assignments
     .filter(assignment => assignment.urls.length === 0)
@@ -235,6 +277,8 @@ queue.skippedPriorityEntryPointCount = skippedEntryPoints.length;
 queue.skippedPriorityEntryPoints = skippedEntryPoints;
 queue.reassignedEmptyLaneCount = reassignedEmptyLanes.length;
 queue.reassignedEmptyLanes = reassignedEmptyLanes;
+queue.balancedLaneTransferCount = balancedLaneTransfers.length;
+queue.balancedLaneTransfers = balancedLaneTransfers;
 queue.sourcePageLedgerDeltaCount = sourcePageLedger.deltaCount;
 queue.sourcePageLedgerObservationCount = sourcePageLedger.attemptedObservationCount;
 queue.uniquePreviouslyAttemptedSourcePageCount =
@@ -258,6 +302,8 @@ const summary = {
   skippedPriorityEntryPoints: skippedEntryPoints,
   reassignedEmptyLaneCount: reassignedEmptyLanes.length,
   reassignedEmptyLanes,
+  balancedLaneTransferCount: balancedLaneTransfers.length,
+  balancedLaneTransfers,
   sourcePageLedgerDeltaCount: sourcePageLedger.deltaCount,
   sourcePageLedgerObservationCount: sourcePageLedger.attemptedObservationCount,
   uniquePreviouslyAttemptedSourcePageCount:
