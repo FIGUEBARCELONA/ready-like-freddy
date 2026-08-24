@@ -13,8 +13,9 @@ permissions:
   contents: write
 
 env:
-  TARGET_SHA: '4152c61fbb1d8de5b0ba04a9e8e097a9967e41cd'
-  TARGET_WORKFLOW: 'RLF 50-worker KB official discovery'
+  TARGET_SHA: '77661d411e42e5ab678018b4bacde4ddb1786b36'
+  TARGET_WORKFLOW: 'RLF validation proof'
+  OUTPUT_PATH: 'data/execution/validation-run-probe.json'
 
 jobs:
   probe:
@@ -29,7 +30,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p data/execution
+          mkdir -p "$(dirname "$OUTPUT_PATH")"
           gh api \
             -H 'Accept: application/vnd.github+json' \
             "/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&event=push&per_page=50" \
@@ -58,13 +59,13 @@ jobs:
                 $checks[0].check_runs[]
                 | {id, name, status, conclusion, started_at, completed_at, details_url, external_id}
               ]
-            }' > data/execution/sequence8-run-probe.json
+            }' > "$OUTPUT_PATH"
       - name: Publish probe result
         run: |
           set -euo pipefail
           git pull --rebase origin feature/rlf-execution-backend-20260823
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/execution/sequence8-run-probe.json
-          git commit -m 'Resolve sequence 8 workflow run'
+          git add "$OUTPUT_PATH"
+          git commit -m 'Resolve exact sequence 8 validation run'
           git push origin HEAD:feature/rlf-execution-backend-20260823
