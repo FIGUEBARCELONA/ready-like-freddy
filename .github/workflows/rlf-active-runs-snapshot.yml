@@ -14,7 +14,7 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '7'
+  SNAPSHOT_REVISION: '8'
   TARGET_SHA: '8af115e91e7b4918a538a352cd929c0e6a0c0825'
   TARGET_RUN_ID: '32777623316'
 
@@ -71,7 +71,9 @@ jobs:
                 productActive: ([$jobs[0][] | select((.name | startswith("Product F")) and .status != "completed")] | length),
                 totalArtifacts: ($artifacts[0] | length),
                 discoveryWorkerArtifacts: ([$artifacts[0][] | select(.name | startswith("rlf-discovery-worker-F"))] | length),
-                productWorkerArtifacts: ([$artifacts[0][] | select(.name | startswith("rlf-product-worker-F"))] | length)
+                productWorkerArtifacts: ([$artifacts[0][] | select(.name | startswith("rlf-product-worker-F"))] | length),
+                consolidatedDiscoveryArtifacts: ([$artifacts[0][] | select(.name == "rlf-kb-official-discovery-32777623316")] | length),
+                consolidatedProductArtifacts: ([$artifacts[0][] | select(.name == "rlf-kb-product-pages-32777623316")] | length)
               }
             }' > data/execution/workflow-runs-snapshot.json
           cat data/execution/workflow-runs-snapshot.json
@@ -81,7 +83,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot sequence 12 full job matrix'
+          git commit -m 'Refresh sequence 12 full job matrix'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
