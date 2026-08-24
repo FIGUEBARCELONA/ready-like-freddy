@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "runId": "32758087459",
+  "acceptedAt": "2026-08-24T17:48:31.095Z",
+  "sourceArtifact": {
+    "artifactId": 9531737243,
+    "artifactDigest": "sha256:ef94513a6efafee18bc19c147ee1ff56a5fea52537ad9fdbe8980590681710d6",
+    "artifactName": "rlf-kb-official-discovery-32758087459"
+  },
+  "attemptedSourcePageCount": 232,
+  "uniqueSourcePageCount": 232,
+  "successfulSourcePageCount": 227,
+  "attemptedSourcePages": [
+    {"url":"https://www.fredperry.com/men/coats-jackets","sourceSha256":"5caf0006570be9fd9ad57410ef767f552535a9ceae24c2da73ea89189010ddda","slot":"F01","fetchOk":true,"observedAt":"2026-08-24T17:43:48.192Z","sourceTransport":"JINA_READER_TRANSFORMED_OFFICIAL_SOURCE","sourceMarket":"GB","sourceScope":"MEN_CORE","productLinkCandidateCount":29}
+  ],
+  "status": "AUDITED_DISCOVERY_SOURCE_PAGES_NOT_PRODUCT_IDENTITIES",
+  "sourcePageDeltaSha256": "daeb4b9200be0251be848349afef07be506f1257c29807bc35dffc271ee3f827"
+}
