@@ -1,18 +1,61 @@
 {
-  "schemaVersion": 2,
-  "recordedAt": "2026-08-24T16:12:15.422Z",
-  "sourceCommitSha": "e8888ec40b36076a0bc6f46992ffbcb68b168332",
-  "runId": "32749428761",
+  "schemaVersion": 3,
+  "recordedAt": "2026-08-24T17:24:56.306Z",
+  "sourceCommitSha": "ede642aff6b65cb0a4ef9c2c6a1fb0a05503d122",
+  "runId": "32756447582",
   "runAttempt": 1,
-  "validationOutcome": "failure",
+  "validationOutcome": "success",
   "nodeVersion": "v22.23.2",
-  "logSha256": "78eb68b5883cf0ac009fa871a2970b95366349a6608b99193131cfdeac81ebf7",
-  "ledgerCheckpoint": null,
+  "logSha256": "9d0886bc474fda63b6329e1af989ed4497d4332b8eea276c32d93dc36a8ea3d2",
+  "ledgerCheckpoint": {
+    "schemaVersion": 2,
+    "sourceRunId": "32754804084",
+    "generatedAt": "2026-08-24T17:24:44.155Z",
+    "expected": {
+      "completedIdentityCount": 1054,
+      "productUrlCaptureCount": 1707,
+      "officialProductImageReferenceCount": 9271,
+      "materialEvidenceCount": 1383,
+      "manufacturingClaimCount": 59,
+      "descriptionMissingIdentityCount": 523,
+      "priceMissingIdentityCount": 467,
+      "materialMissingIdentityCount": 68,
+      "retryIdentityKeys": [
+        "B2328|560",
+        "HW2300|843"
+      ],
+      "deltaCount": 5,
+      "latestRunId": "32754804084",
+      "factoryVerifiedCount": 0,
+      "globalCanonicalProductCount": 0
+    },
+    "actual": {
+      "completedIdentityCount": 1054,
+      "productUrlCaptureCount": 1707,
+      "officialProductImageReferenceCount": 9271,
+      "materialEvidenceCount": 1383,
+      "manufacturingClaimCount": 59,
+      "descriptionMissingIdentityCount": 523,
+      "priceMissingIdentityCount": 467,
+      "materialMissingIdentityCount": 68,
+      "retryIdentityKeys": [
+        "B2328|560",
+        "HW2300|843"
+      ],
+      "deltaCount": 5,
+      "latestRunId": "32754804084",
+      "factoryVerifiedCount": 0,
+      "globalCanonicalProductCount": 0,
+      "ledgerSha256": "a8cc70c9f14fa51466baaf6122bdd648bf66c00b3a982c354a400e18b7856cd5"
+    },
+    "mismatches": [],
+    "passed": true
+  },
   "requiredChecks": [
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
-    "canonical_json_and_delta_parse",
-    "exact_sequence_9_append_only_ledger_checkpoint",
+    "canonical_json_and_five_delta_parse",
+    "exact_sequence_10_append_only_ledger_checkpoint",
     "typescript_no_emit",
     "production_build"
   ]
