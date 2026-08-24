@@ -14,8 +14,8 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '20'
-  TARGET_SHA: '0106e908d7ab29279a8d07df6ecfcac66a378597'
+  SNAPSHOT_REVISION: '21'
+  TARGET_SHA: '42fbb08f61dc9f7881375e3e5f5ae4c1aeedb4f4'
 
 jobs:
   snapshot:
@@ -60,7 +60,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot sequence 14 preflight run'
+          git commit -m 'Snapshot sequence 14 massive run'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
