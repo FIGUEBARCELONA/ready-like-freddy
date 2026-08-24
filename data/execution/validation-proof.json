@@ -1,16 +1,16 @@
 {
-  "schemaVersion": 7,
-  "recordedAt": "2026-08-24T21:55:33.105Z",
-  "sourceCommitSha": "b892e922635d8d138081c9405190f9df2d043914",
-  "runId": "32782019682",
+  "schemaVersion": 8,
+  "recordedAt": "2026-08-24T22:23:39.658Z",
+  "sourceCommitSha": "c1b966b892712d39a44e963d870afdea60e5b64f",
+  "runId": "32784395001",
   "runAttempt": 1,
   "validationOutcome": "success",
   "nodeVersion": "v22.23.2",
-  "logSha256": "618264399096b16d9763e96f3b74d1adbda6a5012f84de50494e181698590897",
+  "logSha256": "213940b47eee2e3e2f0acd7b3288ba55c8361072d9e3a6ecd8aff4bf1a244ad3",
   "ledgerCheckpoint": {
-    "schemaVersion": 6,
-    "sourceRunId": "32781308211",
-    "generatedAt": "2026-08-24T21:55:20.431Z",
+    "schemaVersion": 8,
+    "sourceRunId": "32783967794",
+    "generatedAt": "2026-08-24T22:23:27.820Z",
     "expected": {
       "identity": {
         "completedIdentityCount": 1354,
@@ -29,17 +29,17 @@
           "M4613|41A",
           "SY3660|46A"
         ],
-        "deltaCount": 9,
-        "latestRunId": "32781308211",
+        "deltaCount": 10,
+        "latestRunId": "32783967794",
         "factoryVerifiedCount": 0,
         "globalCanonicalProductCount": 0,
-        "ledgerSha256": "2a796480e8db88080fac020161b25b37e408631c77d2856353597f767496b114"
+        "ledgerSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b"
       },
       "sourcePages": {
-        "deltaCount": 7,
-        "attemptedObservationCount": 1448,
-        "uniqueAttemptedSourcePageCount": 1163,
-        "ledgerSha256": "8de01546abe681f1c271755341f19641083cb59f32cbd63bd7eae1f8980fee24"
+        "deltaCount": 8,
+        "attemptedObservationCount": 1524,
+        "uniqueAttemptedSourcePageCount": 1239,
+        "ledgerSha256": "19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3"
       }
     },
     "actual": {
@@ -60,72 +60,67 @@
           "M4613|41A",
           "SY3660|46A"
         ],
-        "deltaCount": 9,
-        "latestRunId": "32781308211",
+        "deltaCount": 10,
+        "latestRunId": "32783967794",
         "factoryVerifiedCount": 0,
         "globalCanonicalProductCount": 0,
-        "ledgerSha256": "2a796480e8db88080fac020161b25b37e408631c77d2856353597f767496b114"
+        "ledgerSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b"
       },
       "sourcePages": {
-        "deltaCount": 7,
-        "attemptedObservationCount": 1448,
-        "uniqueAttemptedSourcePageCount": 1163,
-        "ledgerSha256": "8de01546abe681f1c271755341f19641083cb59f32cbd63bd7eae1f8980fee24"
+        "deltaCount": 8,
+        "attemptedObservationCount": 1524,
+        "uniqueAttemptedSourcePageCount": 1239,
+        "ledgerSha256": "19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3"
       }
     },
-    "sequence14": {
-      "completedIdentityKeys": [
-        "B9352|X89",
-        "M2407|X86",
-        "M3574|84A"
-      ],
-      "failedIdentityCount": 0,
-      "identityDeltaSha256": "6539e13f665c18b90a7956980605a06b87598cbb3a48137a5eaad9f42d70e6eb",
-      "sourcePageCount": 250,
-      "sourcePageDeltaSha256": "060379a5365f276ba7426f877c9e4b7f12eacfc6b2c33376817f61243ca4e914",
+    "sequence15": {
+      "acceptance": "FULL_STRICT_EVIDENCE_0_COMPLETE",
+      "identityDeltaSha256": "a32897eaf941304d885cf712bdf09596b83d640c8991a8ae91b6ee37114b7efe",
+      "sourcePageCount": 76,
+      "sourcePageDeltaSha256": "5d775c5e67af9f03f1788de3fb4fc60e91acdbb3677481df9417db438cb46a0d",
       "productTotals": {
-        "frontierProductUrlCount": 233,
-        "frontierProductIdentityCount": 82,
-        "previouslyCompletedIdentityCount": 1351,
-        "selectedIdentityCount": 3,
-        "expectedProductCaptureCount": 3,
-        "attemptedProductCount": 3,
-        "attemptedIdentityCount": 3,
-        "httpFetchSuccessCount": 3,
-        "successfulProductFetchCount": 3,
+        "frontierProductUrlCount": 425,
+        "frontierProductIdentityCount": 117,
+        "previouslyCompletedIdentityCount": 1354,
+        "selectedIdentityCount": 0,
+        "expectedProductCaptureCount": 0,
+        "attemptedProductCount": 0,
+        "attemptedIdentityCount": 0,
+        "httpFetchSuccessCount": 0,
+        "successfulProductFetchCount": 0,
         "failedProductFetchCount": 0,
-        "successfulIdentityCaptureCount": 3,
+        "successfulIdentityCaptureCount": 0,
         "failedIdentityCaptureCount": 0,
         "soft404IdentityCount": 0,
         "missingImageIdentityCount": 0,
         "aliasFallbackSuccessCount": 0,
         "directSourceCount": 0,
-        "transformedReaderSourceCount": 3,
-        "imageReferenceCount": 28,
-        "officialProductImageReferenceCount": 28,
+        "transformedReaderSourceCount": 0,
+        "imageReferenceCount": 0,
+        "officialProductImageReferenceCount": 0,
         "rejectedImageReferenceCount": 0,
         "descriptionEvidenceCount": 0,
         "verifiedPriceCount": 0,
-        "materialEvidenceCount": 3,
+        "materialEvidenceCount": 0,
         "materialMissingIdentityCount": 0,
-        "manufacturingClaimCount": 1,
+        "manufacturingClaimCount": 0,
         "factoryVerifiedCount": 0
       },
       "dashboardCounts": {
         "totalJobs": 103,
-        "discoveryJobs": 50,
+        "discoveryTotal": 50,
         "discoverySuccess": 50,
         "discoveryFailed": 0,
         "discoveryActive": 0,
-        "productJobs": 50,
+        "productTotal": 50,
         "productSuccess": 50,
         "productFailed": 0,
         "productActive": 0,
-        "totalArtifacts": 104,
         "discoveryWorkerArtifacts": 50,
         "productWorkerArtifacts": 50,
         "consolidatedDiscoveryArtifacts": 1,
-        "consolidatedProductArtifacts": 1
+        "consolidatedProductArtifacts": 1,
+        "totalArtifacts": 104
       }
     },
     "mismatches": [],
@@ -134,12 +129,13 @@
   "requiredChecks": [
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
-    "canonical_json_nine_identity_deltas_seven_source_page_deltas",
-    "exact_sequence14_ledgers",
+    "canonical_json_ten_identity_deltas_eight_source_page_deltas",
+    "exact_sequence15_ledgers",
     "fifty_of_fifty_discovery_workers",
     "fifty_of_fifty_product_workers",
-    "sequence14_3_complete_0_retry_no_overlap",
-    "sequence14_250_unique_source_pages_no_overlap",
+    "sequence15_terminal_frontier_exhausted",
+    "sequence15_full_strict_evidence_zero_complete",
+    "sequence15_76_unique_source_pages_no_overlap",
     "zero_soft404_missing_or_rejected_images",
     "zero_verified_transformed_prices",
     "factory_verified_zero",
