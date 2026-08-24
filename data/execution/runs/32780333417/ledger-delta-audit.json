@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "runId": "32780333417",
+  "generatedAt": "2026-08-24T21:40:33.294Z",
+  "passed": true,
+  "sourceHashes": {
+    "productManifestSha256": "f0da8f8e49145e1df5c5ba2f3218c0da616ed3990f50f62db427a6f633c395af",
+    "productManifestFileSha256": "ec70179bc260348ae3e4fa5be329add6d7ccfc0c2254d5781f39ccb81135dea9",
+    "sourceProgressDeltaSha256": "89ca635ba66d472f7cffb307df201d94f8cba5c2c79ccdaae198c2f59fcf3986",
+    "sourceProgressDeltaFileSha256": "8915116419495aec02af7cc5183ac0a75053dd9377df09336cde70d41f2826a0",
+    "frontierFileSha256": "d24637d3b19301ff4ef35fbd08e8ea2ecff74e2a652c545bf682fc62ceb17d94"
+  },
+  "priorLedger": {
+    "completedIdentityCount": 1348,
+    "retryIdentityCount": 6,
+    "deltaCount": 7,
+    "ledgerSha256": "c57080c5befb8df5d00f8403b3a2b8c384017ed975441523498062b4f8b1edf9"
+  },
+  "batch": {
+    "selectedIdentityCount": 3,
+    "expectedProductCaptureCount": 3,
+    "successfulIdentityCaptureCount": 3,
+    "failedIdentityCaptureCount": 0,
+    "completedIdentityKeyCount": 3,
+    "capturedProductUrlCount": 5,
+    "overlapWithPrior": [],
+    "completedAndFailedOverlap": []
+  },
+  "projectedLedger": {
+    "completedIdentityCount": 1351,
+    "retryIdentityCount": 6
+  },
+  "ledgerDeltaSha256": "af1f5a2b2589ecadbfd95c0e891614ffde17d0f210dd5dbc51be0b9c149f4437"
+}

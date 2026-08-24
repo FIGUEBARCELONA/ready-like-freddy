@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 3,
+  "runId": "32780333417",
+  "acceptedAt": "2026-08-24T21:40:33.294Z",
+  "qualityGatePassed": true,
+  "strictQualityGatePassed": true,
+  "acceptance": "FULL_STRICT_EVIDENCE_3_COMPLETE",
+  "sourceEvidence": {
+    "productManifestSha256": "f0da8f8e49145e1df5c5ba2f3218c0da616ed3990f50f62db427a6f633c395af",
+    "productManifestFileSha256": "ec70179bc260348ae3e4fa5be329add6d7ccfc0c2254d5781f39ccb81135dea9",
+    "sourceProgressDeltaSha256": "89ca635ba66d472f7cffb307df201d94f8cba5c2c79ccdaae198c2f59fcf3986",
+    "sourceProgressDeltaFileSha256": "8915116419495aec02af7cc5183ac0a75053dd9377df09336cde70d41f2826a0",
+    "frontierFileSha256": "d24637d3b19301ff4ef35fbd08e8ea2ecff74e2a652c545bf682fc62ceb17d94"
+  },
+  "frontier": {
+    "frontierId": "RLF-OFFICIAL-20260824213557186-PRODUCTS",
+    "candidateUrlCount": 569,
+    "candidateIdentityCount": 151,
+    "previouslyCompletedIdentityCount": 1348,
+    "remainingIdentityCountBeforeSelection": 3,
+    "selectedIdentityCount": 3,
+    "expectedProductCaptureCount": 3,
+    "retryIdentityCount": 0,
+    "frontierSha256": "56aaca13624d8df0940d663d62ce0532f3b725c8333e2f7007f36d0c7661d6c4",
+    "selectedIdentitySha256": "f9ed6998af06b04cdee3d27608dc3de735e3a4aee82500752c5027c3757305a5",
+    "priorLedgerSha256": "c57080c5befb8df5d00f8403b3a2b8c384017ed975441523498062b4f8b1edf9",
+    "priorDeltaCount": 7
+  },
+  "completedIdentityKeys": [
+    "J3301|608",
+    "J5557|37C",
+    "T5505|420"
+  ],
+  "capturedProductUrlCount": 5,
+  "failedIdentities": [],
+  "counters": {
+    "successfulIdentityCaptureCount": 3,
+    "failedIdentityCaptureCount": 0,
+    "officialProductImageReferenceCount": 28,
+    "materialEvidenceCount": 5,
+    "manufacturingClaimCount": 0,
+    "factoryVerifiedCount": 0
+  },
+  "metadataGaps": {
+    "descriptionMissingIdentityCount": 3,
+    "priceMissingIdentityCount": 3,
+    "materialMissingIdentityCount": 0
+  },
+  "status": "FULL_STRICT_BATCH_ACCEPTED_NOT_GLOBAL_CANONICAL",
+  "ledgerDeltaSha256": "af1f5a2b2589ecadbfd95c0e891614ffde17d0f210dd5dbc51be0b9c149f4437"
+}
