@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
-  "validatedAt": "2026-08-24T21:03:13.526Z",
-  "sourceCommitSha": "a5b45e471c407e0d4c5021b3cadb7b9feb8a382a",
+  "validatedAt": "2026-08-24T21:05:20.184Z",
+  "sourceCommitSha": "adb03d116dea229cdd9dec296e80016899d6bde5",
   "targetSequence": 12,
   "workerCount": 50,
   "sourcePageLedgerDeltaCount": 4,
@@ -83,16 +83,299 @@
       "url": "https://www.fredperry.com/us/subculture/category/playlists"
     }
   ],
+  "balancedLaneTransferCount": 40,
+  "balancedLaneTransfers": [
+    {
+      "slot": "F21",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/subculture/category/all"
+    },
+    {
+      "slot": "F21",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/shop-finder/location/vietnam"
+    },
+    {
+      "slot": "F21",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/shop-finder/location/united-states"
+    },
+    {
+      "slot": "F21",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/shop-finder/location/united-kingdom"
+    },
+    {
+      "slot": "F22",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/subculture/category/all"
+    },
+    {
+      "slot": "F22",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/shop-finder/location/vietnam"
+    },
+    {
+      "slot": "F22",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/shop-finder/location/united-states"
+    },
+    {
+      "slot": "F22",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/shop-finder/location/united-kingdom"
+    },
+    {
+      "slot": "F26",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/subculture/category/all"
+    },
+    {
+      "slot": "F26",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/shop-finder/location/vietnam"
+    },
+    {
+      "slot": "F26",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/shop-finder/location/united-states"
+    },
+    {
+      "slot": "F26",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/shop-finder/location/united-kingdom"
+    },
+    {
+      "slot": "F32",
+      "donorSlot": "F44",
+      "market": "AE",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/ae-en/subculture/category/playlists"
+    },
+    {
+      "slot": "F32",
+      "donorSlot": "F44",
+      "market": "AE",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/ae-en/subculture/category/all"
+    },
+    {
+      "slot": "F32",
+      "donorSlot": "F44",
+      "market": "AE",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/ae-en/shop-finder/location/vietnam"
+    },
+    {
+      "slot": "F32",
+      "donorSlot": "F44",
+      "market": "AE",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/ae-en/shop-finder/location/united-states"
+    },
+    {
+      "slot": "F33",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/shop-finder/location/united-arab-emirates"
+    },
+    {
+      "slot": "F33",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/shop-finder/location/ukraine"
+    },
+    {
+      "slot": "F33",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/shop-finder/location/thailand"
+    },
+    {
+      "slot": "F33",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/shop-finder/location/taiwan-area"
+    },
+    {
+      "slot": "F34",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/shop-finder/location/united-arab-emirates"
+    },
+    {
+      "slot": "F34",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/shop-finder/location/ukraine"
+    },
+    {
+      "slot": "F34",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/shop-finder/location/thailand"
+    },
+    {
+      "slot": "F34",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/shop-finder/location/taiwan-area"
+    },
+    {
+      "slot": "F47",
+      "donorSlot": "F35",
+      "market": "ID",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/id-en/subculture/category/playlists"
+    },
+    {
+      "slot": "F47",
+      "donorSlot": "F35",
+      "market": "ID",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/id-en/subculture/category/all"
+    },
+    {
+      "slot": "F47",
+      "donorSlot": "F35",
+      "market": "ID",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/id-en/shop-finder/location/vietnam"
+    },
+    {
+      "slot": "F47",
+      "donorSlot": "F35",
+      "market": "ID",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/id-en/shop-finder/location/united-states"
+    },
+    {
+      "slot": "F48",
+      "donorSlot": "F36",
+      "market": "AU",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/au-en/subculture/category/playlists"
+    },
+    {
+      "slot": "F48",
+      "donorSlot": "F36",
+      "market": "AU",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/au-en/subculture/category/all"
+    },
+    {
+      "slot": "F48",
+      "donorSlot": "F36",
+      "market": "AU",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/au-en/shop-finder/location/vietnam"
+    },
+    {
+      "slot": "F48",
+      "donorSlot": "F36",
+      "market": "AU",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/au-en/shop-finder/location/united-states"
+    },
+    {
+      "slot": "F49",
+      "donorSlot": "F37",
+      "market": "GB",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/subculture/category/playlists"
+    },
+    {
+      "slot": "F49",
+      "donorSlot": "F37",
+      "market": "GB",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/subculture/category/all"
+    },
+    {
+      "slot": "F49",
+      "donorSlot": "F37",
+      "market": "GB",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/shop-finder/location/vietnam"
+    },
+    {
+      "slot": "F49",
+      "donorSlot": "F37",
+      "market": "GB",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/shop-finder/location/united-states"
+    },
+    {
+      "slot": "F50",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/shop-finder/location/united-arab-emirates"
+    },
+    {
+      "slot": "F50",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/shop-finder/location/ukraine"
+    },
+    {
+      "slot": "F50",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/shop-finder/location/thailand"
+    },
+    {
+      "slot": "F50",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/shop-finder/location/taiwan-area"
+    }
+  ],
   "remainingQueueUrlCount": 2990,
   "theoreticalBatchCapacity": 250,
-  "effectiveBatchCapacity": 157,
-  "effectiveBatchUtilization": 0.628,
+  "effectiveBatchCapacity": 197,
+  "effectiveBatchUtilization": 0.788,
   "repeatedFirstBatchUrlCount": 0,
   "duplicateRemainingQueueUrlCount": 0,
   "emptySlots": [],
   "minimumUrlsPerWorker": 1,
-  "maximumUrlsPerWorker": 246,
-  "queueSha256": "19fe5ac3bf559b0ae0aa1adcfbda6b8e8d58d3a2ab5fc8c94433408dec69bbd3",
+  "maximumUrlsPerWorker": 245,
+  "queueSha256": "19435a2b87426358e5bcce87a27476575d01819acaea1afb313df2d35b126fcd",
   "sourcePageLedgerSha256": "f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347",
-  "passed": false
+  "passed": true
 }
