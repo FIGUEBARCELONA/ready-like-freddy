@@ -5,7 +5,7 @@ import {domainOf} from './search';
 import {evidence} from './evidence';
 import {LEGAL,MARKETPLACES,NEW_RETAIL,PRELOVED,PROFESSIONAL,PURCHASE,UK_OPERATORS} from './policy';
 import {analyzeIdentity,detectCountry} from './identity';
-import {KNOWN_IDENTITY_KEYS,KNOWN_IDENTITY_QUARANTINE_DOMAINS,KNOWN_REJECTED_DOMAINS,KNOWN_SUPPLIER_DOMAINS,STAGED_SUPPLIER_DOMAINS} from '@/lib/known-suppliers';
+import {KNOWN_IDENTITY_KEYS,KNOWN_IDENTITY_QUARANTINE_DOMAINS,KNOWN_REJECTED_DOMAINS,KNOWN_SUPPLIER_ALIAS_DOMAINS,KNOWN_SUPPLIER_DOMAINS,STAGED_SUPPLIER_DOMAINS} from '@/lib/known-suppliers';
 
 export function assess(input:DiscoverInput,query:string,queryTemplate:number,identityQueryTemplate:number,result:SearchItem,bundle:Bundle):Candidate {
   const url=bundle.target.url||result.url;
@@ -18,9 +18,11 @@ export function assess(input:DiscoverInput,query:string,queryTemplate:number,ide
   const joined=`${result.title} ${result.snippet} ${pageText}`.toLowerCase();
   const marketplace=MARKETPLACES.some(item=>domain.includes(item));
   const knownRejected=KNOWN_REJECTED_DOMAINS.has(domain);
-  const knownDuplicateDomain=KNOWN_SUPPLIER_DOMAINS.has(domain)||STAGED_SUPPLIER_DOMAINS.has(domain);
+  const knownDuplicateDomain=KNOWN_SUPPLIER_DOMAINS.has(domain)||KNOWN_SUPPLIER_ALIAS_DOMAINS.has(domain)||STAGED_SUPPLIER_DOMAINS.has(domain);
   const identityQuarantine=KNOWN_IDENTITY_QUARANTINE_DOMAINS.has(domain);
-  const uk=UK_OPERATORS.includes(domain)||domain.endsWith('.co.uk')||domain.endsWith('.uk')||/\b(united kingdom|company registered in england|companies house)\b/i.test(legalText)||/\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i.test(legalText);
+  const explicitUK=/\b(united kingdom|england|scotland|wales|northern ireland|company registered in england|companies house)\b/i.test(legalText);
+  const contextualUKPostcode=/\b(?:registered office|return address|business address|postal address|based in|located in)[^.;|]{0,180}\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i.test(legalText);
+  const uk=UK_OPERATORS.includes(domain)||domain.endsWith('.co.uk')||domain.endsWith('.uk')||explicitUK||contextualUKPostcode;
   const country=detectCountry(domain,legalText);
   const detectedCountryCode=uk?'NON_EU':country.code;
   const nonEU=detectedCountryCode==='NON_EU';
