@@ -1,59 +1,18 @@
 {
   "schemaVersion": 2,
-  "recordedAt": "2026-08-24T15:58:34.223Z",
-  "sourceCommitSha": "a44db0de48035f8f998497a6f3bfe19cb79e916c",
-  "runId": "32748026086",
+  "recordedAt": "2026-08-24T16:12:15.422Z",
+  "sourceCommitSha": "e8888ec40b36076a0bc6f46992ffbcb68b168332",
+  "runId": "32749428761",
   "runAttempt": 1,
-  "validationOutcome": "success",
+  "validationOutcome": "failure",
   "nodeVersion": "v22.23.2",
-  "logSha256": "c4b6efd888d0ea605873836213f04209542fb46fd2b6b4b00284df474235085b",
-  "ledgerCheckpoint": {
-    "schemaVersion": 1,
-    "sourceRunId": "32746322369",
-    "generatedAt": "2026-08-24T15:58:22.214Z",
-    "expected": {
-      "completedIdentityCount": 906,
-      "productUrlCaptureCount": 1418,
-      "officialProductImageReferenceCount": 7963,
-      "materialEvidenceCount": 1232,
-      "manufacturingClaimCount": 54,
-      "descriptionMissingIdentityCount": 375,
-      "priceMissingIdentityCount": 319,
-      "materialMissingIdentityCount": 44,
-      "retryIdentityKeys": [
-        "B2328|560",
-        "HW2300|843"
-      ],
-      "deltaCount": 3,
-      "factoryVerifiedCount": 0,
-      "globalCanonicalProductCount": 0
-    },
-    "actual": {
-      "completedIdentityCount": 906,
-      "productUrlCaptureCount": 1418,
-      "officialProductImageReferenceCount": 7963,
-      "materialEvidenceCount": 1232,
-      "manufacturingClaimCount": 54,
-      "descriptionMissingIdentityCount": 375,
-      "priceMissingIdentityCount": 319,
-      "materialMissingIdentityCount": 44,
-      "retryIdentityKeys": [
-        "B2328|560",
-        "HW2300|843"
-      ],
-      "deltaCount": 3,
-      "factoryVerifiedCount": 0,
-      "globalCanonicalProductCount": 0,
-      "ledgerSha256": "e6120cddbd32ed7388fdf2e854a2667fc48b0a9c24534686695e6295d49f301a"
-    },
-    "mismatches": [],
-    "passed": true
-  },
+  "logSha256": "78eb68b5883cf0ac009fa871a2970b95366349a6608b99193131cfdeac81ebf7",
+  "ledgerCheckpoint": null,
   "requiredChecks": [
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
     "canonical_json_and_delta_parse",
-    "exact_sequence_8_append_only_ledger_checkpoint",
+    "exact_sequence_9_append_only_ledger_checkpoint",
     "typescript_no_emit",
     "production_build"
   ]
