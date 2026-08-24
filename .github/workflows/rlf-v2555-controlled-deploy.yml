@@ -5,6 +5,10 @@ on:
     branches: [rlf-v2555-sweep-once-v2556]
     paths:
       - '.github/deploy/RLF_V25_55_CONTROLLED_DEPLOY.json'
+  pull_request:
+    branches: [rlf-v2555-ci-base]
+    paths:
+      - '.github/deploy/RLF_V25_55_CONTROLLED_DEPLOY.json'
 
 permissions:
   contents: read
@@ -15,6 +19,7 @@ concurrency:
 
 jobs:
   deploy-production:
+    if: github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'rlf-v2555-sweep-once-v2556')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
