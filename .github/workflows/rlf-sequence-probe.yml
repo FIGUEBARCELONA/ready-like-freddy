@@ -13,9 +13,9 @@ permissions:
   contents: write
 
 env:
-  TARGET_SHA: '87a0fc83cfbdc99db30395529e16b00f54d7ac79'
+  TARGET_SHA: '660aa4c7203d4561834daee8dedc91321b6f9a0e'
   TARGET_WORKFLOW: 'RLF repair sequence 9 delta hash'
-  OUTPUT_PATH: 'data/execution/sequence9-hash-repair-probe.json'
+  OUTPUT_PATH: 'data/execution/sequence9-corrected-repair-probe.json'
 
 jobs:
   probe:
@@ -64,7 +64,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$OUTPUT_PATH"
-          git commit -m 'Resolve sequence 9 delta hash repair run'
+          git commit -m 'Resolve corrected sequence 9 audit repair run'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
