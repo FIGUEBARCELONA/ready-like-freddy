@@ -14,9 +14,8 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '28'
-  TARGET_SHA: '9c8588bcbb652acb56d680730ed90d11f7c8d5ac'
-  TARGET_RUN_ID: '32782249638'
+  SNAPSHOT_REVISION: '29'
+  TARGET_SHA: '49de5fc2eb2d5760a557c22f7da713b048d4606a'
 
 jobs:
   snapshot:
@@ -25,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/rlf-execution-backend-20260823
-      - name: Capture full target run matrix
+      - name: Capture repaired preflight run
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -33,49 +32,20 @@ jobs:
           set -euo pipefail
           mkdir -p data/execution
           gh api -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}" \
-            --jq '{id, name, run_number, run_attempt, event, status, conclusion, head_sha, head_branch, created_at, updated_at, html_url}' \
-            > /tmp/run.json
-          gh api --paginate -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}/jobs?per_page=100" \
-            --jq '.jobs[] | {id, name, status, conclusion, started_at, completed_at, html_url}' \
-            | jq -s 'unique_by(.id) | sort_by(.name)' > /tmp/jobs.json
-          gh api --paginate -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}/artifacts?per_page=100" \
-            --jq '.artifacts[] | {id, name, size_in_bytes, digest, expired, created_at, expires_at, archive_download_url}' \
-            | jq -s 'unique_by(.id) | sort_by(.name)' > /tmp/artifacts.json
+            "/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&per_page=50" \
+            --jq '[.workflow_runs[] | {id, name, run_number, run_attempt, event, status, conclusion, head_sha, created_at, updated_at, html_url}]' \
+            > /tmp/runs.json
+          gh api -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/commits/${TARGET_SHA}/check-runs?per_page=100" \
+            --jq '[.check_runs[] | {id, name, status, conclusion, started_at, completed_at, details_url}]' \
+            > /tmp/checks.json
           jq -n \
             --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --arg targetSha "$TARGET_SHA" \
-            --arg targetRunId "$TARGET_RUN_ID" \
-            --slurpfile run /tmp/run.json \
-            --slurpfile jobs /tmp/jobs.json \
-            --slurpfile artifacts /tmp/artifacts.json \
-            '{
-              schemaVersion: 12,
-              capturedAt: $capturedAt,
-              targetSha: $targetSha,
-              targetRunId: ($targetRunId | tonumber),
-              run: $run[0],
-              jobs: $jobs[0],
-              artifacts: $artifacts[0],
-              counts: {
-                totalJobs: ($jobs[0] | length),
-                discoveryJobs: ([$jobs[0][] | select(.name | startswith("Discovery F"))] | length),
-                discoverySuccess: ([$jobs[0][] | select((.name | startswith("Discovery F")) and .status == "completed" and .conclusion == "success")] | length),
-                discoveryFailed: ([$jobs[0][] | select((.name | startswith("Discovery F")) and .status == "completed" and .conclusion != "success")] | length),
-                discoveryActive: ([$jobs[0][] | select((.name | startswith("Discovery F")) and .status != "completed")] | length),
-                productJobs: ([$jobs[0][] | select(.name | startswith("Product F"))] | length),
-                productSuccess: ([$jobs[0][] | select((.name | startswith("Product F")) and .status == "completed" and .conclusion == "success")] | length),
-                productFailed: ([$jobs[0][] | select((.name | startswith("Product F")) and .status == "completed" and .conclusion != "success")] | length),
-                productActive: ([$jobs[0][] | select((.name | startswith("Product F")) and .status != "completed")] | length),
-                totalArtifacts: ($artifacts[0] | length),
-                discoveryWorkerArtifacts: ([$artifacts[0][] | select(.name | startswith("rlf-discovery-worker-F"))] | length),
-                productWorkerArtifacts: ([$artifacts[0][] | select(.name | startswith("rlf-product-worker-F"))] | length),
-                consolidatedDiscoveryArtifacts: ([$artifacts[0][] | select(.name == "rlf-kb-official-discovery-32782249638")] | length),
-                consolidatedProductArtifacts: ([$artifacts[0][] | select(.name == "rlf-kb-product-pages-32782249638")] | length)
-              }
-            }' > data/execution/workflow-runs-snapshot.json
+            --slurpfile runs /tmp/runs.json \
+            --slurpfile checks /tmp/checks.json \
+            '{schemaVersion:13,capturedAt:$capturedAt,targetSha:$targetSha,targetRuns:$runs[0],targetChecks:$checks[0]}' \
+            > data/execution/workflow-runs-snapshot.json
           cat data/execution/workflow-runs-snapshot.json
       - name: Publish snapshot
         shell: bash
@@ -85,7 +55,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot sequence 15 full dashboard matrix'
+          git commit -m 'Snapshot repaired sequence 15 preflight'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
