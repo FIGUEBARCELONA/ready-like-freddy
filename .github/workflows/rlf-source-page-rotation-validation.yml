@@ -1,0 +1,111 @@
+name: RLF source page rotation validation
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-source-page-rotation-validation.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-source-page-rotation-validation
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build sequence 11 preflight without activating mass workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'data/execution/rlf-kb-run-plan.json';
+          const plan = JSON.parse(fs.readFileSync(path, 'utf8'));
+          plan.schemaVersion = 10;
+          plan.planId = 'RLF-KB-SOURCE-PAGE-ROTATION-20260824-S11-PREFLIGHT';
+          plan.pilotRunSequence = 11;
+          plan.phaseId = 'OFFICIAL_ARCHIVE_SOURCE_PAGE_ROTATION_02_PREFLIGHT';
+          plan.discoveryPolicy = {
+            ...plan.discoveryPolicy,
+            strategy: 'EXCLUDE_AUDITED_SOURCE_PAGES_THEN_STRATIFY_50_LANES',
+            requiredPriorityEntryPointCount: 0,
+            previousPriorityEntryPointCount: 23,
+            sourcePageDeltaDirectory: 'data/execution/source-page-deltas',
+            minimumPreviouslyAttemptedSourcePageExclusions: 250,
+            excludePreviouslyAttemptedSourcePages: true,
+            sourcePageRotationSequence: 2,
+          };
+          fs.writeFileSync(path, `${JSON.stringify(plan, null, 2)}\n`);
+          NODE
+          node scripts/execution/prepare-official-queue.mjs --out=execution/queue-rotation-test
+          node --input-type=module <<'NODE'
+          import { readFile, writeFile } from 'node:fs/promises';
+          import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
+          const queue = JSON.parse(await readFile('execution/queue-rotation-test/queue.json', 'utf8'));
+          const summary = JSON.parse(await readFile('execution/queue-rotation-test/summary.json', 'utf8'));
+          const ledger = await loadSourcePageLedger();
+          const firstBatch = queue.assignments.flatMap(assignment => assignment.urls.slice(0, 5));
+          const repeated = firstBatch.filter(entry => ledger.attemptedUrlSet.has(entry.url));
+          const allUrls = queue.assignments.flatMap(assignment => assignment.urls.map(entry => entry.url));
+          const emptySlots = queue.assignments.filter(assignment => assignment.urls.length === 0).map(assignment => assignment.slot);
+          const result = {
+            schemaVersion: 1,
+            validatedAt: new Date().toISOString(),
+            sourceCommitSha: process.env.GITHUB_SHA,
+            workerCount: queue.assignments.length,
+            sourcePageLedgerDeltaCount: ledger.deltaCount,
+            sourcePageLedgerObservationCount: ledger.attemptedObservationCount,
+            uniquePreviouslyAttemptedSourcePageCount: ledger.uniqueAttemptedSourcePageCount,
+            excludedPreviouslyAttemptedSourcePageCount: queue.excludedPreviouslyAttemptedSourcePageCount,
+            skippedPriorityEntryPointCount: queue.skippedPriorityEntryPointCount,
+            injectedPriorityEntryPointCount: queue.priorityEntryPointCount,
+            remainingQueueUrlCount: allUrls.length,
+            firstBatchUrlCount: firstBatch.length,
+            repeatedFirstBatchUrlCount: repeated.length,
+            duplicateRemainingQueueUrlCount: allUrls.length - new Set(allUrls).size,
+            emptySlots,
+            minimumUrlsPerWorker: summary.minimumUrlsPerWorker,
+            maximumUrlsPerWorker: summary.maximumUrlsPerWorker,
+            queueSha256: queue.queueSha256,
+            sourcePageLedgerSha256: ledger.ledgerSha256,
+          };
+          result.passed =
+            result.workerCount === 50 &&
+            result.sourcePageLedgerDeltaCount === 3 &&
+            result.sourcePageLedgerObservationCount === 550 &&
+            result.uniquePreviouslyAttemptedSourcePageCount === 265 &&
+            result.excludedPreviouslyAttemptedSourcePageCount >= 250 &&
+            result.skippedPriorityEntryPointCount === 23 &&
+            result.injectedPriorityEntryPointCount === 0 &&
+            result.firstBatchUrlCount === 250 &&
+            result.repeatedFirstBatchUrlCount === 0 &&
+            result.duplicateRemainingQueueUrlCount === 0 &&
+            result.emptySlots.length === 0;
+          await writeFile('data/execution/source-page-rotation-validation.json', `${JSON.stringify(result, null, 2)}\n`);
+          console.log(JSON.stringify(result, null, 2));
+          if (!result.passed) throw new Error('Source-page rotation preflight failed');
+          NODE
+      - name: Publish auditable preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          git checkout -- data/execution/rlf-kb-run-plan.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/source-page-rotation-validation.json
+          git commit -m 'Persist source page rotation preflight'
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
+          git push origin HEAD:feature/rlf-execution-backend-20260823
