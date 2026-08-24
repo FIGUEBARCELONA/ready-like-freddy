@@ -1,0 +1,106 @@
+name: RLF source page ledger backfill
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-source-page-ledger-backfill.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: rlf-source-page-ledger-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Download audited discovery artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/rlf-source-pages
+          gh api /repos/${GITHUB_REPOSITORY}/actions/artifacts/9527476312/zip > /tmp/rlf-source-pages/32746322369.zip
+          gh api /repos/${GITHUB_REPOSITORY}/actions/artifacts/9528164175/zip > /tmp/rlf-source-pages/32748405808.zip
+          gh api /repos/${GITHUB_REPOSITORY}/actions/artifacts/9530611276/zip > /tmp/rlf-source-pages/32754804084.zip
+          for run in 32746322369 32748405808 32754804084; do
+            mkdir -p /tmp/rlf-source-pages/${run}
+            unzip -q /tmp/rlf-source-pages/${run}.zip -d /tmp/rlf-source-pages/${run}
+          done
+      - name: Reconstruct and sign append-only source page deltas
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/execution/source-page-deltas
+          node <<'NODE'
+          const fs = require('node:fs');
+          const crypto = require('node:crypto');
+          const metadata = {
+            '32746322369': { artifactId: 9527476312, artifactDigest: 'sha256:84c92dd04562a6b34badf99a1cf501fd3ace147efb450372b686d3d7844d3d47', artifactName: 'rlf-kb-official-discovery-32746322369' },
+            '32748405808': { artifactId: 9528164175, artifactDigest: 'sha256:ff76608cae233c52913efe7db5bf471f641de171afb5295d75a17c5f300a9a96', artifactName: 'rlf-kb-official-discovery-32748405808' },
+            '32754804084': { artifactId: 9530611276, artifactDigest: 'sha256:d9f11351a7f08578e23d4a6d69c7962ec1a00e0c178d398e5aa1a3416f890078', artifactName: 'rlf-kb-official-discovery-32754804084' },
+          };
+          function stableValue(value) {
+            if (Array.isArray(value)) return value.map(stableValue);
+            if (!value || typeof value !== 'object') return value;
+            return Object.fromEntries(Object.keys(value).sort().map(key => [key, stableValue(value[key])]));
+          }
+          function stableJson(value) { return JSON.stringify(stableValue(value)); }
+          for (const [runId, sourceArtifact] of Object.entries(metadata)) {
+            const path = `/tmp/rlf-source-pages/${runId}/consolidated/records.ndjson`;
+            const records = fs.readFileSync(path, 'utf8').split(/\r?\n/).filter(Boolean).map(JSON.parse);
+            const attemptedSourcePages = records.map(record => ({
+              url: record.requestedUrl,
+              sourceSha256: record.sourceSha256,
+              slot: record.slot,
+              fetchOk: Boolean(record.fetchOk),
+              observedAt: record.observedAt ?? null,
+              sourceTransport: record.sourceTransport ?? null,
+              sourceMarket: record.sourceMarket ?? null,
+              sourceScope: record.sourceDiscoveryScope ?? null,
+              productLinkCandidateCount: Number(record.productLinkCandidateCount ?? 0),
+            }));
+            const delta = {
+              schemaVersion: 1,
+              runId,
+              acceptedAt: new Date().toISOString(),
+              sourceArtifact,
+              attemptedSourcePageCount: attemptedSourcePages.length,
+              uniqueSourcePageCount: new Set(attemptedSourcePages.map(page => page.url)).size,
+              successfulSourcePageCount: attemptedSourcePages.filter(page => page.fetchOk).length,
+              attemptedSourcePages,
+              status: 'AUDITED_DISCOVERY_SOURCE_PAGES_NOT_PRODUCT_IDENTITIES',
+            };
+            delta.sourcePageDeltaSha256 = crypto.createHash('sha256').update(stableJson(delta)).digest('hex');
+            fs.writeFileSync(`data/execution/source-page-deltas/${runId}.json`, `${JSON.stringify(delta, null, 2)}\n`);
+          }
+          NODE
+          node --input-type=module <<'NODE'
+          import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
+          const ledger = await loadSourcePageLedger();
+          if (ledger.deltaCount !== 3) throw new Error(`Expected 3 source-page deltas, got ${ledger.deltaCount}`);
+          if (ledger.attemptedObservationCount !== 550) throw new Error(`Expected 550 observations, got ${ledger.attemptedObservationCount}`);
+          if (ledger.uniqueAttemptedSourcePageCount !== 265) throw new Error(`Expected 265 unique source pages, got ${ledger.uniqueAttemptedSourcePageCount}`);
+          console.log(JSON.stringify({ deltaCount: ledger.deltaCount, attemptedObservationCount: ledger.attemptedObservationCount, uniqueAttemptedSourcePageCount: ledger.uniqueAttemptedSourcePageCount, ledgerSha256: ledger.ledgerSha256 }, null, 2));
+          NODE
+      - name: Commit authoritative source page ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/source-page-deltas
+          git commit -m 'Backfill audited source page ledger through sequence 10'
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
+          git push origin HEAD:feature/rlf-execution-backend-20260823
