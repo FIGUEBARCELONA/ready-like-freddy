@@ -20,10 +20,10 @@ jobs:
         with:
           ref: feature/rlf-execution-backend-20260823
           fetch-depth: 0
-      - name: Resolve preflight run
+      - name: Resolve corrected preflight run
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_SHA: 3a4a905d3f851336158dac839defafc5c55d3d1d
+          TARGET_SHA: b88dde9df56036ac7ff1b48c595346edd5cd712e
         shell: bash
         run: |
           set -euo pipefail
@@ -37,7 +37,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/source-page-rotation-run-probe.json
-          git commit -m 'Resolve source page rotation preflight run'
+          git commit -m 'Resolve corrected source page rotation preflight run'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
