@@ -14,8 +14,8 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '18'
-  TARGET_SHA: '302f7b6d8295cd7db5ba2f1952744ae9408ebb35'
+  SNAPSHOT_REVISION: '19'
+  TARGET_SHA: '62e9ee8ba2ea9007bed8aa808e56089b87c4c581'
 
 jobs:
   snapshot:
@@ -60,7 +60,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot exact sequence 13 ledger run'
+          git commit -m 'Snapshot sequence 13 validation proof run'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
