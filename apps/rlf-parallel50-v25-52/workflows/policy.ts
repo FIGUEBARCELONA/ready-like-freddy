@@ -1,9 +1,9 @@
 import type {Lane} from '@/lib/lanes';
 
 export const MARKETPLACES=[
-  'ebay.','vinted.','wallapop.','depop.','etsy.','amazon.','facebook.com','instagram.com','pinterest.','reddit.com','youtube.com','tiktok.com',
+  'ebay.','vinted.','wallapop.','depop.','etsy.','amazon.','facebook.com','instagram.com','pinterest.','reddit.com','youtube.com','tiktok.com','linktr.ee',
   'grailed.com','vestiairecollective.','shpock.','olx.','allegro.','leboncoin.fr','2dehands.','marktplaats.nl','kleinanzeigen.de','catawiki.','tradera.',
-  'finn.no','tori.fi','willhaben.at','marketplace.','poshmark.com','subito.it','carousell.','mercari.','rakuten.','chrono24.','vendora.bg','bazar.bg',
+  'finn.no','tori.fi','willhaben.at','marketplace.','poshmark.com','subito.it','carousell.','mercari.','rakuten.','chrono24.','vendora.bg','bazar.bg','jolicloset.com',
   'wikipedia.org','yelp.','thelabelfinder.','worthpoint.com','bazos.','plick.','adverts.ie','goldenpages.','gem.app','glami.','therealreal.com',
 ];
 
@@ -11,15 +11,16 @@ export const NEW_RETAIL=[
   'fredperry.com','fred-perry.it','asos.com','endclothing.com','stuartslondon.com','dandyfellow.com','farfetch.com','zalando.','aboutyou.','yoox.com','mrporter.com','ssense.com',
   'mainlinemenswear.com','arnotts.ie','boozt.com','miinto.','bstn.com','size.co.uk','flannels.com','julesb.co.uk','kingpinclothingstore.com',
   'stockmann.','luc.pt','sportus.nl','elcorteingles.','laredoute.','rihu.pt','saros.pt','kuantokusta.pt','kurpirkt.lv',
+  'careofcarl.','jdsports.','sokos.','spartoo.','kastner-oehler.','peek-cloppenburg.',
 ];
 
 export const UK_OPERATORS=['headlock.co','roundrobinclassics.com','mainlinemenswear.com','thrifted.com','freshmansarchive.com','messinahembry.com','brasshanger.co.uk','preworn.com','rokit.co.uk','ie.rokit.co.uk','vintagerecovery.co.uk','livefortweed.co.uk','vintage-folk.com'];
 export const INTERNAL=['google.com','googleusercontent.com','gstatic.com','yahoo.com','yahoo.net','bing.com','microsoft.com'];
 export const PRELOVED=['vintage','second hand','secondhand','preloved','pre-loved','pre owned','pre-owned','used clothing','seconde main','friperie','occasion','gebraucht','zweite hand','tweedehands','kringloop','usato','seconda mano','segunda mano','segunda mão','odzież używana','használt','rabljena','použité','genbrug','käytetyt','lietoti','dėvėti','дрехи втора употреба','μεταχειρισμένα','haine second hand','kasutatud riided','vintage kleding','abbigliamento vintage','ropa vintage','roupa vintage','odzież vintage','haine vintage','retro clothing','archive clothing'];
 export const PROFESSIONAL=['add to cart','add to bag','basket','checkout','shop now','buy now','shipping','delivery','returns','return policy','terms and conditions','contact us','about us','ajouter au panier','in den warenkorb','aggiungi al carrello','añadir al carrito','adicionar ao carrinho','toevoegen aan winkelwagen','lägg i varukorg','dodaj do koszyka','tilføj til kurv','retour','versand','spedizione','livrare','plată','zahlung','refund policy','shipping policy'];
-export const LEGAL=['vat','iva','nif','cif','p.iva','partita iva','btw','kvk','siret','siren','ust-id','ust-idnr','ust-idnr.','company number','registration number','impressum','legal notice','mentions légales','aviso legal','privacy policy','regulamin','cui','registrul comerțului','firmenbuch','uid-nummer','geschäftsführer','amtsgericht','organisationsnummer','aktiebolag','limited company','s.r.o.','sp. z o.o.','srl','s.r.l.','gmbh','ab'];
+export const LEGAL=['vat','iva','nif','cif','p.iva','partita iva','btw','kvk','siret','siren','ust-id','ust-idnr','ust-idnr.','company number','registration number','impressum','legal notice','mentions légales','aviso legal','privacy policy','regulamin','cui','registrul comerțului','firmenbuch','uid-nummer','geschäftsführer','amtsgericht','organisationsnummer','aktiebolag','limited company','s.r.o.','sp. z o.o.','srl','s.r.l.','gmbh'];
 export const PURCHASE=['add to cart','add to bag','buy now','checkout','ajouter au panier','in den warenkorb','aggiungi al carrello','añadir al carrito','adicionar ao carrinho','dodaj do koszyka','toevoegen aan winkelwagen','adaugă în coș'];
-export const NEGATIVE='-ebay -vinted -wallapop -depop -etsy -amazon -poshmark -subito -grailed -vestiaire -leboncoin -olx -marktplaats -2dehands -kleinanzeigen -catawiki -reddit -wikipedia -yelp -zalando -asos -farfetch -vendora -bazar -pappers -pagesjaunes -kuantokusta -kurpirkt';
+export const NEGATIVE='-ebay -vinted -wallapop -depop -etsy -amazon -poshmark -subito -grailed -vestiaire -leboncoin -olx -marktplaats -2dehands -kleinanzeigen -catawiki -reddit -wikipedia -yelp -zalando -asos -farfetch -vendora -bazar -pappers -pagesjaunes -kuantokusta -kurpirkt -linktree -jolicloset';
 
 export const EU_TLDS=new Set(['at','be','bg','hr','cy','cz','dk','ee','fi','fr','de','gr','hu','ie','it','lv','lt','lu','mt','nl','pl','pt','ro','sk','si','es','se']);
 export const NON_EU_TLDS=new Set(['uk','co.uk','com.au','ca','ch','no','us','co.nz']);
