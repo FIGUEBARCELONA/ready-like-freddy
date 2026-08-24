@@ -33,8 +33,12 @@ jobs:
         run: node --version && npm --version
       - name: TypeScript strict gate
         run: npx tsc --noEmit
-      - name: Next production build
-        run: npm run build
+      - name: Next production build and Workflow manifest gate
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee workflow-build.log
+          grep -F '6 steps, 2 workflows' workflow-build.log
       - name: Dependency audit gate
         run: npm audit --audit-level=moderate --json > dependency-audit-v2555.json
       - uses: actions/upload-artifact@v4
@@ -43,4 +47,5 @@ jobs:
           path: |
             apps/rlf-parallel50-v25-52/dependency-audit-v2555.json
             apps/rlf-parallel50-v25-52/package-lock.json
+            apps/rlf-parallel50-v25-52/workflow-build.log
           retention-days: 7
