@@ -119,12 +119,12 @@ export function analyzeIdentity(domain:string,legalText:string,country:CountryDe
   const addr=address(text);
   let identityKey:string|null=null;
   let basis:IdentityBasis='NONE';
-  if(euVat){identityKey=`EU-VAT:${euVat}`;basis='VAT';}
-  else if(local){identityKey=`${local.keyPrefix}:${local.id}`;basis='REGISTRATION';}
+  if(local){identityKey=`${local.keyPrefix}:${local.id}`;basis='REGISTRATION';}
+  else if(euVat){identityKey=`EU-VAT:${euVat}`;basis='VAT';}
   else if(name&&addr){const key=compact(`${name}|${addr}`).slice(0,96);identityKey=key?`NAME-ADDRESS:${key}`:null;basis=identityKey?'NAME_ADDRESS':'NONE';}
   const generic=/\.(com|net|org|shop|store)$|myshopify\.com$/i.test(domain);
   const named=NAMED_OPERATOR.test(text)||Boolean(name);
   const hasAddress=Boolean(addr)||(ADDRESS.test(text)&&/\b\d{1,5}\b/.test(text));
   const strong=text.length>=120&&named&&hasAddress&&(basis==='VAT'||basis==='REGISTRATION'||(!generic&&basis==='NAME_ADDRESS'&&country.code!==null&&country.code!=='NON_EU'));
-  return {identityKey,identityBasis:basis,vatId:euVat,registrationId:euVat?null:local?.id??null,contractingName:name,addressSignal:addr,strong};
+  return {identityKey,identityBasis:basis,vatId:basis==='VAT'?euVat:null,registrationId:basis==='REGISTRATION'?local?.id??null:null,contractingName:name,addressSignal:addr,strong};
 }
