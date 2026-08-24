@@ -1,84 +1,23 @@
 {
-  "schemaVersion": 4,
-  "recordedAt": "2026-08-24T17:52:57.550Z",
-  "sourceCommitSha": "6e658fa8591612592eb2fb044cc8bac410b155b5",
-  "runId": "32759127019",
+  "schemaVersion": 5,
+  "recordedAt": "2026-08-24T21:17:03.579Z",
+  "sourceCommitSha": "6bb461260bfce2a03767315690ecf8f750e2b9f3",
+  "runId": "32778633048",
   "runAttempt": 1,
-  "validationOutcome": "success",
+  "validationOutcome": "failure",
   "nodeVersion": "v22.23.2",
-  "logSha256": "a1828f017094e9377013d3d2e0d1a0b5b75fa1aa35970f4d1a56422465e31bc7",
-  "ledgerCheckpoint": {
-    "schemaVersion": 3,
-    "sourceRunId": "32758087459",
-    "generatedAt": "2026-08-24T17:52:45.502Z",
-    "expected": {
-      "identity": {
-        "completedIdentityCount": 1241,
-        "productUrlCaptureCount": 2013,
-        "officialProductImageReferenceCount": 10787,
-        "materialEvidenceCount": 1605,
-        "manufacturingClaimCount": 63,
-        "descriptionMissingIdentityCount": 710,
-        "priceMissingIdentityCount": 654,
-        "materialMissingIdentityCount": 86,
-        "retryIdentityKeys": [
-          "G3636|Z77",
-          "HW2300|843",
-          "M1588|81B",
-          "M1588|84B",
-          "SY3660|46A"
-        ],
-        "deltaCount": 6,
-        "latestRunId": "32758087459",
-        "factoryVerifiedCount": 0,
-        "globalCanonicalProductCount": 0
-      },
-      "sourcePages": {
-        "deltaCount": 4,
-        "attemptedObservationCount": 782,
-        "uniqueAttemptedSourcePageCount": 497,
-        "ledgerSha256": "f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347"
-      }
-    },
-    "actual": {
-      "identity": {
-        "completedIdentityCount": 1241,
-        "productUrlCaptureCount": 2013,
-        "officialProductImageReferenceCount": 10787,
-        "materialEvidenceCount": 1605,
-        "manufacturingClaimCount": 63,
-        "descriptionMissingIdentityCount": 710,
-        "priceMissingIdentityCount": 654,
-        "materialMissingIdentityCount": 86,
-        "retryIdentityKeys": [
-          "G3636|Z77",
-          "HW2300|843",
-          "M1588|81B",
-          "M1588|84B",
-          "SY3660|46A"
-        ],
-        "deltaCount": 6,
-        "latestRunId": "32758087459",
-        "factoryVerifiedCount": 0,
-        "globalCanonicalProductCount": 0,
-        "ledgerSha256": "179993c636c082e27b432f57a553a8c8d24b71d3b3b7749c7a60549376eba578"
-      },
-      "sourcePages": {
-        "deltaCount": 4,
-        "attemptedObservationCount": 782,
-        "uniqueAttemptedSourcePageCount": 497,
-        "ledgerSha256": "f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347"
-      }
-    },
-    "mismatches": [],
-    "passed": true
-  },
+  "logSha256": "c8bcb3806bf4c3bb6f3508e8b180bbb03174f091241c853d4d9a12f55dc014e2",
+  "ledgerCheckpoint": null,
   "requiredChecks": [
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
-    "canonical_json_six_identity_deltas_four_source_page_deltas",
-    "exact_sequence_11_identity_and_source_page_ledgers",
+    "canonical_json_seven_identity_deltas_five_source_page_deltas",
+    "exact_sequence_12_identity_and_source_page_ledgers",
+    "sequence12_107_complete_4_retry_no_overlap",
+    "sequence12_197_unique_source_pages_no_overlap",
     "resolved_retry_b2328_560",
+    "factory_verified_zero",
+    "global_canonical_products_zero",
     "typescript_no_emit",
     "production_build"
   ]
