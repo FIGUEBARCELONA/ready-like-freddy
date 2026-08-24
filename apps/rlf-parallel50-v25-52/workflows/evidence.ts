@@ -3,11 +3,12 @@ import type {DiscoverInput,EvidenceRecord} from './types';
 import type {SearchItem} from './search';
 import {canonical,relevant,strip} from './search';
 import {LEGAL} from './policy';
-import {legalResourceEligible} from './provenance';
+import {contactLikePath,legalResourceEligible,strongLegalPath} from './provenance';
 
 export type Resource={url:string;status:number|null;contentType:string|null;bytes:Uint8Array;text:string;raw:string;sha256:string|null;length:number;error:string|null};
 export type Bundle={target:Resource;home:Resource|null;legal:Resource|null;shopify:Resource|null;shopifyProducts:Array<{title:string;url:string;available:boolean|null;price:string|null}>};
 
+const LEGAL_IDENTITY_TERMS=['vat','iva','nif','cif','p.iva','partita iva','btw','kvk','siret','siren','ust-id','company number','registration number','cui','registrul comerțului','firmenbuch','uid-nummer','organisationsnummer','aktiebolag','limited company','s.r.o.','sp. z o.o.','srl','s.r.l.','gmbh'];
 const hash=(bytes:Uint8Array)=>createHash('sha256').update(bytes).digest('hex');
 
 async function fetchResource(url:string):Promise<Resource> {
@@ -41,7 +42,7 @@ function linkedLegalPaths(raw:string) {
   for(const match of raw.matchAll(/href\s*=\s*["']([^"']+)["']/gi)) {
     const href=match[1];
     if(/^(?:mailto:|tel:|javascript:|data:|#)/i.test(href))continue;
-    if(/impressum|legal|mentions-legales|aviso-legal|terms|conditions|regulamin|kontakt|contact|retur|refund|company|about/i.test(href)) output.push(href);
+    if(/impressum|anbieterkennzeichnung|legal|mentions-legales|aviso-legal|terms|conditions|regulamin|firmenbuch|obchodn|uvjeti|kopvillkor|handelsbetingelser|termos-e-condicoes|termini-e-condizioni|kontakt|contact|retur|refund/i.test(href)) output.push(href);
   }
   return [...new Set(output)].slice(0,12);
 }
@@ -90,8 +91,11 @@ export async function fetchBundle(result:SearchItem,input:DiscoverInput):Promise
     seen.add(url);
     const resource=await fetchResource(url);
     if(!legalResourceEligible(url,resource.url,operatorUrl,resource.contentType))continue;
-    const legalHits=LEGAL.filter(term=>resource.text.toLowerCase().includes(term)).length;
-    if(resource.status===200&&resource.length>300&&(legalHits>0||/impressum|legal|terms|conditions|contact|kontakt|retur/i.test(resource.url))) {legal=resource;break;}
+    const text=resource.text.toLowerCase();
+    const legalHits=LEGAL.filter(term=>text.includes(term)).length;
+    const identityHits=LEGAL_IDENTITY_TERMS.filter(term=>text.includes(term)).length;
+    const semanticLegal=strongLegalPath(resource.url)||(contactLikePath(resource.url)&&identityHits>0)||identityHits>=2;
+    if(resource.status===200&&resource.length>300&&semanticLegal&&(legalHits>0||strongLegalPath(resource.url))) {legal=resource;break;}
   }
 
   return {target,home,legal,shopify:shopifyResource,shopifyProducts};
