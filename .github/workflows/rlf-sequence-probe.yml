@@ -13,9 +13,9 @@ permissions:
   contents: write
 
 env:
-  TARGET_SHA: 'ffcee11af170db9f1fc20ce22f538aa4abe6a48d'
+  TARGET_SHA: '9c7ed90438f362686bfed8669a816499f7f2d046'
   TARGET_WORKFLOW: 'RLF code and ledger validation'
-  OUTPUT_PATH: 'data/execution/canonical-ledger-workflow-validation-probe.json'
+  OUTPUT_PATH: 'data/execution/archive-entrypoint-prioritizer-validation-probe.json'
 
 jobs:
   probe:
@@ -64,7 +64,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$OUTPUT_PATH"
-          git commit -m 'Resolve canonical ledger workflow validation run'
+          git commit -m 'Resolve archive entry-point prioritizer validation run'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
