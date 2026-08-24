@@ -1,0 +1,85 @@
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const ts=require('typescript');
+
+const root=path.resolve(__dirname,'..');
+
+function compile(file){
+  const source=fs.readFileSync(file,'utf8');
+  return ts.transpileModule(source,{
+    compilerOptions:{
+      module:ts.ModuleKind.CommonJS,
+      target:ts.ScriptTarget.ES2022,
+      esModuleInterop:true,
+      importsNotUsedAsValues:ts.ImportsNotUsedAsValues.Remove,
+    },
+    fileName:file,
+  }).outputText;
+}
+
+function evaluate(file,requireFn){
+  const module={exports:{}};
+  const code=compile(file);
+  const wrapper=`(function(exports,require,module,__filename,__dirname){${code}\n})`;
+  const fn=vm.runInNewContext(wrapper,{console,URL,Set,Map,RegExp,String,Object,Array,Boolean,Number,Math,Date});
+  fn(module.exports,requireFn,module,file,path.dirname(file));
+  return module.exports;
+}
+
+const policyFile=path.join(root,'workflows','policy.ts');
+const identityFile=path.join(root,'workflows','identity.ts');
+const policy=evaluate(policyFile,(id)=>{throw new Error(`Unexpected policy import: ${id}`);});
+const identity=evaluate(identityFile,(id)=>{
+  if(id==='./policy') return policy;
+  throw new Error(`Unexpected identity import: ${id}`);
+});
+
+function assert(condition,message){
+  if(!condition) throw new Error(message);
+}
+
+function analyze(domain,text){
+  const country=identity.detectCountry(domain,text);
+  return identity.analyzeIdentity(domain,text,country);
+}
+
+const falseVatFixtures=[
+  ['example.sk','skip to content privacy policy company address 12 main street'],
+  ['example.sk','site not valid company address 12 main street'],
+  ['example.sk','skip to main company address 12 main street'],
+  ['example.pl','playsuits leggings company address 12 main street'],
+  ['example.de','best company company address 12 main street'],
+];
+for(const [domain,text] of falseVatFixtures){
+  const result=analyze(domain,text);
+  assert(result.vatId===null,`False VAT accepted for ${domain}: ${result.vatId}`);
+  assert(!result.identityKey?.startsWith('EU-VAT:'),`False EU VAT key accepted for ${domain}: ${result.identityKey}`);
+}
+
+const validVatFixtures=[
+  ['shop.mt','Company address 12 Main Street. VAT Reg No: MT 1724-3326','MT17243326'],
+  ['shop.de','GmbH address 12 Hauptstraße. VAT: DE 123 456 789','DE123456789'],
+  ['shop.pt','Empresa address Rua 12. VAT PT 198 687 974','PT198687974'],
+  ['shop.fr','SAS address 12 rue Exemple. TVA FR 43 507 928 935','FR43507928935'],
+  ['shop.nl','BV company address 12 Street. VAT NL 123456789 B 01','NL123456789B01'],
+];
+for(const [domain,text,expected] of validVatFixtures){
+  const result=analyze(domain,text);
+  assert(result.vatId===expected,`Valid VAT missed for ${domain}: expected ${expected}, got ${result.vatId}`);
+  assert(result.identityKey===`EU-VAT:${expected}`,`Wrong VAT key for ${domain}: ${result.identityKey}`);
+}
+
+const registrationFixtures=[
+  ['shop.pl','Company address ul. Testowa 12. NIP: 882-213-42-74','PL-NIP:8822134274'],
+  ['shop.fr','SAS address 12 rue Exemple. SIRET: 50792893500109','FR-SIRET:50792893500109'],
+  ['shop.cz','s.r.o. address Ulice 12. IČO: 14416042','CZ-ICO:14416042'],
+  ['shop.ro','SRL address Strada 12. CUI: RO 41820792','RO-CUI:41820792'],
+  ['shop.it','SRL address Via Roma 12. Partita IVA: 07431160485','IT-PIVA:07431160485'],
+];
+for(const [domain,text,expected] of registrationFixtures){
+  const result=analyze(domain,text);
+  assert(result.identityKey===expected,`Registration key mismatch for ${domain}: expected ${expected}, got ${result.identityKey}`);
+}
+
+console.log(`identity regression fixtures passed: ${falseVatFixtures.length+validVatFixtures.length+registrationFixtures.length}`);
