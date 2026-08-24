@@ -17,8 +17,8 @@ concurrency:
 
 env:
   TARGET_RUN_ID: '32754804084'
-  OUTPUT_PATH: 'data/execution/sequence10-live-snapshot.json'
-  SNAPSHOT_REVISION: '1'
+  OUTPUT_PATH: 'data/execution/sequence10-status-summary.json'
+  SNAPSHOT_REVISION: '2'
 
 jobs:
   probe:
@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/rlf-execution-backend-20260823
-      - name: Capture complete run snapshot
+      - name: Capture concise run status
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -37,15 +37,15 @@ jobs:
           gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}" > /tmp/run.json
           gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}/jobs?per_page=100" > /tmp/jobs.json
           gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}/artifacts?per_page=100" > /tmp/artifacts.json
-          jq -n --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg revision "$SNAPSHOT_REVISION" --slurpfile run /tmp/run.json --slurpfile jobs /tmp/jobs.json --slurpfile artifacts /tmp/artifacts.json '{schemaVersion: 2, capturedAt: $capturedAt, revision: $revision, run: ($run[0] | {id, name, run_number, run_attempt, event, status, conclusion, head_sha, created_at, updated_at, html_url}), jobCount: $jobs[0].total_count, jobs: [$jobs[0].jobs[] | {id, name, status, conclusion, started_at, completed_at, html_url}], artifactCount: $artifacts[0].total_count, artifacts: [$artifacts[0].artifacts[] | {id, name, size_in_bytes, digest, expired, created_at}]}' > "$OUTPUT_PATH"
-      - name: Publish snapshot
+          jq -n --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg revision "$SNAPSHOT_REVISION" --slurpfile run /tmp/run.json --slurpfile jobs /tmp/jobs.json --slurpfile artifacts /tmp/artifacts.json '{schemaVersion: 2, capturedAt: $capturedAt, revision: $revision, run: ($run[0] | {id, run_number, status, conclusion, head_sha, updated_at, html_url}), totals: {jobs: $jobs[0].total_count, completed: ([$jobs[0].jobs[] | select(.status == "completed")] | length), successful: ([$jobs[0].jobs[] | select(.conclusion == "success")] | length), failed: ([$jobs[0].jobs[] | select(.conclusion == "failure")] | length), cancelled: ([$jobs[0].jobs[] | select(.conclusion == "cancelled")] | length), inProgress: ([$jobs[0].jobs[] | select(.status == "in_progress")] | length), queued: ([$jobs[0].jobs[] | select(.status == "queued")] | length), artifacts: $artifacts[0].total_count}, discovery: {total: ([$jobs[0].jobs[] | select(.name | startswith("Discovery F"))] | length), successful: ([$jobs[0].jobs[] | select((.name | startswith("Discovery F")) and .conclusion == "success")] | length), failed: ([$jobs[0].jobs[] | select((.name | startswith("Discovery F")) and .conclusion == "failure")] | length), active: ([$jobs[0].jobs[] | select((.name | startswith("Discovery F")) and (.status == "in_progress" or .status == "queued"))] | length)}, product: {total: ([$jobs[0].jobs[] | select(.name | startswith("Product F"))] | length), successful: ([$jobs[0].jobs[] | select((.name | startswith("Product F")) and .conclusion == "success")] | length), failed: ([$jobs[0].jobs[] | select((.name | startswith("Product F")) and .conclusion == "failure")] | length), active: ([$jobs[0].jobs[] | select((.name | startswith("Product F")) and (.status == "in_progress" or .status == "queued"))] | length)}, specialJobs: [$jobs[0].jobs[] | select((.name | startswith("Discovery F") | not) and (.name | startswith("Product F") | not)) | {id, name, status, conclusion}], failedJobs: [$jobs[0].jobs[] | select(.conclusion == "failure" or .conclusion == "cancelled") | {id, name, conclusion}], finalArtifacts: [$artifacts[0].artifacts[] | select(.name == "rlf-kb-official-discovery-32754804084" or .name == "rlf-kb-product-pages-32754804084") | {id, name, size_in_bytes, digest}]}' > "$OUTPUT_PATH"
+      - name: Publish status summary
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$OUTPUT_PATH"
-          git commit -m 'Snapshot sequence 10 run revision 1'
+          git commit -m 'Summarize sequence 10 run revision 2'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
