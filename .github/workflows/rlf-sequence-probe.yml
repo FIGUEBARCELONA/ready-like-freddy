@@ -1,0 +1,70 @@
+name: RLF sequence run probe
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence-probe.yml'
+
+permissions:
+  actions: read
+  checks: read
+  contents: write
+
+env:
+  TARGET_SHA: '4152c61fbb1d8de5b0ba04a9e8e097a9967e41cd'
+  TARGET_WORKFLOW: 'RLF 50-worker KB official discovery'
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/rlf-execution-backend-20260823
+      - name: Resolve target workflow run and checks
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p data/execution
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&event=push&per_page=50" \
+            > /tmp/runs.json
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/commits/${TARGET_SHA}/check-runs?per_page=100" \
+            > /tmp/checks.json
+          jq -n \
+            --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg targetSha "$TARGET_SHA" \
+            --arg targetWorkflow "$TARGET_WORKFLOW" \
+            --slurpfile runs /tmp/runs.json \
+            --slurpfile checks /tmp/checks.json \
+            '{
+              schemaVersion: 1,
+              capturedAt: $capturedAt,
+              targetSha: $targetSha,
+              targetWorkflow: $targetWorkflow,
+              matchingRuns: [
+                $runs[0].workflow_runs[]
+                | select(.name == $targetWorkflow)
+                | {id, run_number, run_attempt, event, status, conclusion, head_sha, created_at, updated_at, html_url, jobs_url, artifacts_url}
+              ],
+              checkRuns: [
+                $checks[0].check_runs[]
+                | {id, name, status, conclusion, started_at, completed_at, details_url, external_id}
+              ]
+            }' > data/execution/sequence8-run-probe.json
+      - name: Publish probe result
+        run: |
+          set -euo pipefail
+          git pull --rebase origin feature/rlf-execution-backend-20260823
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence8-run-probe.json
+          git commit -m 'Resolve sequence 8 workflow run'
+          git push origin HEAD:feature/rlf-execution-backend-20260823
