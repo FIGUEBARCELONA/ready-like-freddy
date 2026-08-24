@@ -1,0 +1,67 @@
+name: Deploy RLF Parallel50 v25.55.4
+
+on:
+  push:
+    branches: [rlf-parallel50-v25-55]
+    paths:
+      - '.github/deploy/RLF_V25_55_4_DEPLOY'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rlf-parallel50-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      VERCEL_ORG_ID: team_fhf0Woa7HxognliF2TaI3zsq
+      VERCEL_PROJECT_ID: prj_KIU3Yvscq5uryndAt1VH3u2oP4gu
+      VERCEL_SCOPE: jordifiguerassolerpersonal-2224s-projects
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    defaults:
+      run:
+        working-directory: apps/rlf-parallel50-v25-52
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Require deployment credential
+        run: test -n "$VERCEL_TOKEN" || { echo '::error::VERCEL_TOKEN secret is not configured'; exit 1; }
+      - name: Install verified dependency graph
+        run: npm install --ignore-scripts --no-fund
+      - name: Re-run strict gates
+        run: |
+          npx tsc --noEmit
+          npm run build
+          npm audit --audit-level=moderate
+      - name: Pull production project settings
+        run: npx vercel@58.4.4 pull --yes --environment=production --token="$VERCEL_TOKEN" --scope="$VERCEL_SCOPE"
+      - name: Build Vercel production output
+        run: npx vercel@58.4.4 build --prod --token="$VERCEL_TOKEN" --scope="$VERCEL_SCOPE"
+      - name: Deploy prebuilt output to production
+        id: deploy
+        run: |
+          DEPLOY_URL=$(npx vercel@58.4.4 deploy --prebuilt --prod --token="$VERCEL_TOKEN" --scope="$VERCEL_SCOPE" | tail -n 1)
+          echo "$DEPLOY_URL" | tee deployment-url.txt
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+      - name: Verify deployed truth boundary
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          curl --fail --silent --show-error "$DEPLOY_URL/api/health" -o health.json
+          node -e "const h=require('./health.json');if(h.version!=='25.55.4'||h.delta!=='0051'||h.sweepBootstrap!=='CLOSED'||h.parallelism!==50||h.dependencyAudit?.total!==0)process.exit(1);"
+          CODE=$(curl --silent --output bootstrap.json --write-out '%{http_code}' "$DEPLOY_URL/api/sweep-bootstrap")
+          test "$CODE" = "410"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-v2555-production-deployment
+          path: |
+            apps/rlf-parallel50-v25-52/deployment-url.txt
+            apps/rlf-parallel50-v25-52/health.json
+            apps/rlf-parallel50-v25-52/bootstrap.json
+          retention-days: 14

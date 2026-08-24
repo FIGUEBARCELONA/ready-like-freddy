@@ -1,0 +1,7 @@
+RLF Parallel50 production deployment sentinel
+version=25.55.4
+runtime_commit=117dcac80d3e2446181622b104560af803d36ecb
+qa_run=32748052802
+audit_total=0
+bootstrap=CLOSED
+issued_at=2026-08-24T16:03:00Z
