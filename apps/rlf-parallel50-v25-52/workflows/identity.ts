@@ -44,6 +44,7 @@ function registration(text:string,country:CountryDetection):RegistrationMatch|nu
     {keyPrefix:'FR-SIRET',countryCode:'FR',regex:/\bSIRET\s*[:#]?\s*(\d{14})\b/i,minDigits:14},
     {keyPrefix:'FR-SIREN',countryCode:'FR',regex:/\bSIREN\s*[:#]?\s*(\d{9})\b/i,minDigits:9},
     {keyPrefix:'CZ-ICO',countryCode:'CZ',regex:/\bIČO\s*[:#]?\s*(\d{6,10})\b/i,minDigits:6},
+    {keyPrefix:'DK-CVR',countryCode:'DK',regex:/\bCVR(?:\s*(?:NR\.?|NUMBER|NUMMER))?\s*[:#]?\s*(\d{8})\b/i,minDigits:8},
     {keyPrefix:'RO-CUI',countryCode:'RO',regex:/\bCUI\s*[:#]?\s*(?:RO)?\s*(\d{2,10})\b/i,minDigits:2},
     {keyPrefix:'IT-PIVA',countryCode:'IT',regex:/\b(?:P\.?\s*IVA|PARTITA IVA)\s*[:#]?\s*(?:IT)?\s*(\d{11})\b/i,minDigits:11},
     {keyPrefix:'NL-KVK',countryCode:'NL',regex:/\bKVK\s*[:#]?\s*(\d{8})\b/i,minDigits:8},
