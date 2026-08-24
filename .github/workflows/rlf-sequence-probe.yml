@@ -8,63 +8,59 @@ on:
       - '.github/workflows/rlf-sequence-probe.yml'
 
 permissions:
-  actions: read
-  checks: read
   contents: write
 
-env:
-  TARGET_SHA: '3c109356593fc73bb1e82bdc7a98ec347c6ce7af'
-  TARGET_WORKFLOW: 'RLF connect entry-point prioritizer'
-  OUTPUT_PATH: 'data/execution/entrypoint-connector-run-probe.json'
+concurrency:
+  group: rlf-active-probe-patch
+  cancel-in-progress: false
 
 jobs:
-  probe:
+  patch:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feature/rlf-execution-backend-20260823
-      - name: Resolve target workflow run and checks
+          ref: ${{ github.sha }}
+      - name: Connect priority entry points exactly once
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p "$(dirname "$OUTPUT_PATH")"
-          gh api -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&event=push&per_page=50" \
-            > /tmp/runs.json
-          gh api -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/commits/${TARGET_SHA}/check-runs?per_page=100" \
-            > /tmp/checks.json
-          jq -n \
-            --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --arg targetSha "$TARGET_SHA" \
-            --arg targetWorkflow "$TARGET_WORKFLOW" \
-            --slurpfile runs /tmp/runs.json \
-            --slurpfile checks /tmp/checks.json \
-            '{
-              schemaVersion: 1,
-              capturedAt: $capturedAt,
-              targetSha: $targetSha,
-              targetWorkflow: $targetWorkflow,
-              matchingRuns: [
-                $runs[0].workflow_runs[]
-                | select(.name == $targetWorkflow)
-                | {id, run_number, run_attempt, event, status, conclusion, head_sha, created_at, updated_at, html_url, jobs_url, artifacts_url}
-              ],
-              checkRuns: [
-                $checks[0].check_runs[]
-                | {id, name, status, conclusion, started_at, completed_at, details_url, external_id}
-              ]
-            }' > "$OUTPUT_PATH"
-      - name: Publish probe result
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/rlf-50-worker-kb.yml')
+          text = path.read_text()
+          needle = '          node scripts/execution/prepare-official-queue.mjs --out=execution/queue\n'
+          replacement = '''          node scripts/execution/prepare-official-queue.mjs --out=execution/queue
+          node scripts/execution/prioritize-official-entrypoints.mjs \\
+            --queue=execution/queue/queue.json \\
+            --seeds=data/execution/rlf-kb-official-seeds.json \\
+            --summary=execution/queue/summary.json \\
+            --urls=execution/queue/urls.txt
+'''
+          count = text.count(needle)
+          existing = text.count('prioritize-official-entrypoints.mjs')
+          if existing == 1:
+              print('Prioritizer already connected; retaining exact existing connection')
+          elif existing == 0 and count == 1:
+              path.write_text(text.replace(needle, replacement, 1))
+          else:
+              raise SystemExit(f'Unsafe patch state: prepare_count={count}, prioritizer_count={existing}')
+          PY
+          test "$(grep -c 'prioritize-official-entrypoints.mjs' .github/workflows/rlf-50-worker-kb.yml)" = 1
+          node --check scripts/execution/prioritize-official-entrypoints.mjs
+          grep -A6 -B2 'prioritize-official-entrypoints.mjs' .github/workflows/rlf-50-worker-kb.yml
+      - name: Commit connection when changed
+        shell: bash
         run: |
           set -euo pipefail
+          if git diff --quiet -- .github/workflows/rlf-50-worker-kb.yml; then
+            echo 'No workflow change required'
+            exit 0
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$OUTPUT_PATH"
-          git commit -m 'Resolve entry-point connector workflow run'
+          git add .github/workflows/rlf-50-worker-kb.yml
+          git commit -m 'Connect verified archive entry points to 50-lane prepare stage'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
