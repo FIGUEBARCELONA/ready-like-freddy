@@ -50,17 +50,70 @@ jobs:
           console.log(JSON.stringify({ validatedJsonFiles: paths.length, paths }, null, 2));
           NODE
             node --input-type=module - <<'NODE'
+          import { writeFile } from 'node:fs/promises';
           import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
           const state = await loadProgressLedger();
-          if (state.completed.identityCount < 778) throw new Error(`Identity ledger regressed: ${state.completed.identityCount}`);
-          if (state.deltaCount < 2) throw new Error(`Immutable delta ledger incomplete: ${state.deltaCount}`);
+          const expected = {
+            completedIdentityCount: 906,
+            productUrlCaptureCount: 1418,
+            officialProductImageReferenceCount: 7963,
+            materialEvidenceCount: 1232,
+            manufacturingClaimCount: 54,
+            descriptionMissingIdentityCount: 375,
+            priceMissingIdentityCount: 319,
+            materialMissingIdentityCount: 44,
+            retryIdentityKeys: ['B2328|560', 'HW2300|843'],
+            deltaCount: 3,
+            factoryVerifiedCount: 0,
+            globalCanonicalProductCount: 0,
+          };
+          const actualRetryKeys = state.retry.identities.map(item => item.identityKey).sort();
+          const checks = [
+            ['completedIdentityCount', state.completed.identityCount, expected.completedIdentityCount],
+            ['productUrlCaptureCount', state.completed.productUrlCaptureCount, expected.productUrlCaptureCount],
+            ['officialProductImageReferenceCount', state.counters.officialProductImageReferenceCount, expected.officialProductImageReferenceCount],
+            ['materialEvidenceCount', state.counters.materialEvidenceCount, expected.materialEvidenceCount],
+            ['manufacturingClaimCount', state.counters.manufacturingClaimCount, expected.manufacturingClaimCount],
+            ['descriptionMissingIdentityCount', state.metadataGaps.descriptionMissingIdentityCount, expected.descriptionMissingIdentityCount],
+            ['priceMissingIdentityCount', state.metadataGaps.priceMissingIdentityCount, expected.priceMissingIdentityCount],
+            ['materialMissingIdentityCount', state.metadataGaps.materialMissingIdentityCount, expected.materialMissingIdentityCount],
+            ['deltaCount', state.deltaCount, expected.deltaCount],
+            ['factoryVerifiedCount', state.counters.factoryVerifiedCount, expected.factoryVerifiedCount],
+            ['globalCanonicalProductCount', state.counters.globalCanonicalProductCount, expected.globalCanonicalProductCount],
+          ];
+          const mismatches = checks.filter(([, actual, wanted]) => actual !== wanted);
+          if (JSON.stringify(actualRetryKeys) !== JSON.stringify(expected.retryIdentityKeys)) {
+            mismatches.push(['retryIdentityKeys', actualRetryKeys, expected.retryIdentityKeys]);
+          }
           const completed = new Set(state.completed.identityKeys);
-          const retryKeys = state.retry.identities.map(item => item.identityKey);
-          if (new Set(retryKeys).size !== retryKeys.length) throw new Error('Duplicate retry identity keys');
-          if (retryKeys.some(identityKey => completed.has(identityKey))) throw new Error('Completed identity remains in retry ledger');
-          if (state.counters.factoryVerifiedCount !== 0) throw new Error('Factory count must remain zero');
-          if (state.counters.globalCanonicalProductCount !== 0) throw new Error('Canonical product count must remain zero');
-          console.log(JSON.stringify(state, null, 2));
+          const completedRetries = actualRetryKeys.filter(identityKey => completed.has(identityKey));
+          if (completedRetries.length) mismatches.push(['completedRetries', completedRetries, []]);
+          const checkpoint = {
+            schemaVersion: 1,
+            sourceRunId: '32746322369',
+            generatedAt: new Date().toISOString(),
+            expected,
+            actual: {
+              completedIdentityCount: state.completed.identityCount,
+              productUrlCaptureCount: state.completed.productUrlCaptureCount,
+              officialProductImageReferenceCount: state.counters.officialProductImageReferenceCount,
+              materialEvidenceCount: state.counters.materialEvidenceCount,
+              manufacturingClaimCount: state.counters.manufacturingClaimCount,
+              descriptionMissingIdentityCount: state.metadataGaps.descriptionMissingIdentityCount,
+              priceMissingIdentityCount: state.metadataGaps.priceMissingIdentityCount,
+              materialMissingIdentityCount: state.metadataGaps.materialMissingIdentityCount,
+              retryIdentityKeys: actualRetryKeys,
+              deltaCount: state.deltaCount,
+              factoryVerifiedCount: state.counters.factoryVerifiedCount,
+              globalCanonicalProductCount: state.counters.globalCanonicalProductCount,
+              ledgerSha256: state.ledgerSha256,
+            },
+            mismatches,
+            passed: mismatches.length === 0,
+          };
+          await writeFile('/tmp/rlf-ledger-checkpoint.json', `${JSON.stringify(checkpoint, null, 2)}\n`);
+          console.log(JSON.stringify(checkpoint, null, 2));
+          if (mismatches.length) throw new Error(`Ledger checkpoint mismatch: ${JSON.stringify(mismatches)}`);
           NODE
             pnpm check
             pnpm build
@@ -79,8 +132,11 @@ jobs:
           const log = fs.existsSync('/tmp/rlf-validation.log')
             ? fs.readFileSync('/tmp/rlf-validation.log')
             : Buffer.from('validation step did not create a log');
+          const checkpoint = fs.existsSync('/tmp/rlf-ledger-checkpoint.json')
+            ? JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json', 'utf8'))
+            : null;
           const proof = {
-            schemaVersion: 1,
+            schemaVersion: 2,
             recordedAt: new Date().toISOString(),
             sourceCommitSha: process.env.GITHUB_SHA,
             runId: process.env.GITHUB_RUN_ID,
@@ -88,11 +144,12 @@ jobs:
             validationOutcome: process.env.VALIDATION_OUTCOME,
             nodeVersion: process.version,
             logSha256: crypto.createHash('sha256').update(log).digest('hex'),
+            ledgerCheckpoint: checkpoint,
             requiredChecks: [
               'pnpm_install_frozen_lockfile',
               'execution_script_syntax',
               'canonical_json_and_delta_parse',
-              'append_only_ledger_invariants',
+              'exact_sequence_8_append_only_ledger_checkpoint',
               'typescript_no_emit',
               'production_build'
             ]
