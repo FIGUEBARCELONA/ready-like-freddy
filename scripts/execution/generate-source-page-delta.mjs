@@ -34,9 +34,14 @@ const auditsDir = resolve(
 );
 const runId = String(args.runId ?? process.env.GITHUB_RUN_ID ?? "").trim();
 const artifactId = Number(args.artifactId ?? process.env.RLF_SOURCE_ARTIFACT_ID);
-const artifactDigest = String(
+let artifactDigest = String(
   args.artifactDigest ?? process.env.RLF_SOURCE_ARTIFACT_DIGEST ?? "",
-).trim();
+)
+  .trim()
+  .toLowerCase();
+if (/^[a-f0-9]{64}$/.test(artifactDigest)) {
+  artifactDigest = `sha256:${artifactDigest}`;
+}
 const artifactName = String(
   args.artifactName ??
     process.env.RLF_SOURCE_ARTIFACT_NAME ??
