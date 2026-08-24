@@ -67,8 +67,10 @@ const countryFixtures=[
   ['careofcarl.fi','Company terms. Shipping destinations include United Kingdom and Finland.','FI','EU_TLD'],
   ['vintagewholesalespain.com','Company address Calle Cementerio 19, Manises Valencia Spain. We ship to the United Kingdom.','ES','LEGAL_COUNTRY'],
   ['shop.de','GmbH address Berlin Germany. Returns accepted from England and Wales.','DE','EU_TLD'],
+  ['clochard92.com','Shipping Austria Belgium Germany. Company address Dei Serragli 31R, Firenze FI, Italy.','IT','LEGAL_COUNTRY'],
+  ['shop.com','Shipping destinations Austria Belgium Germany Italy Spain. No registered address is published.','NONE','NONE'],
 ];
-for(const[domain,text,expectedCode,expectedBasis]of countryFixtures){const{country}=analyze(domain,text);assert(country.code===expectedCode&&country.basis===expectedBasis,`Country mismatch for ${domain}: expected ${expectedCode}/${expectedBasis}, got ${country.code}/${country.basis}`);}
+for(const[domain,text,expectedCode,expectedBasis]of countryFixtures){const{country}=analyze(domain,text);const code=expectedCode==='NONE'?null:expectedCode;assert(country.code===code&&country.basis===expectedBasis,`Country mismatch for ${domain}: expected ${code}/${expectedBasis}, got ${country.code}/${country.basis}`);}
 
 const residualFalseIdentityFixtures=[
   ['clochard92.com','Company address Dei Serragli 31R, Firenze FI, Italy. registration number lity in 2020 with th.','IT'],
@@ -89,6 +91,11 @@ const provenanceFixtures=[
   [provenance.legalContentTypeAllowed('text/html; charset=utf-8'),true,'HTML legal MIME'],
   [provenance.legalContentTypeAllowed('text/css'),false,'CSS legal MIME'],
   [provenance.legalResourceEligible('https://store.ie/terms','https://judge.me/terms','https://store.ie/products/item','text/html'),false,'external redirect'],
+  [provenance.strongLegalPath('https://store.ie/policies/legal-notice'),true,'strong legal notice path'],
+  [provenance.strongLegalPath('https://thrifted.com/collections/vintage-mens-best-company'),false,'collection company false legal path'],
+  [provenance.strongLegalPath('https://arnotts.ie/brands/the-lyndon-company'),false,'brand company false legal path'],
+  [provenance.strongLegalPath('https://shop.example/about'),false,'about false legal path'],
+  [provenance.contactLikePath('https://shop.example/pages/contact'),true,'contact path'],
 ];
 for(const[actual,expected,label]of provenanceFixtures)assert(actual===expected,`Provenance mismatch for ${label}: expected ${expected}, got ${actual}`);
 
