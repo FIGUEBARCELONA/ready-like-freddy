@@ -9,7 +9,7 @@ export const runtime='nodejs';
 export const maxDuration=60;
 export const preferredRegion='fra1';
 const OWNER_HASH='e942da2df116775a1f9caba47b5870a19a1058612a8a18c15fa168d28d3afec2';
-const ONE_SHOT_HASH='d68e9e60308aff78f67307ff7fa7e0dd1e882f43cd624b6281b054bb73f00a52';
+const ONE_SHOT_HASH='831495d292f7e08e5c5e098c14ce293d8b682de180a3a9ea7593ff9f51d3e207';
 const MONITOR_RUN_ID='wrun_01M0Q8981CTB61S3DJJ06JZ2FW';
 const LATEST_SWEEP_RUN_ID='wrun_01M0TW6TX73T3A9TK8YT4QWB6D';
 const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{'cache-control':'no-store'}});
@@ -17,12 +17,12 @@ const digest=(value:string)=>createHash('sha256').update(value).digest();
 function secureEqual(value:string,expectedHex:string){try{return timingSafeEqual(digest(value),Buffer.from(expectedHex,'hex'));}catch{return false;}}
 async function runState(id:string,includeOutput=false){if(!id)return{status:'not_started',active:0,output:null as CampaignResult|null,error:null as string|null};try{const run=await getRun(id);const status=await run.status;const output=status==='completed'&&includeOutput?await run.returnValue as CampaignResult:null;return{status,active:['running','pending'].includes(status)?50:0,output,error:null as string|null};}catch(error){return{status:'unavailable',active:0,output:null,error:error instanceof Error?error.message:'run error'};}}
 const campaignId=(prefix:string)=>`${prefix}-${new Date().toISOString().replace(/[-:.TZ]/g,'').slice(0,14)}-${randomUUID().slice(0,8)}`;
-async function startSweep(){const id=campaignId('RLF-P50-SWEEP-V255534');const run=await start(parallel50Sweep,[{campaignId:id,cycle:15,maxCandidatesPerLaneCycle:8}]);return{campaignId:id,runId:run.runId};}
-async function startMonitor(){const id=campaignId('RLF-P50-MONITOR-V255534');const run=await start(parallel50Campaign,[{campaignId:id,cycles:12,intervalMs:7200000,maxCandidatesPerLaneCycle:6}]);return{campaignId:id,runId:run.runId};}
+async function startSweep(){const id=campaignId('RLF-P50-SWEEP-V255534R1');const run=await start(parallel50Sweep,[{campaignId:id,cycle:15,maxCandidatesPerLaneCycle:8}]);return{campaignId:id,runId:run.runId};}
+async function startMonitor(){const id=campaignId('RLF-P50-MONITOR-V255534R1');const run=await start(parallel50Campaign,[{campaignId:id,cycles:12,intervalMs:7200000,maxCandidatesPerLaneCycle:6}]);return{campaignId:id,runId:run.runId};}
 
 export async function GET(request:Request,{params}:{params:Promise<{path:string[]}>}){
   const parts=(await params).path??[];const path=parts.join('/');void request;
-  const base={version:'25.55.34',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_CONTEXTUAL_BING_RECOVERY_V17',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0}};
+  const base={version:'25.55.34-r1',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_CONTEXTUAL_BING_RECOVERY_V17',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0}};
   if(path==='health')return json({ok:true,...base,executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'CLOSED',oneShotSweep:'ARMED',replacementEngineVersion:REPLACEMENT_POLICY.version,replacementSourcePool:REPLACEMENT_POLICY.sourcePool,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0,checkedAt:new Date().toISOString()});
   if(parts[0]==='one-shot'&&parts[1]){if(!secureEqual(parts[1],ONE_SHOT_HASH))return json({ok:false,code:'NOT_FOUND'},404);const started=await startSweep();return json({ok:true,state:'SWEEP_STARTED',...started,parallelism:50,simulatedWorkersStarted:0},202);}
   if(path==='replacement/policy')return json({ok:true,policy:REPLACEMENT_POLICY,activationState:'FAIL_CLOSED_EMPTY_ACCEPTED_4K'});
