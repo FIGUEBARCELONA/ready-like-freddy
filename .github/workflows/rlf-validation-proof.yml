@@ -46,6 +46,10 @@ jobs:
               .filter(name => name.endsWith('.json'))
               .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
               .map(name => `data/execution/progress-deltas/${name}`),
+            ...readdirSync('data/execution/source-page-deltas')
+              .filter(name => name.endsWith('.json'))
+              .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
+              .map(name => `data/execution/source-page-deltas/${name}`),
           ];
           for (const path of paths) JSON.parse(readFileSync(path, 'utf8'));
           console.log(JSON.stringify({ validatedJsonFiles: paths.length, paths }, null, 2));
@@ -53,60 +57,110 @@ jobs:
             node --input-type=module - <<'NODE'
           import { writeFile } from 'node:fs/promises';
           import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
-          const state = await loadProgressLedger();
-          const expected = {
-            completedIdentityCount: 1054,
-            productUrlCaptureCount: 1707,
-            officialProductImageReferenceCount: 9271,
-            materialEvidenceCount: 1383,
-            manufacturingClaimCount: 59,
-            descriptionMissingIdentityCount: 523,
-            priceMissingIdentityCount: 467,
-            materialMissingIdentityCount: 68,
-            retryIdentityKeys: ['B2328|560', 'HW2300|843'],
-            deltaCount: 5,
-            latestRunId: '32754804084',
+          import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
+
+          const identityState = await loadProgressLedger();
+          const sourcePageState = await loadSourcePageLedger();
+
+          const expectedIdentity = {
+            completedIdentityCount: 1241,
+            productUrlCaptureCount: 2013,
+            officialProductImageReferenceCount: 10787,
+            materialEvidenceCount: 1605,
+            manufacturingClaimCount: 63,
+            descriptionMissingIdentityCount: 710,
+            priceMissingIdentityCount: 654,
+            materialMissingIdentityCount: 86,
+            retryIdentityKeys: [
+              'G3636|Z77',
+              'HW2300|843',
+              'M1588|81B',
+              'M1588|84B',
+              'SY3660|46A',
+            ],
+            deltaCount: 6,
+            latestRunId: '32758087459',
             factoryVerifiedCount: 0,
             globalCanonicalProductCount: 0,
           };
-          const actual = {
-            completedIdentityCount: state.completed.identityCount,
-            productUrlCaptureCount: state.completed.productUrlCaptureCount,
-            officialProductImageReferenceCount: state.counters.officialProductImageReferenceCount,
-            materialEvidenceCount: state.counters.materialEvidenceCount,
-            manufacturingClaimCount: state.counters.manufacturingClaimCount,
-            descriptionMissingIdentityCount: state.metadataGaps.descriptionMissingIdentityCount,
-            priceMissingIdentityCount: state.metadataGaps.priceMissingIdentityCount,
-            materialMissingIdentityCount: state.metadataGaps.materialMissingIdentityCount,
-            retryIdentityKeys: state.retry.identities.map(item => item.identityKey).sort(),
-            deltaCount: state.deltaCount,
-            latestRunId: String(state.latestRunId),
-            factoryVerifiedCount: state.counters.factoryVerifiedCount,
-            globalCanonicalProductCount: state.counters.globalCanonicalProductCount,
-            ledgerSha256: state.ledgerSha256,
+          const actualIdentity = {
+            completedIdentityCount: identityState.completed.identityCount,
+            productUrlCaptureCount: identityState.completed.productUrlCaptureCount,
+            officialProductImageReferenceCount: identityState.counters.officialProductImageReferenceCount,
+            materialEvidenceCount: identityState.counters.materialEvidenceCount,
+            manufacturingClaimCount: identityState.counters.manufacturingClaimCount,
+            descriptionMissingIdentityCount: identityState.metadataGaps.descriptionMissingIdentityCount,
+            priceMissingIdentityCount: identityState.metadataGaps.priceMissingIdentityCount,
+            materialMissingIdentityCount: identityState.metadataGaps.materialMissingIdentityCount,
+            retryIdentityKeys: identityState.retry.identities.map(item => item.identityKey).sort(),
+            deltaCount: identityState.deltaCount,
+            latestRunId: String(identityState.latestRunId),
+            factoryVerifiedCount: identityState.counters.factoryVerifiedCount,
+            globalCanonicalProductCount: identityState.counters.globalCanonicalProductCount,
+            ledgerSha256: identityState.ledgerSha256,
           };
-          const fields = Object.keys(expected).filter(key => key !== 'retryIdentityKeys');
-          const mismatches = fields
-            .filter(key => actual[key] !== expected[key])
-            .map(key => [key, actual[key], expected[key]]);
-          if (JSON.stringify(actual.retryIdentityKeys) !== JSON.stringify(expected.retryIdentityKeys)) {
-            mismatches.push(['retryIdentityKeys', actual.retryIdentityKeys, expected.retryIdentityKeys]);
+
+          const expectedSourcePages = {
+            deltaCount: 4,
+            attemptedObservationCount: 782,
+            uniqueAttemptedSourcePageCount: 497,
+            ledgerSha256: 'f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347',
+          };
+          const actualSourcePages = {
+            deltaCount: sourcePageState.deltaCount,
+            attemptedObservationCount: sourcePageState.attemptedObservationCount,
+            uniqueAttemptedSourcePageCount: sourcePageState.uniqueAttemptedSourcePageCount,
+            ledgerSha256: sourcePageState.ledgerSha256,
+          };
+
+          const mismatches = [];
+          for (const key of Object.keys(expectedIdentity).filter(key => key !== 'retryIdentityKeys')) {
+            if (actualIdentity[key] !== expectedIdentity[key]) {
+              mismatches.push([`identity.${key}`, actualIdentity[key], expectedIdentity[key]]);
+            }
           }
-          const completed = new Set(state.completed.identityKeys);
-          const completedRetries = actual.retryIdentityKeys.filter(key => completed.has(key));
-          if (completedRetries.length) mismatches.push(['completedRetries', completedRetries, []]);
+          if (JSON.stringify(actualIdentity.retryIdentityKeys) !== JSON.stringify(expectedIdentity.retryIdentityKeys)) {
+            mismatches.push([
+              'identity.retryIdentityKeys',
+              actualIdentity.retryIdentityKeys,
+              expectedIdentity.retryIdentityKeys,
+            ]);
+          }
+          for (const key of Object.keys(expectedSourcePages)) {
+            if (actualSourcePages[key] !== expectedSourcePages[key]) {
+              mismatches.push([`sourcePages.${key}`, actualSourcePages[key], expectedSourcePages[key]]);
+            }
+          }
+
+          const completed = new Set(identityState.completed.identityKeys);
+          const completedRetries = actualIdentity.retryIdentityKeys.filter(key => completed.has(key));
+          if (completedRetries.length) {
+            mismatches.push(['identity.completedRetries', completedRetries, []]);
+          }
+          if (!completed.has('B2328|560')) {
+            mismatches.push(['identity.resolvedRetry.B2328|560', false, true]);
+          }
+
           const checkpoint = {
-            schemaVersion: 2,
-            sourceRunId: '32754804084',
+            schemaVersion: 3,
+            sourceRunId: '32758087459',
             generatedAt: new Date().toISOString(),
-            expected,
-            actual,
+            expected: {
+              identity: expectedIdentity,
+              sourcePages: expectedSourcePages,
+            },
+            actual: {
+              identity: actualIdentity,
+              sourcePages: actualSourcePages,
+            },
             mismatches,
             passed: mismatches.length === 0,
           };
           await writeFile('/tmp/rlf-ledger-checkpoint.json', `${JSON.stringify(checkpoint, null, 2)}\n`);
           console.log(JSON.stringify(checkpoint, null, 2));
-          if (mismatches.length) throw new Error(`Ledger checkpoint mismatch: ${JSON.stringify(mismatches)}`);
+          if (mismatches.length) {
+            throw new Error(`Ledger checkpoint mismatch: ${JSON.stringify(mismatches)}`);
+          }
           NODE
             pnpm check
             pnpm build
@@ -129,7 +183,7 @@ jobs:
             ? JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json', 'utf8'))
             : null;
           const proof = {
-            schemaVersion: 3,
+            schemaVersion: 4,
             recordedAt: new Date().toISOString(),
             sourceCommitSha: process.env.GITHUB_SHA,
             runId: process.env.GITHUB_RUN_ID,
@@ -141,8 +195,9 @@ jobs:
             requiredChecks: [
               'pnpm_install_frozen_lockfile',
               'execution_script_syntax',
-              'canonical_json_and_five_delta_parse',
-              'exact_sequence_10_append_only_ledger_checkpoint',
+              'canonical_json_six_identity_deltas_four_source_page_deltas',
+              'exact_sequence_11_identity_and_source_page_ledgers',
+              'resolved_retry_b2328_560',
               'typescript_no_emit',
               'production_build'
             ]
