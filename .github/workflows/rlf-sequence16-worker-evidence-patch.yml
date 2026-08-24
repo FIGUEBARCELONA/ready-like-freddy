@@ -1,0 +1,134 @@
+name: RLF sequence 16 worker evidence patch
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence16-worker-evidence-patch.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/rlf-execution-backend-20260823
+          fetch-depth: 0
+      - name: Add exact code-colour category image fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/execution/run-product-worker.mjs')
+          text = path.read_text(encoding='utf-8')
+
+          marker = '''function isSoft404(fields, content) {'''
+          insertion = '''function collectCategoryEvidenceImages(candidate, productCode, colourCode) {
+            const evidence = candidate.categoryImageEvidence ?? null;
+            const references = evidence?.imageReferences ?? [];
+            const codePattern = productCode ? productCode.replaceAll("-", "[-_]") : null;
+            const identityPattern =
+              codePattern && colourCode
+                ? new RegExp(`${codePattern}[-_]${colourCode}(?:[-_.]|$)`, "i")
+                : null;
+            return references
+              .filter(reference => reference?.sourceUrl)
+              .filter(reference => isOfficialProductMedia(reference.sourceUrl, allowedHosts))
+              .filter(reference =>
+                !identityPattern ||
+                identityPattern.test(decodeURIComponent(new URL(reference.sourceUrl).pathname)),
+              )
+              .map(reference => ({
+                ...reference,
+                evidenceSource: "OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE",
+                evidenceSourcePageUrl: evidence.sourcePageUrl,
+                evidenceSourcePageSha256: evidence.sourcePageSha256,
+                evidenceArtifact: evidence.sourceArtifact,
+              }));
+          }
+
+          function mergeImageReferences(...groups) {
+            const byUrl = new Map();
+            for (const reference of groups.flat()) {
+              if (!reference?.sourceUrl) continue;
+              const existing = byUrl.get(reference.sourceUrl);
+              byUrl.set(reference.sourceUrl, existing ? { ...existing, ...reference } : reference);
+            }
+            return [...byUrl.values()];
+          }
+
+          function isSoft404(fields, content) {'''
+          if text.count(marker) != 1:
+              raise SystemExit(f'Expected one soft404 marker, found {text.count(marker)}')
+          text = text.replace(marker, insertion)
+
+          old_images = '''      const imageReferences = response.ok
+                ? collectProductImages(content, productCode, colourCode)
+                : [];'''
+          new_images = '''      const pageImageReferences = response.ok
+                ? collectProductImages(content, productCode, colourCode)
+                : [];
+              const categoryEvidenceImageReferences =
+                response.ok && !isSoft404(fields, content)
+                  ? collectCategoryEvidenceImages(candidate, productCode, colourCode)
+                  : [];
+              const imageReferences = mergeImageReferences(
+                pageImageReferences,
+                categoryEvidenceImageReferences,
+              );
+              const imageEvidenceSources = [
+                ...(pageImageReferences.length
+                  ? ["OFFICIAL_PRODUCT_PAGE_MEDIA_CAPTURE"]
+                  : []),
+                ...(categoryEvidenceImageReferences.length
+                  ? ["OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"]
+                  : []),
+              ];'''
+          if text.count(old_images) != 1:
+              raise SystemExit(f'Expected one image collection block, found {text.count(old_images)}')
+          text = text.replace(old_images, new_images)
+
+          old_current = '''        imageReferences,
+                validationReasons: reasons,'''
+          new_current = '''        imageReferences,
+                imageEvidenceSources,
+                validationReasons: reasons,'''
+          if text.count(old_current) != 1:
+              raise SystemExit(f'Expected one current image marker, found {text.count(old_current)}')
+          text = text.replace(old_current, new_current)
+
+          old_record = '''      imageReferences: result.imageReferences ?? [],
+              sourceTransport: fetched?.sourceTransport ?? null,'''
+          new_record = '''      imageReferences: result.imageReferences ?? [],
+              imageEvidenceSources: result.imageEvidenceSources ?? [],
+              categoryImageEvidence: candidate.categoryImageEvidence ?? null,
+              sourceTransport: fetched?.sourceTransport ?? null,'''
+          if text.count(old_record) != 1:
+              raise SystemExit(f'Expected one record image marker, found {text.count(old_record)}')
+          text = text.replace(old_record, new_record)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+          node --check scripts/execution/run-product-worker.mjs
+      - name: Commit audited worker patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/execution/run-product-worker.mjs
+          git commit -m 'Allow exact official category image evidence in retry recovery'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1
