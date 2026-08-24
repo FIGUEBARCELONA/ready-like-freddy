@@ -26,9 +26,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: corepack enable
-        name: Enable pinned pnpm
-      - name: Execute complete validation
+      - name: Enable pinned pnpm
+        run: corepack enable
+      - name: Execute complete sequence 14 validation
         id: validate
         continue-on-error: true
         shell: bash
@@ -37,250 +37,136 @@ jobs:
           {
             pnpm install --frozen-lockfile
             find scripts/execution -name '*.mjs' -print0 | sort -z | xargs -0 -n1 node --check
-            node - <<'NODE'
-          const { readFileSync, readdirSync } = require('node:fs');
-          const paths = [
-            'data/execution/rlf-kb-official-seeds.json',
-            'data/execution/rlf-kb-run-plan.json',
-            'data/execution/product-progress.json',
-            'data/execution/sequence13-ledger-snapshot.json',
-            ...readdirSync('data/execution/progress-deltas')
-              .filter(name => name.endsWith('.json'))
-              .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
-              .map(name => `data/execution/progress-deltas/${name}`),
-            ...readdirSync('data/execution/source-page-deltas')
-              .filter(name => name.endsWith('.json'))
-              .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
-              .map(name => `data/execution/source-page-deltas/${name}`),
-            ...readdirSync('data/execution/source-page-delta-audits')
-              .filter(name => name.endsWith('.json'))
-              .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
-              .map(name => `data/execution/source-page-delta-audits/${name}`),
-          ];
-          for (const path of paths) JSON.parse(readFileSync(path, 'utf8'));
-          console.log(JSON.stringify({ validatedJsonFiles: paths.length, paths }, null, 2));
-          NODE
-            node --input-type=module - <<'NODE'
-          import { readFile, writeFile } from 'node:fs/promises';
+            node --input-type=module <<'NODE'
+          import { readdir, readFile, writeFile } from 'node:fs/promises';
           import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
           import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
 
-          const identityState = await loadProgressLedger();
-          const sourcePageState = await loadSourcePageLedger();
-          const sequence13Delta = JSON.parse(
-            await readFile('data/execution/progress-deltas/32780333417.json', 'utf8'),
-          );
-          const sequence13SourceDelta = JSON.parse(
-            await readFile('data/execution/source-page-deltas/32780333417.json', 'utf8'),
-          );
-          const sequence13SourceAudit = JSON.parse(
-            await readFile('data/execution/source-page-delta-audits/32780333417.json', 'utf8'),
-          );
-          const sequence13ProductManifest = JSON.parse(
-            await readFile('data/execution/runs/32780333417/product-manifest.json', 'utf8'),
-          );
-          const sequence13LedgerAudit = JSON.parse(
-            await readFile('data/execution/runs/32780333417/ledger-delta-audit.json', 'utf8'),
-          );
-          const sequence13Snapshot = JSON.parse(
-            await readFile('data/execution/sequence13-ledger-snapshot.json', 'utf8'),
-          );
+          const jsonPaths = [
+            'data/execution/rlf-kb-official-seeds.json',
+            'data/execution/rlf-kb-run-plan.json',
+            'data/execution/product-progress.json',
+            'data/execution/sequence14-ledger-snapshot.json',
+            'data/execution/workflow-runs-snapshot.json',
+          ];
+          for (const directory of [
+            'data/execution/progress-deltas',
+            'data/execution/source-page-deltas',
+            'data/execution/source-page-delta-audits',
+          ]) {
+            const names = (await readdir(directory)).filter(name => name.endsWith('.json')).sort((a,b) => a.localeCompare(b,'en',{numeric:true}));
+            jsonPaths.push(...names.map(name => `${directory}/${name}`));
+          }
+          for (const path of jsonPaths) JSON.parse(await readFile(path, 'utf8'));
 
-          const expectedIdentity = {
-            completedIdentityCount: 1351,
-            productUrlCaptureCount: 2149,
-            officialProductImageReferenceCount: 11654,
-            materialEvidenceCount: 1742,
-            manufacturingClaimCount: 63,
-            descriptionMissingIdentityCount: 820,
-            priceMissingIdentityCount: 764,
-            materialMissingIdentityCount: 86,
-            retryIdentityKeys: [
-              'G3636|Z77',
-              'HW2300|843',
-              'M1588|81B',
-              'M1588|84B',
-              'M4613|41A',
-              'SY3660|46A',
-            ],
-            deltaCount: 8,
-            latestRunId: '32780333417',
-            factoryVerifiedCount: 0,
-            globalCanonicalProductCount: 0,
-            ledgerSha256: 'd20d264b5508091d3052fdd95e7ac9bfab928072537d2e45d0f8069a288990d7',
-          };
-          const actualIdentity = {
-            completedIdentityCount: identityState.completed.identityCount,
-            productUrlCaptureCount: identityState.completed.productUrlCaptureCount,
-            officialProductImageReferenceCount: identityState.counters.officialProductImageReferenceCount,
-            materialEvidenceCount: identityState.counters.materialEvidenceCount,
-            manufacturingClaimCount: identityState.counters.manufacturingClaimCount,
-            descriptionMissingIdentityCount: identityState.metadataGaps.descriptionMissingIdentityCount,
-            priceMissingIdentityCount: identityState.metadataGaps.priceMissingIdentityCount,
-            materialMissingIdentityCount: identityState.metadataGaps.materialMissingIdentityCount,
-            retryIdentityKeys: identityState.retry.identities.map(item => item.identityKey).sort(),
-            deltaCount: identityState.deltaCount,
-            latestRunId: String(identityState.latestRunId),
-            factoryVerifiedCount: identityState.counters.factoryVerifiedCount,
-            globalCanonicalProductCount: identityState.counters.globalCanonicalProductCount,
-            ledgerSha256: identityState.ledgerSha256,
-          };
+          const identity = await loadProgressLedger();
+          const sourcePages = await loadSourcePageLedger();
+          const snapshot = JSON.parse(await readFile('data/execution/sequence14-ledger-snapshot.json','utf8'));
+          const dashboard = JSON.parse(await readFile('data/execution/workflow-runs-snapshot.json','utf8'));
+          const delta = JSON.parse(await readFile('data/execution/progress-deltas/32781308211.json','utf8'));
+          const sourceDelta = JSON.parse(await readFile('data/execution/source-page-deltas/32781308211.json','utf8'));
+          const sourceAudit = JSON.parse(await readFile('data/execution/source-page-delta-audits/32781308211.json','utf8'));
+          const manifest = JSON.parse(await readFile('data/execution/runs/32781308211/product-manifest.json','utf8'));
+          const ledgerAudit = JSON.parse(await readFile('data/execution/runs/32781308211/ledger-delta-audit.json','utf8'));
 
-          const expectedSourcePages = {
-            deltaCount: 6,
-            attemptedObservationCount: 1198,
-            uniqueAttemptedSourcePageCount: 913,
-            ledgerSha256: '958615fe3ff5d8192371a8d1c2f0ed65308b31309ef03fcebd6b10b20d23f339',
+          const expectedRetries = ['G3636|Z77','HW2300|843','M1588|81B','M1588|84B','M4613|41A','SY3660|46A'];
+          const actual = {
+            identity: {
+              completedIdentityCount: identity.completed.identityCount,
+              productUrlCaptureCount: identity.completed.productUrlCaptureCount,
+              officialProductImageReferenceCount: identity.counters.officialProductImageReferenceCount,
+              materialEvidenceCount: identity.counters.materialEvidenceCount,
+              manufacturingClaimCount: identity.counters.manufacturingClaimCount,
+              descriptionMissingIdentityCount: identity.metadataGaps.descriptionMissingIdentityCount,
+              priceMissingIdentityCount: identity.metadataGaps.priceMissingIdentityCount,
+              materialMissingIdentityCount: identity.metadataGaps.materialMissingIdentityCount,
+              retryIdentityKeys: identity.retry.identities.map(item => item.identityKey).sort(),
+              deltaCount: identity.deltaCount,
+              latestRunId: String(identity.latestRunId),
+              factoryVerifiedCount: identity.counters.factoryVerifiedCount,
+              globalCanonicalProductCount: identity.counters.globalCanonicalProductCount,
+              ledgerSha256: identity.ledgerSha256,
+            },
+            sourcePages: {
+              deltaCount: sourcePages.deltaCount,
+              attemptedObservationCount: sourcePages.attemptedObservationCount,
+              uniqueAttemptedSourcePageCount: sourcePages.uniqueAttemptedSourcePageCount,
+              ledgerSha256: sourcePages.ledgerSha256,
+            },
           };
-          const actualSourcePages = {
-            deltaCount: sourcePageState.deltaCount,
-            attemptedObservationCount: sourcePageState.attemptedObservationCount,
-            uniqueAttemptedSourcePageCount: sourcePageState.uniqueAttemptedSourcePageCount,
-            ledgerSha256: sourcePageState.ledgerSha256,
+          const expected = {
+            identity: {
+              completedIdentityCount: 1354,
+              productUrlCaptureCount: 2152,
+              officialProductImageReferenceCount: 11682,
+              materialEvidenceCount: 1745,
+              manufacturingClaimCount: 64,
+              descriptionMissingIdentityCount: 823,
+              priceMissingIdentityCount: 767,
+              materialMissingIdentityCount: 86,
+              retryIdentityKeys: expectedRetries,
+              deltaCount: 9,
+              latestRunId: '32781308211',
+              factoryVerifiedCount: 0,
+              globalCanonicalProductCount: 0,
+              ledgerSha256: '2a796480e8db88080fac020161b25b37e408631c77d2856353597f767496b114',
+            },
+            sourcePages: {
+              deltaCount: 7,
+              attemptedObservationCount: 1448,
+              uniqueAttemptedSourcePageCount: 1163,
+              ledgerSha256: '8de01546abe681f1c271755341f19641083cb59f32cbd63bd7eae1f8980fee24',
+            },
           };
-
           const mismatches = [];
-          for (const key of Object.keys(expectedIdentity).filter(key => key !== 'retryIdentityKeys')) {
-            if (actualIdentity[key] !== expectedIdentity[key]) {
-              mismatches.push([`identity.${key}`, actualIdentity[key], expectedIdentity[key]]);
+          for (const section of ['identity','sourcePages']) {
+            for (const [key,value] of Object.entries(expected[section])) {
+              if (JSON.stringify(actual[section][key]) !== JSON.stringify(value)) mismatches.push([`${section}.${key}`,actual[section][key],value]);
             }
           }
-          if (JSON.stringify(actualIdentity.retryIdentityKeys) !== JSON.stringify(expectedIdentity.retryIdentityKeys)) {
-            mismatches.push([
-              'identity.retryIdentityKeys',
-              actualIdentity.retryIdentityKeys,
-              expectedIdentity.retryIdentityKeys,
-            ]);
-          }
-          for (const key of Object.keys(expectedSourcePages)) {
-            if (actualSourcePages[key] !== expectedSourcePages[key]) {
-              mismatches.push([`sourcePages.${key}`, actualSourcePages[key], expectedSourcePages[key]]);
-            }
-          }
-
-          const completed = new Set(identityState.completed.identityKeys);
-          const completedRetries = actualIdentity.retryIdentityKeys.filter(key => completed.has(key));
-          if (completedRetries.length) {
-            mismatches.push(['identity.completedRetries', completedRetries, []]);
-          }
-          if (!completed.has('B2328|560')) {
-            mismatches.push(['identity.resolvedRetry.B2328|560', false, true]);
-          }
-
-          const expectedSequence13Keys = ['J3301|608', 'J5557|37C', 'T5505|420'];
-          if (String(sequence13Delta.runId) !== '32780333417') {
-            mismatches.push(['sequence13.identityRunId', sequence13Delta.runId, '32780333417']);
-          }
-          if (JSON.stringify(sequence13Delta.completedIdentityKeys) !== JSON.stringify(expectedSequence13Keys)) {
-            mismatches.push([
-              'sequence13.completedIdentityKeys',
-              sequence13Delta.completedIdentityKeys,
-              expectedSequence13Keys,
-            ]);
-          }
-          if ((sequence13Delta.failedIdentities ?? []).length !== 0) {
-            mismatches.push([
-              'sequence13.failedIdentityCount',
-              sequence13Delta.failedIdentities?.length ?? null,
-              0,
-            ]);
-          }
-          if (sequence13Delta.capturedProductUrlCount !== 5) {
-            mismatches.push([
-              'sequence13.capturedProductUrlCount',
-              sequence13Delta.capturedProductUrlCount,
-              5,
-            ]);
-          }
-          if (sequence13Delta.ledgerDeltaSha256 !== 'af1f5a2b2589ecadbfd95c0e891614ffde17d0f210dd5dbc51be0b9c149f4437') {
-            mismatches.push([
-              'sequence13.identityDeltaSha256',
-              sequence13Delta.ledgerDeltaSha256,
-              'af1f5a2b2589ecadbfd95c0e891614ffde17d0f210dd5dbc51be0b9c149f4437',
-            ]);
-          }
-          if (sequence13SourceDelta.attemptedSourcePageCount !== 219) {
-            mismatches.push([
-              'sequence13.attemptedSourcePageCount',
-              sequence13SourceDelta.attemptedSourcePageCount,
-              219,
-            ]);
-          }
-          if (sequence13SourceDelta.sourcePageDeltaSha256 !== 'be4c1f1bf8a7e3e825a94a399462f6bac0697a619b1de2948302fe090f028a67') {
-            mismatches.push([
-              'sequence13.sourcePageDeltaSha256',
-              sequence13SourceDelta.sourcePageDeltaSha256,
-              'be4c1f1bf8a7e3e825a94a399462f6bac0697a619b1de2948302fe090f028a67',
-            ]);
-          }
-          if (!sequence13SourceAudit.passed || sequence13SourceAudit.batch.overlapWithPrior.length !== 0) {
-            mismatches.push([
-              'sequence13.sourcePageAudit',
-              sequence13SourceAudit,
-              { passed: true, overlapWithPrior: [] },
-            ]);
-          }
-
-          const totals = sequence13ProductManifest.totals;
-          if (
-            sequence13ProductManifest.workerCount !== 50 ||
-            !sequence13ProductManifest.qualityGatePassed ||
-            totals.selectedIdentityCount !== 3 ||
-            totals.attemptedIdentityCount !== 3 ||
-            totals.successfulIdentityCaptureCount !== 3 ||
-            totals.failedIdentityCaptureCount !== 0 ||
-            totals.soft404IdentityCount !== 0 ||
-            totals.missingImageIdentityCount !== 0 ||
-            totals.officialProductImageReferenceCount !== 28 ||
-            totals.rejectedImageReferenceCount !== 0 ||
-            totals.verifiedPriceCount !== 0 ||
-            totals.factoryVerifiedCount !== 0
-          ) {
-            mismatches.push(['sequence13.productManifestTotals', totals, 'strict expected totals']);
-          }
-          if (
-            !sequence13LedgerAudit.passed ||
-            sequence13LedgerAudit.batch.overlapWithPrior.length !== 0 ||
-            sequence13LedgerAudit.batch.completedAndFailedOverlap.length !== 0
-          ) {
-            mismatches.push(['sequence13.ledgerDeltaAudit', sequence13LedgerAudit, 'passed with zero overlap']);
-          }
-          if (!sequence13Snapshot.passed) {
-            mismatches.push(['sequence13.exactLedgerSnapshotPassed', sequence13Snapshot.passed, true]);
-          }
+          const expectedKeys = ['B9352|X89','M2407|X86','M3574|84A'];
+          if (JSON.stringify(delta.completedIdentityKeys) !== JSON.stringify(expectedKeys)) mismatches.push(['sequence14.completedIdentityKeys',delta.completedIdentityKeys,expectedKeys]);
+          if (delta.failedIdentities.length !== 0) mismatches.push(['sequence14.failedIdentities',delta.failedIdentities,[]]);
+          if (delta.capturedProductUrlCount !== 3) mismatches.push(['sequence14.capturedProductUrlCount',delta.capturedProductUrlCount,3]);
+          if (delta.ledgerDeltaSha256 !== '6539e13f665c18b90a7956980605a06b87598cbb3a48137a5eaad9f42d70e6eb') mismatches.push(['sequence14.identityDeltaSha256',delta.ledgerDeltaSha256,'6539e13f665c18b90a7956980605a06b87598cbb3a48137a5eaad9f42d70e6eb']);
+          if (sourceDelta.attemptedSourcePageCount !== 250 || sourceDelta.uniqueSourcePageCount !== 250 || sourceDelta.successfulSourcePageCount !== 250) mismatches.push(['sequence14.sourcePageCounts',[sourceDelta.attemptedSourcePageCount,sourceDelta.uniqueSourcePageCount,sourceDelta.successfulSourcePageCount],[250,250,250]]);
+          if (sourceDelta.sourcePageDeltaSha256 !== '060379a5365f276ba7426f877c9e4b7f12eacfc6b2c33376817f61243ca4e914') mismatches.push(['sequence14.sourcePageDeltaSha256',sourceDelta.sourcePageDeltaSha256,'060379a5365f276ba7426f877c9e4b7f12eacfc6b2c33376817f61243ca4e914']);
+          if (!sourceAudit.passed || sourceAudit.batch.overlapWithPrior.length) mismatches.push(['sequence14.sourceAudit',sourceAudit,'passed with zero overlap']);
+          const totals = manifest.totals;
+          const expectedTotals = {selectedIdentityCount:3,attemptedIdentityCount:3,successfulIdentityCaptureCount:3,failedIdentityCaptureCount:0,soft404IdentityCount:0,missingImageIdentityCount:0,officialProductImageReferenceCount:28,rejectedImageReferenceCount:0,verifiedPriceCount:0,materialEvidenceCount:3,manufacturingClaimCount:1,factoryVerifiedCount:0};
+          if (manifest.workerCount !== 50 || !manifest.qualityGatePassed) mismatches.push(['sequence14.productManifestGate',[manifest.workerCount,manifest.qualityGatePassed],[50,true]]);
+          for (const [key,value] of Object.entries(expectedTotals)) if (totals[key] !== value) mismatches.push([`sequence14.productTotals.${key}`,totals[key],value]);
+          if (!ledgerAudit.passed || ledgerAudit.batch.overlapWithPrior.length || ledgerAudit.batch.completedAndFailedOverlap.length) mismatches.push(['sequence14.ledgerAudit',ledgerAudit,'passed with zero overlap']);
+          const c = dashboard.counts;
+          if (dashboard.run.status !== 'completed' || dashboard.run.conclusion !== 'success') mismatches.push(['dashboard.run',[dashboard.run.status,dashboard.run.conclusion],['completed','success']]);
+          for (const [key,value] of Object.entries({discoveryJobs:50,discoverySuccess:50,discoveryFailed:0,discoveryActive:0,productJobs:50,productSuccess:50,productFailed:0,productActive:0,discoveryWorkerArtifacts:50,productWorkerArtifacts:50,consolidatedDiscoveryArtifacts:1,consolidatedProductArtifacts:1})) if (c[key] !== value) mismatches.push([`dashboard.${key}`,c[key],value]);
+          if (!snapshot.passed || snapshot.identity.ledgerSha256 !== expected.identity.ledgerSha256 || snapshot.sourcePages.ledgerSha256 !== expected.sourcePages.ledgerSha256) mismatches.push(['sequence14.snapshot',snapshot,'passed exact snapshot']);
+          const completed = new Set(identity.completed.identityKeys);
+          const retryOverlap = expectedRetries.filter(key => completed.has(key));
+          if (retryOverlap.length) mismatches.push(['retry.completedOverlap',retryOverlap,[]]);
+          if (!completed.has('B2328|560')) mismatches.push(['resolvedRetry.B2328|560',false,true]);
 
           const checkpoint = {
-            schemaVersion: 5,
-            sourceRunId: '32780333417',
+            schemaVersion: 6,
+            sourceRunId: '32781308211',
             generatedAt: new Date().toISOString(),
-            expected: {
-              identity: expectedIdentity,
-              sourcePages: expectedSourcePages,
-            },
-            actual: {
-              identity: actualIdentity,
-              sourcePages: actualSourcePages,
-            },
-            sequence13: {
-              completedIdentityKeys: sequence13Delta.completedIdentityKeys,
-              failedIdentityCount: sequence13Delta.failedIdentities?.length ?? null,
-              capturedProductUrlCount: sequence13Delta.capturedProductUrlCount,
-              identityDeltaSha256: sequence13Delta.ledgerDeltaSha256,
-              attemptedSourcePageCount: sequence13SourceDelta.attemptedSourcePageCount,
-              sourcePageDeltaSha256: sequence13SourceDelta.sourcePageDeltaSha256,
-              productWorkerCount: sequence13ProductManifest.workerCount,
+            expected,
+            actual,
+            sequence14: {
+              completedIdentityKeys: delta.completedIdentityKeys,
+              failedIdentityCount: delta.failedIdentities.length,
+              identityDeltaSha256: delta.ledgerDeltaSha256,
+              sourcePageCount: sourceDelta.attemptedSourcePageCount,
+              sourcePageDeltaSha256: sourceDelta.sourcePageDeltaSha256,
               productTotals: totals,
-              sourcePageAuditPassed: sequence13SourceAudit.passed,
-              ledgerDeltaAuditPassed: sequence13LedgerAudit.passed,
+              dashboardCounts: c,
             },
             mismatches,
             passed: mismatches.length === 0,
           };
-          await writeFile('/tmp/rlf-ledger-checkpoint.json', `${JSON.stringify(checkpoint, null, 2)}\n`);
-          console.log(JSON.stringify(checkpoint, null, 2));
-          if (mismatches.length) {
-            throw new Error(`Ledger checkpoint mismatch: ${JSON.stringify(mismatches)}`);
-          }
+          await writeFile('/tmp/rlf-ledger-checkpoint.json',`${JSON.stringify(checkpoint,null,2)}\n`);
+          console.log(JSON.stringify(checkpoint,null,2));
+          if (mismatches.length) throw new Error(`Sequence 14 validation mismatch: ${JSON.stringify(mismatches)}`);
           NODE
             pnpm check
             pnpm build
@@ -292,47 +178,14 @@ jobs:
           VALIDATION_OUTCOME: ${{ steps.validate.outcome }}
         run: |
           set -euo pipefail
-          mkdir -p data/execution
-          node - <<'NODE'
-          const fs = require('node:fs');
-          const crypto = require('node:crypto');
-          const log = fs.existsSync('/tmp/rlf-validation.log')
-            ? fs.readFileSync('/tmp/rlf-validation.log')
-            : Buffer.from('validation step did not create a log');
-          const checkpoint = fs.existsSync('/tmp/rlf-ledger-checkpoint.json')
-            ? JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json', 'utf8'))
-            : null;
-          const proof = {
-            schemaVersion: 6,
-            recordedAt: new Date().toISOString(),
-            sourceCommitSha: process.env.GITHUB_SHA,
-            runId: process.env.GITHUB_RUN_ID,
-            runAttempt: Number(process.env.GITHUB_RUN_ATTEMPT || '1'),
-            validationOutcome: process.env.VALIDATION_OUTCOME,
-            nodeVersion: process.version,
-            logSha256: crypto.createHash('sha256').update(log).digest('hex'),
-            ledgerCheckpoint: checkpoint,
-            requiredChecks: [
-              'pnpm_install_frozen_lockfile',
-              'execution_script_syntax',
-              'canonical_json_eight_identity_deltas_six_source_page_deltas',
-              'exact_sequence_13_identity_and_source_page_ledgers',
-              'sequence13_3_complete_0_retry_no_overlap',
-              'sequence13_219_unique_source_pages_no_overlap',
-              'fifty_of_fifty_discovery_workers',
-              'fifty_of_fifty_product_workers',
-              'zero_soft404_zero_missing_images_zero_rejected_images',
-              'zero_verified_transformed_prices',
-              'resolved_retry_b2328_560',
-              'factory_verified_zero',
-              'global_canonical_products_zero',
-              'typescript_no_emit',
-              'production_build'
-            ]
-          };
-          fs.writeFileSync('data/execution/validation-proof.json', `${JSON.stringify(proof, null, 2)}\n`);
+          node <<'NODE'
+          const fs=require('node:fs'); const crypto=require('node:crypto');
+          const log=fs.existsSync('/tmp/rlf-validation.log')?fs.readFileSync('/tmp/rlf-validation.log'):Buffer.from('missing validation log');
+          const checkpoint=fs.existsSync('/tmp/rlf-ledger-checkpoint.json')?JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json','utf8')):null;
+          const proof={schemaVersion:7,recordedAt:new Date().toISOString(),sourceCommitSha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT||'1'),validationOutcome:process.env.VALIDATION_OUTCOME,nodeVersion:process.version,logSha256:crypto.createHash('sha256').update(log).digest('hex'),ledgerCheckpoint:checkpoint,requiredChecks:['pnpm_install_frozen_lockfile','execution_script_syntax','canonical_json_nine_identity_deltas_seven_source_page_deltas','exact_sequence14_ledgers','fifty_of_fifty_discovery_workers','fifty_of_fifty_product_workers','sequence14_3_complete_0_retry_no_overlap','sequence14_250_unique_source_pages_no_overlap','zero_soft404_missing_or_rejected_images','zero_verified_transformed_prices','factory_verified_zero','global_canonical_products_zero','typescript_no_emit','production_build']};
+          fs.writeFileSync('data/execution/validation-proof.json',`${JSON.stringify(proof,null,2)}\n`);
           NODE
-      - name: Commit, rebase and publish proof with retry
+      - name: Publish proof
         if: always()
         shell: bash
         run: |
@@ -341,16 +194,13 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/validation-proof.json
-          git commit -m "Persist RLF sequence 13 validation proof ${GITHUB_RUN_ID}"
+          git commit -m "Persist RLF sequence 14 validation proof ${GITHUB_RUN_ID}"
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
-            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
-              exit 0
-            fi
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
             git rebase --abort 2>/dev/null || true
             sleep $((attempt * 3))
           done
-          echo 'Unable to publish validation proof after five rebases' >&2
           exit 1
       - name: Enforce validation success
         if: steps.validate.outcome != 'success'
