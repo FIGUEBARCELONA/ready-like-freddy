@@ -4,10 +4,8 @@ import {INTERNAL,MARKETPLACES} from './policy';
 export type SearchItem={title:string;url:string;snippet:string;provider:string};
 type Provider={name:string;url:(query:string,language:string)=>string;rss?:boolean};
 
-const PROVIDERS:Provider[]=[
-  {name:'bing-rss',rss:true,url:(query,language)=>`https://www.bing.com/search?format=rss&q=${encodeURIComponent(query)}&count=40&setlang=${encodeURIComponent(language.split('-')[0])}`},
-  {name:'yahoo',url:query=>`https://search.yahoo.com/search?p=${encodeURIComponent(query)}&n=40`},
-];
+const PRIMARY_PROVIDER:Provider={name:'bing-rss',rss:true,url:(query,language)=>`https://www.bing.com/search?format=rss&q=${encodeURIComponent(query)}&count=40&setlang=${encodeURIComponent(language.split('-')[0])}`};
+const FALLBACK_PROVIDER:Provider={name:'yahoo',url:query=>`https://search.yahoo.com/search?p=${encodeURIComponent(query)}&n=40`};
 
 const decode=(value:string)=>String(value||'').replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&#39;',"'").replaceAll('&lt;','<').replaceAll('&gt;','>');
 export const strip=(value:string)=>decode(String(value||'').replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<noscript[\s\S]*?<\/noscript>/gi,' ').replace(/<svg[\s\S]*?<\/svg>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim());
@@ -90,21 +88,27 @@ async function searchProvider(provider:Provider,query:string,language:string,lim
   }
 }
 
+export function shouldFallbackSearch(attempt:ProviderAttempt,resultCount:number) {
+  return attempt.status!==200||attempt.challenge||Boolean(attempt.error)||resultCount===0;
+}
+
 export async function searchAll(query:string,input:DiscoverInput) {
   const attempts:ProviderAttempt[]=[];
   const results:SearchItem[]=[];
   const seen=new Set<string>();
-  const pivot=input.lane.index%PROVIDERS.length;
-  const rotated=[...PROVIDERS.slice(pivot),...PROVIDERS.slice(0,pivot)];
-  for(const provider of rotated) {
-    const response=await searchProvider(provider,query,input.lane.language,Math.max(input.maxCandidates*5,30));
-    attempts.push(response.attempt);
-    for(const item of response.results) {
+  const limit=Math.max(input.maxCandidates*5,30);
+  const append=(items:SearchItem[])=>{
+    for(const item of items) {
       const domain=domainOf(item.url);
       if(!domain||MARKETPLACES.some(rule=>domain.includes(rule))||seen.has(item.url)) continue;
       seen.add(item.url);results.push(item);
     }
-    if(results.length>=input.maxCandidates*4) break;
+  };
+  const primary=await searchProvider(PRIMARY_PROVIDER,query,input.lane.language,limit);
+  attempts.push(primary.attempt);append(primary.results);
+  if(shouldFallbackSearch(primary.attempt,primary.results.length)) {
+    const fallback=await searchProvider(FALLBACK_PROVIDER,query,input.lane.language,limit);
+    attempts.push(fallback.attempt);append(fallback.results);
   }
-  return {attempts,results:results.slice(0,Math.max(input.maxCandidates*5,30))};
+  return {attempts,results:results.slice(0,limit)};
 }
