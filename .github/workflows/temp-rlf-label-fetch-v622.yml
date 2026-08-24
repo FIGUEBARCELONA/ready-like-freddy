@@ -1,0 +1,54 @@
+name: TEMP RLF label fetch v6.22
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download fixed label evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/original evidence/reports
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
+          fetch() {
+            key="$1"; url="$2"
+            curl --fail --location --retry 3 --retry-all-errors \
+              --connect-timeout 20 --max-time 180 --user-agent "$UA" \
+              --header 'Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8' \
+              "$url" --output "evidence/original/${key}.jpg" \
+              --write-out '%{http_code}|%{url_effective}|%{content_type}|%{size_download}\n' \
+              > "evidence/reports/${key}.meta"
+          }
+          fetch 'RLF-EXT-020_J1518_Vietnam' 'https://images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg'
+          fetch 'RLF-EXT-021_J6319_Portugal' 'https://img.gem.app/449928663/5f/1695627431/fred-perry-fred-ferry-vintage-made-in-portugal.jpg'
+          fetch 'RLF-EXT-022_J6327_Portugal' 'https://img.gem.app/317472623/7f/1658213994/fred-perry-fred-perry-laurel-wreath-track-jacket.jpg'
+          fetch 'RLF-EXT-023_SM2109F_Portugal' 'https://i.ebayimg.com/images/g/hmQAAOSwh3FlPcj1/s-l1600.jpg'
+          fetch 'RLF-EXT-024_J4237_Vietnam' 'https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0511/user/ed06c33691c923876f3f6be00479c1d6d4f64952cd37ce72f1380d107834ce7c/i-img1200x1200-17316525605967kjltp342454.jpg'
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME.txt
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+          python - <<'PY'
+          import hashlib, json, pathlib
+          root=pathlib.Path('evidence')
+          rows=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file() and p.name!='manifest.json':
+                  data=p.read_bytes()
+                  rows.append({'path':p.as_posix(),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v622-fetch-v1','files':rows},indent=2),encoding='utf-8')
+          PY
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-label-evidence-v622
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
