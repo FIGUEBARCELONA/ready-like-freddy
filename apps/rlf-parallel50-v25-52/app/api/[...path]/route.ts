@@ -17,12 +17,12 @@ const digest=(value:string)=>createHash('sha256').update(value).digest();
 function secureEqual(value:string,expectedHex:string){try{return timingSafeEqual(digest(value),Buffer.from(expectedHex,'hex'));}catch{return false;}}
 async function runState(id:string,includeOutput=false){if(!id)return{status:'not_started',active:0,output:null as CampaignResult|null,error:null as string|null};try{const run=await getRun(id);const status=await run.status;const output=status==='completed'&&includeOutput?await run.returnValue as CampaignResult:null;return{status,active:['running','pending'].includes(status)?50:0,output,error:null as string|null};}catch(error){return{status:'unavailable',active:0,output:null,error:error instanceof Error?error.message:'run error'};}}
 const campaignId=(prefix:string)=>`${prefix}-${new Date().toISOString().replace(/[-:.TZ]/g,'').slice(0,14)}-${randomUUID().slice(0,8)}`;
-async function startSweep(){const id=campaignId('RLF-P50-SWEEP-V25551');const run=await start(parallel50Sweep,[{campaignId:id,cycle:5,maxCandidatesPerLaneCycle:8}]);return{campaignId:id,runId:run.runId};}
-async function startMonitor(){const id=campaignId('RLF-P50-MONITOR-V25551');const run=await start(parallel50Campaign,[{campaignId:id,cycles:12,intervalMs:7200000,maxCandidatesPerLaneCycle:6}]);return{campaignId:id,runId:run.runId};}
+async function startSweep(){const id=campaignId('RLF-P50-SWEEP-V25552');const run=await start(parallel50Sweep,[{campaignId:id,cycle:5,maxCandidatesPerLaneCycle:8}]);return{campaignId:id,runId:run.runId};}
+async function startMonitor(){const id=campaignId('RLF-P50-MONITOR-V25552');const run=await start(parallel50Campaign,[{campaignId:id,cycles:12,intervalMs:7200000,maxCandidatesPerLaneCycle:6}]);return{campaignId:id,runId:run.runId};}
 
 export async function GET(request:Request,{params}:{params:Promise<{path:string[]}>}){
   const parts=(await params).path??[];const path=parts.join('/');const url=new URL(request.url);
-  const base={version:'25.55.1',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_IDENTITY_DEDUP_V6',delta:'0051_PREP',dedupRegistry:CANONICAL_REGISTRY_COVERAGE};
+  const base={version:'25.55.2',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_IDENTITY_DEDUP_V6',delta:'0051_PREP',dedupRegistry:CANONICAL_REGISTRY_COVERAGE};
   if(path==='health')return json({ok:true,...base,executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'ONE_TIME_OPEN',replacementEngineVersion:REPLACEMENT_POLICY.version,replacementSourcePool:REPLACEMENT_POLICY.sourcePool,simulatedWorkersStarted:0,checkedAt:new Date().toISOString()});
   if(path==='replacement/policy')return json({ok:true,policy:REPLACEMENT_POLICY,activationState:'FAIL_CLOSED_EMPTY_ACCEPTED_4K'});
   if(path==='sweep-bootstrap'){
