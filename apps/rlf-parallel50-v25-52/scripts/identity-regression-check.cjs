@@ -42,6 +42,7 @@ const validVatFixtures=[
   ['shop.pt','Empresa address Rua 12. VAT PT 198 687 974','PT198687974'],
   ['shop.fr','SAS address 12 rue Exemple. TVA FR 43 507 928 935','FR43507928935'],
   ['shop.nl','BV company address 12 Street. VAT NL 123456789 B 01','NL123456789B01'],
+  ['shop.ie','Limited company address Dublin Ireland. VAT Number: IE9331506J','IE9331506J'],
 ];
 for(const[domain,text,expected]of validVatFixtures){const{result}=analyze(domain,text);assert(result.vatId===expected,`Valid VAT missed for ${domain}: expected ${expected}, got ${result.vatId}`);assert(result.identityKey===`EU-VAT:${expected}`,`Wrong VAT key for ${domain}: ${result.identityKey}`);}
 
@@ -52,6 +53,7 @@ const registrationFixtures=[
   ['shop.ro','SRL address Strada 12. CUI: RO 41820792','RO-CUI:41820792'],
   ['shop.it','SRL address Via Roma 12. Partita IVA: 07431160485','IT-PIVA:07431160485'],
   ['vintagie.com','Company address Amsterdam Netherlands. KVK: 85882623','NL-KVK:85882623'],
+  ['weighnpay.ie','Cliché Vintage Limited. Company address Unit 9 Ossory Court Dublin 3. Company number 599102 and our VAT number is IE9331506J.','IE-CRO:599102'],
 ];
 for(const[domain,text,expected]of registrationFixtures){const{result}=analyze(domain,text);assert(result.identityKey===expected,`Registration key mismatch for ${domain}: expected ${expected}, got ${result.identityKey}`);}
 
