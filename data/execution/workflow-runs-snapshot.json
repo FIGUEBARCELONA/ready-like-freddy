@@ -1,36 +1,62 @@
 {
-  "schemaVersion": 9,
-  "capturedAt": "2026-08-24T21:55:56Z",
-  "targetSha": "b892e922635d8d138081c9405190f9df2d043914",
+  "schemaVersion": 10,
+  "capturedAt": "2026-08-24T21:57:05Z",
+  "targetSha": "073c346299b1a291c97b106f499be67f30a9fc61",
   "targetRuns": [
     {
       "conclusion": "success",
-      "created_at": "2026-08-24T21:55:06Z",
+      "created_at": "2026-08-24T21:56:28Z",
       "event": "push",
-      "head_sha": "b892e922635d8d138081c9405190f9df2d043914",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32782019682",
-      "id": 32782019682,
-      "name": "RLF validation proof",
+      "head_sha": "073c346299b1a291c97b106f499be67f30a9fc61",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32782139984",
+      "id": 32782139984,
+      "name": "RLF source page rotation validation",
       "run_attempt": 1,
-      "run_number": 11,
+      "run_number": 9,
       "status": "completed",
-      "updated_at": "2026-08-24T21:55:36Z"
+      "updated_at": "2026-08-24T21:56:46Z"
     }
   ],
   "targetChecks": [
     {
-      "completed_at": "2026-08-24T21:55:36Z",
+      "completed_at": "2026-08-24T21:56:45Z",
       "conclusion": "success",
-      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32782019682/job/97605933828",
-      "id": 97605933828,
-      "name": "prove",
-      "started_at": "2026-08-24T21:55:09Z",
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32782139984/job/97606295048",
+      "id": 97606295048,
+      "name": "validate",
+      "started_at": "2026-08-24T21:56:31Z",
       "status": "completed"
     }
   ],
   "recentRuns": [
     {
       "conclusion": null,
+      "created_at": "2026-08-24T21:56:57Z",
+      "event": "push",
+      "head_sha": "7e822b377d0bbda403e0b99a13123c8e2f8a1542",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32782182767",
+      "id": 32782182767,
+      "name": "RLF workflow runs snapshot",
+      "run_attempt": 1,
+      "run_number": 28,
+      "status": "in_progress",
+      "updated_at": "2026-08-24T21:57:01Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-08-24T21:56:28Z",
+      "event": "push",
+      "head_sha": "073c346299b1a291c97b106f499be67f30a9fc61",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32782139984",
+      "id": 32782139984,
+      "name": "RLF source page rotation validation",
+      "run_attempt": 1,
+      "run_number": 9,
+      "status": "completed",
+      "updated_at": "2026-08-24T21:56:46Z"
+    },
+    {
+      "conclusion": "success",
       "created_at": "2026-08-24T21:55:45Z",
       "event": "push",
       "head_sha": "066eb7559548b72d549b59abe0a2274d8450ae26",
@@ -39,8 +65,8 @@
       "name": "RLF workflow runs snapshot",
       "run_attempt": 1,
       "run_number": 27,
-      "status": "in_progress",
-      "updated_at": "2026-08-24T21:55:49Z"
+      "status": "completed",
+      "updated_at": "2026-08-24T21:56:01Z"
     },
     {
       "conclusion": "success",
@@ -652,32 +678,6 @@
       "run_number": 18,
       "status": "completed",
       "updated_at": "2026-08-24T21:03:19Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T21:01:16Z",
-      "event": "push",
-      "head_sha": "c373e994c3830031c1f9fef720d3b402ebac88b6",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777177516",
-      "id": 32777177516,
-      "name": "RLF workflow runs snapshot",
-      "run_attempt": 1,
-      "run_number": 6,
-      "status": "completed",
-      "updated_at": "2026-08-24T21:01:27Z"
-    },
-    {
-      "conclusion": "failure",
-      "created_at": "2026-08-24T20:59:02Z",
-      "event": "push",
-      "head_sha": "bd62b7aaa5d6dcce31ef5e63da5ed5638e8fa3ef",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32776966148",
-      "id": 32776966148,
-      "name": "RLF source page rotation validation",
-      "run_attempt": 1,
-      "run_number": 4,
-      "status": "completed",
-      "updated_at": "2026-08-24T21:01:26Z"
     }
   ]
 }
