@@ -11,6 +11,9 @@ on:
 permissions:
   contents: write
 
+env:
+  PREFLIGHT_REVISION: '2'
+
 concurrency:
   group: rlf-source-page-rotation-validation
   cancel-in-progress: true
@@ -76,6 +79,8 @@ jobs:
             excludedPreviouslyAttemptedSourcePageCount: queue.excludedPreviouslyAttemptedSourcePageCount,
             skippedPriorityEntryPointCount: queue.skippedPriorityEntryPointCount,
             injectedPriorityEntryPointCount: queue.priorityEntryPointCount,
+            reassignedEmptyLaneCount: queue.reassignedEmptyLaneCount ?? 0,
+            reassignedEmptyLanes: queue.reassignedEmptyLanes ?? [],
             remainingQueueUrlCount: allUrls.length,
             theoreticalBatchCapacity,
             effectiveBatchCapacity: firstBatch.length,
