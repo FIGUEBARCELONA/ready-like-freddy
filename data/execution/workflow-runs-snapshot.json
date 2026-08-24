@@ -1,36 +1,62 @@
 {
   "schemaVersion": 6,
-  "capturedAt": "2026-08-24T21:43:50Z",
-  "targetSha": "302f7b6d8295cd7db5ba2f1952744ae9408ebb35",
+  "capturedAt": "2026-08-24T21:45:03Z",
+  "targetSha": "62e9ee8ba2ea9007bed8aa808e56089b87c4c581",
   "targetRuns": [
     {
       "conclusion": "success",
-      "created_at": "2026-08-24T21:43:17Z",
+      "created_at": "2026-08-24T21:44:26Z",
       "event": "push",
-      "head_sha": "302f7b6d8295cd7db5ba2f1952744ae9408ebb35",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32780994828",
-      "id": 32780994828,
-      "name": "RLF sequence 13 ledger snapshot",
+      "head_sha": "62e9ee8ba2ea9007bed8aa808e56089b87c4c581",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32781096096",
+      "id": 32781096096,
+      "name": "RLF validation proof",
       "run_attempt": 1,
-      "run_number": 1,
+      "run_number": 10,
       "status": "completed",
-      "updated_at": "2026-08-24T21:43:29Z"
+      "updated_at": "2026-08-24T21:44:53Z"
     }
   ],
   "targetChecks": [
     {
-      "completed_at": "2026-08-24T21:43:28Z",
+      "completed_at": "2026-08-24T21:44:53Z",
       "conclusion": "success",
-      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32780994828/job/97602816880",
-      "id": 97602816880,
-      "name": "snapshot",
-      "started_at": "2026-08-24T21:43:21Z",
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32781096096/job/97603122271",
+      "id": 97603122271,
+      "name": "prove",
+      "started_at": "2026-08-24T21:44:28Z",
       "status": "completed"
     }
   ],
   "recentRuns": [
     {
       "conclusion": null,
+      "created_at": "2026-08-24T21:44:55Z",
+      "event": "push",
+      "head_sha": "9be52d2efce1aeea05f56fc81db9068be34b0f35",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32781141683",
+      "id": 32781141683,
+      "name": "RLF workflow runs snapshot",
+      "run_attempt": 1,
+      "run_number": 21,
+      "status": "in_progress",
+      "updated_at": "2026-08-24T21:44:59Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-08-24T21:44:26Z",
+      "event": "push",
+      "head_sha": "62e9ee8ba2ea9007bed8aa808e56089b87c4c581",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32781096096",
+      "id": 32781096096,
+      "name": "RLF validation proof",
+      "run_attempt": 1,
+      "run_number": 10,
+      "status": "completed",
+      "updated_at": "2026-08-24T21:44:53Z"
+    },
+    {
+      "conclusion": "success",
       "created_at": "2026-08-24T21:43:43Z",
       "event": "push",
       "head_sha": "44efa47c511f35a5803c45681beaca7abbdc5353",
@@ -39,8 +65,8 @@
       "name": "RLF workflow runs snapshot",
       "run_attempt": 1,
       "run_number": 20,
-      "status": "in_progress",
-      "updated_at": "2026-08-24T21:43:46Z"
+      "status": "completed",
+      "updated_at": "2026-08-24T21:43:54Z"
     },
     {
       "conclusion": "success",
@@ -652,32 +678,6 @@
       "run_number": 23,
       "status": "completed",
       "updated_at": "2026-08-24T17:38:17Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T17:37:46Z",
-      "event": "push",
-      "head_sha": "47e1da2de02eee460dab6e43717e54a7220f4602",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32757729713",
-      "id": 32757729713,
-      "name": "RLF validation run index",
-      "run_attempt": 1,
-      "run_number": 17,
-      "status": "completed",
-      "updated_at": "2026-08-24T17:38:26Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T17:36:50Z",
-      "event": "push",
-      "head_sha": "ac371254e79b83f0cbb45637c97ed3b6a552b337",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32757638631",
-      "id": 32757638631,
-      "name": "RLF source page ledger backfill",
-      "run_attempt": 1,
-      "run_number": 1,
-      "status": "completed",
-      "updated_at": "2026-08-24T17:37:06Z"
     }
   ]
 }
