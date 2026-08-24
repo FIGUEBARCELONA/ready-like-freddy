@@ -53,10 +53,6 @@ function registration(text:string,country:CountryDetection):RegistrationMatch|nu
     const cro=text.match(/\b(?:COMPANY\s+(?:REGISTRATION\s+)?NUMBER|CRO\s+NUMBER)\s*[:#]?\s*(\d{5,8})\b/i);
     if(cro?.[1]){const id=compact(cro[1]);if(validRegistration(id,5,8))return{keyPrefix:'IE-CRO',id,countryCode:'IE'};}
   }
-  if(country.code&&country.code!=='NON_EU'){
-    const generic=text.match(/\b(?:COMPANY|REGISTRATION)\s+NUMBER\s*[:#]?\s*([A-Z]{0,3}[-\/]?\d[\dA-Z\/-]{3,15})\b/i);
-    if(generic?.[1]){const id=compact(generic[1]);if(validRegistration(id,4,18))return{keyPrefix:`${country.code}-REG`,id,countryCode:country.code};}
-  }
   if(country.code==='PT'||country.code==='ES'){
     const nif=text.match(/\b(?:NIF|CIF)\s*[:#]?\s*([A-Z0-9][A-Z0-9 -]{6,10}[A-Z0-9])\b/i);
     if(nif?.[1]){const id=compact(nif[1]);if(validRegistration(id,7,12))return{keyPrefix:country.code==='PT'?'PT-NIF':'ES-NIF',id,countryCode:country.code};}
