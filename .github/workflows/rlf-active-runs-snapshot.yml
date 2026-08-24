@@ -14,7 +14,7 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '23'
+  SNAPSHOT_REVISION: '24'
   TARGET_SHA: '42fbb08f61dc9f7881375e3e5f5ae4c1aeedb4f4'
   TARGET_RUN_ID: '32781308211'
 
@@ -52,7 +52,7 @@ jobs:
             --slurpfile jobs /tmp/jobs.json \
             --slurpfile artifacts /tmp/artifacts.json \
             '{
-              schemaVersion: 7,
+              schemaVersion: 8,
               capturedAt: $capturedAt,
               targetSha: $targetSha,
               targetRunId: ($targetRunId | tonumber),
@@ -77,6 +77,18 @@ jobs:
               }
             }' > data/execution/workflow-runs-snapshot.json
           cat data/execution/workflow-runs-snapshot.json
+      - name: Assert complete dashboard matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const data = require('./data/execution/workflow-runs-snapshot.json');
+          const c = data.counts;
+          if (data.run.status !== 'completed' || data.run.conclusion !== 'success') throw new Error('Sequence 14 run is not successful');
+          if (c.discoveryJobs !== 50 || c.discoverySuccess !== 50 || c.discoveryFailed !== 0 || c.discoveryActive !== 0) throw new Error(`Discovery matrix mismatch: ${JSON.stringify(c)}`);
+          if (c.productJobs !== 50 || c.productSuccess !== 50 || c.productFailed !== 0 || c.productActive !== 0) throw new Error(`Product matrix mismatch: ${JSON.stringify(c)}`);
+          if (c.discoveryWorkerArtifacts !== 50 || c.productWorkerArtifacts !== 50 || c.consolidatedDiscoveryArtifacts !== 1 || c.consolidatedProductArtifacts !== 1) throw new Error(`Artifact matrix mismatch: ${JSON.stringify(c)}`);
+          NODE
       - name: Publish snapshot
         shell: bash
         run: |
@@ -85,7 +97,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Refresh sequence 14 discovery dashboard'
+          git commit -m 'Certify final sequence 14 dashboard matrix'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
