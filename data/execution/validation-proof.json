@@ -1,18 +1,16 @@
 {
   "schemaVersion": 2,
-  "recordedAt": "2026-08-24T15:55:59.706Z",
-  "sourceCommitSha": "77661d411e42e5ab678018b4bacde4ddb1786b36",
-  "runId": "32747815123",
+  "recordedAt": "2026-08-24T15:58:34.223Z",
+  "sourceCommitSha": "a44db0de48035f8f998497a6f3bfe19cb79e916c",
+  "runId": "32748026086",
   "runAttempt": 1,
-  "workflowConclusion": "failure",
   "validationOutcome": "success",
-  "publishStepOutcome": "failure",
-  "publishFailureReason": "DIRTY_WORKTREE_BEFORE_GIT_PULL_REBASE",
   "nodeVersion": "v22.23.2",
+  "logSha256": "c4b6efd888d0ea605873836213f04209542fb46fd2b6b4b00284df474235085b",
   "ledgerCheckpoint": {
     "schemaVersion": 1,
     "sourceRunId": "32746322369",
-    "generatedAt": "2026-08-24T15:55:47.277Z",
+    "generatedAt": "2026-08-24T15:58:22.214Z",
     "expected": {
       "completedIdentityCount": 906,
       "productUrlCaptureCount": 1418,
@@ -22,7 +20,10 @@
       "descriptionMissingIdentityCount": 375,
       "priceMissingIdentityCount": 319,
       "materialMissingIdentityCount": 44,
-      "retryIdentityKeys": ["B2328|560", "HW2300|843"],
+      "retryIdentityKeys": [
+        "B2328|560",
+        "HW2300|843"
+      ],
       "deltaCount": 3,
       "factoryVerifiedCount": 0,
       "globalCanonicalProductCount": 0
@@ -36,7 +37,10 @@
       "descriptionMissingIdentityCount": 375,
       "priceMissingIdentityCount": 319,
       "materialMissingIdentityCount": 44,
-      "retryIdentityKeys": ["B2328|560", "HW2300|843"],
+      "retryIdentityKeys": [
+        "B2328|560",
+        "HW2300|843"
+      ],
       "deltaCount": 3,
       "factoryVerifiedCount": 0,
       "globalCanonicalProductCount": 0,
@@ -45,22 +49,12 @@
     "mismatches": [],
     "passed": true
   },
-  "requiredChecks": {
-    "pnpmInstallFrozenLockfile": "success",
-    "executionScriptSyntax": "success",
-    "canonicalJsonAndDeltaParse": "success",
-    "exactSequence8AppendOnlyLedgerCheckpoint": "success",
-    "typescriptNoEmit": "success",
-    "productionBuild": "success"
-  },
-  "buildWarnings": [
-    "VITE_ANALYTICS_ENDPOINT_NOT_DEFINED",
-    "VITE_ANALYTICS_WEBSITE_ID_NOT_DEFINED",
-    "MAIN_CLIENT_CHUNK_EXCEEDS_500KB"
-  ],
-  "evidence": {
-    "jobId": "97497413683",
-    "checkRunId": "97497413683",
-    "validationRunProbePath": "data/execution/validation-run-probe.json"
-  }
+  "requiredChecks": [
+    "pnpm_install_frozen_lockfile",
+    "execution_script_syntax",
+    "canonical_json_and_delta_parse",
+    "exact_sequence_8_append_only_ledger_checkpoint",
+    "typescript_no_emit",
+    "production_build"
+  ]
 }
