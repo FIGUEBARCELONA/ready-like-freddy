@@ -37,6 +37,7 @@ jobs:
     outputs:
       queue_sha256: ${{ steps.queue.outputs.queue_sha256 }}
       queue_id: ${{ steps.queue.outputs.queue_id }}
+      discovery_limit: ${{ steps.queue.outputs.discovery_limit }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,6 +53,7 @@ jobs:
           node scripts/execution/prepare-official-queue.mjs --out=execution/queue
           printf 'queue_sha256=%s\n' "$(node -p "require('./execution/queue/queue.json').queueSha256")" >> "$GITHUB_OUTPUT"
           printf 'queue_id=%s\n' "$(node -p "require('./execution/queue/queue.json').queueId")" >> "$GITHUB_OUTPUT"
+          printf 'discovery_limit=%s\n' "$(node -p "require('./execution/queue/queue.json').plan.pilotPerWorkerLimit")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -82,7 +84,7 @@ jobs:
           path: execution/queue
       - name: Capture category evidence and extract product links
         env:
-          RLF_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.per_worker_limit || '1' }}
+          RLF_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.per_worker_limit || needs.prepare.outputs.discovery_limit }}
         run: |
           node scripts/execution/run-official-worker.mjs \
             --slot=${{ matrix.slot }} \
