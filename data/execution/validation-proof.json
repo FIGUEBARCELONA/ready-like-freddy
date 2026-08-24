@@ -1,18 +1,66 @@
 {
-  "schemaVersion": 1,
-  "recordedAt": "2026-08-24T15:40:09.503Z",
-  "sourceCommitSha": "7d38163da56cb4d522852859ac664403d5b05657",
-  "runId": "32746208117",
+  "schemaVersion": 2,
+  "recordedAt": "2026-08-24T15:55:59.706Z",
+  "sourceCommitSha": "77661d411e42e5ab678018b4bacde4ddb1786b36",
+  "runId": "32747815123",
   "runAttempt": 1,
+  "workflowConclusion": "failure",
   "validationOutcome": "success",
+  "publishStepOutcome": "failure",
+  "publishFailureReason": "DIRTY_WORKTREE_BEFORE_GIT_PULL_REBASE",
   "nodeVersion": "v22.23.2",
-  "logSha256": "a7958930c94e5aed542f322e625989726d0489c7a9b6ec528159408cd84141e5",
-  "requiredChecks": [
-    "pnpm_install_frozen_lockfile",
-    "execution_script_syntax",
-    "canonical_json_and_delta_parse",
-    "append_only_ledger_invariants",
-    "typescript_no_emit",
-    "production_build"
-  ]
+  "ledgerCheckpoint": {
+    "schemaVersion": 1,
+    "sourceRunId": "32746322369",
+    "generatedAt": "2026-08-24T15:55:47.277Z",
+    "expected": {
+      "completedIdentityCount": 906,
+      "productUrlCaptureCount": 1418,
+      "officialProductImageReferenceCount": 7963,
+      "materialEvidenceCount": 1232,
+      "manufacturingClaimCount": 54,
+      "descriptionMissingIdentityCount": 375,
+      "priceMissingIdentityCount": 319,
+      "materialMissingIdentityCount": 44,
+      "retryIdentityKeys": ["B2328|560", "HW2300|843"],
+      "deltaCount": 3,
+      "factoryVerifiedCount": 0,
+      "globalCanonicalProductCount": 0
+    },
+    "actual": {
+      "completedIdentityCount": 906,
+      "productUrlCaptureCount": 1418,
+      "officialProductImageReferenceCount": 7963,
+      "materialEvidenceCount": 1232,
+      "manufacturingClaimCount": 54,
+      "descriptionMissingIdentityCount": 375,
+      "priceMissingIdentityCount": 319,
+      "materialMissingIdentityCount": 44,
+      "retryIdentityKeys": ["B2328|560", "HW2300|843"],
+      "deltaCount": 3,
+      "factoryVerifiedCount": 0,
+      "globalCanonicalProductCount": 0,
+      "ledgerSha256": "e6120cddbd32ed7388fdf2e854a2667fc48b0a9c24534686695e6295d49f301a"
+    },
+    "mismatches": [],
+    "passed": true
+  },
+  "requiredChecks": {
+    "pnpmInstallFrozenLockfile": "success",
+    "executionScriptSyntax": "success",
+    "canonicalJsonAndDeltaParse": "success",
+    "exactSequence8AppendOnlyLedgerCheckpoint": "success",
+    "typescriptNoEmit": "success",
+    "productionBuild": "success"
+  },
+  "buildWarnings": [
+    "VITE_ANALYTICS_ENDPOINT_NOT_DEFINED",
+    "VITE_ANALYTICS_WEBSITE_ID_NOT_DEFINED",
+    "MAIN_CLIENT_CHUNK_EXCEEDS_500KB"
+  ],
+  "evidence": {
+    "jobId": "97497413683",
+    "checkRunId": "97497413683",
+    "validationRunProbePath": "data/execution/validation-run-probe.json"
+  }
 }
