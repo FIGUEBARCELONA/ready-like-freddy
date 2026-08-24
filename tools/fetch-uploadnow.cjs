@@ -8,198 +8,165 @@ const diagDir = path.resolve('diagnostics');
 fs.mkdirSync(outDir, { recursive: true });
 fs.mkdirSync(diagDir, { recursive: true });
 
-const target = {
-  id: 'RLF-EXT-020',
-  code: 'J1518/A25/01975/336',
-  origin: 'MADE IN VIETNAM',
-  listingId: '29492494',
-  sourcePage: 'https://us.vestiairecollective.com/men-clothing/jackets/fred-perry/burgundy-cotton-fred-perry-jacket-29492494.shtml',
-  directImage: 'https://images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg',
-  queries: [
-    'burgundy cotton Fred Perry jacket 29492494 label',
-    'Vestiaire 29492494 J1518 336',
-  ],
-};
+const targets = [
+  {
+    id: 'CAND-046',
+    listingId: '4416347158',
+    page: 'https://www.etsy.com/fi-en/listing/4416347158/fred-perry-jacket-mens-m-down-filled',
+    query: '"FRED PERRY Jacket Men’s M Down Filled Parka" "4416347158"',
+    expected: 'MADE IN VIETNAM | shell 100% nylon | fill 80% down / 20% feathers | lining 100% nylon',
+  },
+  {
+    id: 'CAND-051',
+    listingId: '1504984921',
+    page: 'https://www.etsy.com/listing/1504984921/vintage-80s-fred-perry-shirt-sleeveless',
+    query: '"Vintage 80s FRED PERRY Shirt Sleeveless Women Tennis Made Japan Size Medium"',
+    expected: 'MADE IN JAPAN | size Medium | sleeveless women tennis shirt',
+  },
+];
 
 const sha256 = (b) => crypto.createHash('sha256').update(b).digest('hex');
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 function magicMime(b) {
-  if (b.length >= 12 && b.subarray(0, 4).toString('hex') === '52494646' && b.subarray(8, 12).toString() === 'WEBP') return 'image/webp';
-  if (b.length >= 8 && b.subarray(0, 8).toString('hex') === '89504e470d0a1a0a') return 'image/png';
-  if (b.length >= 3 && b.subarray(0, 3).toString('hex') === 'ffd8ff') return 'image/jpeg';
+  if (b.length >= 12 && b.subarray(0,4).toString('hex') === '52494646' && b.subarray(8,12).toString() === 'WEBP') return 'image/webp';
+  if (b.length >= 8 && b.subarray(0,8).toString('hex') === '89504e470d0a1a0a') return 'image/png';
+  if (b.length >= 3 && b.subarray(0,3).toString('hex') === 'ffd8ff') return 'image/jpeg';
   return 'application/octet-stream';
 }
 function ext(m) { return m === 'image/webp' ? 'webp' : m === 'image/png' ? 'png' : m === 'image/jpeg' ? 'jpg' : 'bin'; }
+function safe(s) { return String(s).replace(/[^A-Za-z0-9._-]+/g,'_').slice(0,120); }
 
 const report = {
-  schema: 'rlf-v625b-exact-vestiaire-recovery-v1',
+  schema: 'rlf-v625-exact-etsy-recovery-v1',
   policy: 'APPEND_ONLY_FAIL_CLOSED',
   generatedAt: new Date().toISOString(),
-  target,
-  attempts: [],
-  preserved: [],
+  targets: [],
   exactIdentityVerified: false,
   canonicalPromotion: false,
 };
 const seen = new Set();
 
-function preserve(b, label, provenance) {
-  const mime = magicMime(b);
-  const hash = sha256(b);
-  const binaryPass = /^image\/(jpeg|png|webp)$/.test(mime) && b.length >= 1024;
-  const row = { label, ...provenance, bytes: b.length, sha256: hash, magicMime: mime, binaryPass };
+function preserve(target, buffer, provenance) {
+  const mime = magicMime(buffer);
+  const hash = sha256(buffer);
+  const binaryPass = /^image\/(jpeg|png|webp)$/.test(mime) && buffer.length >= 2048;
+  const row = { targetId: target.id, listingId: target.listingId, expected: target.expected, ...provenance, bytes: buffer.length, sha256: hash, magicMime: mime, binaryPass };
   if (binaryPass && !seen.has(hash)) {
     seen.add(hash);
-    const file = `${target.id}_${target.code.replace(/[^A-Za-z0-9]+/g, '_')}_${label}.${ext(mime)}`;
-    fs.writeFileSync(path.join(outDir, file), b);
+    const n = String(report.targets.flatMap((x) => x.preserved || []).filter((x) => x.targetId === target.id).length + 1).padStart(2,'0');
+    const file = `${target.id}_${target.listingId}_candidate_${n}.${ext(mime)}`;
+    fs.writeFileSync(path.join(outDir,file),buffer);
     row.file = file;
     row.admission = 'CANDIDATE_ONLY_MANUAL_VISUAL_GATE';
-    report.preserved.push(row);
   } else {
     row.admission = binaryPass ? 'DUPLICATE_SHA' : 'REJECT_BINARY_GATE';
   }
-  report.attempts.push(row);
   return row;
 }
 
-async function fetchCandidate(request, url, label, provenance = {}) {
+async function fetchImage(context, target, url, provenance) {
   if (!url || !/^https?:\/\//i.test(url)) return null;
   try {
-    const response = await request.get(url, {
-      timeout: 45000,
-      failOnStatusCode: false,
-      headers: {
-        Referer: provenance.referer || target.sourcePage,
-        Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
-      },
-    });
-    const body = await response.body();
-    return preserve(body, label, {
-      ...provenance,
-      url,
-      status: response.status(),
-      headerContentType: response.headers()['content-type'] || '',
-    });
+    const response = await context.request.get(url, { timeout: 90000, failOnStatusCode: false, headers: { Referer: target.page, Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' } });
+    return preserve(target, await response.body(), { ...provenance, url, status: response.status(), headerContentType: response.headers()['content-type'] || '' });
   } catch (error) {
-    report.attempts.push({ label, ...provenance, url, error: String(error), admission: 'REQUEST_ERROR' });
-    return null;
+    return { targetId: target.id, ...provenance, url, error: String(error), admission: 'REQUEST_ERROR' };
   }
 }
 
-async function directAndSource(context) {
-  await fetchCandidate(context.request, target.directImage, 'vestiaire_direct', { mode: 'direct', referer: target.sourcePage });
+async function inspectTarget(context, target) {
+  const result = { ...target, source: null, attempts: [], preserved: [] };
   const page = await context.newPage();
   try {
-    const nav = await page.goto(target.sourcePage, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await sleep(12000);
-    await page.screenshot({ path: path.join(diagDir, 'vestiaire_source_full.png'), fullPage: true });
-    const data = await page.evaluate(() => ({
-      title: document.title,
-      url: location.href,
-      bodyText: (document.body?.innerText || '').slice(0, 20000),
-      ogImage: document.querySelector('meta[property="og:image"]')?.content || '',
-      images: [...document.images].map((img, index) => ({
-        index,
-        src: img.currentSrc || img.src || '',
-        srcset: img.srcset || '',
-        alt: img.alt || '',
-        width: img.naturalWidth,
-        height: img.naturalHeight,
-      })),
-    })).catch((error) => ({ error: String(error) }));
-    fs.writeFileSync(path.join(diagDir, 'vestiaire_source.json'), JSON.stringify({ status: nav?.status(), ...data }, null, 2));
-    if (data.ogImage) await fetchCandidate(context.request, data.ogImage, 'vestiaire_og', { mode: 'source_og' });
-    for (const image of (data.images || []).filter((x) => String(x.src + x.srcset).includes(target.listingId)).slice(0, 12)) {
-      if (image.src) await fetchCandidate(context.request, image.src, `vestiaire_dom_${String(image.index).padStart(2, '0')}`, { mode: 'source_dom', alt: image.alt });
+    const nav = await page.goto(target.page, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await sleep(14000);
+    await page.waitForLoadState('networkidle', { timeout: 25000 }).catch(() => {});
+    const data = await page.evaluate(() => {
+      const meta = (s,a='content') => document.querySelector(s)?.getAttribute(a) || '';
+      return {
+        title: document.title,
+        finalUrl: location.href,
+        canonical: meta('link[rel="canonical"]','href'),
+        ogImage: meta('meta[property="og:image"]'),
+        ogDescription: meta('meta[property="og:description"]'),
+        bodyText: (document.body?.innerText || '').slice(0,50000),
+        images: [...document.images].map((img,index) => ({ index, src: img.currentSrc || img.src || '', srcset: img.srcset || '', alt: img.alt || '', width: img.naturalWidth || 0, height: img.naturalHeight || 0 })),
+      };
+    }).catch((error) => ({ error: String(error), images: [] }));
+    result.source = { status: nav ? nav.status() : null, ...data };
+    fs.writeFileSync(path.join(diagDir,`${target.id}_source.json`),JSON.stringify(result.source,null,2));
+    fs.writeFileSync(path.join(diagDir,`${target.id}_source_body.txt`),data.bodyText || '');
+    await page.screenshot({ path: path.join(diagDir,`${target.id}_source_full.png`), fullPage: true });
+
+    const urls = new Set();
+    if (data.ogImage) urls.add(data.ogImage);
+    for (const image of data.images || []) {
+      const contextText = `${image.src} ${image.srcset} ${image.alt}`.toLowerCase();
+      if (image.width >= 250 && image.height >= 250 && (/etsystatic|etsy/.test(contextText))) {
+        if (image.src) urls.add(image.src);
+        for (const part of String(image.srcset || '').split(',')) {
+          const u = part.trim().split(/\s+/)[0]; if (u) urls.add(u);
+        }
+      }
+      if (urls.size >= 30) break;
+    }
+    let n = 0;
+    for (const url of urls) {
+      n += 1;
+      const row = await fetchImage(context,target,url,{mode:'etsy_source_image',ordinal:n});
+      result.attempts.push(row);
+      if (row?.file) result.preserved.push(row);
     }
   } catch (error) {
-    report.attempts.push({ label: 'vestiaire_source', error: String(error), admission: 'PAGE_ERROR' });
+    result.source = { ...(result.source || {}), error: String(error) };
   } finally {
     await page.close();
   }
-}
 
-async function exactBing(context, query, queryIndex) {
-  const page = await context.newPage();
+  const bing = await context.newPage();
   try {
-    const url = `https://www.bing.com/images/search?q=${encodeURIComponent(query)}`;
-    const nav = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await sleep(10000);
-    await page.screenshot({ path: path.join(diagDir, `bing_${queryIndex}_full.png`), fullPage: true });
-    const tiles = await page.locator('a.iusc').evaluateAll((nodes) => nodes.map((node, index) => {
-      let metadata = {};
-      try { metadata = JSON.parse(node.getAttribute('m') || '{}'); } catch (_) {}
-      const image = node.querySelector('img.mimg');
-      return {
-        index,
-        metadata,
-        thumbSrc: image?.currentSrc || image?.src || '',
-        thumbAlt: image?.alt || '',
-        width: image?.naturalWidth || 0,
-        height: image?.naturalHeight || 0,
-      };
-    })).catch(() => []);
-    fs.writeFileSync(path.join(diagDir, `bing_${queryIndex}_tiles.json`), JSON.stringify({ status: nav?.status(), query, tiles }, null, 2));
-
+    const qurl = `https://www.bing.com/images/search?q=${encodeURIComponent(target.query)}`;
+    const nav = await bing.goto(qurl,{waitUntil:'domcontentloaded',timeout:120000});
+    await sleep(9000);
+    await bing.screenshot({path:path.join(diagDir,`${target.id}_bing_full.png`),fullPage:true});
+    const tiles = await bing.locator('a.iusc').evaluateAll((nodes) => nodes.map((node,index) => {
+      let m={}; try{m=JSON.parse(node.getAttribute('m')||'{}')}catch(_){}
+      const img=node.querySelector('img.mimg');
+      return {index,metadata:m,thumbSrc:img?.currentSrc||img?.src||'',thumbAlt:img?.alt||''};
+    })).catch(()=>[]);
+    fs.writeFileSync(path.join(diagDir,`${target.id}_bing_tiles.json`),JSON.stringify({status:nav?.status(),query:target.query,tiles},null,2));
     const exact = tiles.filter((tile) => {
       const text = JSON.stringify(tile).toLowerCase();
-      return text.includes(target.listingId) || text.includes('burgundy-cotton-fred-perry-jacket-29492494-7_1');
-    });
-    report.attempts.push({ label: `bing_${queryIndex}_exact_matches`, query, matches: exact.length, admission: exact.length ? 'MATCHES_FOUND' : 'NO_MATCH' });
-
-    let matchOrdinal = 0;
+      return text.includes(target.listingId) || text.includes(target.page.toLowerCase()) || (target.id === 'CAND-051' && text.includes('vintage 80s fred perry shirt sleeveless women tennis made japan size medium'));
+    }).slice(0,20);
+    let n=0;
     for (const tile of exact) {
-      matchOrdinal += 1;
-      const locator = page.locator('a.iusc').nth(tile.index).locator('img.mimg').first();
-      if (await locator.isVisible().catch(() => false)) {
-        const temp = path.join(diagDir, `bing_${queryIndex}_match_${matchOrdinal}_rendered.png`);
-        await locator.screenshot({ path: temp, timeout: 30000 });
-        preserve(fs.readFileSync(temp), `bing_${queryIndex}_match_${matchOrdinal}_rendered`, {
-          mode: 'rendered_search_element', query, sourcePage: tile.metadata?.purl || '', originalUrl: tile.metadata?.murl || '',
-        });
-      }
-      const urls = [
-        ['murl', tile.metadata?.murl],
-        ['turl', tile.metadata?.turl],
-        ['thumb', tile.thumbSrc],
-      ];
-      for (const [kind, candidateUrl] of urls) {
-        if (candidateUrl) await fetchCandidate(context.request, candidateUrl, `bing_${queryIndex}_match_${matchOrdinal}_${kind}`, {
-          mode: `bing_${kind}`,
-          query,
-          sourcePage: tile.metadata?.purl || '',
-          title: tile.metadata?.t || '',
-          referer: url,
-        });
+      n+=1;
+      for (const [kind,url] of [['murl',tile.metadata?.murl],['turl',tile.metadata?.turl],['thumb',tile.thumbSrc]]) {
+        if (!url) continue;
+        const row=await fetchImage(context,target,url,{mode:`bing_${kind}`,ordinal:n,sourcePage:tile.metadata?.purl||'',title:tile.metadata?.t||''});
+        result.attempts.push(row); if(row?.file) result.preserved.push(row);
       }
     }
+    result.bingExactMatches = exact.length;
   } catch (error) {
-    report.attempts.push({ label: `bing_${queryIndex}`, query, error: String(error), admission: 'PAGE_ERROR' });
+    result.bingError = String(error);
   } finally {
-    await page.close();
+    await bing.close();
   }
+  return result;
 }
 
-async function main() {
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    locale: 'en-US',
-    viewport: { width: 1440, height: 1200 },
-    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36',
-  });
-
-  await directAndSource(context);
-  for (let i = 0; i < target.queries.length; i += 1) await exactBing(context, target.queries[i], i + 1);
+async function main(){
+  const browser=await chromium.launch({headless:true});
+  const context=await browser.newContext({locale:'en-US',viewport:{width:1440,height:1400},userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36'});
+  for(const target of targets) report.targets.push(await inspectTarget(context,target));
   await browser.close();
-
-  report.nextGate = 'Manually verify that a preserved image visibly contains FRED PERRY, MADE IN VIETNAM and exact code J1518/A25/01975/336; then run global SHA and perceptual deduplication.';
-  fs.writeFileSync(path.join(diagDir, 'rlf-v625b-exact-vestiaire-report.json'), JSON.stringify(report, null, 2));
-  fs.writeFileSync(path.join(diagDir, 'RLF_V625B_SHA256SUMS.txt'), report.preserved.map((x) => `${x.sha256}  ${x.file}`).join('\n') + '\n');
-  console.log(JSON.stringify({ preserved: report.preserved.length, files: report.preserved, canonicalPromotion: false }, null, 2));
+  const files=fs.readdirSync(outDir).sort().map((file)=>{const b=fs.readFileSync(path.join(outDir,file));return{file,bytes:b.length,sha256:sha256(b),magicMime:magicMime(b)}});
+  report.preservedFiles=files;
+  report.nextGate='Manual visual QA must prove exact same-piece identity and physical sewn-label text; no source title alone is promotable.';
+  fs.writeFileSync(path.join(diagDir,'rlf-v625-exact-etsy-report.json'),JSON.stringify(report,null,2));
+  fs.writeFileSync(path.join(diagDir,'RLF_V625_ETSY_SHA256SUMS.txt'),files.map((x)=>`${x.sha256}  ${x.file}`).join('\n')+'\n');
+  console.log(JSON.stringify({files:files.length,canonicalPromotion:false},null,2));
 }
-
-main().catch((error) => {
-  fs.writeFileSync(path.join(diagDir, 'fatal-error.txt'), String(error));
-  console.error(error);
-  process.exitCode = 1;
-});
+main().catch((error)=>{fs.writeFileSync(path.join(diagDir,'fatal-error.txt'),String(error));console.error(error);process.exitCode=1;});
