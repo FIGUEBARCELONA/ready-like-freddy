@@ -1,18 +1,18 @@
 {
   "schemaVersion": 2,
-  "indexedAt": "2026-08-24T21:57:50.294Z",
-  "sourceCommitSha": "9c8588bcbb652acb56d680730ed90d11f7c8d5ac",
+  "indexedAt": "2026-08-24T22:17:57.449Z",
+  "sourceCommitSha": "607e6838597f64bea50f08b9915a5ae9cf995c2b",
   "workflowName": "RLF 50-worker KB official discovery",
   "workflowId": 340557520,
-  "runId": "32782249638",
-  "runNumber": 62,
+  "runId": "32783967794",
+  "runNumber": 63,
   "runAttempt": 1,
   "event": "push",
-  "status": "queued",
+  "status": "in_progress",
   "conclusion": null,
-  "createdAt": "2026-08-24T21:57:45Z",
-  "updatedAt": "2026-08-24T21:57:45Z",
-  "htmlUrl": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32782249638",
+  "createdAt": "2026-08-24T22:17:51Z",
+  "updatedAt": "2026-08-24T22:17:55Z",
+  "htmlUrl": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32783967794",
   "headBranch": "feature/rlf-execution-backend-20260823",
-  "headSha": "9c8588bcbb652acb56d680730ed90d11f7c8d5ac"
+  "headSha": "607e6838597f64bea50f08b9915a5ae9cf995c2b"
 }
