@@ -46,10 +46,13 @@ function registration(text:string,country:CountryDetection):RegistrationMatch|nu
     {keyPrefix:'IT-PIVA',countryCode:'IT',regex:/\b(?:P\.?\s*IVA|PARTITA IVA)\s*[:#]?\s*(?:IT)?\s*(\d{11})\b/i,minDigits:11},
     {keyPrefix:'NL-KVK',countryCode:'NL',regex:/\bKVK\s*[:#]?\s*(\d{8})\b/i,minDigits:8},
     {keyPrefix:'SE-ORG',countryCode:'SE',regex:/\b(?:ORG\.?\s*NR|ORGANISATIONSNUMMER)\s*[:#]?\s*([0-9][0-9 -]{7,13})\b/i,minDigits:8},
-    {keyPrefix:'IE-CRO',countryCode:'IE',regex:/\b(?:COMPANY\s+(?:REGISTRATION\s+)?NUMBER|CRO\s+NUMBER)\s*[:#]?\s*(\d{5,8})\b/i,minDigits:5},
     {keyPrefix:'DE-REG',countryCode:'DE',regex:/\b(?:HRB|HRA|VR|PR|GNR)\s*[:#]?\s*([0-9][0-9 A-Z/-]{1,15})\b/i,minDigits:2},
   ];
   for(const item of patterns){const match=text.match(item.regex);if(!match?.[1])continue;const id=compact(match[1]);if(validRegistration(id,item.minDigits))return{keyPrefix:item.keyPrefix,id,countryCode:item.countryCode};}
+  if(country.code==='IE'){
+    const cro=text.match(/\b(?:COMPANY\s+(?:REGISTRATION\s+)?NUMBER|CRO\s+NUMBER)\s*[:#]?\s*(\d{5,8})\b/i);
+    if(cro?.[1]){const id=compact(cro[1]);if(validRegistration(id,5,8))return{keyPrefix:'IE-CRO',id,countryCode:'IE'};}
+  }
   if(country.code&&country.code!=='NON_EU'){
     const generic=text.match(/\b(?:COMPANY|REGISTRATION)\s+NUMBER\s*[:#]?\s*([A-Z]{0,3}[-\/]?\d[\dA-Z\/-]{3,15})\b/i);
     if(generic?.[1]){const id=compact(generic[1]);if(validRegistration(id,4,18))return{keyPrefix:`${country.code}-REG`,id,countryCode:country.code};}
