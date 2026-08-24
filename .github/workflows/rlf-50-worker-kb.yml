@@ -21,6 +21,7 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: write
 
 env:
@@ -78,10 +79,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: actions/download-artifact@v4
-        with:
-          name: rlf-official-queue
-          path: execution/queue
+      - name: Download official queue with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-official-queue \
+            --dest execution/queue
       - name: Capture category evidence and extract product links
         env:
           RLF_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.per_worker_limit || needs.prepare.outputs.discovery_limit }}
@@ -117,14 +122,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: actions/download-artifact@v4
-        with:
-          name: rlf-official-queue
-          path: execution/queue
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: rlf-discovery-worker-*
-          path: execution/downloaded-workers
+      - name: Download official queue with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-official-queue \
+            --dest execution/queue
+      - name: Download 50 discovery artifacts with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --pattern 'rlf-discovery-worker-*' \
+            --dest execution/downloaded-workers
       - id: frontier
         name: Consolidate 50 discovery outputs
         shell: bash
@@ -188,10 +201,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: actions/download-artifact@v4
-        with:
-          name: rlf-product-frontier
-          path: execution/product-frontier
+      - name: Download product frontier with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-product-frontier \
+            --dest execution/product-frontier
       - name: Capture individual official product identity
         env:
           RLF_PRODUCT_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.product_per_worker_limit || '1' }}
@@ -223,14 +240,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: actions/download-artifact@v4
-        with:
-          name: rlf-product-frontier
-          path: execution/product-frontier
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: rlf-product-worker-*
-          path: execution/downloaded-product-workers
+      - name: Download product frontier with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-product-frontier \
+            --dest execution/product-frontier
+      - name: Download 50 product artifacts with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --pattern 'rlf-product-worker-*' \
+            --dest execution/downloaded-product-workers
       - name: Consolidate 50 product worker outputs
         run: |
           node scripts/execution/consolidate-product-results.mjs \
