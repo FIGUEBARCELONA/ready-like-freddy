@@ -92,6 +92,40 @@ function collectProductImages(content, productCode, colourCode) {
     }));
 }
 
+function collectCategoryEvidenceImages(candidate, productCode, colourCode) {
+  const evidence = candidate.categoryImageEvidence ?? null;
+  const references = evidence?.imageReferences ?? [];
+  const codePattern = productCode ? productCode.replaceAll("-", "[-_]") : null;
+  const identityPattern =
+    codePattern && colourCode
+      ? new RegExp(`${codePattern}[-_]${colourCode}(?:[-_.]|$)`, "i")
+      : null;
+  return references
+    .filter(reference => reference?.sourceUrl)
+    .filter(reference => isOfficialProductMedia(reference.sourceUrl, allowedHosts))
+    .filter(reference =>
+      !identityPattern ||
+      identityPattern.test(decodeURIComponent(new URL(reference.sourceUrl).pathname)),
+    )
+    .map(reference => ({
+      ...reference,
+      evidenceSource: "OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE",
+      evidenceSourcePageUrl: evidence.sourcePageUrl,
+      evidenceSourcePageSha256: evidence.sourcePageSha256,
+      evidenceArtifact: evidence.sourceArtifact,
+    }));
+}
+
+function mergeImageReferences(...groups) {
+  const byUrl = new Map();
+  for (const reference of groups.flat()) {
+    if (!reference?.sourceUrl) continue;
+    const existing = byUrl.get(reference.sourceUrl);
+    byUrl.set(reference.sourceUrl, existing ? { ...existing, ...reference } : reference);
+  }
+  return [...byUrl.values()];
+}
+
 function isSoft404(fields, content) {
   const title = String(fields?.title ?? "").toLowerCase();
   const head = content.slice(0, 5_000).toLowerCase();
@@ -151,9 +185,25 @@ async function fetchIdentityCandidate(candidate) {
       const fields = extractProductPageFields(content, productUrl, isHtml);
       const productCode = fields.productCode ?? candidate.productCode;
       const colourCode = fields.colourCode ?? candidate.colourCode;
-      const imageReferences = response.ok
+      const pageImageReferences = response.ok
         ? collectProductImages(content, productCode, colourCode)
         : [];
+      const categoryEvidenceImageReferences =
+        response.ok && !isSoft404(fields, content)
+          ? collectCategoryEvidenceImages(candidate, productCode, colourCode)
+          : [];
+      const imageReferences = mergeImageReferences(
+        pageImageReferences,
+        categoryEvidenceImageReferences,
+      );
+      const imageEvidenceSources = [
+        ...(pageImageReferences.length
+          ? ["OFFICIAL_PRODUCT_PAGE_MEDIA_CAPTURE"]
+          : []),
+        ...(categoryEvidenceImageReferences.length
+          ? ["OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"]
+          : []),
+      ];
       const reasons = validationReasons(
         response,
         fields,
@@ -181,6 +231,7 @@ async function fetchIdentityCandidate(candidate) {
         productCode,
         colourCode,
         imageReferences,
+        imageEvidenceSources,
         validationReasons: reasons,
       };
       if (!best || candidateScore(current) > candidateScore(best)) best = current;
@@ -263,6 +314,8 @@ for (const candidate of assignment.products.slice(0, limit)) {
       originEvidenceStatus:
         fields.originEvidenceStatus ?? "NO_MANUFACTURING_CLAIM_CAPTURED",
       imageReferences: result.imageReferences ?? [],
+      imageEvidenceSources: result.imageEvidenceSources ?? [],
+      categoryImageEvidence: candidate.categoryImageEvidence ?? null,
       sourceTransport: fetched?.sourceTransport ?? null,
       sourceFetchUrl: fetched?.sourceFetchUrl ?? null,
       transportAttempts: fetched?.transportAttempts ?? [],
