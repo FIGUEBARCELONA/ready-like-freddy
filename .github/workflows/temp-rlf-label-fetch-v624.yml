@@ -1,0 +1,115 @@
+name: TEMP RLF label fetch v6.24
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Recover blocked exact label binaries fail-closed
+        shell: bash
+        run: |
+          set -u
+          mkdir -p evidence/original evidence/reports evidence/rejected
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
+
+          fetch_one() {
+            key="$1"; url="$2"; referer="$3"; route="$4"
+            tmp="evidence/rejected/${key}.${route}.payload"
+            set +e
+            meta=$(curl --location --retry 3 --retry-all-errors \
+              --connect-timeout 25 --max-time 210 --user-agent "$UA" \
+              --referer "$referer" \
+              --header 'Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8' \
+              "$url" --output "$tmp" \
+              --write-out '%{http_code}|%{url_effective}|%{content_type}|%{size_download}')
+            rc=$?
+            set -e
+            mime=$(file -b --mime-type "$tmp" 2>/dev/null || true)
+            size=$(stat -c%s "$tmp" 2>/dev/null || echo 0)
+            printf '%s|route=%s|curl_rc=%s|mime=%s|bytes=%s\n' "$meta" "$route" "$rc" "$mime" "$size" >> "evidence/reports/${key}.attempts"
+            if [ "$rc" -eq 0 ] && [ "$size" -ge 1024 ]; then
+              case "$mime" in
+                image/jpeg|image/png|image/webp)
+                  if [ ! -f "evidence/original/${key}" ]; then
+                    mv "$tmp" "evidence/original/${key}"
+                    printf '%s\n' "$route" > "evidence/reports/${key}.accepted_route"
+                  else
+                    rm -f "$tmp"
+                  fi
+                  ;;
+                *) ;;
+              esac
+            fi
+          }
+
+          recover() {
+            key="$1"; referer="$2"; shift 2
+            route=0
+            for url in "$@"; do
+              route=$((route+1))
+              fetch_one "$key" "$url" "$referer" "$route"
+              if [ -f "evidence/original/${key}" ]; then break; fi
+            done
+          }
+
+          set -e
+          recover 'RLF-EXT-020_J1518_Vietnam.jpg' \
+            'https://us.vestiairecollective.com/men-clothing/jackets/fred-perry/burgundy-cotton-fred-perry-jacket-29492494.shtml' \
+            'https://images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg' \
+            'https://images.vestiairecollective.com/images/resized/w=1246,q=75,f=auto,/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg' \
+            'https://images.weserv.nl/?url=images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg'
+
+          recover 'RLF-EXT-026_M12_1576_England.jpg' \
+            'https://us.vestiairecollective.com/men-clothing/polo-shirts/fred-perry/black-cotton-fred-perry-polo-shirt-43131917.shtml' \
+            'https://images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/black-cotton-fred-perry-polo-shirt-43131917-3_2.jpg' \
+            'https://images.vestiairecollective.com/images/resized/w=1246,q=75,f=auto,/produit/black-cotton-fred-perry-polo-shirt-43131917-3_2.jpg' \
+            'https://images.weserv.nl/?url=images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/black-cotton-fred-perry-polo-shirt-43131917-3_2.jpg'
+
+          recover 'RLF-EXT-021_J6319_Portugal.jpg' \
+            'https://gem.app/product/fred-perry-fred-ferry-vintage-made-in' \
+            'https://img.gem.app/449928663/5f/1695627431/fred-perry-fred-ferry-vintage-made-in-portugal.jpg' \
+            'https://images.weserv.nl/?url=img.gem.app/449928663/5f/1695627431/fred-perry-fred-ferry-vintage-made-in-portugal.jpg'
+
+          recover 'RLF-EXT-022_J6327_Portugal.jpg' \
+            'https://gem.app/product/fred-perry-fred-perry-laurel-wreath-track' \
+            'https://img.gem.app/317472623/7f/1658213994/fred-perry-fred-perry-laurel-wreath-track-jacket.jpg' \
+            'https://images.weserv.nl/?url=img.gem.app/317472623/7f/1658213994/fred-perry-fred-perry-laurel-wreath-track-jacket.jpg'
+
+          cat > evidence/reports/routes.csv <<'CSV'
+record_id,model_code,source_page,expected_physical_fields
+RLF-EXT-020,J1518/A25/01975/336,https://us.vestiairecollective.com/men-clothing/jackets/fred-perry/burgundy-cotton-fred-perry-jacket-29492494.shtml,MADE IN VIETNAM / J1518/A25/01975/336 / Fred Perry Ltd / 14 James St / Covent Garden / London / WC2E 8BU
+RLF-EXT-021,J6319/170/2990/154,https://gem.app/product/fred-perry-fred-ferry-vintage-made-in,MADE IN PORTUGAL / STYLE J6319/170/2990/154 / 50% COTTON / 50% POLYESTER
+RLF-EXT-022,J6327/330/2090/196,https://gem.app/product/fred-perry-fred-perry-laurel-wreath-track,MADE IN PORTUGAL / STYLE J6327/330/2090/196 / 50% COTTON / 50% POLYESTER
+RLF-EXT-026,M12/1576/35237,https://us.vestiairecollective.com/men-clothing/polo-shirts/fred-perry/black-cotton-fred-perry-polo-shirt-43131917.shtml,FRED PERRY / MADE IN ENGLAND / STYLE M12/1576/35237 / 100% COMBED COTTON
+CSV
+
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME.txt || true
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+          python - <<'PY'
+          import hashlib, json, pathlib
+          root=pathlib.Path('evidence')
+          files=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file() and p.name!='manifest.json':
+                  data=p.read_bytes()
+                  files.append({'path':p.as_posix(),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+          accepted=sorted(p.name for p in (root/'original').glob('*') if p.is_file())
+          rejected=sorted(p.name for p in (root/'rejected').glob('*') if p.is_file())
+          manifest={'schema':'rlf-v624-fetch-v1','policy':'APPEND_ONLY_FAIL_CLOSED','accepted_originals':accepted,'rejected_payloads':rejected,'files':files}
+          (root/'reports'/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
+          PY
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-label-evidence-v624
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
