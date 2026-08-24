@@ -1,4 +1,4 @@
-name: RLF source page rotation probe
+name: RLF sequence 11 run probe
 
 on:
   push:
@@ -20,24 +20,24 @@ jobs:
         with:
           ref: feature/rlf-execution-backend-20260823
           fetch-depth: 0
-      - name: Resolve corrected preflight run
+      - name: Resolve sequence 11 mass run
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_SHA: b88dde9df56036ac7ff1b48c595346edd5cd712e
+          TARGET_SHA: 65f70f1448470a1ccdc680f9df5083444999b76e
         shell: bash
         run: |
           set -euo pipefail
           gh api /repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}\&event=push\&per_page=50 > /tmp/runs.json
           gh api /repos/${GITHUB_REPOSITORY}/commits/${TARGET_SHA}/check-runs?per_page=100 > /tmp/checks.json
-          jq -n --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg targetSha "$TARGET_SHA" --slurpfile runs /tmp/runs.json --slurpfile checks /tmp/checks.json '{schemaVersion:1,capturedAt:$capturedAt,targetSha:$targetSha,matchingRuns:[$runs[0].workflow_runs[]|select(.name=="RLF source page rotation validation")|{id,run_number,run_attempt,status,conclusion,head_sha,created_at,updated_at,html_url}],checkRuns:[$checks[0].check_runs[]|{id,name,status,conclusion,started_at,completed_at,details_url}]}' > data/execution/source-page-rotation-run-probe.json
+          jq -n --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg targetSha "$TARGET_SHA" --slurpfile runs /tmp/runs.json --slurpfile checks /tmp/checks.json '{schemaVersion:1,capturedAt:$capturedAt,targetSha:$targetSha,matchingRuns:[$runs[0].workflow_runs[]|select(.name=="RLF 50-worker KB official discovery")|{id,run_number,run_attempt,status,conclusion,head_sha,created_at,updated_at,html_url,jobs_url,artifacts_url}],checkRuns:[$checks[0].check_runs[]|{id,name,status,conclusion,started_at,completed_at,details_url}]}' > data/execution/sequence11-run-probe.json
       - name: Publish probe
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/execution/source-page-rotation-run-probe.json
-          git commit -m 'Resolve corrected source page rotation preflight run'
+          git add data/execution/sequence11-run-probe.json
+          git commit -m 'Resolve sequence 11 workflow run'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
