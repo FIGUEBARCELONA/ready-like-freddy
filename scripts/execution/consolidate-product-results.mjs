@@ -11,8 +11,12 @@ const args = Object.fromEntries(
     return [key, rest.join("=") || "true"];
   }),
 );
-const inputRoot = resolve(args.input ?? "execution/downloaded-product-workers");
-const frontierPath = resolve(args.frontier ?? "execution/product-frontier/product-frontier.json");
+const inputRoot = resolve(
+  args.input ?? "execution/downloaded-product-workers",
+);
+const frontierPath = resolve(
+  args.frontier ?? "execution/product-frontier/product-frontier.json",
+);
 const outDir = resolve(args.out ?? "execution/products-consolidated");
 const frontier = await readJson(frontierPath);
 const allowedHosts = ["www.fredperry.com", "fredperry.com"];
@@ -27,6 +31,29 @@ async function walk(path) {
     else files.push(full);
   }
   return files;
+}
+
+function isSoft404Record(record) {
+  const title = String(record.displayName ?? "").toLowerCase();
+  return (
+    record.validationReasons?.includes("SOFT_404_RESPONSE") ||
+    /(?:^|\b)404(?:\b|$)/.test(title) ||
+    /\bnot found\b/.test(title)
+  );
+}
+
+function strictFailureReasons(record) {
+  const reasons = new Set(record.validationReasons ?? []);
+  if (!record.fetchOk) reasons.add("IDENTITY_CAPTURE_NOT_VALID");
+  if (isSoft404Record(record)) reasons.add("SOFT_404_RESPONSE");
+  if (!(record.imageReferences?.length > 0)) {
+    reasons.add("NO_MATCHING_OFFICIAL_PRODUCT_IMAGE");
+  }
+  return [...reasons];
+}
+
+function strictCaptureValid(record) {
+  return strictFailureReasons(record).length === 0;
 }
 
 const files = await walk(inputRoot);
@@ -49,8 +76,13 @@ if (summaries.some(summary => summary.frontierSha256 !== frontier.frontierSha256
 }
 
 const records = [];
-for (const path of files.filter(path => basename(path) === "product-records.ndjson")) {
-  const reader = createInterface({ input: createReadStream(path), crlfDelay: Infinity });
+for (const path of files.filter(
+  path => basename(path) === "product-records.ndjson",
+)) {
+  const reader = createInterface({
+    input: createReadStream(path),
+    crlfDelay: Infinity,
+  });
   for await (const line of reader) {
     if (!line.trim()) continue;
     const record = JSON.parse(line);
@@ -63,7 +95,8 @@ for (const path of files.filter(path => basename(path) === "product-records.ndjs
 
 const byIdentity = new Map();
 for (const record of records) {
-  const identityKey = record.identityKey ?? `${record.productCode}|${record.colourCode}`;
+  const identityKey =
+    record.identityKey ?? `${record.productCode}|${record.colourCode}`;
   const group = byIdentity.get(identityKey) ?? [];
   group.push({ ...record, identityKey });
   byIdentity.set(identityKey, group);
@@ -72,19 +105,28 @@ for (const record of records) {
 const identityRecords = [...byIdentity.entries()]
   .map(([identityKey, group]) => {
     const preferred = [...group].sort((a, b) => {
-      const fetchDelta = Number(Boolean(b.fetchOk)) - Number(Boolean(a.fetchOk));
-      if (fetchDelta) return fetchDelta;
-      const imageDelta = (b.imageReferences?.length ?? 0) - (a.imageReferences?.length ?? 0);
+      const strictDelta =
+        Number(strictCaptureValid(b)) - Number(strictCaptureValid(a));
+      if (strictDelta) return strictDelta;
+      const imageDelta =
+        (b.imageReferences?.length ?? 0) -
+        (a.imageReferences?.length ?? 0);
       if (imageDelta) return imageDelta;
       return (b.sourceBytes ?? 0) - (a.sourceBytes ?? 0);
     })[0];
     return {
       ...preferred,
       identityKey,
+      strictCaptureValid: strictCaptureValid(preferred),
+      strictFailureReasons: strictFailureReasons(preferred),
       duplicateIdentityCaptureCount: group.length,
-      attemptedUrls: [...new Set(group.flatMap(record =>
-        (record.aliasAttempts ?? []).map(attempt => attempt.productUrl),
-      ))],
+      attemptedUrls: [
+        ...new Set(
+          group.flatMap(record =>
+            (record.aliasAttempts ?? []).map(attempt => attempt.productUrl),
+          ),
+        ),
+      ],
     };
   })
   .sort((a, b) => a.identityKey.localeCompare(b.identityKey));
@@ -108,68 +150,98 @@ if (invalidImages.length) {
   );
 }
 
-const expectedProductCaptureCount = Number(frontier.expectedProductCaptureCount ?? 0);
-const successfulIdentityRecords = identityRecords.filter(record => record.fetchOk);
-const failedIdentityRecords = identityRecords.filter(record => !record.fetchOk);
+const expectedProductCaptureCount = Number(
+  frontier.expectedProductCaptureCount ?? 0,
+);
+const successfulIdentityRecords = identityRecords.filter(
+  record => record.strictCaptureValid,
+);
+const failedIdentityRecords = identityRecords.filter(
+  record => !record.strictCaptureValid,
+);
+const acceptedImages = successfulIdentityRecords.flatMap(
+  record => record.imageReferences ?? [],
+);
 const totals = {
   frontierProductUrlCount: frontier.uniqueProductUrlCount,
   frontierProductIdentityCount: frontier.uniqueProductIdentityCount,
-  previouslyCompletedIdentityCount: frontier.previouslyCompletedIdentityCount ?? 0,
-  selectedIdentityCount: frontier.selectedIdentityCount ?? expectedProductCaptureCount,
+  previouslyCompletedIdentityCount:
+    frontier.previouslyCompletedIdentityCount ?? 0,
+  selectedIdentityCount:
+    frontier.selectedIdentityCount ?? expectedProductCaptureCount,
   expectedProductCaptureCount,
   attemptedProductCount: records.length,
   attemptedIdentityCount: identityRecords.length,
+  httpFetchSuccessCount: records.filter(
+    record => record.httpFetchOk ?? record.transportHttpStatus === 200,
+  ).length,
   successfulProductFetchCount: records.filter(record => record.fetchOk).length,
   failedProductFetchCount: records.filter(record => !record.fetchOk).length,
   successfulIdentityCaptureCount: successfulIdentityRecords.length,
   failedIdentityCaptureCount: failedIdentityRecords.length,
+  soft404IdentityCount: identityRecords.filter(isSoft404Record).length,
+  missingImageIdentityCount: identityRecords.filter(
+    record => !(record.imageReferences?.length > 0),
+  ).length,
   aliasFallbackSuccessCount: identityRecords.filter(
-    record => record.fetchOk && record.aliasFallbackUsed,
+    record => record.strictCaptureValid && record.aliasFallbackUsed,
   ).length,
   directSourceCount: records.filter(
-    record => record.sourceTransport === "DIRECT_OFFICIAL_HTTP" && record.fetchOk,
+    record =>
+      record.sourceTransport === "DIRECT_OFFICIAL_HTTP" &&
+      strictCaptureValid(record),
   ).length,
   transformedReaderSourceCount: records.filter(
     record =>
-      record.sourceTransport === "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE" &&
-      record.fetchOk,
+      record.sourceTransport ===
+        "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE" &&
+      strictCaptureValid(record),
   ).length,
   imageReferenceCount: imageManifest.length,
-  officialProductImageReferenceCount: imageManifest.length,
+  officialProductImageReferenceCount: acceptedImages.length,
   rejectedImageReferenceCount: invalidImages.length,
-  materialEvidenceCount: records.reduce(
+  descriptionEvidenceCount: successfulIdentityRecords.filter(
+    record => Boolean(record.description),
+  ).length,
+  verifiedPriceCount: successfulIdentityRecords.filter(
+    record => Boolean(record.observedPrice),
+  ).length,
+  materialEvidenceCount: successfulIdentityRecords.reduce(
     (sum, record) => sum + (record.materialSnippets?.length ?? 0),
     0,
   ),
-  manufacturingClaimCount: records.reduce(
+  materialMissingIdentityCount: successfulIdentityRecords.filter(
+    record => !(record.materialSnippets?.length > 0),
+  ).length,
+  manufacturingClaimCount: successfulIdentityRecords.reduce(
     (sum, record) => sum + (record.originSnippets?.length ?? 0),
     0,
   ),
-  factoryVerifiedCount: records.filter(record => record.factoryStatus === "VERIFIED").length,
+  factoryVerifiedCount: 0,
 };
 const qualityGatePassed =
   summaries.length === 50 &&
   totals.attemptedIdentityCount === expectedProductCaptureCount &&
   totals.successfulIdentityCaptureCount === expectedProductCaptureCount &&
   totals.failedIdentityCaptureCount === 0 &&
+  totals.soft404IdentityCount === 0 &&
+  totals.missingImageIdentityCount === 0 &&
   invalidImages.length === 0;
 
 const progressDelta = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   runId: process.env.GITHUB_RUN_ID ?? args.runId ?? "LOCAL",
   frontierId: frontier.frontierId,
   frontierSha256: frontier.frontierSha256,
   selectedIdentitySha256: frontier.selectedIdentitySha256 ?? null,
-  successfulIdentities: successfulIdentityRecords.map(record => ({
-    identityKey: record.identityKey,
-    productCode: record.productCode,
-    colourCode: record.colourCode,
-    preferredProductUrl: record.productUrl,
-    aliasUrls: record.aliasUrls ?? [record.productUrl],
-    sourceSha256: record.sourceSha256,
-    imageReferenceCount: record.imageReferences?.length ?? 0,
-    observedAt: record.observedAt,
-  })),
+  completedIdentityKeys: successfulIdentityRecords.map(
+    record => record.identityKey,
+  ),
+  capturedProductUrlCount: new Set(
+    successfulIdentityRecords.flatMap(
+      record => record.aliasUrls ?? [record.productUrl],
+    ),
+  ).size,
   failedIdentities: failedIdentityRecords.map(record => ({
     identityKey: record.identityKey,
     productCode: record.productCode,
@@ -178,22 +250,35 @@ const progressDelta = {
     aliasUrls: record.aliasUrls ?? [record.productUrl],
     transportHttpStatus: record.transportHttpStatus ?? null,
     sourceTransport: record.sourceTransport ?? null,
+    failureReasons: record.strictFailureReasons,
     fallbackError: record.fallbackError ?? record.error ?? null,
   })),
   counters: {
     successfulIdentityCaptureCount: successfulIdentityRecords.length,
     failedIdentityCaptureCount: failedIdentityRecords.length,
-    officialProductImageReferenceCount: imageManifest.length,
+    officialProductImageReferenceCount: acceptedImages.length,
     materialEvidenceCount: totals.materialEvidenceCount,
     manufacturingClaimCount: totals.manufacturingClaimCount,
     factoryVerifiedCount: 0,
   },
+  metadataGaps: {
+    descriptionMissingIdentityCount:
+      successfulIdentityRecords.length - totals.descriptionEvidenceCount,
+    priceMissingIdentityCount:
+      successfulIdentityRecords.length - totals.verifiedPriceCount,
+    materialMissingIdentityCount: totals.materialMissingIdentityCount,
+  },
   qualityGatePassed,
+  status: qualityGatePassed
+    ? "FULL_STRICT_IDENTITY_BATCH_ACCEPTED_NOT_GLOBAL_CANONICAL"
+    : "PARTIAL_STRICT_IDENTITY_BATCH_REQUIRES_RETRY_NOT_GLOBAL_CANONICAL",
 };
-progressDelta.deltaSha256 = sha256(Buffer.from(JSON.stringify(progressDelta)));
+progressDelta.deltaSha256 = sha256(
+  Buffer.from(JSON.stringify(progressDelta)),
+);
 
 const manifest = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   runId: process.env.GITHUB_RUN_ID ?? args.runId ?? "LOCAL",
   runAttempt: process.env.GITHUB_RUN_ATTEMPT ?? "1",
   repository: process.env.GITHUB_REPOSITORY ?? null,
@@ -207,12 +292,18 @@ const manifest = {
       ? "USABLE_PRODUCT_SOURCES_CAPTURED"
       : "NO_USABLE_PRODUCT_SOURCES",
   contaminationStatus:
-    invalidImages.length === 0 ? "OFFICIAL_PRODUCT_MEDIA_ONLY" : "CONTAMINATION_DETECTED",
+    invalidImages.length === 0
+      ? "OFFICIAL_PRODUCT_MEDIA_ONLY"
+      : "CONTAMINATION_DETECTED",
   qualityGatePassed,
   totals,
-  productStatus: "CODE_COLOUR_IDENTITY_EVIDENCE_NOT_GLOBAL_CANONICAL_PRODUCTS",
+  productStatus:
+    "CODE_COLOUR_IDENTITY_WITH_IMAGE_EVIDENCE_NOT_GLOBAL_CANONICAL_PRODUCTS",
   factoryStatus: "TEXTUAL_CLAIMS_ONLY_NO_FACTORY_VERIFICATION",
-  imageStatus: "OFFICIAL_SOURCE_URLS_ONLY_RIGHTS_UNKNOWN_NOT_INGESTED",
+  imageStatus:
+    "OFFICIAL_SOURCE_URLS_ONLY_RIGHTS_UNKNOWN_NOT_INGESTED",
+  priceStatus:
+    "ONLY_DIRECT_OFFICIAL_PAGE_PRICE_CANDIDATES_RETAINED_REQUIRES_QA",
   progressDeltaSha256: progressDelta.deltaSha256,
   workerSummaries: summaries.sort((a, b) => a.slot.localeCompare(b.slot)),
   completedAt: new Date().toISOString(),
