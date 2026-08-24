@@ -13,27 +13,36 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Download fixed label evidence
+      - name: Download fixed label evidence best effort
         shell: bash
         run: |
-          set -euo pipefail
+          set -u
           mkdir -p evidence/original evidence/reports
           UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
           fetch() {
-            key="$1"; url="$2"
-            curl --fail --location --retry 3 --retry-all-errors \
+            key="$1"; url="$2"; referer="$3"
+            out="evidence/original/${key}.jpg"
+            set +e
+            meta=$(curl --location --retry 2 --retry-all-errors \
               --connect-timeout 20 --max-time 180 --user-agent "$UA" \
+              --referer "$referer" \
               --header 'Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8' \
-              "$url" --output "evidence/original/${key}.jpg" \
-              --write-out '%{http_code}|%{url_effective}|%{content_type}|%{size_download}\n' \
-              > "evidence/reports/${key}.meta"
+              "$url" --output "$out" \
+              --write-out '%{http_code}|%{url_effective}|%{content_type}|%{size_download}')
+            rc=$?
+            set -e
+            printf '%s|curl_rc=%s\n' "$meta" "$rc" > "evidence/reports/${key}.meta"
+            if [ "$rc" -ne 0 ] || [ ! -s "$out" ]; then rm -f "$out"; return 0; fi
+            mime=$(file -b --mime-type "$out" || true)
+            case "$mime" in image/*) ;; *) rm -f "$out" ;; esac
           }
-          fetch 'RLF-EXT-020_J1518_Vietnam' 'https://images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg'
-          fetch 'RLF-EXT-021_J6319_Portugal' 'https://img.gem.app/449928663/5f/1695627431/fred-perry-fred-ferry-vintage-made-in-portugal.jpg'
-          fetch 'RLF-EXT-022_J6327_Portugal' 'https://img.gem.app/317472623/7f/1658213994/fred-perry-fred-perry-laurel-wreath-track-jacket.jpg'
-          fetch 'RLF-EXT-023_SM2109F_Portugal' 'https://i.ebayimg.com/images/g/hmQAAOSwh3FlPcj1/s-l1600.jpg'
-          fetch 'RLF-EXT-024_J4237_Vietnam' 'https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0511/user/ed06c33691c923876f3f6be00479c1d6d4f64952cd37ce72f1380d107834ce7c/i-img1200x1200-17316525605967kjltp342454.jpg'
-          find evidence/original -type f -exec file {} \; > evidence/reports/MIME.txt
+          set -e
+          fetch 'RLF-EXT-020_J1518_Vietnam' 'https://images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg' 'https://us.vestiairecollective.com/men-clothing/jackets/fred-perry/burgundy-cotton-fred-perry-jacket-29492494.shtml'
+          fetch 'RLF-EXT-021_J6319_Portugal' 'https://img.gem.app/449928663/5f/1695627431/fred-perry-fred-ferry-vintage-made-in-portugal.jpg' 'https://gem.app/product/fred-perry-fred-ferry-vintage-made-in'
+          fetch 'RLF-EXT-022_J6327_Portugal' 'https://img.gem.app/317472623/7f/1658213994/fred-perry-fred-perry-laurel-wreath-track-jacket.jpg' 'https://gem.app/product/fred-perry-fred-perry-laurel-wreath-track'
+          fetch 'RLF-EXT-023_SM2109F_Portugal' 'https://i.ebayimg.com/images/g/hmQAAOSwh3FlPcj1/s-l1600.jpg' 'https://gem.app/product/fred-perry-x-raf-simmons-striped-button'
+          fetch 'RLF-EXT-024_J4237_Vietnam' 'https://auctions.c.yimg.jp/images.auctions.yahoo.co.jp/image/dr000/auc0511/user/ed06c33691c923876f3f6be00479c1d6d4f64952cd37ce72f1380d107834ce7c/i-img1200x1200-17316525605967kjltp342454.jpg' 'https://auctions.yahoo.co.jp/jp/auction/l1161285676'
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME.txt || true
           find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
           python - <<'PY'
           import hashlib, json, pathlib
@@ -43,7 +52,7 @@ jobs:
               if p.is_file() and p.name!='manifest.json':
                   data=p.read_bytes()
                   rows.append({'path':p.as_posix(),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
-          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v622-fetch-v1','files':rows},indent=2),encoding='utf-8')
+          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v622-fetch-v2','files':rows},indent=2),encoding='utf-8')
           PY
       - name: Upload evidence artifact
         uses: actions/upload-artifact@v4
