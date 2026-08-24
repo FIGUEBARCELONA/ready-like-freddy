@@ -27,12 +27,12 @@ jobs:
           mkdir -p data/execution
           gh api \
             -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/workflows/340557520/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=10" \
+            "/repos/${GITHUB_REPOSITORY}/actions/workflows/340557520/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=15" \
             --jq '[.workflow_runs[] | {id, name, run_number, event, status, conclusion, head_sha, created_at, updated_at, html_url}]' \
             > /tmp/execution-runs.json
           gh api \
             -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/workflows/340716025/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=10" \
+            "/repos/${GITHUB_REPOSITORY}/actions/workflows/340716025/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=15" \
             --jq '[.workflow_runs[] | {id, name, run_number, event, status, conclusion, head_sha, created_at, updated_at, html_url}]' \
             > /tmp/validation-runs.json
           jq -n \
