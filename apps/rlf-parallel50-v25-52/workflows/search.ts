@@ -6,6 +6,9 @@ export type SearchItem={title:string;url:string;snippet:string;provider:string};
 type Provider={name:string;url:(query:string,language:string)=>string;rss?:boolean};
 
 const BING_RSS:Provider={name:'bing-rss',rss:true,url:(query,language)=>`https://www.bing.com/search?format=rss&q=${encodeURIComponent(query)}&count=50&setlang=${encodeURIComponent(language.split('-')[0])}`};
+const PURCHASE_TERM:Record<string,string>={
+  AT:'in den warenkorb',BE:'toevoegen aan winkelwagen',BG:'добави в количката',HR:'dodaj u košaricu',CY:'add to cart',CZ:'přidat do košíku',DK:'tilføj til kurv',EE:'lisa ostukorvi',FI:'lisää ostoskoriin',FR:'ajouter au panier',DE:'in den warenkorb',GR:'προσθήκη στο καλάθι',HU:'kosárba',IE:'add to cart',IT:'aggiungi al carrello',LV:'pievienot grozam',LT:'į krepšelį',LU:'ajouter au panier',MT:'add to cart',NL:'toevoegen aan winkelwagen',PL:'dodaj do koszyka',PT:'adicionar ao carrinho',RO:'adaugă în coș',SK:'pridať do košíka',SI:'dodaj v košarico',ES:'añadir al carrito',SE:'lägg i varukorg',
+};
 
 const decode=(value:string)=>String(value||'').replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&#39;',"'").replaceAll('&lt;','<').replaceAll('&gt;','>');
 export const strip=(value:string)=>decode(String(value||'').replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<noscript[\s\S]*?<\/noscript>/gi,' ').replace(/<svg[\s\S]*?<\/svg>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim());
@@ -23,15 +26,6 @@ export function canonical(raw:string) {
 export function domainOf(raw:string) {
   try {return new URL(raw).hostname.toLowerCase().replace(/^www\./,'');}
   catch {return '';}
-}
-
-function clean(raw:string,provider:string) {
-  const value=decode(raw);
-  try {
-    if(/^(javascript:|mailto:|tel:|#)/i.test(value)) return '';
-    const url=new URL(value,'https://www.bing.com');
-    return canonical(url.toString());
-  } catch {return '';}
 }
 
 export function relevant(title:string,url:string,description='') {
@@ -79,21 +73,42 @@ async function searchProvider(provider:Provider,query:string,language:string,lim
   }
 }
 
-export function shouldRunContextualRecovery(primaryCount:number,identityCount:number) {
-  return primaryCount===0&&identityCount===0;
+export function primaryCommerceQuery(input:DiscoverInput) {
+  const lane=input.lane;
+  const purchase=PURCHASE_TERM[lane.countryCode]??'add to cart';
+  const templates=[
+    `site:.${lane.tld} inurl:product "Fred Perry" "${lane.localSecondhand}"`,
+    `site:.${lane.tld} inurl:shop "Fred Perry" "${lane.localSecondhand}"`,
+    `site:.${lane.tld} "Fred Perry" "${purchase}" vintage`,
+    `site:.${lane.tld} "Fred Perry" "${purchase}" "${lane.localSecondhand}"`,
+    `site:.${lane.tld} inurl:products "Fred Perry" pre-owned`,
+    `site:.${lane.tld} inurl:collection "Fred Perry" secondhand`,
+    `site:.${lane.tld} "Fred Perry" vintage webshop`,
+    `site:.${lane.tld} "Fred Perry" used clothing "${purchase}"`,
+  ];
+  const index=(input.cycle+lane.index)%templates.length;
+  return {index,query:templates[index]};
 }
 
-export function contextualRecoveryQuery(input:DiscoverInput) {
+export function alternateCommerceQuery(input:DiscoverInput) {
   const lane=input.lane;
+  const purchase=PURCHASE_TERM[lane.countryCode]??'add to cart';
   const templates=[
-    `site:.${lane.tld} inurl:product "Fred Perry" ${lane.localSecondhand}`,
-    `site:.${lane.tld} inurl:shop "Fred Perry" vintage`,
-    `site:.${lane.tld} "Fred Perry" ${lane.localSecondhand} webshop`,
-    `"Fred Perry" ${lane.localSecondhand} online shop ${lane.country}`,
-    `site:.${lane.tld} "Fred Perry" pre-owned clothing store`,
-    `site:.${lane.tld} "Fred Perry" vintage ecommerce`,
+    `"Fred Perry" "${lane.localSecondhand}" online shop ${lane.country}`,
+    `"Fred Perry" vintage boutique "${purchase}" ${lane.country}`,
+    `"Fred Perry" pre-owned menswear shop ${lane.country}`,
+    `"Fred Perry" secondhand ecommerce ${lane.country}`,
+    `"Fred Perry" archive clothing store ${lane.country}`,
+    `"Fred Perry" retro clothing webshop ${lane.country}`,
+    `"Fred Perry" used polo shop ${lane.country}`,
+    `"Fred Perry" vintage track jacket shop ${lane.country}`,
   ];
-  return templates[(input.cycle+lane.index)%templates.length];
+  const index=(input.cycle*3+lane.index)%templates.length;
+  return {index,query:templates[index]};
+}
+
+export function shouldRunAlternateSearch(primaryCount:number) {
+  return primaryCount===0;
 }
 
 export async function searchAll(query:string,input:DiscoverInput) {
