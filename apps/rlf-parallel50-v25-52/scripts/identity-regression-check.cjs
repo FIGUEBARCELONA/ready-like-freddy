@@ -22,8 +22,10 @@ function evaluate(file,requireFn){
 }
 const policyFile=path.join(root,'workflows','policy.ts');
 const identityFile=path.join(root,'workflows','identity.ts');
+const provenanceFile=path.join(root,'workflows','provenance.ts');
 const policy=evaluate(policyFile,(id)=>{throw new Error(`Unexpected policy import: ${id}`);});
 const identity=evaluate(identityFile,(id)=>{if(id==='./policy')return policy;throw new Error(`Unexpected identity import: ${id}`);});
+const provenance=evaluate(provenanceFile,(id)=>{throw new Error(`Unexpected provenance import: ${id}`);});
 function assert(condition,message){if(!condition)throw new Error(message);}
 function analyze(domain,text){const country=identity.detectCountry(domain,text);return{country,result:identity.analyzeIdentity(domain,text,country)};}
 
@@ -75,8 +77,20 @@ const residualFalseIdentityFixtures=[
   ['joinfleek.com','Among other things this company agreement requires arbitration of disputes. Address 4612 San Francisco California 94114.','NONE'],
   ['vintager2.de','Ab einem Bestellwert von 90 Euro versenden wir versandkostenfrei. Sportswear und clothing shop. Adresse Berlin 12 Germany.','DE'],
   ['shop.es','Empresa address Calle Mayor 12 Spain. No VAT or registration identifier is published.','ES'],
+  ['fajneciuchy24.pl','Company address Warsaw Poland. Company number 12157706. Terms supplied by Judge.me.','PL'],
+  ['shop.at','GmbH company address Vienna Austria. Registration number 11116145.','AT'],
 ];
 for(const[domain,text,expectedCountry]of residualFalseIdentityFixtures){const{country,result}=analyze(domain,text);if(expectedCountry!=='NONE')assert(country.code===expectedCountry,`Residual fixture country mismatch for ${domain}: ${country.code}`);assert(result.identityKey===null,`Residual false identity accepted for ${domain}: ${result.identityKey}`);assert(result.vatId===null,`Residual false VAT accepted for ${domain}: ${result.vatId}`);assert(result.registrationId===null,`Residual false registration accepted for ${domain}: ${result.registrationId}`);}
 
-const total=falseVatFixtures.length+validVatFixtures.length+registrationFixtures.length+countryFixtures.length+residualFalseIdentityFixtures.length;
-console.log(`identity regression fixtures passed: ${total}`);
+const provenanceFixtures=[
+  [provenance.sameRegistrableDomain('https://shop.example.ie/legal','https://example.ie/products/fred-perry'),true,'same registrable subdomain'],
+  [provenance.sameRegistrableDomain('https://judge.me/terms','https://fajneciuchy24.pl/products/fred-perry'),false,'Judge.me external'],
+  [provenance.sameRegistrableDomain('https://linkedin.com/company/store','https://store.be'),false,'LinkedIn external'],
+  [provenance.legalContentTypeAllowed('text/html; charset=utf-8'),true,'HTML legal MIME'],
+  [provenance.legalContentTypeAllowed('text/css'),false,'CSS legal MIME'],
+  [provenance.legalResourceEligible('https://store.ie/terms','https://judge.me/terms','https://store.ie/products/item','text/html'),false,'external redirect'],
+];
+for(const[actual,expected,label]of provenanceFixtures)assert(actual===expected,`Provenance mismatch for ${label}: expected ${expected}, got ${actual}`);
+
+const total=falseVatFixtures.length+validVatFixtures.length+registrationFixtures.length+countryFixtures.length+residualFalseIdentityFixtures.length+provenanceFixtures.length;
+console.log(`identity and provenance regression fixtures passed: ${total}`);
