@@ -13,9 +13,9 @@ permissions:
   contents: write
 
 env:
-  TARGET_SHA: '8b3bc91a1a7dd1e8f3abfbe1a7b4b9b3305d5cf3'
-  TARGET_WORKFLOW: 'RLF repair sequence 9 delta hash'
-  OUTPUT_PATH: 'data/execution/sequence9-artifact-reconstruction-probe.json'
+  TARGET_SHA: 'ffcee11af170db9f1fc20ce22f538aa4abe6a48d'
+  TARGET_WORKFLOW: 'RLF code and ledger validation'
+  OUTPUT_PATH: 'data/execution/canonical-ledger-workflow-validation-probe.json'
 
 jobs:
   probe:
@@ -64,7 +64,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$OUTPUT_PATH"
-          git commit -m 'Resolve artifact-derived sequence 9 reconstruction run'
+          git commit -m 'Resolve canonical ledger workflow validation run'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
