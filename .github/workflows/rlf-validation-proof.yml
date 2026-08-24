@@ -21,6 +21,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -148,18 +149,26 @@ jobs:
           };
           fs.writeFileSync('data/execution/validation-proof.json', `${JSON.stringify(proof, null, 2)}\n`);
           NODE
-      - name: Commit, rebase and publish proof
+      - name: Commit, rebase and publish proof with retry
         if: always()
         shell: bash
         run: |
           set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/validation-proof.json
           git commit -m "Persist RLF validation proof ${GITHUB_RUN_ID}"
-          git fetch origin feature/rlf-execution-backend-20260823
-          git rebase origin/feature/rlf-execution-backend-20260823
-          git push origin HEAD:feature/rlf-execution-backend-20260823
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          echo 'Unable to publish validation proof after five rebases' >&2
+          exit 1
       - name: Enforce validation success
         if: steps.validate.outcome != 'success'
         run: exit 1
