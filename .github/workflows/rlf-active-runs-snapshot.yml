@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '32'
+  SNAPSHOT_REVISION: '33'
   TARGET_RUN_ID: '32783967794'
   TARGET_SHA: '607e6838597f64bea50f08b9915a5ae9cf995c2b'
 
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/rlf-execution-backend-20260823
-      - name: Capture paginated sequence 15 dashboard
+      - name: Capture and certify paginated sequence 15 dashboard
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -32,16 +32,13 @@ jobs:
           set -euo pipefail
           mkdir -p data/execution
           gh api -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}" \
-            > /tmp/run.json
+            "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}" > /tmp/run.json
           gh api --paginate -H 'Accept: application/vnd.github+json' \
             "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}/jobs?per_page=100" \
-            --jq '.jobs[] | {id,name,status,conclusion,started_at,completed_at}' \
-            | jq -s '.' > /tmp/jobs.json
+            --jq '.jobs[] | {id,name,status,conclusion,started_at,completed_at}' | jq -s '.' > /tmp/jobs.json
           gh api --paginate -H 'Accept: application/vnd.github+json' \
             "/repos/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}/artifacts?per_page=100" \
-            --jq '.artifacts[] | {id,name,size_in_bytes,digest,expired,created_at,expires_at}' \
-            | jq -s '.' > /tmp/artifacts.json
+            --jq '.artifacts[] | {id,name,size_in_bytes,digest,expired,created_at,expires_at}' | jq -s '.' > /tmp/artifacts.json
           jq -n \
             --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --arg targetRunId "$TARGET_RUN_ID" \
@@ -50,7 +47,7 @@ jobs:
             --slurpfile jobs /tmp/jobs.json \
             --slurpfile artifacts /tmp/artifacts.json \
             '{
-              schemaVersion:16,
+              schemaVersion:17,
               capturedAt:$capturedAt,
               targetRunId:$targetRunId,
               targetSha:$targetSha,
@@ -73,9 +70,17 @@ jobs:
               },
               jobs:$jobs[0],
               artifacts:$artifacts[0]
-            }' > data/execution/workflow-runs-snapshot.json
+            } | .passed = (
+              .run.status=="completed" and .run.conclusion=="success" and .run.head_sha==$targetSha and
+              .counts.discoveryTotal==50 and .counts.discoverySuccess==50 and .counts.discoveryFailed==0 and .counts.discoveryActive==0 and
+              .counts.productTotal==50 and .counts.productSuccess==50 and .counts.productFailed==0 and .counts.productActive==0 and
+              .counts.discoveryWorkerArtifacts==50 and .counts.productWorkerArtifacts==50 and
+              .counts.consolidatedDiscoveryArtifacts==1 and .counts.consolidatedProductArtifacts==1 and
+              .counts.totalArtifacts==104
+            )' > data/execution/workflow-runs-snapshot.json
           cat data/execution/workflow-runs-snapshot.json
-      - name: Publish snapshot
+          jq -e '.passed == true' data/execution/workflow-runs-snapshot.json >/dev/null
+      - name: Publish certified snapshot
         shell: bash
         run: |
           set -euo pipefail
@@ -83,7 +88,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot terminal sequence 15 dashboard'
+          git commit -m 'Certify final sequence 15 dashboard'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
