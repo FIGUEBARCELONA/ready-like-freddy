@@ -2,6 +2,12 @@ import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
+interface MetadataGaps {
+  descriptionMissingIdentityCount?: number;
+  priceMissingIdentityCount?: number;
+  materialMissingIdentityCount?: number;
+}
+
 interface BaseProgress {
   sourceRunId?: string;
   frontier?: Record<string, number>;
@@ -15,6 +21,7 @@ interface BaseProgress {
     identities?: Array<{ identityKey: string; [key: string]: unknown }>;
   };
   counters?: Record<string, number>;
+  metadataGaps?: MetadataGaps;
   status?: string;
 }
 
@@ -25,6 +32,7 @@ interface LedgerDelta {
   capturedProductUrlCount?: number;
   failedIdentities?: Array<{ identityKey: string; [key: string]: unknown }>;
   counters?: Record<string, number>;
+  metadataGaps?: MetadataGaps;
   frontier?: Record<string, number>;
   status?: string;
   ledgerDeltaSha256?: string;
@@ -62,6 +70,7 @@ export async function loadProductProgressLedger(executionRoot: string) {
     completed: { identityKeys: [], productUrlCaptureCount: 0 },
     retry: { identities: [] },
     counters: {},
+    metadataGaps: {},
   });
 
   let deltaNames: string[] = [];
@@ -77,7 +86,9 @@ export async function loadProductProgressLedger(executionRoot: string) {
 
   const deltas: LedgerDelta[] = [];
   for (const name of deltaNames) {
-    const delta = JSON.parse(await readFile(resolve(deltasDir, name), "utf8")) as LedgerDelta;
+    const delta = JSON.parse(
+      await readFile(resolve(deltasDir, name), "utf8"),
+    ) as LedgerDelta;
     if (!delta.runId || !Array.isArray(delta.completedIdentityKeys)) {
       throw new Error(`Invalid progress delta: ${name}`);
     }
@@ -96,15 +107,30 @@ export async function loadProductProgressLedger(executionRoot: string) {
   const retry = new Map(
     (base.retry?.identities ?? []).map(item => [item.identityKey, item]),
   );
-  let productUrlCaptureCount = Number(base.completed?.productUrlCaptureCount ?? 0);
+  let productUrlCaptureCount = Number(
+    base.completed?.productUrlCaptureCount ?? 0,
+  );
   const counters = {
     officialProductImageReferenceCount: Number(
       base.counters?.officialProductImageReferenceCount ?? 0,
     ),
     materialEvidenceCount: Number(base.counters?.materialEvidenceCount ?? 0),
-    manufacturingClaimCount: Number(base.counters?.manufacturingClaimCount ?? 0),
+    manufacturingClaimCount: Number(
+      base.counters?.manufacturingClaimCount ?? 0,
+    ),
     factoryVerifiedCount: 0,
     globalCanonicalProductCount: 0,
+  };
+  const metadataGaps = {
+    descriptionMissingIdentityCount: Number(
+      base.metadataGaps?.descriptionMissingIdentityCount ?? 0,
+    ),
+    priceMissingIdentityCount: Number(
+      base.metadataGaps?.priceMissingIdentityCount ?? 0,
+    ),
+    materialMissingIdentityCount: Number(
+      base.metadataGaps?.materialMissingIdentityCount ?? 0,
+    ),
   };
 
   for (const delta of deltas) {
@@ -119,9 +145,20 @@ export async function loadProductProgressLedger(executionRoot: string) {
     counters.officialProductImageReferenceCount += Number(
       delta.counters?.officialProductImageReferenceCount ?? 0,
     );
-    counters.materialEvidenceCount += Number(delta.counters?.materialEvidenceCount ?? 0);
+    counters.materialEvidenceCount += Number(
+      delta.counters?.materialEvidenceCount ?? 0,
+    );
     counters.manufacturingClaimCount += Number(
       delta.counters?.manufacturingClaimCount ?? 0,
+    );
+    metadataGaps.descriptionMissingIdentityCount += Number(
+      delta.metadataGaps?.descriptionMissingIdentityCount ?? 0,
+    );
+    metadataGaps.priceMissingIdentityCount += Number(
+      delta.metadataGaps?.priceMissingIdentityCount ?? 0,
+    );
+    metadataGaps.materialMissingIdentityCount += Number(
+      delta.metadataGaps?.materialMissingIdentityCount ?? 0,
     );
   }
 
@@ -143,6 +180,7 @@ export async function loadProductProgressLedger(executionRoot: string) {
       identities: retryIdentities,
     },
     counters,
+    metadataGaps,
     status: latestDelta?.status ?? base.status,
     deltaCount: deltas.length,
     deltaRunIds: deltas.map(delta => delta.runId),
