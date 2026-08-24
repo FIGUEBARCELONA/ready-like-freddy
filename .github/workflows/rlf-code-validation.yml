@@ -32,7 +32,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: pnpm
       - name: Enable pinned pnpm
         run: corepack enable
       - name: Install dependencies
@@ -90,6 +89,9 @@ jobs:
             images: state.counters.officialProductImageReferenceCount,
             materials: state.counters.materialEvidenceCount,
             manufacturingClaims: state.counters.manufacturingClaimCount,
+            descriptionGaps: state.metadataGaps.descriptionMissingIdentityCount,
+            priceGaps: state.metadataGaps.priceMissingIdentityCount,
+            materialGaps: state.metadataGaps.materialMissingIdentityCount,
             retries: state.retry.identityCount,
             deltas: state.deltaCount,
             ledgerSha256: state.ledgerSha256,
