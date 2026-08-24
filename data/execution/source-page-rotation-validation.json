@@ -1,24 +1,98 @@
 {
-  "schemaVersion": 2,
-  "validatedAt": "2026-08-24T17:40:49.386Z",
-  "sourceCommitSha": "b88dde9df56036ac7ff1b48c595346edd5cd712e",
+  "schemaVersion": 3,
+  "validatedAt": "2026-08-24T21:03:13.526Z",
+  "sourceCommitSha": "a5b45e471c407e0d4c5021b3cadb7b9feb8a382a",
+  "targetSequence": 12,
   "workerCount": 50,
-  "sourcePageLedgerDeltaCount": 3,
-  "sourcePageLedgerObservationCount": 550,
-  "uniquePreviouslyAttemptedSourcePageCount": 265,
-  "excludedPreviouslyAttemptedSourcePageCount": 265,
+  "sourcePageLedgerDeltaCount": 4,
+  "sourcePageLedgerObservationCount": 782,
+  "uniquePreviouslyAttemptedSourcePageCount": 497,
+  "excludedPreviouslyAttemptedSourcePageCount": 497,
   "skippedPriorityEntryPointCount": 23,
   "injectedPriorityEntryPointCount": 0,
-  "remainingQueueUrlCount": 3222,
+  "reassignedEmptyLaneCount": 10,
+  "reassignedEmptyLanes": [
+    {
+      "slot": "F21",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/subculture/category/subculture-live"
+    },
+    {
+      "slot": "F22",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/subculture/category/subculture-live"
+    },
+    {
+      "slot": "F26",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/subculture/category/subculture-live"
+    },
+    {
+      "slot": "F32",
+      "donorSlot": "F44",
+      "market": "AE",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/ae-en/subculture/category/subculture-live"
+    },
+    {
+      "slot": "F33",
+      "donorSlot": "F45",
+      "market": "EG",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/eg-en/subculture/category/playlists"
+    },
+    {
+      "slot": "F34",
+      "donorSlot": "F46",
+      "market": "SA",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/sa-en/subculture/category/playlists"
+    },
+    {
+      "slot": "F47",
+      "donorSlot": "F35",
+      "market": "ID",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/id-en/subculture/category/subculture-live"
+    },
+    {
+      "slot": "F48",
+      "donorSlot": "F36",
+      "market": "AU",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/au-en/subculture/category/subculture-live"
+    },
+    {
+      "slot": "F49",
+      "donorSlot": "F37",
+      "market": "GB",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/subculture/category/subculture-live"
+    },
+    {
+      "slot": "F50",
+      "donorSlot": "F38",
+      "market": "US",
+      "scope": "OTHER_CATALOG",
+      "url": "https://www.fredperry.com/us/subculture/category/playlists"
+    }
+  ],
+  "remainingQueueUrlCount": 2990,
   "theoreticalBatchCapacity": 250,
-  "effectiveBatchCapacity": 232,
-  "effectiveBatchUtilization": 0.928,
+  "effectiveBatchCapacity": 157,
+  "effectiveBatchUtilization": 0.628,
   "repeatedFirstBatchUrlCount": 0,
   "duplicateRemainingQueueUrlCount": 0,
   "emptySlots": [],
   "minimumUrlsPerWorker": 1,
-  "maximumUrlsPerWorker": 252,
-  "queueSha256": "f9885ea7622551cf11da3f65f719dd6f435a701f0145cc308ae774981fec945f",
-  "sourcePageLedgerSha256": "a05e975c12c9d0831403ca23045e5df117a8b3b19f851c078e3d25dc3991361c",
-  "passed": true
+  "maximumUrlsPerWorker": 246,
+  "queueSha256": "19fe5ac3bf559b0ae0aa1adcfbda6b8e8d58d3a2ab5fc8c94433408dec69bbd3",
+  "sourcePageLedgerSha256": "f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347",
+  "passed": false
 }
