@@ -1,0 +1,276 @@
+name: RLF sequence 17 official media API probe
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence17-official-media-api-probe.yml'
+      - 'scripts/execution/build-sequence17-media-probe-frontier.mjs'
+      - 'scripts/execution/run-official-media-api-worker.mjs'
+      - 'scripts/execution/consolidate-official-media-api-probe.mjs'
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  SOURCE_BRANCH: feature/rlf-execution-backend-20260823
+
+concurrency:
+  group: rlf-sequence17-official-media-api-probe
+  cancel-in-progress: true
+
+jobs:
+  prepare_media_probe:
+    name: Prepare exact official media API frontier
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.frontier.outputs.matrix }}
+      frontier_sha256: ${{ steps.frontier.outputs.frontier_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - id: frontier
+        name: Build fail-closed 3+47 probe frontier
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/execution/build-sequence17-media-probe-frontier.mjs \
+            --progress=data/execution/product-progress.json \
+            --progressDeltas=data/execution/progress-deltas \
+            --out=execution/sequence17-frontier/media-probe-frontier.json
+          node --input-type=module <<'NODE'
+          import { appendFile } from 'node:fs/promises';
+          import { readJson } from './scripts/execution/common.mjs';
+          const frontier = await readJson(
+            'execution/sequence17-frontier/media-probe-frontier.json',
+          );
+          const active = frontier.assignments.filter(item => item.probes.length === 1);
+          const idle = frontier.assignments.filter(item => item.probes.length === 0);
+          if (
+            frontier.workerCount !== 50 ||
+            frontier.activeLaneCount !== 3 ||
+            frontier.auditedIdleLaneCount !== 47 ||
+            frontier.selectedIdentityCount !== 3 ||
+            frontier.expectedProbeRecordCount !== 10 ||
+            active.length !== 3 ||
+            idle.length !== 47
+          ) {
+            throw new Error('Invalid sequence 17 frontier');
+          }
+          const matrix = JSON.stringify({
+            slot: frontier.assignments.map(item => item.slot),
+          });
+          await appendFile(process.env.GITHUB_OUTPUT, `matrix=${matrix}\n`);
+          await appendFile(
+            process.env.GITHUB_OUTPUT,
+            `frontier_sha256=${frontier.frontierSha256}\n`,
+          );
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence17-media-probe-frontier
+          path: execution/sequence17-frontier/media-probe-frontier.json
+          if-no-files-found: error
+          retention-days: 30
+
+  media_probe_worker:
+    name: Media probe ${{ matrix.slot }}
+    needs: prepare_media_probe
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix: ${{ fromJSON(needs.prepare_media_probe.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download immutable media probe frontier
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-sequence17-media-probe-frontier \
+            --dest execution/media-probe-frontier
+      - name: Probe exact official SKU media API assignment
+        run: |
+          node scripts/execution/run-official-media-api-worker.mjs \
+            --slot=${{ matrix.slot }} \
+            --frontier=execution/media-probe-frontier/media-probe-frontier.json \
+            --out=execution/sequence17-media-workers/${{ matrix.slot }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rlf-sequence17-media-probe-worker-${{ matrix.slot }}
+          path: execution/sequence17-media-workers/${{ matrix.slot }}
+          if-no-files-found: error
+          retention-days: 30
+
+  consolidate_media_probe:
+    name: Consolidate exact official media API evidence
+    needs:
+      - prepare_media_probe
+      - media_probe_worker
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download frontier and all 50 worker artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-sequence17-media-probe-frontier \
+            --dest execution/media-probe-frontier
+          bash scripts/execution/download-artifact-retry.sh \
+            --pattern 'rlf-sequence17-media-probe-worker-*' \
+            --dest execution/downloaded-sequence17-media-workers
+      - name: Consolidate fail-closed official media evidence
+        run: |
+          node scripts/execution/consolidate-official-media-api-probe.mjs \
+            --input=execution/downloaded-sequence17-media-workers \
+            --frontier=execution/media-probe-frontier/media-probe-frontier.json \
+            --out=execution/sequence17-media-consolidated
+      - name: Prove no false recovery or protected-ledger mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+          import { readJson } from './scripts/execution/common.mjs';
+          const report = await readJson(
+            'execution/sequence17-media-consolidated/sequence17-official-media-api-probe.json',
+          );
+          const records = (await readFile(
+            'execution/sequence17-media-consolidated/probe-records.ndjson',
+            'utf8',
+          ))
+            .split(/\r?\n/)
+            .filter(Boolean)
+            .map(JSON.parse);
+          if (
+            report.workerCount !== 50 ||
+            report.activeLaneCount !== 3 ||
+            report.auditedIdleLaneCount !== 47 ||
+            report.selectedIdentityCount !== 3 ||
+            report.attemptedProbeCount !== 10 ||
+            records.length !== 10 ||
+            report.ledgerMutationCount !== 0 ||
+            report.factoryVerifiedCount !== 0 ||
+            report.globalCanonicalProductCount !== 0 ||
+            report.passed !== true
+          ) {
+            throw new Error('Sequence 17 accounting or protected gates failed');
+          }
+          const expected = ['HW2300|843','M1588|81B','M1588|84B'];
+          const accounted = [
+            ...report.recoveredCandidateIdentityKeys,
+            ...report.unresolvedIdentityKeys,
+          ].sort();
+          if (JSON.stringify(accounted) !== JSON.stringify(expected)) {
+            throw new Error(`Sequence 17 identity accounting mismatch: ${JSON.stringify(accounted)}`);
+          }
+          console.log(JSON.stringify(report, null, 2));
+          NODE
+      - name: Generate immutable SHA-256 evidence manifest
+        run: |
+          find \
+            execution/media-probe-frontier \
+            execution/downloaded-sequence17-media-workers \
+            execution/sequence17-media-consolidated \
+            -type f -print0 \
+            | sort -z | xargs -0 sha256sum \
+            > execution/SEQUENCE17_MEDIA_PROBE_SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rlf-sequence17-official-media-probe-${{ github.run_id }}
+          path: |
+            execution/media-probe-frontier/media-probe-frontier.json
+            execution/sequence17-media-consolidated
+            execution/SEQUENCE17_MEDIA_PROBE_SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+      - name: Persist immutable sequence 17 probe checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="${SOURCE_BRANCH}"
+          git fetch origin "${branch}"
+          git rebase "origin/${branch}"
+          node --input-type=module <<'NODE'
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          import { readJson } from './scripts/execution/common.mjs';
+          const frontier = await readJson(
+            'execution/media-probe-frontier/media-probe-frontier.json',
+          );
+          const ledger = await loadProgressLedger();
+          if (
+            ledger.ledgerSha256 !== frontier.priorLedgerSha256 ||
+            String(ledger.latestRunId) !== String(frontier.priorRunId) ||
+            ledger.deltaCount !== frontier.priorDeltaCount ||
+            ledger.retry.identityCount !== 3
+          ) {
+            throw new Error(
+              `Canonical ledger changed before probe persistence: ${ledger.ledgerSha256}`,
+            );
+          }
+          NODE
+          destination="data/execution/runs/${GITHUB_RUN_ID}"
+          mkdir -p "${destination}"
+          cp \
+            execution/media-probe-frontier/media-probe-frontier.json \
+            "${destination}/media-probe-frontier.json"
+          cp \
+            execution/sequence17-media-consolidated/sequence17-official-media-api-probe.json \
+            "${destination}/sequence17-official-media-api-probe.json"
+          cp \
+            execution/sequence17-media-consolidated/probe-records.ndjson \
+            "${destination}/media-api-probe-records.ndjson"
+          cp \
+            execution/SEQUENCE17_MEDIA_PROBE_SHA256SUMS.txt \
+            "${destination}/SEQUENCE17_MEDIA_PROBE_SHA256SUMS.txt"
+          cp \
+            execution/sequence17-media-consolidated/sequence17-official-media-api-probe.json \
+            data/execution/sequence17-official-media-api-probe.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "${destination}" data/execution/sequence17-official-media-api-probe.json
+          git commit -m "Persist audited sequence 17 official media probe ${GITHUB_RUN_ID}"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "${branch}"
+            if ! git merge-base --is-ancestor "origin/${branch}" HEAD; then
+              base="$(git merge-base HEAD "origin/${branch}")"
+              if git diff --name-only "${base}" "origin/${branch}" \
+                -- data/execution/progress-deltas \
+                | grep -q .; then
+                echo 'Concurrent progress delta changed; refusing stale probe persistence' >&2
+                exit 1
+              fi
+              git rebase "origin/${branch}"
+            fi
+            if git push origin "HEAD:${branch}"; then
+              exit 0
+            fi
+            sleep $((attempt * 3))
+          done
+          echo 'Unable to publish sequence 17 probe checkpoint' >&2
+          exit 1
