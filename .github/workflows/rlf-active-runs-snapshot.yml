@@ -14,7 +14,7 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '22'
+  SNAPSHOT_REVISION: '23'
   TARGET_SHA: '42fbb08f61dc9f7881375e3e5f5ae4c1aeedb4f4'
   TARGET_RUN_ID: '32781308211'
 
@@ -85,7 +85,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot sequence 14 full dashboard matrix'
+          git commit -m 'Refresh sequence 14 discovery dashboard'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
