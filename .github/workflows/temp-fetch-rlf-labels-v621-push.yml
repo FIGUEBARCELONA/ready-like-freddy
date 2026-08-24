@@ -1,0 +1,116 @@
+name: TEMP RLF label fetch v6.21 push
+
+on:
+  push:
+    branches:
+      - temp-rlf-label-fetch-v621
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Fetch exact and professional-source evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/pages evidence/original evidence/reports evidence/probes
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
+
+          probe_page() {
+            local key="$1" url="$2"
+            curl --location --connect-timeout 20 --max-time 120 --user-agent "$UA" \
+              --header 'Accept-Language: en-GB,en;q=0.9' \
+              --dump-header "evidence/probes/${key}.headers" \
+              --output "evidence/pages/${key}.html" \
+              --write-out '%{http_code}\n%{url_effective}\n%{content_type}\n%{size_download}\n' \
+              "$url" > "evidence/probes/${key}.meta" || true
+          }
+
+          probe_page 'CAND-046_etsy' 'https://www.etsy.com/fi-en/listing/4416347158/fred-perry-jacket-mens-m-down-filled'
+          probe_page 'CAND-034_etsy' 'https://www.etsy.com/listing/4307123417/90s-pred-perry-track-jacket-medium'
+          probe_page 'CAND-075_brick' 'https://brickvintage.com/product/vintage-1960s-fred-perry-cable-knit-jumper-size-m/'
+
+          python - <<'PY'
+          import html, json, pathlib, re, subprocess, urllib.parse
+          root = pathlib.Path('evidence')
+          ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
+          sources = {
+              'CAND-046': root/'pages'/'CAND-046_etsy.html',
+              'CAND-034': root/'pages'/'CAND-034_etsy.html',
+          }
+          all_urls = {}
+          for key, path in sources.items():
+              text = path.read_text('utf-8', errors='ignore') if path.exists() else ''
+              text = html.unescape(text).replace('\\u002F','/').replace('\\/','/')
+              urls = set()
+              for pat in [
+                  r'https://i\.etsystatic\.com/[^\"\'<> ]+?\.(?:jpg|jpeg|webp)(?:\?[^\"\'<> ]*)?',
+                  r'https://i\.etsystatic\.com/[^\"\'<> ]+',
+              ]:
+                  for match in re.findall(pat, text, flags=re.I):
+                      url = match.rstrip('\\,;')
+                      if any(token in url.lower() for token in ['avatar','icon','logo']):
+                          continue
+                      urls.add(url)
+              all_urls[key] = sorted(urls)
+
+          all_urls['CAND-075'] = [
+              'https://brickvintage.com/wp-content/uploads/2024/09/DSC_6410_edited-1-Photoroom-600x780.jpg',
+              'https://brickvintage.com/wp-content/uploads/2024/09/DSC_6410_edited-1-copy-Photoroom-600x780.jpg',
+              'https://brickvintage.com/wp-content/uploads/2024/09/DSC_6414-Photoroom-600x780.jpg',
+          ]
+
+          downloads = []
+          for key, urls in all_urls.items():
+              for idx, url in enumerate(urls[:40]):
+                  ext = pathlib.Path(urllib.parse.urlparse(url).path).suffix.lower()
+                  if ext not in {'.jpg','.jpeg','.png','.webp'}:
+                      ext = '.jpg'
+                  out = root/'original'/f'{key}_{idx:02d}{ext}'
+                  proc = subprocess.run([
+                      'curl','--fail','--location','--retry','2','--retry-all-errors',
+                      '--connect-timeout','20','--max-time','120','--user-agent',ua,
+                      '--header','Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+                      url,'--output',str(out),
+                      '--write-out','%{http_code}|%{url_effective}|%{content_type}|%{size_download}'
+                  ], capture_output=True, text=True)
+                  meta = {
+                      'record_id':key,'index':idx,'requested_url':url,
+                      'curl_returncode':proc.returncode,'curl_meta':proc.stdout.strip(),
+                      'stderr':proc.stderr[-1000:],'output':out.as_posix(),
+                      'exists':out.exists(),'bytes':out.stat().st_size if out.exists() else 0,
+                  }
+                  if proc.returncode != 0 and out.exists():
+                      out.unlink(); meta['exists']=False; meta['bytes']=0
+                  downloads.append(meta)
+
+          (root/'reports'/'DISCOVERED_IMAGE_URLS.json').write_text(json.dumps(all_urls,indent=2),encoding='utf-8')
+          (root/'reports'/'DOWNLOAD_RESULTS.json').write_text(json.dumps(downloads,indent=2),encoding='utf-8')
+          PY
+
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME_AND_DIMENSIONS.txt || true
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+          python - <<'PY'
+          import hashlib, json, pathlib
+          root=pathlib.Path('evidence')
+          rows=[]
+          for p in sorted(root.rglob('*')):
+              if not p.is_file() or p.name=='manifest.json':
+                  continue
+              b=p.read_bytes()
+              rows.append({'path':p.as_posix(),'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v621-fetch-v2','files':rows},indent=2),encoding='utf-8')
+          PY
+
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-label-evidence-v621-push
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
