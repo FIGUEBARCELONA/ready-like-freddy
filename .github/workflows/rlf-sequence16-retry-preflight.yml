@@ -1,0 +1,135 @@
+name: RLF sequence 16 retry recovery preflight
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence16-retry-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-sequence16-retry-preflight
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build factual retry-only 50-lane plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { writeFile } from 'node:fs/promises';
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          import { sha256 } from './scripts/execution/common.mjs';
+
+          const expectedKeys = ['G3636|Z77','HW2300|843','M1588|81B','M1588|84B','M4613|41A','SY3660|46A'];
+          const ledger = await loadProgressLedger();
+          const completed = new Set(ledger.completed.identityKeys);
+          const retries = ledger.retry.identities.map(item => ({
+            ...item,
+            aliasUrls: [...new Set([item.requestedProductUrl, ...(item.aliasUrls ?? [])].filter(Boolean))].sort(),
+          })).sort((a,b) => a.identityKey.localeCompare(b.identityKey));
+          const slots = Array.from({length:50}, (_,i) => `F${String(i+1).padStart(2,'0')}`);
+          const assignments = slots.map((slot,index) => ({
+            slot,
+            index,
+            retry: index < retries.length ? retries[index] : null,
+            status: index < retries.length ? 'ASSIGNED_REAL_RETRY' : 'AUDITED_IDLE_LANE',
+          }));
+          const officialHost = url => {
+            try {
+              const parsed = new URL(url);
+              return parsed.protocol === 'https:' && (parsed.hostname === 'fredperry.com' || parsed.hostname.endsWith('.fredperry.com'));
+            } catch { return false; }
+          };
+          const identityMatchesUrl = (retry,url) => {
+            const normalized = String(url).toLowerCase();
+            return normalized.includes(retry.productCode.toLowerCase()) && normalized.includes(retry.colourCode.toLowerCase());
+          };
+          const allAliasUrls = retries.flatMap(retry => retry.aliasUrls);
+          const completedOverlap = retries.map(item => item.identityKey).filter(key => completed.has(key));
+          const missingUrls = retries.filter(item => item.aliasUrls.length === 0).map(item => item.identityKey);
+          const nonOfficialUrls = retries.flatMap(item => item.aliasUrls.filter(url => !officialHost(url)).map(url => ({identityKey:item.identityKey,url})));
+          const mismatchedUrls = retries.flatMap(item => item.aliasUrls.filter(url => !identityMatchesUrl(item,url)).map(url => ({identityKey:item.identityKey,url})));
+          const duplicateIdentityAssignments = assignments.filter(a => a.retry).map(a => a.retry.identityKey).length - new Set(assignments.filter(a => a.retry).map(a => a.retry.identityKey)).size;
+          const result = {
+            schemaVersion: 1,
+            generatedAt: new Date().toISOString(),
+            sourceCommitSha: process.env.GITHUB_SHA,
+            targetSequence: 16,
+            phaseId: 'OFFICIAL_RETRY_RECOVERY_01',
+            sourceLedger: {
+              completedIdentityCount: ledger.completed.identityCount,
+              retryIdentityCount: ledger.retry.identityCount,
+              deltaCount: ledger.deltaCount,
+              latestRunId: String(ledger.latestRunId),
+              ledgerSha256: ledger.ledgerSha256,
+              factoryVerifiedCount: ledger.counters.factoryVerifiedCount,
+              globalCanonicalProductCount: ledger.counters.globalCanonicalProductCount,
+            },
+            expectedRetryIdentityKeys: expectedKeys,
+            retryIdentityKeys: retries.map(item => item.identityKey),
+            retries,
+            assignmentCount: assignments.length,
+            activeLaneCount: assignments.filter(a => a.retry).length,
+            auditedIdleLaneCount: assignments.filter(a => !a.retry).length,
+            assignments,
+            uniqueOfficialAliasUrlCount: new Set(allAliasUrls).size,
+            completedOverlap,
+            missingUrls,
+            nonOfficialUrls,
+            mismatchedUrls,
+            duplicateIdentityAssignments,
+          };
+          result.planSha256 = sha256(Buffer.from(JSON.stringify(result.assignments)));
+          result.passed =
+            result.sourceLedger.completedIdentityCount === 1354 &&
+            result.sourceLedger.retryIdentityCount === 6 &&
+            result.sourceLedger.deltaCount === 10 &&
+            result.sourceLedger.latestRunId === '32783967794' &&
+            result.sourceLedger.ledgerSha256 === '843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b' &&
+            result.sourceLedger.factoryVerifiedCount === 0 &&
+            result.sourceLedger.globalCanonicalProductCount === 0 &&
+            JSON.stringify(result.retryIdentityKeys) === JSON.stringify(expectedKeys) &&
+            result.assignmentCount === 50 &&
+            result.activeLaneCount === 6 &&
+            result.auditedIdleLaneCount === 44 &&
+            result.uniqueOfficialAliasUrlCount >= 6 &&
+            result.completedOverlap.length === 0 &&
+            result.missingUrls.length === 0 &&
+            result.nonOfficialUrls.length === 0 &&
+            result.mismatchedUrls.length === 0 &&
+            result.duplicateIdentityAssignments === 0;
+          await writeFile('data/execution/sequence16-retry-preflight.json', `${JSON.stringify(result,null,2)}\n`);
+          console.log(JSON.stringify(result,null,2));
+          if (!result.passed) throw new Error('Sequence 16 factual retry preflight failed');
+          NODE
+      - name: Publish retry preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence16-retry-preflight.json
+          git commit -m 'Persist sequence 16 retry recovery preflight'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1
