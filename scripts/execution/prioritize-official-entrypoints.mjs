@@ -1,6 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { isAllowedUrl, readJson, sha256, writeJson } from "./common.mjs";
+import { loadSourcePageLedger } from "./source-page-ledger.mjs";
 
 const args = Object.fromEntries(
   process.argv.slice(2).map(argument => {
@@ -10,14 +11,17 @@ const args = Object.fromEntries(
 );
 
 const queuePath = resolve(args.queue ?? "execution/queue/queue.json");
-const seedsPath = resolve(
-  args.seeds ?? "data/execution/rlf-kb-official-seeds.json",
-);
+const seedsPath = resolve(args.seeds ?? "data/execution/rlf-kb-official-seeds.json");
 const summaryPath = resolve(args.summary ?? "execution/queue/summary.json");
 const urlsPath = resolve(args.urls ?? "execution/queue/urls.txt");
 const queue = await readJson(queuePath);
 const manifest = await readJson(seedsPath);
 const entryPoints = manifest.entryPoints ?? [];
+const sourcePageLedger = await loadSourcePageLedger({
+  deltasDir:
+    queue.plan?.discoveryPolicy?.sourcePageDeltaDirectory ??
+    "data/execution/source-page-deltas",
+});
 const scopes = new Set([
   "MEN_CORE",
   "WOMEN_CORE",
@@ -66,17 +70,49 @@ for (const entryPoint of entryPoints) {
   }
 }
 
+const excludedPreviouslyAttempted = [];
 for (const assignment of queue.assignments) {
-  assignment.urls = assignment.urls.filter(entry => !seenEntryPointUrls.has(entry.url));
+  const retained = [];
+  for (const entry of assignment.urls) {
+    if (sourcePageLedger.attemptedUrlSet.has(entry.url)) {
+      excludedPreviouslyAttempted.push({
+        slot: assignment.slot,
+        url: entry.url,
+        previousRunId:
+          sourcePageLedger.pages.find(page => page.url === entry.url)?.latestRunId ?? null,
+      });
+    } else {
+      retained.push(entry);
+    }
+  }
+  assignment.urls = retained;
+}
+
+const unvisitedEntryPoints = entryPoints.filter(
+  entryPoint => !sourcePageLedger.attemptedUrlSet.has(entryPoint.url),
+);
+const skippedEntryPoints = entryPoints
+  .filter(entryPoint => sourcePageLedger.attemptedUrlSet.has(entryPoint.url))
+  .map(entryPoint => ({
+    market: entryPoint.market,
+    scope: entryPoint.scope,
+    url: entryPoint.url,
+    reason: "PREVIOUSLY_CAPTURED_SOURCE_PAGE",
+  }));
+
+const unvisitedEntryPointUrls = new Set(unvisitedEntryPoints.map(entry => entry.url));
+for (const assignment of queue.assignments) {
+  assignment.urls = assignment.urls.filter(entry => !unvisitedEntryPointUrls.has(entry.url));
 }
 
 const injected = [];
-for (const entryPoint of entryPoints) {
+for (const entryPoint of unvisitedEntryPoints) {
   const seed = seedByMarket.get(entryPoint.market);
   const candidates = queue.assignments
-    .filter(assignment =>
-      assignment.laneProfile?.market === entryPoint.market &&
-      assignment.laneProfile?.scope === entryPoint.scope,
+    .filter(
+      assignment =>
+        assignment.laneProfile?.market === entryPoint.market &&
+        assignment.laneProfile?.scope === entryPoint.scope,
     )
     .sort((a, b) => a.urls.length - b.urls.length || a.slot.localeCompare(b.slot));
   const fallback = queue.assignments
@@ -112,20 +148,50 @@ for (const entryPoint of entryPoints) {
   });
 }
 
+if (queue.assignments.some(assignment => assignment.urls.length === 0)) {
+  const emptySlots = queue.assignments
+    .filter(assignment => assignment.urls.length === 0)
+    .map(assignment => assignment.slot);
+  throw new Error(`Source-page rotation produced empty factual lanes: ${emptySlots.join(", ")}`);
+}
+
 const allEntries = queue.assignments.flatMap(assignment => assignment.urls);
 const allUrls = allEntries.map(entry => entry.url);
 if (new Set(allUrls).size !== allUrls.length) {
-  throw new Error("Queue contains duplicate URLs after priority entry point injection");
+  throw new Error("Queue contains duplicate URLs after source-page rotation");
 }
-if (queue.assignments.some(assignment => assignment.urls.length === 0)) {
-  throw new Error("Priority entry point injection produced an empty lane");
+
+const policy = queue.plan?.discoveryPolicy ?? {};
+if (
+  Number.isInteger(policy.requiredPriorityEntryPointCount) &&
+  injected.length !== policy.requiredPriorityEntryPointCount
+) {
+  throw new Error(
+    `Injected ${injected.length}/${policy.requiredPriorityEntryPointCount} required entry points`,
+  );
 }
-if (injected.length !== entryPoints.length) {
-  throw new Error(`Injected ${injected.length}/${entryPoints.length} entry points`);
+const excludedUniqueCount = new Set(
+  excludedPreviouslyAttempted.map(entry => entry.url),
+).size;
+if (
+  Number.isInteger(policy.minimumPreviouslyAttemptedSourcePageExclusions) &&
+  excludedUniqueCount < policy.minimumPreviouslyAttemptedSourcePageExclusions
+) {
+  throw new Error(
+    `Excluded ${excludedUniqueCount}/${policy.minimumPreviouslyAttemptedSourcePageExclusions} required prior source pages`,
+  );
 }
 
 queue.priorityEntryPointCount = injected.length;
 queue.priorityEntryPoints = injected;
+queue.skippedPriorityEntryPointCount = skippedEntryPoints.length;
+queue.skippedPriorityEntryPoints = skippedEntryPoints;
+queue.sourcePageLedgerDeltaCount = sourcePageLedger.deltaCount;
+queue.sourcePageLedgerObservationCount = sourcePageLedger.attemptedObservationCount;
+queue.uniquePreviouslyAttemptedSourcePageCount =
+  sourcePageLedger.uniqueAttemptedSourcePageCount;
+queue.excludedPreviouslyAttemptedSourcePageCount = excludedUniqueCount;
+queue.sourcePageLedgerSha256 = sourcePageLedger.ledgerSha256;
 queue.discoveredUrlCount = allUrls.length;
 delete queue.queueSha256;
 queue.queueSha256 = sha256(Buffer.from(JSON.stringify(queue)));
@@ -139,6 +205,14 @@ const summary = {
   discoveredUrlCount: queue.discoveredUrlCount,
   priorityEntryPointCount: injected.length,
   priorityEntryPoints: injected,
+  skippedPriorityEntryPointCount: skippedEntryPoints.length,
+  skippedPriorityEntryPoints: skippedEntryPoints,
+  sourcePageLedgerDeltaCount: sourcePageLedger.deltaCount,
+  sourcePageLedgerObservationCount: sourcePageLedger.attemptedObservationCount,
+  uniquePreviouslyAttemptedSourcePageCount:
+    sourcePageLedger.uniqueAttemptedSourcePageCount,
+  excludedPreviouslyAttemptedSourcePageCount: excludedUniqueCount,
+  sourcePageLedgerSha256: sourcePageLedger.ledgerSha256,
   minimumUrlsPerWorker: Math.min(...queue.assignments.map(item => item.urls.length)),
   maximumUrlsPerWorker: Math.max(...queue.assignments.map(item => item.urls.length)),
 };
