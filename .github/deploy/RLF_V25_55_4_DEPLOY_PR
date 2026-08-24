@@ -1,0 +1,6 @@
+RLF Parallel50 v25.55.4 production deployment request
+operational_commit=7ee4bb5bb64eb54b1788a28c98abd20b91da2c34
+qa_run=32748052802
+audit_total=0
+request_mode=IDEMPOTENT_PR_GATE
+issued_at=2026-08-24T16:06:00Z
