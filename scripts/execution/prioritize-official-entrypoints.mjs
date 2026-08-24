@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { isAllowedUrl, readJson, sha256, writeJson } from "./common.mjs";
 
@@ -84,10 +84,12 @@ for (const entryPoint of entryPoints) {
     .sort((a, b) => a.urls.length - b.urls.length || a.slot.localeCompare(b.slot));
   const target = candidates[0] ?? fallback[0];
   if (!target) throw new Error(`No factual lane available for ${entryPoint.market}`);
+  const locale = entryPoint.locale ?? seed.locale;
   const injectedEntry = {
     url: entryPoint.url,
     market: entryPoint.market,
-    locale: entryPoint.locale ?? seed.locale,
+    locale,
+    seedLocale: locale,
     regionGroup: entryPoint.regionGroup ?? seed.regionGroup,
     pathPrefix: seed.pathPrefix,
     sourceClass: entryPoint.sourceClass,
