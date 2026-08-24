@@ -35,10 +35,12 @@ jobs:
         run: npx tsc --noEmit
       - name: Next production build
         run: npm run build
-      - name: Dependency audit evidence
-        run: npm audit --json > dependency-audit-v2555.json || true
+      - name: Dependency audit gate
+        run: npm audit --audit-level=moderate --json > dependency-audit-v2555.json
       - uses: actions/upload-artifact@v4
         with:
           name: rlf-v2555-qa-evidence
-          path: apps/rlf-parallel50-v25-52/dependency-audit-v2555.json
+          path: |
+            apps/rlf-parallel50-v25-52/dependency-audit-v2555.json
+            apps/rlf-parallel50-v25-52/package-lock.json
           retention-days: 7
