@@ -1,0 +1,50 @@
+name: TEMP RLF label fetch v6.21 PR2
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Fetch fixed alternative-exemplar assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/original evidence/reports
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
+          fetch() {
+            local key="$1" url="$2"
+            curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 \
+              --user-agent "$UA" --header 'Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8' \
+              "$url" --output "evidence/original/${key}"
+          }
+          fetch 'CAND-034_ALT_technical.jpg' 'https://i.ebayimg.com/images/g/zPMAAOSwMfZlkGv2/s-l400.jpg'
+          fetch 'CAND-034_ALT_neck.jpg' 'https://u-mercari-images.mercdn.net/photos/m35593253134_11.jpg'
+          fetch 'CAND-034_ALT_garment.jpg' 'https://baseec-img-mng.akamaized.net/images/item/origin/89263c15ff9e43156abce268161575a2.jpg?imformat=generic'
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME_AND_DIMENSIONS.txt
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+          python - <<'PY'
+          import hashlib, json, pathlib
+          root=pathlib.Path('evidence')
+          rows=[]
+          for p in sorted(root.rglob('*')):
+              if not p.is_file() or p.name=='manifest.json':
+                  continue
+              b=p.read_bytes()
+              rows.append({'path':p.as_posix(),'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v621-fetch-pr2','files':rows},indent=2),encoding='utf-8')
+          PY
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-label-evidence-v621-pr2
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
