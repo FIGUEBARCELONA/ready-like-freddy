@@ -1,4 +1,4 @@
-name: RLF active runs snapshot
+name: RLF workflow runs snapshot
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/rlf-execution-backend-20260823
-      - name: Capture recent workflow runs
+      - name: Capture recent execution and validation runs
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -27,15 +27,26 @@ jobs:
           mkdir -p data/execution
           gh api \
             -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/workflows/340557520/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=20" \
-            --jq '{capturedAt: now | todateiso8601, runs: [.workflow_runs[] | {id, run_number, event, status, conclusion, head_sha, created_at, updated_at, html_url}]}' \
-            > data/execution/active-runs.json
+            "/repos/${GITHUB_REPOSITORY}/actions/workflows/340557520/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=10" \
+            --jq '[.workflow_runs[] | {id, name, run_number, event, status, conclusion, head_sha, created_at, updated_at, html_url}]' \
+            > /tmp/execution-runs.json
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/actions/workflows/340716025/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=10" \
+            --jq '[.workflow_runs[] | {id, name, run_number, event, status, conclusion, head_sha, created_at, updated_at, html_url}]' \
+            > /tmp/validation-runs.json
+          jq -n \
+            --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --slurpfile execution /tmp/execution-runs.json \
+            --slurpfile validation /tmp/validation-runs.json \
+            '{capturedAt: $capturedAt, executionRuns: $execution[0], validationRuns: $validation[0]}' \
+            > data/execution/workflow-runs-snapshot.json
       - name: Publish snapshot
         run: |
           set -euo pipefail
           git pull --rebase origin feature/rlf-execution-backend-20260823
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/execution/active-runs.json
-          git commit -m 'Snapshot RLF workflow runs'
+          git add data/execution/workflow-runs-snapshot.json
+          git commit -m 'Snapshot RLF execution and validation runs'
           git push origin HEAD:feature/rlf-execution-backend-20260823
