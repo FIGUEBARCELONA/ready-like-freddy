@@ -5,6 +5,7 @@ import {domainOf} from './search';
 import {evidence} from './evidence';
 import {LEGAL,MARKETPLACES,NEW_RETAIL,PRELOVED,PROFESSIONAL,PURCHASE,UK_OPERATORS} from './policy';
 import {analyzeIdentity,detectCountry} from './identity';
+import {legalContentTypeAllowed,sameRegistrableDomain} from './provenance';
 import {KNOWN_IDENTITY_KEYS,KNOWN_IDENTITY_QUARANTINE_DOMAINS,KNOWN_REJECTED_DOMAINS,KNOWN_SUPPLIER_ALIAS_DOMAINS,KNOWN_SUPPLIER_DOMAINS,STAGED_SUPPLIER_DOMAINS} from '@/lib/known-suppliers';
 
 export function assess(input:DiscoverInput,query:string,queryTemplate:number,identityQueryTemplate:number,result:SearchItem,bundle:Bundle):Candidate {
@@ -12,9 +13,11 @@ export function assess(input:DiscoverInput,query:string,queryTemplate:number,ide
   const domain=domainOf(url);
   const targetText=bundle.target.text.toLowerCase();
   const homeText=(bundle.home?.text??'').toLowerCase();
-  const legalText=(bundle.legal?.text??'').toLowerCase();
   const shopifyText=(bundle.shopify?.text??'').toLowerCase();
-  const pageText=`${targetText} ${homeText} ${legalText} ${shopifyText}`;
+  const legalProvenance=Boolean(bundle.legal&&sameRegistrableDomain(bundle.legal.url,url)&&legalContentTypeAllowed(bundle.legal.contentType));
+  const legalText=legalProvenance?(bundle.legal?.text??'').toLowerCase():'';
+  const commerceText=`${targetText} ${homeText} ${shopifyText}`;
+  const pageText=`${commerceText} ${legalText}`;
   const joined=`${result.title} ${result.snippet} ${pageText}`.toLowerCase();
   const marketplace=MARKETPLACES.some(item=>domain.includes(item));
   const knownRejected=KNOWN_REJECTED_DOMAINS.has(domain);
@@ -28,18 +31,18 @@ export function assess(input:DiscoverInput,query:string,queryTemplate:number,ide
   const identity=analyzeIdentity(domain,legalText,country);
   const knownDuplicateIdentity=Boolean(identity.identityKey&&KNOWN_IDENTITY_KEYS.has(identity.identityKey));
   const fred=/fred\s+perry/i.test(joined)||/fredperry/i.test(joined)||bundle.shopifyProducts.length>0;
-  const preloved=PRELOVED.some(item=>joined.includes(item));
-  const professionalHits=PROFESSIONAL.filter(item=>joined.includes(item)).length;
+  const preloved=PRELOVED.some(item=>commerceText.includes(item));
+  const professionalHits=PROFESSIONAL.filter(item=>commerceText.includes(item)).length;
   const availableProducts=bundle.shopifyProducts.filter(product=>product.available!==false).length;
-  const commerceSignal=PURCHASE.some(item=>joined.includes(item))||availableProducts>0||/\b(cart|basket|checkout|shipping|returns?)\b/i.test(joined);
+  const commerceSignal=PURCHASE.some(item=>commerceText.includes(item))||availableProducts>0||/\b(cart|basket|checkout|shipping|returns?)\b/i.test(commerceText);
   const professional=professionalHits>=2&&commerceSignal;
-  const direct=PURCHASE.some(item=>joined.includes(item))||availableProducts>0;
-  const legalSignal=LEGAL.some(item=>legalText.includes(item));
-  const legalHealthy=bundle.legal?.status===200&&legalSignal&&identity.strong;
+  const direct=PURCHASE.some(item=>commerceText.includes(item))||availableProducts>0;
+  const legalSignal=legalProvenance&&LEGAL.some(item=>legalText.includes(item));
+  const legalHealthy=legalProvenance&&bundle.legal?.status===200&&legalSignal&&identity.strong;
   const sourceHealthy=bundle.target.status===200||availableProducts>0;
   let productPath=false;
   try {productPath=/\/(products?|items?|shop|store|collections?)\//i.test(new URL(url).pathname)||bundle.shopifyProducts.length>0;} catch {}
-  const price=(joined.match(/(?:€|eur|ron|pln|czk|sek|dkk|huf|bgn)\s?\d{1,5}(?:[.,]\d{2})?|\d{1,5}(?:[.,]\d{2})?\s?(?:€|eur|ron|pln|czk|sek|dkk|huf|bgn|лв)/i)||[])[0]||bundle.shopifyProducts.find(product=>product.price)?.price||null;
+  const price=(commerceText.match(/(?:€|eur|ron|pln|czk|sek|dkk|huf|bgn)\s?\d{1,5}(?:[.,]\d{2})?|\d{1,5}(?:[.,]\d{2})?\s?(?:€|eur|ron|pln|czk|sek|dkk|huf|bgn|лв)/i)||[])[0]||bundle.shopifyProducts.find(product=>product.price)?.price||null;
   const knownFirstHand=NEW_RETAIL.some(item=>domain.includes(item));
   const knownDuplicate=knownDuplicateDomain||knownDuplicateIdentity;
   const supplierReady=sourceHealthy&&legalHealthy&&!marketplace&&!knownRejected&&!knownDuplicate&&!identityQuarantine&&!uk&&!nonEU&&!knownFirstHand&&fred&&preloved&&professional&&euEvidence;
