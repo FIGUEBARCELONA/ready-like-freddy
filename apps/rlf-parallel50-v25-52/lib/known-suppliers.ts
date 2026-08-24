@@ -14,7 +14,7 @@ export const KNOWN_IDENTITY_KEYS=new Set([
 ]);
 
 export const KNOWN_REJECTED_DOMAINS=new Set([
-  '2dehands.be','adverts.ie','cybo.com','fashiola.com','fashiola.de','fashiola.fr','gem.app','goldenpages.ie','headlock.co','joinfleek.com','kingpinclothingstore.com','kurpirkt.lv','loopi.com','mainlinemenswear.com','mapcarta.com','near-place.com','novacircle.com','pagesmode.com','roundrobinclassics.com','stockholmfashiondistrict.se','taobao.com','thelabelfinder.com','twintipuk.myshopify.com','vintageclothingguides.com','wikipedia.org','world.taobao.com','worthpoint.com','yellow.com.mt','yelp.com'
+  '2dehands.be','adverts.ie','bazar.bg','cybo.com','fashiola.com','fashiola.de','fashiola.fr','gem.app','goldenpages.ie','headlock.co','joinfleek.com','kingpinclothingstore.com','kurpirkt.lv','loopi.com','mainlinemenswear.com','mapcarta.com','near-place.com','novacircle.com','one4all.mt','pagesmode.com','roundrobinclassics.com','stockholmfashiondistrict.se','taobao.com','thelabelfinder.com','twintipuk.myshopify.com','vendora.bg','vintageclothingguides.com','wikipedia.org','world.taobao.com','worthpoint.com','yellow.com.mt','yelp.com'
 ]);
 
 export const KNOWN_IDENTITY_QUARANTINE_DOMAINS=new Set([
