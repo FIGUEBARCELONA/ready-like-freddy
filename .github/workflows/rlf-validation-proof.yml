@@ -60,12 +60,15 @@ jobs:
           console.log(JSON.stringify({ validatedJsonFiles: paths.length, paths }, null, 2));
           NODE
             node --input-type=module - <<'NODE'
-          import { writeFile } from 'node:fs/promises';
+          import { readFile, writeFile } from 'node:fs/promises';
           import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
           import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
 
           const identityState = await loadProgressLedger();
           const sourcePageState = await loadSourcePageLedger();
+          const sequence12Delta = JSON.parse(
+            await readFile('data/execution/progress-deltas/32777623316.json', 'utf8'),
+          );
 
           const expectedIdentity = {
             completedIdentityCount: 1348,
@@ -147,14 +150,18 @@ jobs:
           if (!completed.has('B2328|560')) {
             mismatches.push(['identity.resolvedRetry.B2328|560', false, true]);
           }
-          const sequence12Delta = identityState.deltas.find(
-            delta => String(delta.runId) === '32777623316',
-          );
-          if (!sequence12Delta || sequence12Delta.completedIdentityKeys.length !== 107) {
+          if (String(sequence12Delta.runId) !== '32777623316' || sequence12Delta.completedIdentityKeys.length !== 107) {
             mismatches.push([
               'identity.sequence12CompletedIdentityCount',
               sequence12Delta?.completedIdentityKeys?.length ?? null,
               107,
+            ]);
+          }
+          if ((sequence12Delta.failedIdentities ?? []).length !== 4) {
+            mismatches.push([
+              'identity.sequence12FailedIdentityCount',
+              sequence12Delta?.failedIdentities?.length ?? null,
+              4,
             ]);
           }
           const sequence12SourceDelta = sourcePageState.deltas.find(
