@@ -1,6 +1,6 @@
 import type {DiscoverInput,LaneCycleResult,Candidate,ProviderAttempt} from './types';
 import {NEGATIVE,QUERIES} from './policy';
-import {domainOf,searchAll,type SearchItem} from './search';
+import {contextualRecoveryQuery,domainOf,searchAll,shouldRunContextualRecovery,type SearchItem} from './search';
 import {evidence,fetchBundle} from './evidence';
 import {assess} from './assessment';
 
@@ -21,10 +21,17 @@ export async function discoverLaneCycle(input:DiscoverInput):Promise<LaneCycleRe
   const discoveryQuery=`${QUERIES[queryTemplate](input.lane)} ${NEGATIVE}`;
   const legalQuery=`${identity.query} ${NEGATIVE}`;
   const [primary,identitySearch]=await Promise.all([searchAll(discoveryQuery,input),searchAll(legalQuery,input)]);
-  const query=`${discoveryQuery} || IDENTITY:${legalQuery}`;
   const attempts:ProviderAttempt[]=[...primary.attempts,...identitySearch.attempts];
   const merged:SearchItem[]=[];const seenUrls=new Set<string>();
-  for(const item of [...identitySearch.results,...primary.results]) {if(seenUrls.has(item.url)) continue;seenUrls.add(item.url);merged.push(item);}
+  const merge=(items:SearchItem[])=>{for(const item of items){if(seenUrls.has(item.url))continue;seenUrls.add(item.url);merged.push(item);}};
+  merge(identitySearch.results);merge(primary.results);
+  let query=`${discoveryQuery} || IDENTITY:${legalQuery}`;
+  if(shouldRunContextualRecovery(primary.results.length,identitySearch.results.length)) {
+    const recoveryQuery=`${contextualRecoveryQuery(input)} ${NEGATIVE}`;
+    const recovery=await searchAll(recoveryQuery,input);
+    attempts.push(...recovery.attempts);merge(recovery.results);
+    query+=` || RECOVERY:${recoveryQuery}`;
+  }
   const errors:string[]=[];const candidates:Candidate[]=[];const domains=new Set<string>();
   for(const result of merged) {
     if(candidates.length>=input.maxCandidates) break;
