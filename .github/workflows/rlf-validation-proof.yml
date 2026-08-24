@@ -24,8 +24,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Enable pinned pnpm
-        run: corepack enable
+      - run: corepack enable
+        name: Enable pinned pnpm
       - name: Execute complete validation
         id: validate
         continue-on-error: true
@@ -67,47 +67,37 @@ jobs:
             factoryVerifiedCount: 0,
             globalCanonicalProductCount: 0,
           };
-          const actualRetryKeys = state.retry.identities.map(item => item.identityKey).sort();
-          const checks = [
-            ['completedIdentityCount', state.completed.identityCount, expected.completedIdentityCount],
-            ['productUrlCaptureCount', state.completed.productUrlCaptureCount, expected.productUrlCaptureCount],
-            ['officialProductImageReferenceCount', state.counters.officialProductImageReferenceCount, expected.officialProductImageReferenceCount],
-            ['materialEvidenceCount', state.counters.materialEvidenceCount, expected.materialEvidenceCount],
-            ['manufacturingClaimCount', state.counters.manufacturingClaimCount, expected.manufacturingClaimCount],
-            ['descriptionMissingIdentityCount', state.metadataGaps.descriptionMissingIdentityCount, expected.descriptionMissingIdentityCount],
-            ['priceMissingIdentityCount', state.metadataGaps.priceMissingIdentityCount, expected.priceMissingIdentityCount],
-            ['materialMissingIdentityCount', state.metadataGaps.materialMissingIdentityCount, expected.materialMissingIdentityCount],
-            ['deltaCount', state.deltaCount, expected.deltaCount],
-            ['factoryVerifiedCount', state.counters.factoryVerifiedCount, expected.factoryVerifiedCount],
-            ['globalCanonicalProductCount', state.counters.globalCanonicalProductCount, expected.globalCanonicalProductCount],
-          ];
-          const mismatches = checks.filter(([, actual, wanted]) => actual !== wanted);
-          if (JSON.stringify(actualRetryKeys) !== JSON.stringify(expected.retryIdentityKeys)) {
-            mismatches.push(['retryIdentityKeys', actualRetryKeys, expected.retryIdentityKeys]);
+          const actual = {
+            completedIdentityCount: state.completed.identityCount,
+            productUrlCaptureCount: state.completed.productUrlCaptureCount,
+            officialProductImageReferenceCount: state.counters.officialProductImageReferenceCount,
+            materialEvidenceCount: state.counters.materialEvidenceCount,
+            manufacturingClaimCount: state.counters.manufacturingClaimCount,
+            descriptionMissingIdentityCount: state.metadataGaps.descriptionMissingIdentityCount,
+            priceMissingIdentityCount: state.metadataGaps.priceMissingIdentityCount,
+            materialMissingIdentityCount: state.metadataGaps.materialMissingIdentityCount,
+            retryIdentityKeys: state.retry.identities.map(item => item.identityKey).sort(),
+            deltaCount: state.deltaCount,
+            factoryVerifiedCount: state.counters.factoryVerifiedCount,
+            globalCanonicalProductCount: state.counters.globalCanonicalProductCount,
+            ledgerSha256: state.ledgerSha256,
+          };
+          const fields = Object.keys(expected).filter(key => key !== 'retryIdentityKeys');
+          const mismatches = fields
+            .filter(key => actual[key] !== expected[key])
+            .map(key => [key, actual[key], expected[key]]);
+          if (JSON.stringify(actual.retryIdentityKeys) !== JSON.stringify(expected.retryIdentityKeys)) {
+            mismatches.push(['retryIdentityKeys', actual.retryIdentityKeys, expected.retryIdentityKeys]);
           }
           const completed = new Set(state.completed.identityKeys);
-          const completedRetries = actualRetryKeys.filter(identityKey => completed.has(identityKey));
+          const completedRetries = actual.retryIdentityKeys.filter(key => completed.has(key));
           if (completedRetries.length) mismatches.push(['completedRetries', completedRetries, []]);
           const checkpoint = {
             schemaVersion: 1,
             sourceRunId: '32746322369',
             generatedAt: new Date().toISOString(),
             expected,
-            actual: {
-              completedIdentityCount: state.completed.identityCount,
-              productUrlCaptureCount: state.completed.productUrlCaptureCount,
-              officialProductImageReferenceCount: state.counters.officialProductImageReferenceCount,
-              materialEvidenceCount: state.counters.materialEvidenceCount,
-              manufacturingClaimCount: state.counters.manufacturingClaimCount,
-              descriptionMissingIdentityCount: state.metadataGaps.descriptionMissingIdentityCount,
-              priceMissingIdentityCount: state.metadataGaps.priceMissingIdentityCount,
-              materialMissingIdentityCount: state.metadataGaps.materialMissingIdentityCount,
-              retryIdentityKeys: actualRetryKeys,
-              deltaCount: state.deltaCount,
-              factoryVerifiedCount: state.counters.factoryVerifiedCount,
-              globalCanonicalProductCount: state.counters.globalCanonicalProductCount,
-              ledgerSha256: state.ledgerSha256,
-            },
+            actual,
             mismatches,
             passed: mismatches.length === 0,
           };
@@ -118,7 +108,7 @@ jobs:
             pnpm check
             pnpm build
           } 2>&1 | tee /tmp/rlf-validation.log
-      - name: Publish auditable validation proof
+      - name: Generate validation proof
         if: always()
         shell: bash
         env:
@@ -156,11 +146,17 @@ jobs:
           };
           fs.writeFileSync('data/execution/validation-proof.json', `${JSON.stringify(proof, null, 2)}\n`);
           NODE
-          git pull --rebase origin feature/rlf-execution-backend-20260823
+      - name: Commit, rebase and publish proof
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/validation-proof.json
           git commit -m "Persist RLF validation proof ${GITHUB_RUN_ID}"
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
       - name: Enforce validation success
         if: steps.validate.outcome != 'success'
