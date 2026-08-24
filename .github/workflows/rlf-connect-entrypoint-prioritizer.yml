@@ -1,0 +1,68 @@
+name: RLF connect entry-point prioritizer
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-connect-entrypoint-prioritizer.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-connect-entrypoint-prioritizer
+  cancel-in-progress: false
+
+jobs:
+  connect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Patch prepare stage exactly once
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/rlf-50-worker-kb.yml')
+          text = path.read_text()
+          needle = '          node scripts/execution/prepare-official-queue.mjs --out=execution/queue\n'
+          replacement = '''          node scripts/execution/prepare-official-queue.mjs --out=execution/queue
+          node scripts/execution/prioritize-official-entrypoints.mjs \\
+            --queue=execution/queue/queue.json \\
+            --seeds=data/execution/rlf-kb-official-seeds.json \\
+            --summary=execution/queue/summary.json \\
+            --urls=execution/queue/urls.txt
+'''
+          if text.count(needle) != 1:
+              raise SystemExit(f'Expected one prepare command, found {text.count(needle)}')
+          if 'prioritize-official-entrypoints.mjs' in text:
+              raise SystemExit('Prioritizer is already connected')
+          updated = text.replace(needle, replacement, 1)
+          path.write_text(updated)
+          PY
+          test "$(grep -c 'prioritize-official-entrypoints.mjs' .github/workflows/rlf-50-worker-kb.yml)" = 1
+          grep -A7 -B2 'prioritize-official-entrypoints.mjs' .github/workflows/rlf-50-worker-kb.yml
+      - name: Validate scripts and workflow invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check scripts/execution/prioritize-official-entrypoints.mjs
+          node --check scripts/execution/prepare-official-queue.mjs
+          grep -q "paths:" .github/workflows/rlf-50-worker-kb.yml
+          grep -q "data/execution/rlf-kb-official-seeds.json" .github/workflows/rlf-50-worker-kb.yml
+          grep -q "data/execution/rlf-kb-run-plan.json" .github/workflows/rlf-50-worker-kb.yml
+      - name: Commit exact workflow connection
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/rlf-50-worker-kb.yml
+          git commit -m 'Connect verified archive entry points to 50-lane prepare stage'
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
+          git push origin HEAD:feature/rlf-execution-backend-20260823
