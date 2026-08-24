@@ -1,52 +1,74 @@
 {
-  "schemaVersion": 3,
-  "recordedAt": "2026-08-24T17:24:56.306Z",
-  "sourceCommitSha": "ede642aff6b65cb0a4ef9c2c6a1fb0a05503d122",
-  "runId": "32756447582",
+  "schemaVersion": 4,
+  "recordedAt": "2026-08-24T17:52:57.550Z",
+  "sourceCommitSha": "6e658fa8591612592eb2fb044cc8bac410b155b5",
+  "runId": "32759127019",
   "runAttempt": 1,
   "validationOutcome": "success",
   "nodeVersion": "v22.23.2",
-  "logSha256": "9d0886bc474fda63b6329e1af989ed4497d4332b8eea276c32d93dc36a8ea3d2",
+  "logSha256": "a1828f017094e9377013d3d2e0d1a0b5b75fa1aa35970f4d1a56422465e31bc7",
   "ledgerCheckpoint": {
-    "schemaVersion": 2,
-    "sourceRunId": "32754804084",
-    "generatedAt": "2026-08-24T17:24:44.155Z",
+    "schemaVersion": 3,
+    "sourceRunId": "32758087459",
+    "generatedAt": "2026-08-24T17:52:45.502Z",
     "expected": {
-      "completedIdentityCount": 1054,
-      "productUrlCaptureCount": 1707,
-      "officialProductImageReferenceCount": 9271,
-      "materialEvidenceCount": 1383,
-      "manufacturingClaimCount": 59,
-      "descriptionMissingIdentityCount": 523,
-      "priceMissingIdentityCount": 467,
-      "materialMissingIdentityCount": 68,
-      "retryIdentityKeys": [
-        "B2328|560",
-        "HW2300|843"
-      ],
-      "deltaCount": 5,
-      "latestRunId": "32754804084",
-      "factoryVerifiedCount": 0,
-      "globalCanonicalProductCount": 0
+      "identity": {
+        "completedIdentityCount": 1241,
+        "productUrlCaptureCount": 2013,
+        "officialProductImageReferenceCount": 10787,
+        "materialEvidenceCount": 1605,
+        "manufacturingClaimCount": 63,
+        "descriptionMissingIdentityCount": 710,
+        "priceMissingIdentityCount": 654,
+        "materialMissingIdentityCount": 86,
+        "retryIdentityKeys": [
+          "G3636|Z77",
+          "HW2300|843",
+          "M1588|81B",
+          "M1588|84B",
+          "SY3660|46A"
+        ],
+        "deltaCount": 6,
+        "latestRunId": "32758087459",
+        "factoryVerifiedCount": 0,
+        "globalCanonicalProductCount": 0
+      },
+      "sourcePages": {
+        "deltaCount": 4,
+        "attemptedObservationCount": 782,
+        "uniqueAttemptedSourcePageCount": 497,
+        "ledgerSha256": "f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347"
+      }
     },
     "actual": {
-      "completedIdentityCount": 1054,
-      "productUrlCaptureCount": 1707,
-      "officialProductImageReferenceCount": 9271,
-      "materialEvidenceCount": 1383,
-      "manufacturingClaimCount": 59,
-      "descriptionMissingIdentityCount": 523,
-      "priceMissingIdentityCount": 467,
-      "materialMissingIdentityCount": 68,
-      "retryIdentityKeys": [
-        "B2328|560",
-        "HW2300|843"
-      ],
-      "deltaCount": 5,
-      "latestRunId": "32754804084",
-      "factoryVerifiedCount": 0,
-      "globalCanonicalProductCount": 0,
-      "ledgerSha256": "a8cc70c9f14fa51466baaf6122bdd648bf66c00b3a982c354a400e18b7856cd5"
+      "identity": {
+        "completedIdentityCount": 1241,
+        "productUrlCaptureCount": 2013,
+        "officialProductImageReferenceCount": 10787,
+        "materialEvidenceCount": 1605,
+        "manufacturingClaimCount": 63,
+        "descriptionMissingIdentityCount": 710,
+        "priceMissingIdentityCount": 654,
+        "materialMissingIdentityCount": 86,
+        "retryIdentityKeys": [
+          "G3636|Z77",
+          "HW2300|843",
+          "M1588|81B",
+          "M1588|84B",
+          "SY3660|46A"
+        ],
+        "deltaCount": 6,
+        "latestRunId": "32758087459",
+        "factoryVerifiedCount": 0,
+        "globalCanonicalProductCount": 0,
+        "ledgerSha256": "179993c636c082e27b432f57a553a8c8d24b71d3b3b7749c7a60549376eba578"
+      },
+      "sourcePages": {
+        "deltaCount": 4,
+        "attemptedObservationCount": 782,
+        "uniqueAttemptedSourcePageCount": 497,
+        "ledgerSha256": "f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347"
+      }
     },
     "mismatches": [],
     "passed": true
@@ -54,8 +76,9 @@
   "requiredChecks": [
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
-    "canonical_json_and_five_delta_parse",
-    "exact_sequence_10_append_only_ledger_checkpoint",
+    "canonical_json_six_identity_deltas_four_source_page_deltas",
+    "exact_sequence_11_identity_and_source_page_ledgers",
+    "resolved_retry_b2328_560",
     "typescript_no_emit",
     "production_build"
   ]
