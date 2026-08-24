@@ -2,51 +2,41 @@ const fs=require('fs');
 const path=require('path');
 const crypto=require('crypto');
 const {chromium,request}=require('playwright');
-
-const out=path.resolve('downloaded');
-const diag=path.resolve('diagnostics');
-fs.mkdirSync(out,{recursive:true});
-fs.mkdirSync(diag,{recursive:true});
-
+const out=path.resolve('downloaded'),diag=path.resolve('diagnostics');
+fs.mkdirSync(out,{recursive:true});fs.mkdirSync(diag,{recursive:true});
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-function mime(b){if(b.length>=12&&b.subarray(0,4).toString('hex')==='52494646'&&b.subarray(8,12).toString()==='WEBP')return'image/webp';if(b.length>=8&&b.subarray(0,8).toString('hex')==='89504e470d0a1a0a')return'image/png';if(b.length>=3&&b.subarray(0,3).toString('hex')==='ffd8ff')return'image/jpeg';if(b.length>=4&&b.subarray(0,4).toString()==='%PDF')return'application/pdf';return'application/octet-stream'}
-function ext(m){return m==='image/webp'?'webp':m==='image/png'?'png':m==='image/jpeg'?'jpg':m==='application/pdf'?'pdf':'bin'}
-const seen=new Set();
-const rows=[];
-function safeName(s){return String(s).replace(/[^A-Za-z0-9._-]+/g,'_').slice(0,170)}
-function preserve(buffer,id,meta={}){const m=mime(buffer),h=sha(buffer),pass=(/^image\/(jpeg|png|webp)$/.test(m)&&buffer.length>=1500)||m==='application/pdf';const row={id,...meta,bytes:buffer.length,sha256:h,magicMime:m,binaryPass:pass};if(pass&&!seen.has(h)){seen.add(h);const file=`${safeName(id)}.${ext(m)}`;fs.writeFileSync(path.join(out,file),buffer);row.file=file;row.admission='CANDIDATE_ONLY_MANUAL_VISUAL_GATE'}else row.admission=pass?'DUPLICATE_SHA':'REJECT_BINARY_GATE';rows.push(row);return row}
-async function fetchBinary(ctx,url,id,meta={}){try{const r=await ctx.get(url,{timeout:120000,failOnStatusCode:false,headers:{Referer:meta.referer||meta.pageUrl||'',Accept:'image/avif,image/webp,image/apng,image/*,*/*;q=0.8,application/pdf;q=0.9,*/*;q=0.5'}});const b=await r.body();return preserve(b,id,{...meta,url,status:r.status(),headerContentType:r.headers()['content-type']||''})}catch(e){rows.push({id,...meta,url,error:String(e),admission:'REQUEST_ERROR'})}}
-
-const directTargets=[
- {id:'HIST-M3-1952_980x606',url:'https://designmuseum.org/image/960c8909-c0ed-46b0-a95c-038f5bcc2fed?height=606&width=980',referer:'https://designmuseum.org/exhibitions/fred-perry-a-british-icon',role:'CAPTIONED_M3_1952'},
- {id:'HIST-M3-1952_1600x989',url:'https://designmuseum.org/image/960c8909-c0ed-46b0-a95c-038f5bcc2fed?height=989&width=1600',referer:'https://designmuseum.org/exhibitions/fred-perry-a-british-icon',role:'CAPTIONED_M3_1952'},
- {id:'HIST-M3-1952_2400x1483',url:'https://designmuseum.org/image/960c8909-c0ed-46b0-a95c-038f5bcc2fed?height=1483&width=2400',referer:'https://designmuseum.org/exhibitions/fred-perry-a-british-icon',role:'CAPTIONED_M3_1952'},
- {id:'HIST-M3-1952_3200x1978',url:'https://designmuseum.org/image/960c8909-c0ed-46b0-a95c-038f5bcc2fed?height=1978&width=3200',referer:'https://designmuseum.org/exhibitions/fred-perry-a-british-icon',role:'CAPTIONED_M3_1952'},
- {id:'OFFICIAL-M3-V4',url:'https://www.fredperry.com/static/version0.0.0.919/frontend/Magento/base/default/Perry_Brandbook/images/the-shirt/m3-v4.png',referer:'https://www.fredperry.com/brandbook/',role:'OFFICIAL_M3'},
- {id:'OFFICIAL-GARMENT-TAG',url:'https://www.fredperry.com/static/version0.0.0.919/frontend/Magento/base/default/Perry_Brandbook/images/the-shirt/garment-tag-1.jpg',referer:'https://www.fredperry.com/brandbook/',role:'OFFICIAL_HANG_TAG'},
-];
-
-const pages=[
- {id:'DESIGN-MUSEUM',url:'https://designmuseum.org/exhibitions/fred-perry-a-british-icon',tokens:['960c8909','fred-perry','designmuseum']},
- {id:'CAND-072',url:'https://www.ebay.com/itm/317781354098',tokens:['317781354098','fred-perry','merino','argyle']},
- {id:'CAND-073',url:'https://www.ebay.com/itm/358285983712',tokens:['358285983712','fred-perry','union-jack']},
- {id:'J1826-SELEKTA',url:'https://www.selekta-shop.de/Fred-Perry-Parka-Made-in-England-Green-J1826-M',tokens:['j1826','fred-perry','parka']},
- {id:'J1826-RAKUTEN',url:'https://item.rakuten.co.jp/better/j1826/',tokens:['j1826','fred','parka']},
- {id:'CAND-046',url:'https://www.etsy.com/listing/4416347158',tokens:['4416347158','fred-perry','parka']},
- {id:'CAND-051',url:'https://www.etsy.com/listing/1504984921',tokens:['1504984921','fred-perry','tennis']},
- {id:'J1518-INSTAGRAM',url:'https://www.instagram.com/p/DVvOqMrAh5i/',tokens:['DVvOqMrAh5i','cdninstagram','fbcdn']},
- {id:'OS-HUB-FRED-PERRY',url:'https://opensupplyhub.org/?contributors=1092',tokens:['contributors=1092','opensupplyhub','api']},
-];
-
-function relevant(url,tokens){const u=String(url||'').toLowerCase();return tokens.some(t=>u.includes(String(t).toLowerCase()))}
-function extractUrls(text){const found=new Set();const re=/https?:\\?\/\\?\/[^"'<>\s)]+/g;for(const m of String(text||'').matchAll(re)){let u=m[0].replace(/\\u0026/g,'&').replace(/\\\//g,'/').replace(/&amp;/g,'&');if(/^https?:\/\//i.test(u))found.add(u)}return [...found]}
-
-async function inspectPage(browser,target){const context=await browser.newContext({locale:'en-US',viewport:{width:1440,height:1200},userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36'});const page=await context.newPage();const network=[];page.on('response',async r=>{const u=r.url(),ct=(r.headers()['content-type']||'').toLowerCase();if((ct.startsWith('image/')||ct.includes('json')||ct.includes('javascript'))&&relevant(u,target.tokens)){network.push({url:u,status:r.status(),contentType:ct});if(ct.startsWith('image/')){try{preserve(await r.body(),`${target.id}_NET_${String(network.length).padStart(3,'0')}`,{mode:'network',pageUrl:target.url,url:u,status:r.status(),headerContentType:ct})}catch(_){}}}});
- let navStatus=null,error=null;try{const nav=await page.goto(target.url,{waitUntil:'domcontentloaded',timeout:120000});navStatus=nav?nav.status():null;await sleep(12000);await page.screenshot({path:path.join(diag,`${target.id}_page.png`),fullPage:true}).catch(()=>{});const payload=await page.evaluate(()=>({title:document.title,url:location.href,body:(document.body?.innerText||'').slice(0,60000),html:document.documentElement.outerHTML.slice(0,2500000),images:[...document.images].map((im,i)=>({i,src:im.currentSrc||im.src||'',srcset:im.srcset||'',alt:im.alt||'',w:im.naturalWidth||0,h:im.naturalHeight||0})),scripts:[...document.scripts].map((s,i)=>({i,src:s.src||'',text:(s.textContent||'').slice(0,200000)}))}));fs.writeFileSync(path.join(diag,`${target.id}_page.json`),JSON.stringify({target,navStatus,title:payload.title,finalUrl:payload.url,body:payload.body,images:payload.images,network},null,2));const urls=new Set();for(const im of payload.images){if(im.src)urls.add(im.src);for(const part of String(im.srcset||'').split(',')){const u=part.trim().split(/\s+/)[0];if(u)urls.add(u)}}for(const u of extractUrls(payload.html)){if(/\.(?:jpe?g|png|webp)(?:\?|$)/i.test(u)||relevant(u,target.tokens))urls.add(u)}let n=0;for(const u of urls){if(!/^https?:\/\//i.test(u))continue;if(!relevant(u,target.tokens)&&target.id!=='DESIGN-MUSEUM')continue;n++;if(n>80)break;await fetchBinary(context.request,u,`${target.id}_PAGE_${String(n).padStart(3,'0')}`,{mode:'page_resource',pageUrl:target.url,referer:target.url})}
- if(target.id==='OS-HUB-FRED-PERRY'){fs.writeFileSync(path.join(diag,'OS_HUB_NETWORK.json'),JSON.stringify(network,null,2));const apiUrls=[...new Set(network.filter(x=>x.contentType.includes('json')).map(x=>x.url))];let j=0;for(const u of apiUrls){try{const r=await context.request.get(u,{timeout:120000,failOnStatusCode:false,headers:{Referer:target.url}});const b=await r.body();fs.writeFileSync(path.join(diag,`OS_HUB_API_${String(++j).padStart(2,'0')}.json`),b)}catch(_){}}}
- }catch(e){error=String(e)}finally{fs.writeFileSync(path.join(diag,`${target.id}_summary.json`),JSON.stringify({target,navStatus,error,networkCount:network.length},null,2));await context.close()}}
-
-async function bingExact(browser,id,query){const context=await browser.newContext({locale:'en-US',viewport:{width:1440,height:1200},userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36'});const page=await context.newPage();try{const url=`https://www.bing.com/images/search?q=${encodeURIComponent(query)}`;await page.goto(url,{waitUntil:'domcontentloaded',timeout:120000});await sleep(8000);const tiles=await page.locator('a.iusc').evaluateAll(nodes=>nodes.slice(0,50).map((n,i)=>{let m={};try{m=JSON.parse(n.getAttribute('m')||'{}')}catch(_){}return{i,m}}));fs.writeFileSync(path.join(diag,`${id}_bing.json`),JSON.stringify({query,tiles},null,2));let k=0;for(const t of tiles){const text=JSON.stringify(t).toLowerCase();if(!text.includes(query.replace(/["']/g,'').toLowerCase().split(' ')[0]))continue;for(const u of [t.m?.murl,t.m?.turl]){if(!u)continue;k++;if(k>20)break;await fetchBinary(context.request,u,`${id}_BING_${String(k).padStart(3,'0')}`,{mode:'bing',query,sourcePage:t.m?.purl||'',title:t.m?.t||'',referer:url})}}}catch(e){rows.push({id,query,error:String(e),admission:'SEARCH_ERROR'})}finally{await context.close()}}
-
-(async()=>{const req=await request.newContext({userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36'});for(const t of directTargets)await fetchBinary(req,t.url,t.id,{mode:'direct',referer:t.referer,role:t.role});await req.dispose();const browser=await chromium.launch({headless:true});for(const p of pages)await inspectPage(browser,p);await bingExact(browser,'CAND-055','"M3/157/835/273" Fred Perry label');await bingExact(browser,'J1826-LABEL','"J1826" Fred Perry label Made in England');await browser.close();const files=fs.readdirSync(out).sort().map(f=>{const b=fs.readFileSync(path.join(out,f));return{file:f,bytes:b.length,sha256:sha(b),magicMime:mime(b)}});const report={schema:'rlf-v628-exact-recovery-v1',policy:'APPEND_ONLY_FAIL_CLOSED',generatedAt:new Date().toISOString(),directTargets,pages,preservedFiles:files,rows,canonicalPromotion:false,nextGate:'Manual visual QA, literal transcription, provenance separation, factory-entity reconciliation and global deduplication.'};fs.writeFileSync(path.join(diag,'rlf-v628-exact-recovery-report.json'),JSON.stringify(report,null,2));fs.writeFileSync(path.join(diag,'RLF_V628_SHA256SUMS.txt'),files.map(x=>`${x.sha256}  ${x.file}`).join('\n')+'\n');console.log(JSON.stringify({preserved:files.length,files:files.length,canonicalPromotion:false},null,2))})().catch(e=>{fs.writeFileSync(path.join(diag,'fatal-error.txt'),String(e));console.error(e);process.exitCode=1});
+function mime(b){if(b.length>=12&&b.subarray(0,4).toString('hex')==='52494646'&&b.subarray(8,12).toString()==='WEBP')return'image/webp';if(b.length>=8&&b.subarray(0,8).toString('hex')==='89504e470d0a1a0a')return'image/png';if(b.length>=3&&b.subarray(0,3).toString('hex')==='ffd8ff')return'image/jpeg';return'application/octet-stream'}
+(async()=>{
+ const report={schema:'rlf-v628b-osh-browser-context-v1',policy:'APPEND_ONLY_FAIL_CLOSED',generatedAt:new Date().toISOString(),requests:[],canonicalPromotion:false};
+ const browser=await chromium.launch({headless:true});
+ const context=await browser.newContext({locale:'en-US',viewport:{width:1440,height:1200},userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36'});
+ const page=await context.newPage();
+ const pageUrl='https://opensupplyhub.org/facilities/?contributors=1092';
+ const nav=await page.goto(pageUrl,{waitUntil:'networkidle',timeout:180000});
+ await page.waitForTimeout(8000);
+ const endpoints=[
+  '/api/facilities/?contributors=1092&sort_by=name_asc&number_of_public_contributors=true&pageSize=50',
+  '/api/contributor-lists-sorted/?contributors=1092',
+  '/api/contributors/'
+ ];
+ for(let i=0;i<endpoints.length;i++){
+  const endpoint=endpoints[i];
+  const result=await page.evaluate(async endpoint=>{const r=await fetch(endpoint,{credentials:'include',headers:{Accept:'application/json'}});return{status:r.status,contentType:r.headers.get('content-type')||'',text:await r.text()};},endpoint);
+  const file=`OS_HUB_BROWSER_API_${String(i+1).padStart(2,'0')}.json`;
+  fs.writeFileSync(path.join(diag,file),result.text);
+  report.requests.push({endpoint,status:result.status,contentType:result.contentType,file,bytes:Buffer.byteLength(result.text),sha256:sha(Buffer.from(result.text))});
+ }
+ const dom=await page.evaluate(()=>({title:document.title,url:location.href,body:document.body?.innerText||'',html:document.documentElement.outerHTML}));
+ fs.writeFileSync(path.join(diag,'OS_HUB_BROWSER_DOM.txt'),dom.body);
+ fs.writeFileSync(path.join(diag,'OS_HUB_BROWSER_REPORT.json'),JSON.stringify({...report,navStatus:nav?.status()||null,title:dom.title,finalUrl:dom.url},null,2));
+ await page.screenshot({path:path.join(diag,'OS_HUB_BROWSER_PAGE.png'),fullPage:true});
+ await context.close();await browser.close();
+ const req=await request.newContext({userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36'});
+ const creative='https://creative-boom-media.lon1.cdn.digitaloceanspaces.com/62e3c35c-eb58-4cb9-859c-e769633d42a7/512b0ddcd73e0f2eb4086f01a3af6c39823aca49.jpg';
+ try{const r=await req.get(creative,{timeout:120000,failOnStatusCode:false,headers:{Referer:'https://www.creativeboom.com/inspiration/fred-perry-a-british-icon/'}});const b=await r.body(),m=mime(b);const rec={url:creative,status:r.status(),bytes:b.length,sha256:sha(b),magicMime:m};if(m==='image/jpeg'&&b.length>1500){const file='HIST-M3-1952_CREATIVE_BOOM.jpg';fs.writeFileSync(path.join(out,file),b);rec.file=file;rec.admission='SECONDARY_SAME_OBJECT_CANDIDATE'}else rec.admission='REJECT_BINARY_GATE';report.creativeBoom=rec;}catch(e){report.creativeBoom={url:creative,error:String(e),admission:'REQUEST_ERROR'};}
+ await req.dispose();
+ fs.writeFileSync(path.join(diag,'rlf-v628b-final-report.json'),JSON.stringify(report,null,2));
+ const files=fs.readdirSync(out).sort().map(f=>{const b=fs.readFileSync(path.join(out,f));return{file:f,bytes:b.length,sha256:sha(b),magicMime:mime(b)}});
+ fs.writeFileSync(path.join(diag,'RLF_V628B_SHA256SUMS.txt'),files.map(x=>`${x.sha256}  ${x.file}`).join('\n')+'\n');
+ console.log(JSON.stringify({requests:report.requests,creativeBoom:report.creativeBoom,files},null,2));
+})().catch(e=>{fs.writeFileSync(path.join(diag,'fatal-error.txt'),String(e));console.error(e);process.exitCode=1});
