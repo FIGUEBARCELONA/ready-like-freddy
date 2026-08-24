@@ -1,25 +1,25 @@
 {
-  "schemaVersion": 5,
-  "recordedAt": "2026-08-24T21:18:16.659Z",
-  "sourceCommitSha": "f97cc151651f754e01bf57651f71c985023fc0ab",
-  "runId": "32778727059",
+  "schemaVersion": 6,
+  "recordedAt": "2026-08-24T21:44:50.089Z",
+  "sourceCommitSha": "62e9ee8ba2ea9007bed8aa808e56089b87c4c581",
+  "runId": "32781096096",
   "runAttempt": 1,
   "validationOutcome": "success",
   "nodeVersion": "v22.23.2",
-  "logSha256": "ed4fe69f4ae152f472ae0b6a5d66b931be9703f69668db50f66dbb6f04ac5d6d",
+  "logSha256": "b23fdfd72160f8f0aaca0e16dcf259f0b764272b8ce32d327f683acc2f3c2d36",
   "ledgerCheckpoint": {
-    "schemaVersion": 4,
-    "sourceRunId": "32777623316",
-    "generatedAt": "2026-08-24T21:18:04.793Z",
+    "schemaVersion": 5,
+    "sourceRunId": "32780333417",
+    "generatedAt": "2026-08-24T21:44:38.619Z",
     "expected": {
       "identity": {
-        "completedIdentityCount": 1348,
-        "productUrlCaptureCount": 2144,
-        "officialProductImageReferenceCount": 11626,
-        "materialEvidenceCount": 1737,
+        "completedIdentityCount": 1351,
+        "productUrlCaptureCount": 2149,
+        "officialProductImageReferenceCount": 11654,
+        "materialEvidenceCount": 1742,
         "manufacturingClaimCount": 63,
-        "descriptionMissingIdentityCount": 817,
-        "priceMissingIdentityCount": 761,
+        "descriptionMissingIdentityCount": 820,
+        "priceMissingIdentityCount": 764,
         "materialMissingIdentityCount": 86,
         "retryIdentityKeys": [
           "G3636|Z77",
@@ -29,28 +29,28 @@
           "M4613|41A",
           "SY3660|46A"
         ],
-        "deltaCount": 7,
-        "latestRunId": "32777623316",
+        "deltaCount": 8,
+        "latestRunId": "32780333417",
         "factoryVerifiedCount": 0,
         "globalCanonicalProductCount": 0,
-        "ledgerSha256": "c57080c5befb8df5d00f8403b3a2b8c384017ed975441523498062b4f8b1edf9"
+        "ledgerSha256": "d20d264b5508091d3052fdd95e7ac9bfab928072537d2e45d0f8069a288990d7"
       },
       "sourcePages": {
-        "deltaCount": 5,
-        "attemptedObservationCount": 979,
-        "uniqueAttemptedSourcePageCount": 694,
-        "ledgerSha256": "f1733b93b06210411820a9feb94bbc0492f8da3b1a4f21e78811664ee0402efd"
+        "deltaCount": 6,
+        "attemptedObservationCount": 1198,
+        "uniqueAttemptedSourcePageCount": 913,
+        "ledgerSha256": "958615fe3ff5d8192371a8d1c2f0ed65308b31309ef03fcebd6b10b20d23f339"
       }
     },
     "actual": {
       "identity": {
-        "completedIdentityCount": 1348,
-        "productUrlCaptureCount": 2144,
-        "officialProductImageReferenceCount": 11626,
-        "materialEvidenceCount": 1737,
+        "completedIdentityCount": 1351,
+        "productUrlCaptureCount": 2149,
+        "officialProductImageReferenceCount": 11654,
+        "materialEvidenceCount": 1742,
         "manufacturingClaimCount": 63,
-        "descriptionMissingIdentityCount": 817,
-        "priceMissingIdentityCount": 761,
+        "descriptionMissingIdentityCount": 820,
+        "priceMissingIdentityCount": 764,
         "materialMissingIdentityCount": 86,
         "retryIdentityKeys": [
           "G3636|Z77",
@@ -60,24 +60,61 @@
           "M4613|41A",
           "SY3660|46A"
         ],
-        "deltaCount": 7,
-        "latestRunId": "32777623316",
+        "deltaCount": 8,
+        "latestRunId": "32780333417",
         "factoryVerifiedCount": 0,
         "globalCanonicalProductCount": 0,
-        "ledgerSha256": "c57080c5befb8df5d00f8403b3a2b8c384017ed975441523498062b4f8b1edf9"
+        "ledgerSha256": "d20d264b5508091d3052fdd95e7ac9bfab928072537d2e45d0f8069a288990d7"
       },
       "sourcePages": {
-        "deltaCount": 5,
-        "attemptedObservationCount": 979,
-        "uniqueAttemptedSourcePageCount": 694,
-        "ledgerSha256": "f1733b93b06210411820a9feb94bbc0492f8da3b1a4f21e78811664ee0402efd"
+        "deltaCount": 6,
+        "attemptedObservationCount": 1198,
+        "uniqueAttemptedSourcePageCount": 913,
+        "ledgerSha256": "958615fe3ff5d8192371a8d1c2f0ed65308b31309ef03fcebd6b10b20d23f339"
       }
     },
-    "sequence12": {
-      "completedIdentityCount": 107,
-      "failedIdentityCount": 4,
-      "attemptedSourcePageCount": 197,
-      "sourcePageDeltaSha256": "75ac3ad8894d8a13ed6a6eb544abd8f301d68e3cd5da54cb9c6e2e9b4207fdd0"
+    "sequence13": {
+      "completedIdentityKeys": [
+        "J3301|608",
+        "J5557|37C",
+        "T5505|420"
+      ],
+      "failedIdentityCount": 0,
+      "capturedProductUrlCount": 5,
+      "identityDeltaSha256": "af1f5a2b2589ecadbfd95c0e891614ffde17d0f210dd5dbc51be0b9c149f4437",
+      "attemptedSourcePageCount": 219,
+      "sourcePageDeltaSha256": "be4c1f1bf8a7e3e825a94a399462f6bac0697a619b1de2948302fe090f028a67",
+      "productWorkerCount": 50,
+      "productTotals": {
+        "frontierProductUrlCount": 569,
+        "frontierProductIdentityCount": 151,
+        "previouslyCompletedIdentityCount": 1348,
+        "selectedIdentityCount": 3,
+        "expectedProductCaptureCount": 3,
+        "attemptedProductCount": 3,
+        "attemptedIdentityCount": 3,
+        "httpFetchSuccessCount": 3,
+        "successfulProductFetchCount": 3,
+        "failedProductFetchCount": 0,
+        "successfulIdentityCaptureCount": 3,
+        "failedIdentityCaptureCount": 0,
+        "soft404IdentityCount": 0,
+        "missingImageIdentityCount": 0,
+        "aliasFallbackSuccessCount": 0,
+        "directSourceCount": 0,
+        "transformedReaderSourceCount": 3,
+        "imageReferenceCount": 28,
+        "officialProductImageReferenceCount": 28,
+        "rejectedImageReferenceCount": 0,
+        "descriptionEvidenceCount": 0,
+        "verifiedPriceCount": 0,
+        "materialEvidenceCount": 5,
+        "materialMissingIdentityCount": 0,
+        "manufacturingClaimCount": 0,
+        "factoryVerifiedCount": 0
+      },
+      "sourcePageAuditPassed": true,
+      "ledgerDeltaAuditPassed": true
     },
     "mismatches": [],
     "passed": true
@@ -85,10 +122,14 @@
   "requiredChecks": [
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
-    "canonical_json_seven_identity_deltas_five_source_page_deltas",
-    "exact_sequence_12_identity_and_source_page_ledgers",
-    "sequence12_107_complete_4_retry_no_overlap",
-    "sequence12_197_unique_source_pages_no_overlap",
+    "canonical_json_eight_identity_deltas_six_source_page_deltas",
+    "exact_sequence_13_identity_and_source_page_ledgers",
+    "sequence13_3_complete_0_retry_no_overlap",
+    "sequence13_219_unique_source_pages_no_overlap",
+    "fifty_of_fifty_discovery_workers",
+    "fifty_of_fifty_product_workers",
+    "zero_soft404_zero_missing_images_zero_rejected_images",
+    "zero_verified_transformed_prices",
     "resolved_retry_b2328_560",
     "factory_verified_zero",
     "global_canonical_products_zero",
