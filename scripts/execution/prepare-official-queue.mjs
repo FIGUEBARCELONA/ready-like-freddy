@@ -346,4 +346,16 @@ await writeJson(`${outDir}/summary.json`, {
   minimumUrlsPerWorker: Math.min(...assignments.map(entry => entry.urls.length)),
   maximumUrlsPerWorker: Math.max(...assignments.map(entry => entry.urls.length)),
 });
+// RLF_PRIORITY_ENTRYPOINTS_INTEGRATED
+const { spawnSync } = await import("node:child_process");
+const priorityResult = spawnSync(process.execPath, [
+  new URL("./prioritize-official-entrypoints.mjs", import.meta.url).pathname,
+  `--queue=${outDir}/queue.json`,
+  `--seeds=${seedsPath}`,
+  `--summary=${outDir}/summary.json`,
+  `--urls=${outDir}/urls.txt`,
+], { stdio: "inherit" });
+if (priorityResult.status !== 0) {
+  throw new Error(`Priority entry-point integration failed with status ${priorityResult.status}`);
+}
 console.log(JSON.stringify(await readJson(`${outDir}/summary.json`), null, 2));
