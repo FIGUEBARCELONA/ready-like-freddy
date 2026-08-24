@@ -54,16 +54,17 @@ jobs:
           import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
           const state = await loadProgressLedger();
           const expected = {
-            completedIdentityCount: 1001,
-            productUrlCaptureCount: 1641,
-            officialProductImageReferenceCount: 8847,
-            materialEvidenceCount: 1332,
+            completedIdentityCount: 1054,
+            productUrlCaptureCount: 1707,
+            officialProductImageReferenceCount: 9271,
+            materialEvidenceCount: 1383,
             manufacturingClaimCount: 59,
-            descriptionMissingIdentityCount: 470,
-            priceMissingIdentityCount: 414,
-            materialMissingIdentityCount: 66,
+            descriptionMissingIdentityCount: 523,
+            priceMissingIdentityCount: 467,
+            materialMissingIdentityCount: 68,
             retryIdentityKeys: ['B2328|560', 'HW2300|843'],
-            deltaCount: 4,
+            deltaCount: 5,
+            latestRunId: '32754804084',
             factoryVerifiedCount: 0,
             globalCanonicalProductCount: 0,
           };
@@ -78,6 +79,7 @@ jobs:
             materialMissingIdentityCount: state.metadataGaps.materialMissingIdentityCount,
             retryIdentityKeys: state.retry.identities.map(item => item.identityKey).sort(),
             deltaCount: state.deltaCount,
+            latestRunId: String(state.latestRunId),
             factoryVerifiedCount: state.counters.factoryVerifiedCount,
             globalCanonicalProductCount: state.counters.globalCanonicalProductCount,
             ledgerSha256: state.ledgerSha256,
@@ -93,8 +95,8 @@ jobs:
           const completedRetries = actual.retryIdentityKeys.filter(key => completed.has(key));
           if (completedRetries.length) mismatches.push(['completedRetries', completedRetries, []]);
           const checkpoint = {
-            schemaVersion: 1,
-            sourceRunId: '32748405808',
+            schemaVersion: 2,
+            sourceRunId: '32754804084',
             generatedAt: new Date().toISOString(),
             expected,
             actual,
@@ -126,7 +128,7 @@ jobs:
             ? JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json', 'utf8'))
             : null;
           const proof = {
-            schemaVersion: 2,
+            schemaVersion: 3,
             recordedAt: new Date().toISOString(),
             sourceCommitSha: process.env.GITHUB_SHA,
             runId: process.env.GITHUB_RUN_ID,
@@ -138,8 +140,8 @@ jobs:
             requiredChecks: [
               'pnpm_install_frozen_lockfile',
               'execution_script_syntax',
-              'canonical_json_and_delta_parse',
-              'exact_sequence_9_append_only_ledger_checkpoint',
+              'canonical_json_and_five_delta_parse',
+              'exact_sequence_10_append_only_ledger_checkpoint',
               'typescript_no_emit',
               'production_build'
             ]
