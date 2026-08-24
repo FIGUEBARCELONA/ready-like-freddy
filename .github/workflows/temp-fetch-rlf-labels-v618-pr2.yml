@@ -1,0 +1,101 @@
+name: TEMP RLF label fetch v6.18 PR2
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Recover direct images and alternative exemplars
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/original evidence/pages evidence/reports evidence/probes
+          UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36 RLF-Label-Audit/6.18'
+          fetch_any() {
+            local url="$1" out="$2"
+            curl --location --connect-timeout 20 --max-time 120 --retry 2 --retry-all-errors \
+              --user-agent "$UA" --header 'Accept: */*' \
+              --dump-header "${out}.headers" --output "$out" \
+              --write-out '%{http_code}\n%{url_effective}\n%{content_type}\n%{size_download}\n' \
+              "$url" > "${out}.meta" || true
+          }
+
+          # CAND-033 exact Etsy label faces.
+          fetch_any 'https://i.etsystatic.com/59510226/r/il/6c3077/7119392879/il_300x300.7119392879_ign0.jpg' 'evidence/original/CAND-033_neck.jpg'
+          fetch_any 'https://i.etsystatic.com/59510226/r/il/561f97/7119393083/il_300x300.7119393083_xw26.jpg' 'evidence/original/CAND-033_technical.jpg'
+
+          # CAND-040 exact Etsy label faces.
+          fetch_any 'https://i.etsystatic.com/23833192/r/il/d77908/6292417161/il_300x300.6292417161_hs1n.jpg' 'evidence/original/CAND-040_neck.jpg'
+          fetch_any 'https://i.etsystatic.com/23833192/r/il/71f133/6244364860/il_300x300.6244364860_rsh3.jpg' 'evidence/original/CAND-040_care.jpg'
+          fetch_any 'https://i.etsystatic.com/23833192/r/il/9663a2/6292417101/il_300x300.6292417101_eqwd.jpg' 'evidence/original/CAND-040_composition.jpg'
+
+          # CAND-073 alternative Union Jack exemplar. Probe full page and known image family.
+          fetch_any 'https://barkbox.shop-pro.jp/?pid=99345282' 'evidence/pages/CAND-073_ALT.html'
+          fetch_any 'https://img11.shop-pro.jp/PA01145/841/product/99345282.jpg' 'evidence/original/CAND-073_ALT_00.jpg'
+          for n in 1 2 3 4 5 6 7 8 9 10; do
+            fetch_any "https://img11.shop-pro.jp/PA01145/841/product/99345282_o${n}.jpg" "evidence/original/CAND-073_ALT_${n}.jpg"
+          done
+
+          # CAND-072 alternative Made-in-Italy argyle exemplar from Grailed.
+          fetch_any 'https://www.grailed.com/listings/88088840-fred-perry-fred-perry-argyle-merino-wool-v-neck-jumper' 'evidence/pages/CAND-072_ALT.html'
+
+          python - <<'PY'
+          import pathlib,re,json,hashlib,html,urllib.parse,urllib.request
+          root=pathlib.Path('evidence')
+          ua='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36 RLF-Label-Audit/6.18'
+          page=root/'pages'/'CAND-072_ALT.html'
+          if page.exists():
+              text=page.read_text(errors='replace')
+              urls=set()
+              for pat in [r'https://media-assets\.grailed\.com/[^"\'<>\\ ]+',r'https:\\/\\/media-assets\.grailed\.com\\/[^"\'<> ]+']:
+                  urls.update(re.findall(pat,text))
+              clean=[]
+              for u in sorted(urls):
+                  u=html.unescape(u).replace('\\/','/')
+                  u=urllib.parse.unquote(u).rstrip('\\,}]&quot;')
+                  if u.startswith('https://') and u not in clean: clean.append(u)
+              for i,u in enumerate(clean[:30],1):
+                  out=root/'original'/f'CAND-072_ALT_{i:02d}.jpg'
+                  try:
+                      req=urllib.request.Request(u,headers={'User-Agent':ua,'Accept':'image/*,*/*;q=0.8'})
+                      with urllib.request.urlopen(req,timeout=120) as r: b=r.read()
+                      if len(b)>1000: out.write_bytes(b)
+                  except Exception: pass
+          rows=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file():
+                  b=p.read_bytes(); rows.append({'path':p.as_posix(),'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v618-fetch-v2','files':rows},indent=2),encoding='utf-8')
+          PY
+
+          # Remove failed or non-image placeholders from original/, but preserve their meta/headers.
+          python - <<'PY'
+          import pathlib, imghdr
+          root=pathlib.Path('evidence/original')
+          for p in list(root.iterdir()):
+              if p.suffix in {'.meta','.headers'}: continue
+              try:
+                  kind=imghdr.what(p)
+                  if kind not in {'jpeg','png','webp','gif'} or p.stat().st_size < 1000:
+                      p.unlink()
+              except Exception:
+                  try: p.unlink()
+                  except Exception: pass
+          PY
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME_AND_DIMENSIONS.txt || true
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-label-evidence-v618-pr2
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
