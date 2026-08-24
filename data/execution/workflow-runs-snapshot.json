@@ -1,35 +1,119 @@
 {
   "schemaVersion": 2,
-  "capturedAt": "2026-08-24T21:01:23Z",
-  "targetSha": "bd62b7aaa5d6dcce31ef5e63da5ed5638e8fa3ef",
+  "capturedAt": "2026-08-24T21:05:26Z",
+  "targetSha": "adb03d116dea229cdd9dec296e80016899d6bde5",
   "targetRuns": [
     {
       "conclusion": null,
-      "created_at": "2026-08-24T20:59:02Z",
+      "created_at": "2026-08-24T21:05:03Z",
       "event": "push",
-      "head_sha": "bd62b7aaa5d6dcce31ef5e63da5ed5638e8fa3ef",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32776966148",
-      "id": 32776966148,
+      "head_sha": "adb03d116dea229cdd9dec296e80016899d6bde5",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777532459",
+      "id": 32777532459,
       "name": "RLF source page rotation validation",
-      "run_number": 4,
+      "run_number": 6,
       "status": "in_progress",
-      "updated_at": "2026-08-24T20:59:05Z"
+      "updated_at": "2026-08-24T21:05:07Z"
     }
   ],
   "targetChecks": [
     {
       "completed_at": null,
       "conclusion": null,
-      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32776966148/job/97590128514",
-      "id": 97590128514,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777532459/job/97591928132",
+      "id": 97591928132,
       "name": "validate",
-      "started_at": "2026-08-24T20:59:04Z",
+      "started_at": "2026-08-24T21:05:07Z",
       "status": "in_progress"
     }
   ],
   "recentRuns": [
     {
       "conclusion": null,
+      "created_at": "2026-08-24T21:05:18Z",
+      "event": "push",
+      "head_sha": "8e98b3b5c1d096389a710123305c8b74fc930d80",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777556867",
+      "id": 32777556867,
+      "name": "RLF workflow runs snapshot",
+      "run_number": 7,
+      "status": "in_progress",
+      "updated_at": "2026-08-24T21:05:22Z"
+    },
+    {
+      "conclusion": null,
+      "created_at": "2026-08-24T21:05:03Z",
+      "event": "push",
+      "head_sha": "adb03d116dea229cdd9dec296e80016899d6bde5",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777532459",
+      "id": 32777532459,
+      "name": "RLF source page rotation validation",
+      "run_number": 6,
+      "status": "in_progress",
+      "updated_at": "2026-08-24T21:05:07Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-08-24T21:04:47Z",
+      "event": "push",
+      "head_sha": "f3f8ff1c0eb2f61d5581d7fe7f51e631be12c40d",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777506561",
+      "id": 32777506561,
+      "name": "RLF code and ledger validation",
+      "run_number": 25,
+      "status": "completed",
+      "updated_at": "2026-08-24T21:05:23Z"
+    },
+    {
+      "conclusion": null,
+      "created_at": "2026-08-24T21:04:47Z",
+      "event": "push",
+      "head_sha": "f3f8ff1c0eb2f61d5581d7fe7f51e631be12c40d",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777506574",
+      "id": 32777506574,
+      "name": "RLF validation run index",
+      "run_number": 19,
+      "status": "in_progress",
+      "updated_at": "2026-08-24T21:04:50Z"
+    },
+    {
+      "conclusion": "failure",
+      "created_at": "2026-08-24T21:03:02Z",
+      "event": "push",
+      "head_sha": "a5b45e471c407e0d4c5021b3cadb7b9feb8a382a",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777341646",
+      "id": 32777341646,
+      "name": "RLF source page rotation validation",
+      "run_number": 5,
+      "status": "completed",
+      "updated_at": "2026-08-24T21:03:17Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-08-24T21:02:40Z",
+      "event": "push",
+      "head_sha": "d7f2c698a524051c955d1afd06f47e6d8bee7a28",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777307297",
+      "id": 32777307297,
+      "name": "RLF code and ledger validation",
+      "run_number": 24,
+      "status": "completed",
+      "updated_at": "2026-08-24T21:03:10Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-08-24T21:02:40Z",
+      "event": "push",
+      "head_sha": "d7f2c698a524051c955d1afd06f47e6d8bee7a28",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32777307234",
+      "id": 32777307234,
+      "name": "RLF validation run index",
+      "run_number": 18,
+      "status": "completed",
+      "updated_at": "2026-08-24T21:03:19Z"
+    },
+    {
+      "conclusion": "success",
       "created_at": "2026-08-24T21:01:16Z",
       "event": "push",
       "head_sha": "c373e994c3830031c1f9fef720d3b402ebac88b6",
@@ -37,11 +121,11 @@
       "id": 32777177516,
       "name": "RLF workflow runs snapshot",
       "run_number": 6,
-      "status": "in_progress",
-      "updated_at": "2026-08-24T21:01:19Z"
+      "status": "completed",
+      "updated_at": "2026-08-24T21:01:27Z"
     },
     {
-      "conclusion": null,
+      "conclusion": "failure",
       "created_at": "2026-08-24T20:59:02Z",
       "event": "push",
       "head_sha": "bd62b7aaa5d6dcce31ef5e63da5ed5638e8fa3ef",
@@ -49,8 +133,8 @@
       "id": 32776966148,
       "name": "RLF source page rotation validation",
       "run_number": 4,
-      "status": "in_progress",
-      "updated_at": "2026-08-24T20:59:05Z"
+      "status": "completed",
+      "updated_at": "2026-08-24T21:01:26Z"
     },
     {
       "conclusion": "failure",
@@ -303,90 +387,6 @@
       "run_number": 20,
       "status": "completed",
       "updated_at": "2026-08-24T17:20:45Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T17:20:07Z",
-      "event": "push",
-      "head_sha": "cf315930fb9774334a69272948b3b0db3d00d27a",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32756022958",
-      "id": 32756022958,
-      "name": "RLF recover sequence 10 audited delta",
-      "run_number": 1,
-      "status": "completed",
-      "updated_at": "2026-08-24T17:20:24Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T17:18:26Z",
-      "event": "push",
-      "head_sha": "ebecfc375f421e9424877da98bf5ba79cf2684d0",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32755864023",
-      "id": 32755864023,
-      "name": "RLF code and ledger validation",
-      "run_number": 21,
-      "status": "completed",
-      "updated_at": "2026-08-24T17:18:54Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T17:18:25Z",
-      "event": "push",
-      "head_sha": "ebecfc375f421e9424877da98bf5ba79cf2684d0",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32755863863",
-      "id": 32755863863,
-      "name": "RLF validation run index",
-      "run_number": 15,
-      "status": "completed",
-      "updated_at": "2026-08-24T17:19:01Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T17:16:45Z",
-      "event": "push",
-      "head_sha": "4e1a78b142fcfd126d48fdf3e4e84e57ac77b17c",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32755703671",
-      "id": 32755703671,
-      "name": "RLF sequence run probe",
-      "run_number": 19,
-      "status": "completed",
-      "updated_at": "2026-08-24T17:16:57Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T17:15:47Z",
-      "event": "push",
-      "head_sha": "463019e4c6ba81d6e70df386c3f5df46d4c97d6d",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32755611445",
-      "id": 32755611445,
-      "name": "RLF sequence run probe",
-      "run_number": 18,
-      "status": "completed",
-      "updated_at": "2026-08-24T17:16:05Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T17:13:54Z",
-      "event": "push",
-      "head_sha": "59f7e240ace1ca5adf6868fe08e06dd0c363b8b7",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32755421462",
-      "id": 32755421462,
-      "name": "RLF sequence run probe",
-      "run_number": 17,
-      "status": "completed",
-      "updated_at": "2026-08-24T17:14:16Z"
-    },
-    {
-      "conclusion": "success",
-      "created_at": "2026-08-24T17:12:42Z",
-      "event": "push",
-      "head_sha": "f0cc560ea704598b015bc360522f3948390e5512",
-      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32755302920",
-      "id": 32755302920,
-      "name": "RLF sequence run probe",
-      "run_number": 16,
-      "status": "completed",
-      "updated_at": "2026-08-24T17:12:56Z"
     }
   ]
 }
