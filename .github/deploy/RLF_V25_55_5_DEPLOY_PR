@@ -1,0 +1,5 @@
+RLF Parallel50 v25.55.5 production deployment sentinel.
+QA run: 32750001394
+QA artifact: 9528658015
+Manifest contract: 6 steps, 2 workflows
+Truth boundary unchanged: 151 canonical, 12 READY_TO_MERGE, 163 projected, products 0/0/0.
