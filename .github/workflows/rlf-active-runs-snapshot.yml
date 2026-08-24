@@ -6,6 +6,7 @@ on:
       - feature/rlf-execution-backend-20260823
     paths:
       - '.github/workflows/rlf-active-runs-snapshot.yml'
+  workflow_dispatch:
 
 permissions:
   actions: read
@@ -13,8 +14,8 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '3'
-  TARGET_SHA: 'b6396bec869bf935157ae0073cba0e5dee96de27'
+  SNAPSHOT_REVISION: '4'
+  TARGET_SHA: 'bd62b7aaa5d6dcce31ef5e63da5ed5638e8fa3ef'
 
 jobs:
   snapshot:
@@ -56,7 +57,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot RLF workflow runs and active patch'
+          git commit -m 'Snapshot sequence 12 preflight workflow run'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
