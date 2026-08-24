@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 2,
+  "runId": "32754804084",
+  "frontierId": "RLF-OFFICIAL-20260824170959545-PRODUCTS",
+  "frontierSha256": "ab0eebcb27357d170f3b1b4b008a98cbfadac1f095e97ba43c78f89386f18422",
+  "selectedIdentitySha256": "8e5a84cde6686bc1754d35fc21525c324ea89cde5c22e3a521560bbbfdf203e4",
+  "completedIdentityKeys": [
+    "M1647|Z81",
+    "M1726|608",
+    "M2419|129",
+    "M2421|560",
+    "M3600|01B",
+    "M3600|09B",
+    "M3600|10B",
+    "M3600|12B",
+    "M3600|46A",
+    "M3600|47A",
+    "M3600|53A",
+    "M3600|74A",
+    "M3600|84A",
+    "M3600|85A",
+    "M3600|89A",
+    "M3600|94A",
+    "M3600|99A",
+    "M3600|N62",
+    "M3600|W61",
+    "M3600|Y69",
+    "M3600|Z46",
+    "M3600|Z48",
+    "M3600|Z49",
+    "M3600|Z51",
+    "M3600|Z53",
+    "M3600|Z57",
+    "M3600|Z58",
+    "M3600|Z59",
+    "M3600|Z60",
+    "M3600|Z62",
+    "M3600|Z63",
+    "M3636|49A",
+    "M3636|84A",
+    "M3636|T73",
+    "M6000|14B",
+    "M6000|51A",
+    "M6000|56A",
+    "M6000|58A",
+    "M6000|85C",
+    "M6000|90C",
+    "M6000|N60",
+    "M6000|Y22",
+    "M6000|Y35",
+    "M6000|Y37",
+    "M6000|Z51",
+    "M6000|Z68",
+    "M6000|Z69",
+    "SG8181|129",
+    "SM7181|608",
+    "SM8175|102",
+    "SM8178|100",
+    "SM9125|102",
+    "ST9010|F36"
+  ],
+  "capturedProductUrlCount": 66,
+  "failedIdentities": [
+    {
+      "identityKey": "B2328|560",
+      "productCode": "B2328",
+      "colourCode": "560",
+      "requestedProductUrl": "https://www.fredperry.com/eu-pt/tenis-em-camurca-b2328-560.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/eu-pt/tenis-em-camurca-b2328-560.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "SOFT_404_RESPONSE",
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "requestedProductUrl": "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    }
+  ],
+  "counters": {
+    "successfulIdentityCaptureCount": 53,
+    "failedIdentityCaptureCount": 2,
+    "officialProductImageReferenceCount": 424,
+    "materialEvidenceCount": 51,
+    "manufacturingClaimCount": 0,
+    "factoryVerifiedCount": 0
+  },
+  "metadataGaps": {
+    "descriptionMissingIdentityCount": 53,
+    "priceMissingIdentityCount": 53,
+    "materialMissingIdentityCount": 2
+  },
+  "qualityGatePassed": false,
+  "status": "PARTIAL_STRICT_IDENTITY_BATCH_REQUIRES_RETRY_NOT_GLOBAL_CANONICAL",
+  "deltaSha256": "039339f0a2a641efc9bfe62f630fcfcaa0769bffa19caa68a5f126280f6e3793"
+}

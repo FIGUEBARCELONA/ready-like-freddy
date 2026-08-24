@@ -1,0 +1,3772 @@
+{
+  "schemaVersion": 4,
+  "frontierId": "RLF-OFFICIAL-20260824170959545-PRODUCTS",
+  "createdAt": "2026-08-24T17:13:28.205Z",
+  "sourceQueueId": "RLF-OFFICIAL-20260824170959545",
+  "sourceQueueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+  "workerCount": 50,
+  "uniqueProductUrlCount": 4094,
+  "uniqueProductIdentityCount": 750,
+  "aliasProductUrlCount": 3344,
+  "previouslyCompletedIdentityCount": 1001,
+  "remainingIdentityCountBeforeSelection": 55,
+  "retryIdentityCount": 2,
+  "productPerWorkerLimit": 5,
+  "batchCapacity": 250,
+  "selectedIdentityCount": 55,
+  "expectedProductCaptureCount": 55,
+  "selectedIdentitySha256": "8e5a84cde6686bc1754d35fc21525c324ea89cde5c22e3a521560bbbfdf203e4",
+  "progressSha256": "0297f280d1d7a66622ee30c5f26f3dd04e85bd066cfffdea527018716ac544c1",
+  "progressDeltaCount": 4,
+  "assignments": [
+    {
+      "slot": "F01",
+      "index": 0,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F07",
+          "candidateKey": "62348c9e91a8e0f425eadb19b2e885bf1c45a158696d1afa1bfda44f171087e2",
+          "productUrl": "https://www.fredperry.com/eu-pt/tenis-em-camurca-b2328-560.html",
+          "productCode": "B2328",
+          "colourCode": "560",
+          "displayName": "The Tennis Shoes",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/eu-pt/mens",
+          "sourcePageSha256": "a6c025801e97587f8104a49c75e52a62af15b7376bbc0da4e4dd88078aeb4629",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:11:22.335Z",
+          "imageReferences": [],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "PT|MEN_CORE",
+          "sourceMarket": "PT",
+          "sourceLocale": "pt-PT",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 17,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/eu-pt/collaborations",
+            "https://www.fredperry.com/eu-pt/craig-green",
+            "https://www.fredperry.com/eu-pt/curry-paxton",
+            "https://www.fredperry.com/eu-pt/dna",
+            "https://www.fredperry.com/eu-pt/george-cox",
+            "https://www.fredperry.com/eu-pt/homem/art-comes-first-x-george-cox-leather-gibson",
+            "https://www.fredperry.com/eu-pt/homem/novos-lancamentos",
+            "https://www.fredperry.com/eu-pt/homem/polos",
+            "https://www.fredperry.com/eu-pt/kris-van-assche",
+            "https://www.fredperry.com/eu-pt/mens",
+            "https://www.fredperry.com/eu-pt/mulher/amy-winehouse-foundation",
+            "https://www.fredperry.com/eu-pt/mulher/bolsas",
+            "https://www.fredperry.com/eu-pt/mulher/novos-lancamentos",
+            "https://www.fredperry.com/eu-pt/mulher/polos",
+            "https://www.fredperry.com/eu-pt/mulher/the-fred-perry-shirt",
+            "https://www.fredperry.com/eu-pt/tennis",
+            "https://www.fredperry.com/eu-pt/tennis-dna"
+          ],
+          "sourceSlots": [
+            "F07",
+            "F19",
+            "F31",
+            "F43"
+          ],
+          "identityKey": "B2328|560",
+          "preferredProductUrl": "https://www.fredperry.com/eu-pt/tenis-em-camurca-b2328-560.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/eu-pt/tenis-em-camurca-b2328-560.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "PT"
+          ],
+          "sourceLocales": [
+            "pt-PT"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "COLLABORATIONS",
+            "HERITAGE",
+            "MEN_CORE",
+            "WOMEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "PT|COLLABORATIONS",
+            "PT|HERITAGE",
+            "PT|MEN_CORE",
+            "PT|WOMEN_CORE"
+          ]
+        },
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F37",
+          "candidateKey": "2e6dbbf4a0afc89b36838748c8e2a159938f514e202c580a323fc37d98187b58",
+          "productUrl": "https://www.fredperry.com/back-catalogue-exclusive/dear-sheffield-fred-perry-shirt-sm7181-608.html",
+          "productCode": "SM7181",
+          "colourCode": "608",
+          "displayName": "Corbin Shaw Dear Sheffield Fred Perry Shirt Navy Navy",
+          "observedPrice": {
+            "raw": "£120",
+            "currency": "GBP"
+          },
+          "sourcePageUrl": "https://www.fredperry.com/back-catalogue-exclusive",
+          "sourcePageSha256": "16c99626b37b82b4fb3abd239988c4512050b6b14ec6b0427309dfe41a14eb94",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:20.435Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/f213890175566e8fc52f887875d17b9f/S/M/SM7181_608_V2_Q224_FLATFRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "GB|HERITAGE",
+          "sourceMarket": "GB",
+          "sourceLocale": "en-GB",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "HERITAGE",
+          "sourceOccurrences": 5,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-de/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-es/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-fr/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-it/back-catalogue-exclusive"
+          ],
+          "sourceSlots": [
+            "F37",
+            "F39",
+            "F40",
+            "F41",
+            "F42"
+          ],
+          "identityKey": "SM7181|608",
+          "preferredProductUrl": "https://www.fredperry.com/back-catalogue-exclusive/dear-sheffield-fred-perry-shirt-sm7181-608.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive/dear-sheffield-fred-perry-shirt-sm7181-608.html",
+            "https://www.fredperry.com/eu-fr/back-catalogue-exclusive/polo-fred-perry-dear-sheffield-sm7181-608.html",
+            "https://www.fredperry.com/eu-it/back-catalogue-exclusive/polo-fred-perry-dear-sheffield-sm7181-608.html",
+            "https://www.fredperry.com/eu-es/back-catalogue-exclusive/polo-fred-perry-dear-shefflield-sm7181-608.html",
+            "https://www.fredperry.com/eu-de/back-catalogue-exclusive/dear-sheffield-fred-perry-poloshirt-sm7181-608.html"
+          ],
+          "aliasCount": 5,
+          "sourceMarkets": [
+            "DE",
+            "ES",
+            "FR",
+            "GB",
+            "IT"
+          ],
+          "sourceLocales": [
+            "de-DE",
+            "en-GB",
+            "es-ES",
+            "fr-FR",
+            "it-IT"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "HERITAGE"
+          ],
+          "sourceLaneVectorKeys": [
+            "DE|HERITAGE",
+            "ES|HERITAGE",
+            "FR|HERITAGE",
+            "GB|HERITAGE",
+            "IT|HERITAGE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F02",
+      "index": 1,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F32",
+          "candidateKey": "d4fc6583218f64c915b6ccd2e71d1295bcc9ff3decb8dee1edb875d12d4a089f",
+          "productUrl": "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+          "productCode": "HW2300",
+          "colourCode": "843",
+          "displayName": "Twill Cap Black Black / Snow White",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/ae-en/accessories",
+          "sourcePageSha256": "993d7441105a32eb1b937984a55f62740ee96057839865befa7a09ac0be7dc12",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:11:37.620Z",
+          "imageReferences": [],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "AE|COLLABORATIONS",
+          "sourceMarket": "AE",
+          "sourceLocale": "en-AE",
+          "sourceRegionGroup": "MIDDLE_EAST",
+          "sourceDiscoveryScope": "COLLABORATIONS",
+          "sourceOccurrences": 3,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/ae-en/accessories",
+            "https://www.fredperry.com/eg-en/accessories",
+            "https://www.fredperry.com/sa-en/accessories"
+          ],
+          "sourceSlots": [
+            "F32",
+            "F33",
+            "F34"
+          ],
+          "identityKey": "HW2300|843",
+          "preferredProductUrl": "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html"
+          ],
+          "aliasCount": 3,
+          "sourceMarkets": [
+            "AE",
+            "EG",
+            "SA"
+          ],
+          "sourceLocales": [
+            "en-AE",
+            "en-EG",
+            "en-SA"
+          ],
+          "sourceRegionGroups": [
+            "MIDDLE_EAST"
+          ],
+          "sourceDiscoveryScopes": [
+            "COLLABORATIONS"
+          ],
+          "sourceLaneVectorKeys": [
+            "AE|COLLABORATIONS",
+            "EG|COLLABORATIONS",
+            "SA|COLLABORATIONS"
+          ]
+        },
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F37",
+          "candidateKey": "ffd2ad23eab2843bae6689b80baadbb1102c0d7c13c9b9a41f5778bebbddd865",
+          "productUrl": "https://www.fredperry.com/back-catalogue-exclusive/logo-panel-fred-perry-shirt-sm8175-102.html",
+          "productCode": "SM8175",
+          "colourCode": "102",
+          "displayName": "Mastermind World Logo Panel Fred Perry Shirt Black Black",
+          "observedPrice": {
+            "raw": "£140",
+            "currency": "GBP"
+          },
+          "sourcePageUrl": "https://www.fredperry.com/back-catalogue-exclusive",
+          "sourcePageSha256": "16c99626b37b82b4fb3abd239988c4512050b6b14ec6b0427309dfe41a14eb94",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:20.435Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/1b7e4c98c73bc1431a71a59d2a70c0cf/S/M/SM8175_102_V2_Q424_FLATFRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "GB|HERITAGE",
+          "sourceMarket": "GB",
+          "sourceLocale": "en-GB",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "HERITAGE",
+          "sourceOccurrences": 5,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-de/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-es/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-fr/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-it/back-catalogue-exclusive"
+          ],
+          "sourceSlots": [
+            "F37",
+            "F39",
+            "F40",
+            "F41",
+            "F42"
+          ],
+          "identityKey": "SM8175|102",
+          "preferredProductUrl": "https://www.fredperry.com/back-catalogue-exclusive/logo-panel-fred-perry-shirt-sm8175-102.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive/logo-panel-fred-perry-shirt-sm8175-102.html",
+            "https://www.fredperry.com/eu-fr/back-catalogue-exclusive/polo-fred-perry-a-empiecement-logo-sm8175-102.html",
+            "https://www.fredperry.com/eu-it/back-catalogue-exclusive/polo-fred-perry-con-inserto-con-logo-sm8175-102.html",
+            "https://www.fredperry.com/eu-es/back-catalogue-exclusive/polo-fred-perry-con-panel-con-el-logo-sm8175-102.html",
+            "https://www.fredperry.com/eu-de/back-catalogue-exclusive/poloshirt-von-fred-perry-mit-logo-panel-sm8175-102.html"
+          ],
+          "aliasCount": 5,
+          "sourceMarkets": [
+            "DE",
+            "ES",
+            "FR",
+            "GB",
+            "IT"
+          ],
+          "sourceLocales": [
+            "de-DE",
+            "en-GB",
+            "es-ES",
+            "fr-FR",
+            "it-IT"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "HERITAGE"
+          ],
+          "sourceLaneVectorKeys": [
+            "DE|HERITAGE",
+            "ES|HERITAGE",
+            "FR|HERITAGE",
+            "GB|HERITAGE",
+            "IT|HERITAGE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F03",
+      "index": 2,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "75a0f3f0248e6aa478a23868dfa051eb1fc24de2e31e4a9f41d9b88b3c004fee",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/striped-panel-button-thru-polo-m1647-z81.html",
+          "productCode": "M1647",
+          "colourCode": "Z81",
+          "displayName": "Striped Panel Button Thru Polo Navy Dark Airforce",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/33cd7025310f5b02497209aeb3a5ae80/M/1/M1647_Z81_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M1647|Z81",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/striped-panel-button-thru-polo-m1647-z81.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/striped-panel-button-thru-polo-m1647-z81.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        },
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F37",
+          "candidateKey": "2723ddc5f6158c05e4232c918f7e8d2dc099aca45e042218b4413ba184d48662",
+          "productUrl": "https://www.fredperry.com/back-catalogue-exclusive/never-far-from-home-fred-perry-shirt-sm8178-100.html",
+          "productCode": "SM8178",
+          "colourCode": "100",
+          "displayName": "Derrelle Elijah Never Far From Home Fred Perry Shirt White White",
+          "observedPrice": {
+            "raw": "£120",
+            "currency": "GBP"
+          },
+          "sourcePageUrl": "https://www.fredperry.com/back-catalogue-exclusive",
+          "sourcePageSha256": "16c99626b37b82b4fb3abd239988c4512050b6b14ec6b0427309dfe41a14eb94",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:20.435Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/b99a8a8b7396c1ea3ee3fab628a61c2d/S/M/SM8178_100_V2_Q424_FLATFRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "GB|HERITAGE",
+          "sourceMarket": "GB",
+          "sourceLocale": "en-GB",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "HERITAGE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive"
+          ],
+          "sourceSlots": [
+            "F37"
+          ],
+          "identityKey": "SM8178|100",
+          "preferredProductUrl": "https://www.fredperry.com/back-catalogue-exclusive/never-far-from-home-fred-perry-shirt-sm8178-100.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive/never-far-from-home-fred-perry-shirt-sm8178-100.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "GB"
+          ],
+          "sourceLocales": [
+            "en-GB"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "HERITAGE"
+          ],
+          "sourceLaneVectorKeys": [
+            "GB|HERITAGE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F04",
+      "index": 3,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "57ac892d52b3e991304524b2d619a5db1ab26a457ea5c7f7cbf85cd051c15137",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/pique-zip-neck-polo-shirt-m1726-608.html",
+          "productCode": "M1726",
+          "colourCode": "608",
+          "displayName": "Piqué Zip Neck Polo Shirt Navy Navy / Snow White",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/44f5e8d4ba72b9ab32ebefcb6ae92c89/M/1/M1726_608_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M1726|608",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/pique-zip-neck-polo-shirt-m1726-608.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/pique-zip-neck-polo-shirt-m1726-608.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        },
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F37",
+          "candidateKey": "6c1870edc2b30d2cba81ba912031c9225ce0de20dac92d65345bd5e5c5ab7838",
+          "productUrl": "https://www.fredperry.com/back-catalogue-exclusive/pam-fred-perry-shirt-sm9125-102.html",
+          "productCode": "SM9125",
+          "colourCode": "102",
+          "displayName": "Perks And Mini P.A.M. Fred Perry Shirt Black Black",
+          "observedPrice": {
+            "raw": "£120",
+            "currency": "GBP"
+          },
+          "sourcePageUrl": "https://www.fredperry.com/back-catalogue-exclusive",
+          "sourcePageSha256": "16c99626b37b82b4fb3abd239988c4512050b6b14ec6b0427309dfe41a14eb94",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:20.435Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/72fc08ae03c9074bdc870330184b5302/S/M/SM9125_102_V2_Q325_FLATFRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "GB|HERITAGE",
+          "sourceMarket": "GB",
+          "sourceLocale": "en-GB",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "HERITAGE",
+          "sourceOccurrences": 5,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-de/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-es/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-fr/back-catalogue-exclusive",
+            "https://www.fredperry.com/eu-it/back-catalogue-exclusive"
+          ],
+          "sourceSlots": [
+            "F37",
+            "F39",
+            "F40",
+            "F41",
+            "F42"
+          ],
+          "identityKey": "SM9125|102",
+          "preferredProductUrl": "https://www.fredperry.com/back-catalogue-exclusive/pam-fred-perry-shirt-sm9125-102.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive/pam-fred-perry-shirt-sm9125-102.html",
+            "https://www.fredperry.com/eu-fr/back-catalogue-exclusive/polo-pam-fred-perry-sm9125-102.html",
+            "https://www.fredperry.com/eu-de/back-catalogue-exclusive/pam-fred-perry-shirt-sm9125-102.html",
+            "https://www.fredperry.com/eu-it/back-catalogue-exclusive/polo-pam-x-fred-perry-sm9125-102.html",
+            "https://www.fredperry.com/eu-es/back-catalogue-exclusive/el-polo-fred-perry-reinterpretado-por-pam-sm9125-102.html"
+          ],
+          "aliasCount": 5,
+          "sourceMarkets": [
+            "DE",
+            "ES",
+            "FR",
+            "GB",
+            "IT"
+          ],
+          "sourceLocales": [
+            "de-DE",
+            "en-GB",
+            "es-ES",
+            "fr-FR",
+            "it-IT"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "HERITAGE"
+          ],
+          "sourceLaneVectorKeys": [
+            "DE|HERITAGE",
+            "ES|HERITAGE",
+            "FR|HERITAGE",
+            "GB|HERITAGE",
+            "IT|HERITAGE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F05",
+      "index": 4,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "566c76cc542bed728297b0df286fe073356410aa4cbc75ab41069abd0905f749",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/vertical-stripe-polo-shirt-m2419-129.html",
+          "productCode": "M2419",
+          "colourCode": "129",
+          "displayName": "Vertical Stripe Polo Shirt White Snow White",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/6d91cbfd195316d480b0b8b0a5bb3f23/M/2/M2419_129_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M2419|129",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/vertical-stripe-polo-shirt-m2419-129.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/vertical-stripe-polo-shirt-m2419-129.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        },
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F37",
+          "candidateKey": "93916fae4301ab394b906b788fc21dc10a19a5c7792945dd40e31dd000ca9271",
+          "productUrl": "https://www.fredperry.com/back-catalogue-exclusive/nicholas-daley-tartan-detail-track-pants-st9010-f36.html",
+          "productCode": "ST9010",
+          "colourCode": "F36",
+          "displayName": "Nicholas Daley Tartan Detail Track Pants Navy Shaded Navy",
+          "observedPrice": {
+            "raw": "£150",
+            "currency": "GBP"
+          },
+          "sourcePageUrl": "https://www.fredperry.com/back-catalogue-exclusive",
+          "sourcePageSha256": "16c99626b37b82b4fb3abd239988c4512050b6b14ec6b0427309dfe41a14eb94",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:20.435Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/c2f79277a7967709b38049316a6ef897/S/T/ST9010_F36_1.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "GB|HERITAGE",
+          "sourceMarket": "GB",
+          "sourceLocale": "en-GB",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "HERITAGE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive"
+          ],
+          "sourceSlots": [
+            "F37"
+          ],
+          "identityKey": "ST9010|F36",
+          "preferredProductUrl": "https://www.fredperry.com/back-catalogue-exclusive/nicholas-daley-tartan-detail-track-pants-st9010-f36.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive/nicholas-daley-tartan-detail-track-pants-st9010-f36.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "GB"
+          ],
+          "sourceLocales": [
+            "en-GB"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "HERITAGE"
+          ],
+          "sourceLaneVectorKeys": [
+            "GB|HERITAGE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F06",
+      "index": 5,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "b0bb19bc9ef2036b96036d06f1f8fae1eff9133a327ec42ab3d612c68f0c5c76",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/embroidered-panel-polo-shirt-m2421-560.html",
+          "productCode": "M2421",
+          "colourCode": "560",
+          "displayName": "Embroidered Panel Polo Shirt White Ecru",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/f27a12bfc3bb847bf5cb9909504dc905/M/2/M2421_560_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M2421|560",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/embroidered-panel-polo-shirt-m2421-560.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/embroidered-panel-polo-shirt-m2421-560.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F07",
+      "index": 6,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "322cca34c46559b8b9ba422773255fd9028b3d2b2de5c534b0eb025282cb4bd6",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-01b.html",
+          "productCode": "M3600",
+          "colourCode": "01B",
+          "displayName": "The Fred Perry Shirt M3600 Navy Dark Airforce / Stockport Blue / Black",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/d33853612955c3bb6a5258201394b2e4/M/3/M3600_01B_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|01B",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-01b.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-01b.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F08",
+      "index": 7,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F06",
+          "candidateKey": "30e3e95bf80b8ff33484d9fe1bab12fa5d4013d4dea3e6fcec8e9438776d7c64",
+          "productUrl": "https://www.fredperry.com/eu-it/uomo/polo/m3600-m3600-09b.html",
+          "productCode": "M3600",
+          "colourCode": "09B",
+          "displayName": "La polo Fred Perry M3600 Grigio Grigio / Écru / Blu ball boy",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/eu-it/uomo/polo",
+          "sourcePageSha256": "0d2a062f71be37a44387b6954bbb6de10731b3ea533f5bc9d12d597fc53a5798",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:11:37.110Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/e4ee2b4a2d8b9a455e7847578abeb8f0/M/3/M3600_09B_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "IT|MEN_CORE",
+          "sourceMarket": "IT",
+          "sourceLocale": "it-IT",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 2,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/eu-it/uomo/polo",
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F06",
+            "F11"
+          ],
+          "identityKey": "M3600|09B",
+          "preferredProductUrl": "https://www.fredperry.com/eu-it/uomo/polo/m3600-m3600-09b.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/eu-it/uomo/polo/m3600-m3600-09b.html",
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-09b.html"
+          ],
+          "aliasCount": 2,
+          "sourceMarkets": [
+            "ID",
+            "IT"
+          ],
+          "sourceLocales": [
+            "en-ID",
+            "it-IT"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE",
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE",
+            "IT|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F09",
+      "index": 8,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "5f41830b235e9c4af6aaf81b545330ab4b749a26227ce91b80bc2bc705b0c050",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-10b.html",
+          "productCode": "M3600",
+          "colourCode": "10B",
+          "displayName": "The Fred Perry Shirt M3600 Black Black / Ball Boy Blue / Oxblood",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/3a8d0067ba451a1c6404975af5059cd4/M/3/M3600_10B_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|10B",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-10b.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-10b.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F10",
+      "index": 9,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "a799ab3668f51a8b9b6e6313af3cf8360d3f02476ae4938ab55b955224bb44e9",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-12b.html",
+          "productCode": "M3600",
+          "colourCode": "12B",
+          "displayName": "The Fred Perry Shirt M3600 White Oatmeal / Snow White / Anchor Grey",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/4f7ed9c20d22d07a44e9cde16393033a/M/3/M3600_12B_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|12B",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-12b.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-12b.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F11",
+      "index": 10,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "a4c5a6521c5c3c9d2d5af3f3742d217589e3444f026374107cb7f4521971c579",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-46a.html",
+          "productCode": "M3600",
+          "colourCode": "46A",
+          "displayName": "The Fred Perry Shirt M3600 White Ecru / Tennis Ball Yellow / Anchor Grey",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/1e2db376fb589acaa3ae4110a37896b8/M/3/M3600_46A_V2_Q425_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|46A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-46a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-46a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F12",
+      "index": 11,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "2c2bd3d8e1bf7a736f18cf40519f24c0e9b42173613fe3610895a2dae5cfe58d",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-47a.html",
+          "productCode": "M3600",
+          "colourCode": "47A",
+          "displayName": "The Fred Perry Shirt M3600 Yellow Tennis Ball Yellow / Ecru / French Navy",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/16a5d035a26d46d8bfa37866ace9ca79/M/3/M3600_47A_V2_Q425_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|47A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-47a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-47a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F13",
+      "index": 12,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "b2bf3079fb3edf930fa25495bb15c194b97d52ed4e758d40ea896ed102cbd3a6",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-53a.html",
+          "productCode": "M3600",
+          "colourCode": "53A",
+          "displayName": "The Fred Perry Shirt M3600 Green Court Green / Snow White / Navy",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/84fa6d5b5cc3be6dfd0b51dc4faeab6f/M/3/M3600_53A_V2_Q425_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|53A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-53a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-53a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F14",
+      "index": 13,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "6dd5cae39d333fab46944780ba9545d27b7b45fda980f352bc001587f659551e",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-74a.html",
+          "productCode": "M3600",
+          "colourCode": "74A",
+          "displayName": "The Fred Perry Shirt M3600 Red Burnt Red / Ecru / Black",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/276b676a062734295330a484a3301f22/M/3/M3600_74A_V2_Q425_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|74A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-74a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-74a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F15",
+      "index": 14,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F06",
+          "candidateKey": "174c7be2f0784d5897fb3ef1fd105bf844dc172c0bacbe2fe505942ced55b7f1",
+          "productUrl": "https://www.fredperry.com/eu-it/uomo/polo/m3600-m3600-84a.html",
+          "productCode": "M3600",
+          "colourCode": "84A",
+          "displayName": "La polo Fred Perry M3600 Bianco Écru / Bordeaux / Grassroots",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/eu-it/uomo/polo",
+          "sourcePageSha256": "0d2a062f71be37a44387b6954bbb6de10731b3ea533f5bc9d12d597fc53a5798",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:11:37.110Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/a3eee0ae6b2867be55d41230d22b1e82/M/3/M3600_84A_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "IT|MEN_CORE",
+          "sourceMarket": "IT",
+          "sourceLocale": "it-IT",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/eu-it/uomo/polo"
+          ],
+          "sourceSlots": [
+            "F06"
+          ],
+          "identityKey": "M3600|84A",
+          "preferredProductUrl": "https://www.fredperry.com/eu-it/uomo/polo/m3600-m3600-84a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/eu-it/uomo/polo/m3600-m3600-84a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "IT"
+          ],
+          "sourceLocales": [
+            "it-IT"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "IT|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F16",
+      "index": 15,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "320f7bb1b9c2b94470781ffa6e004a5c7fb84e255d305c61cde380f63e4503cc",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-85a.html",
+          "productCode": "M3600",
+          "colourCode": "85A",
+          "displayName": "The Fred Perry Shirt M3600 Green Grassroots / Stockport Blue / Oxblood",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/91053e8f556b5ced16b56ca9f53f0ecc/M/3/M3600_85A_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|85A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-85a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-85a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F17",
+      "index": 16,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "4da358f43cc23359282c375dfeb7111bbdffc09c86562f7abedf3143887b7654",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-89a.html",
+          "productCode": "M3600",
+          "colourCode": "89A",
+          "displayName": "The Fred Perry Shirt M3600 Blue Ace Blue / Snow White / Tennis Blue",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/17a6de25dfbff244096ae46388b23a71/M/3/M3600_89A_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|89A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-89a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-89a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F18",
+      "index": 17,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "6a19f1a29426a895f4a9010bb606a2795a2bbccaa0fb4ed341510bd3d0e627f2",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-94a.html",
+          "productCode": "M3600",
+          "colourCode": "94A",
+          "displayName": "The Fred Perry Shirt M3600 White Snow White / Deep Mint / Soho Eclipse",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/8af4fcbc70436dbb1764a85485553d14/M/3/M3600_94A_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|94A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-94a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-94a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F19",
+      "index": 18,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "be4bffca406fe3c40b1969a74140620fba8b1ca246bc37a215b3b5fa95cf48d0",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-99a.html",
+          "productCode": "M3600",
+          "colourCode": "99A",
+          "displayName": "The Fred Perry Shirt M3600 Blue Soho Eclipse / Snow White / Snow White",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/e4f1c578f1d91af571375690caa4054a/M/3/M3600_99A_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|99A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-99a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-99a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F20",
+      "index": 19,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "16c1ca0349475fcffa84e036d1a07115e11c06e75f3edd2b6410792c83b5e12d",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-n62.html",
+          "productCode": "M3600",
+          "colourCode": "N62",
+          "displayName": "The Fred Perry Shirt M3600 Red Blood / Snow White / Black",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/9f6851f83aeea2fd653c6490667c35f2/M/3/M3600_N62_1.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|N62",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-n62.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-n62.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F21",
+      "index": 20,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "efbca39d4a0f47ff270ddb9e3bc40e78836f1f7ecb5cc9d981d20a3c87ccea44",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-w61.html",
+          "productCode": "M3600",
+          "colourCode": "W61",
+          "displayName": "The Fred Perry Shirt M3600 Grey Light Smoke / Honeycomb / Shaded Cobalt",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/ab5db66665085719c17ee2fffad939c0/M/3/M3600_W61_V2_Q324_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|W61",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-w61.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-w61.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F22",
+      "index": 21,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "c5290d2c953e2d4daa1e3ef8dfa06887aad46a4cdbd755c341284ec551374ca9",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-y69.html",
+          "productCode": "M3600",
+          "colourCode": "Y69",
+          "displayName": "The Fred Perry Shirt M3600 Blue Light Smoke / Navy",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/1cd15f420dd2d2ca2c50045b29fee693/M/3/M3600_Y69_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Y69",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-y69.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-y69.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F23",
+      "index": 22,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "d1cb0738bb3bb0b1d20c3ad1dddaf2a948075a957051fbef77658c5ed607b858",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z46.html",
+          "productCode": "M3600",
+          "colourCode": "Z46",
+          "displayName": "The Fred Perry Shirt M3600 Ecru Ecru / Court Blue / Oxblood",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/890c3d58f72ec608e70111b9572cc880/M/3/M3600_Z46_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z46",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z46.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z46.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F24",
+      "index": 23,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "2e9ae2ca980c223f20644620b7a1fe2854865d877b3be89b98a0f920d37f6101",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z48.html",
+          "productCode": "M3600",
+          "colourCode": "Z48",
+          "displayName": "The Fred Perry Shirt M3600 Blue Dark Petrol / Shaded Stone / Shaded Stone",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/e9e3614345e84ec3676162a57dcbb643/M/3/M3600_Z48_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z48",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z48.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z48.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F25",
+      "index": 24,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "c54fc0691e6bde17711b06332bd906256db5b46c2695cadb5cf99d3fd9863fe4",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z49.html",
+          "productCode": "M3600",
+          "colourCode": "Z49",
+          "displayName": "The Fred Perry Shirt M3600 Green Bay Leaf / Dark Airforce / Tennis Blue",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/4d1c27a163a805dfee714169ae08041d/M/3/M3600_Z49_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z49",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z49.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z49.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F26",
+      "index": 25,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "953a59226988f4d0c5a31a2aab5c3d392ca2570322ba99a44727ac6a5327f731",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z51.html",
+          "productCode": "M3600",
+          "colourCode": "Z51",
+          "displayName": "The Fred Perry Shirt M3600 Brown Whisky Brown / Ecru / Ecru",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/0ff8243bcab43312f0e0357609d97fc5/M/3/M3600_Z51_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z51",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z51.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z51.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F27",
+      "index": 26,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "664a10d06a95230fc833949a35ddac2dc0dec11cc023b6b03c76abd890b19539",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z53.html",
+          "productCode": "M3600",
+          "colourCode": "Z53",
+          "displayName": "The Fred Perry Shirt M3600 White Oatmeal / Warm Stone / Shaded Stone",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/b51e718fa0f6f461043014a9f6872424/M/3/M3600_Z53_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z53",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z53.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z53.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F28",
+      "index": 27,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "02cb4dee114522caa55e487bedce491486b2631b77a2d30369b29191f04d5a9f",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z57.html",
+          "productCode": "M3600",
+          "colourCode": "Z57",
+          "displayName": "The Fred Perry Shirt M3600 Blue Tennis Blue / Silky Peach / Flamingo Tan",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/9f9097cca5fd60c033b675a14722c420/M/3/M3600_Z57_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z57",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z57.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z57.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F29",
+      "index": 28,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "1b1ad11d527eeab047e0f78a1503020b5177981f86da92f3c71d718be81a0639",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z58.html",
+          "productCode": "M3600",
+          "colourCode": "Z58",
+          "displayName": "The Fred Perry Shirt M3600 Navy Navy / Sport Green / Burnt Red",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/447ee1ba6371c641db68350dd2724e56/M/3/M3600_Z58_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z58",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z58.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z58.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F30",
+      "index": 29,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "3ffda97e08b439e03123c9676dee87e94d940216cf6242f17e6268e49f9af36e",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z59.html",
+          "productCode": "M3600",
+          "colourCode": "Z59",
+          "displayName": "The Fred Perry Shirt M3600 Green Sport Green / Track Blue / Track Blue",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/fe53a2db5215616816aa600d908d9ca4/M/3/M3600_Z59_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z59",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z59.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z59.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F31",
+      "index": 30,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "701440b7113a7087a11743c9927350c43523588ab7e848235f3be774c77ab893",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z60.html",
+          "productCode": "M3600",
+          "colourCode": "Z60",
+          "displayName": "The Fred Perry Shirt M3600 Brown Shaded Stone / Ecru / Dark Petrol",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/9c666280c2838d9c65153e55674235c3/M/3/M3600_Z60_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z60",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z60.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z60.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F32",
+      "index": 31,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "c3c2e8ea689607ebcce7e758dbfb7e7a332eb93ca42a3aaecfb13a4f670b5fd7",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z62.html",
+          "productCode": "M3600",
+          "colourCode": "Z62",
+          "displayName": "The Fred Perry Shirt M3600 Red Burnt Red / Sport Green / Navy",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/a5b60473d213ae358f7609679e975488/M/3/M3600_Z62_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z62",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z62.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z62.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F33",
+      "index": 32,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "9e38261e6aeef4abb63586ae30b1faab2e488a28b1f57423792ff1ee3b36c25b",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z63.html",
+          "productCode": "M3600",
+          "colourCode": "Z63",
+          "displayName": "The Fred Perry Shirt M3600 Red Oxblood / Ecru / Court Blue",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/acd6af169cec4de9abeaf2b9cbd7e67b/M/3/M3600_Z63_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3600|Z63",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z63.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3600-m3600-z63.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F34",
+      "index": 33,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "0c29149cf5c7e762b78e108e315e6126f5e14f9fda34409addf87defe1c8e701",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3636-m3636-49a.html",
+          "productCode": "M3636",
+          "colourCode": "49A",
+          "displayName": "The Fred Perry Shirt M3636 Brown Burnt Tobacco / Stockport Blue / Stockport Blue",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/cc5a46b6beb875956f20b64b9216f2f9/M/3/M3636_49A_V2_Q425_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3636|49A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3636-m3636-49a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3636-m3636-49a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F35",
+      "index": 34,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "f7e47ecafa7865cf5ae1f20a9e34b0efe9d954d3eaab9cdb0cc341f07f6bab6e",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3636-m3636-84a.html",
+          "productCode": "M3636",
+          "colourCode": "84A",
+          "displayName": "The Fred Perry Shirt M3636 White Ecru / Oxblood / Grassroots",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/265eb5365df593407097064e77a39e9c/M/3/M3636_84A_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3636|84A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3636-m3636-84a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3636-m3636-84a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F36",
+      "index": 35,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "65457931973fbd612237962f061a5be6d603ee76131df96d85965dcfa84b1b76",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3636-m3636-t73.html",
+          "productCode": "M3636",
+          "colourCode": "T73",
+          "displayName": "The Fred Perry Shirt M3636 Navy Navy / Seagrass / Seagrass",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/e3966870687cbc32c96a1f35a31efaf7/M/3/M3636_T73_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M3636|T73",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m3636-m3636-t73.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m3636-m3636-t73.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F37",
+      "index": 36,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F01",
+          "candidateKey": "635b3e0529042fef0928ceb9beb2a0c186ae209eab53d7aaaf3119b812ee0de3",
+          "productUrl": "https://www.fredperry.com/men/polo-shirts/m6000-m6000-14b.html",
+          "productCode": "M6000",
+          "colourCode": "14B",
+          "displayName": "The Fred Perry Shirt M6000 Blue Ace Blue / Tennis Blue",
+          "observedPrice": {
+            "raw": "£80",
+            "currency": "GBP"
+          },
+          "sourcePageUrl": "https://www.fredperry.com/men/polo-shirts",
+          "sourcePageSha256": "38f40077ddb5a0b42c8b5bdb42b9cf05e648de6edea613b5d7c625f8e71e650d",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:26.981Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/932e9cbf940b7ce9123b84a25d9d50d8/M/6/M6000_14B_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "GB|MEN_CORE",
+          "sourceMarket": "GB",
+          "sourceLocale": "en-GB",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F01"
+          ],
+          "identityKey": "M6000|14B",
+          "preferredProductUrl": "https://www.fredperry.com/men/polo-shirts/m6000-m6000-14b.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/men/polo-shirts/m6000-m6000-14b.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "GB"
+          ],
+          "sourceLocales": [
+            "en-GB"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "GB|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F38",
+      "index": 37,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "fb1389a36228dea68811ebd89f3bd8ba046a5fc89bcb572b781a68e813770dae",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-51a.html",
+          "productCode": "M6000",
+          "colourCode": "51A",
+          "displayName": "The Fred Perry Shirt M6000 Blue Light Smoke / Ecru",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/d84ae612553427ecc295e01c86b7117d/M/6/M6000_51A_V2_Q425_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|51A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-51a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-51a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F39",
+      "index": 38,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "ea22c34b8a9f62afbb787b8c6cf9036d5f44ca0a9c213eabe89cbbca75267644",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-56a.html",
+          "productCode": "M6000",
+          "colourCode": "56A",
+          "displayName": "The Fred Perry Shirt M6000 Navy French Navy / Stockport Blue",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/db1dea510e4e641fc21283d1f6aaf749/M/6/M6000_56A_V2_Q425_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|56A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-56a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-56a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F40",
+      "index": 39,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "de5b83af130dec8a8c64f8897ee2fdab127b59f80bef9461437a7bd1d006d424",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-58a.html",
+          "productCode": "M6000",
+          "colourCode": "58A",
+          "displayName": "The Fred Perry Shirt M6000 Grey Anchor Grey / Tennis Ball Yellow",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/b7f2506e698816ab8d983445091b16ea/M/6/M6000_58A_V2_Q425_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|58A",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-58a.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-58a.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F41",
+      "index": 40,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F01",
+          "candidateKey": "a3f850271f706bf73fbaea8843bfbbf704111a4ae8e9c2c311b4e4e560c0622c",
+          "productUrl": "https://www.fredperry.com/men/polo-shirts/m6000-m6000-85c.html",
+          "productCode": "M6000",
+          "colourCode": "85C",
+          "displayName": "The Fred Perry Shirt M6000 Grey Anchor Grey / Golden",
+          "observedPrice": {
+            "raw": "£80",
+            "currency": "GBP"
+          },
+          "sourcePageUrl": "https://www.fredperry.com/men/polo-shirts",
+          "sourcePageSha256": "38f40077ddb5a0b42c8b5bdb42b9cf05e648de6edea613b5d7c625f8e71e650d",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:26.981Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/af720bfa5efb6a2aeeb71b8c5e0e961c/M/6/M6000_85C_V2_Q326_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "GB|MEN_CORE",
+          "sourceMarket": "GB",
+          "sourceLocale": "en-GB",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F01"
+          ],
+          "identityKey": "M6000|85C",
+          "preferredProductUrl": "https://www.fredperry.com/men/polo-shirts/m6000-m6000-85c.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/men/polo-shirts/m6000-m6000-85c.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "GB"
+          ],
+          "sourceLocales": [
+            "en-GB"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "GB|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F42",
+      "index": 41,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F01",
+          "candidateKey": "3500a2cdd6ff9bf8f270aab55ff33809dd8125332d41479443dae5f29b0e2804",
+          "productUrl": "https://www.fredperry.com/men/polo-shirts/m6000-m6000-90c.html",
+          "productCode": "M6000",
+          "colourCode": "90C",
+          "displayName": "The Fred Perry Shirt M6000 Blue Dark Airforce / Seagrass",
+          "observedPrice": {
+            "raw": "£80",
+            "currency": "GBP"
+          },
+          "sourcePageUrl": "https://www.fredperry.com/men/polo-shirts",
+          "sourcePageSha256": "38f40077ddb5a0b42c8b5bdb42b9cf05e648de6edea613b5d7c625f8e71e650d",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:26.981Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/50d19491ca9f70672f67903fbb140c0d/M/6/M6000_90C_V2_Q326_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "GB|MEN_CORE",
+          "sourceMarket": "GB",
+          "sourceLocale": "en-GB",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F01"
+          ],
+          "identityKey": "M6000|90C",
+          "preferredProductUrl": "https://www.fredperry.com/men/polo-shirts/m6000-m6000-90c.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/men/polo-shirts/m6000-m6000-90c.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "GB"
+          ],
+          "sourceLocales": [
+            "en-GB"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "GB|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F43",
+      "index": 42,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "b29ec50e00094f2adb97fac4de2f2973d40a690fa3922556fb359dc038fc1ee1",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-n60.html",
+          "productCode": "M6000",
+          "colourCode": "N60",
+          "displayName": "The Fred Perry Shirt M6000 Black Black / Dark Caramel",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/0f5d0a6e63a4d05a728d977843bcf044/M/6/M6000_N60_V2_Q126_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|N60",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-n60.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-n60.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F44",
+      "index": 43,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "d40346dcdea1332a34936ccf11edef0a6be70fc5dd4565456781271be4cf6d6b",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-y22.html",
+          "productCode": "M6000",
+          "colourCode": "Y22",
+          "displayName": "The Fred Perry Shirt M6000 Green Court Green / Honeycomb",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/1be9d29d59ae25ab95825666860649c7/M/6/M6000_Y22_V2_Q125_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|Y22",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-y22.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-y22.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F45",
+      "index": 44,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "d1ac271b6e013d37704d4731a2e306dc769b98fc159787714c48edb713b74491",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-y35.html",
+          "productCode": "M6000",
+          "colourCode": "Y35",
+          "displayName": "The Fred Perry Shirt M6000 Red Burnt Red / Navy",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/4400710a4e23161a490772a52eb946d8/M/6/M6000_Y35_V2_Q125_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|Y35",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-y35.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-y35.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F46",
+      "index": 45,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "8204238d494bc52463a27ff3c32ec6cdc31fc95a3f390b8dfe8e5dee9345555a",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-y37.html",
+          "productCode": "M6000",
+          "colourCode": "Y37",
+          "displayName": "The Fred Perry Shirt M6000 Green Label Green / Ecru",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/39a0b1fe08c403645bcaed50aceffc2b/M/6/M6000_Y37_V2_Q125_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|Y37",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-y37.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-y37.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F47",
+      "index": 46,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "9702e62648e2554e9298b5dc01c3d2cb332c1b6298760e9420041bfb761cc632",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-z51.html",
+          "productCode": "M6000",
+          "colourCode": "Z51",
+          "displayName": "The Fred Perry Shirt M6000 Brown Whisky Brown / Ecru",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/1881bef2f3ec3c1fde99ac2c3af521b5/M/6/M6000_Z51_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|Z51",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-z51.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-z51.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F48",
+      "index": 47,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "b8ef370afd6fae50fb9f02b347f896f65e86439fdd19178ec28d69b3e30f99cd",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-z68.html",
+          "productCode": "M6000",
+          "colourCode": "Z68",
+          "displayName": "The Fred Perry Shirt M6000 Brown Shaded Stone / Dark Petrol",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/6ec1a0a4d3b05f16582fa6ef6105a516/M/6/M6000_Z68_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|Z68",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-z68.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-z68.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F49",
+      "index": 48,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F11",
+          "candidateKey": "904401026ba0f8c1b3f09addfeb8cfd32315f3fde8f206ca29331e415b5f608f",
+          "productUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-z69.html",
+          "productCode": "M6000",
+          "colourCode": "Z69",
+          "displayName": "The Fred Perry Shirt M6000 White Silky Peach / Dark Airforce",
+          "observedPrice": null,
+          "sourcePageUrl": "https://www.fredperry.com/id-en/men/polo-shirts",
+          "sourcePageSha256": "6c7adf4d7a690528010cf879eab06871e21df79fa37914da17f216be369cae80",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:25.379Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/788462af12fda656e5b1d8c8cbac5bf3/M/6/M6000_Z69_V2_Q325_MOD1_FRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "ID|MEN_CORE",
+          "sourceMarket": "ID",
+          "sourceLocale": "en-ID",
+          "sourceRegionGroup": "SOUTHEAST_ASIA",
+          "sourceDiscoveryScope": "MEN_CORE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts"
+          ],
+          "sourceSlots": [
+            "F11"
+          ],
+          "identityKey": "M6000|Z69",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-z69.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/polo-shirts/m6000-m6000-z69.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "ID"
+          ],
+          "sourceLocales": [
+            "en-ID"
+          ],
+          "sourceRegionGroups": [
+            "SOUTHEAST_ASIA"
+          ],
+          "sourceDiscoveryScopes": [
+            "MEN_CORE"
+          ],
+          "sourceLaneVectorKeys": [
+            "ID|MEN_CORE"
+          ]
+        }
+      ]
+    },
+    {
+      "slot": "F50",
+      "index": 49,
+      "products": [
+        {
+          "schemaVersion": 2,
+          "queueId": "RLF-OFFICIAL-20260824170959545",
+          "queueSha256": "ab3562f97fa947477491b42d55cc274c9a6b3f7ffcdd0385e2c9bee52b30f9c4",
+          "slot": "F37",
+          "candidateKey": "75d2d1ebdd6342b01f3fc0510905d68ff490a10dcafec4d1f943ea606ad7e752",
+          "productUrl": "https://www.fredperry.com/back-catalogue-exclusive/bustier-fred-perry-shirt-sg8181-129.html",
+          "productCode": "SG8181",
+          "colourCode": "129",
+          "displayName": "Ray BEAMS Bustier Fred Perry Shirt White Snow White",
+          "observedPrice": {
+            "raw": "£120",
+            "currency": "GBP"
+          },
+          "sourcePageUrl": "https://www.fredperry.com/back-catalogue-exclusive",
+          "sourcePageSha256": "16c99626b37b82b4fb3abd239988c4512050b6b14ec6b0427309dfe41a14eb94",
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "observedAt": "2026-08-24T17:10:20.435Z",
+          "imageReferences": [
+            {
+              "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/19172ad03aecb09ab1c87cc205a5fe00/S/G/SG8181_129_V2_Q424_FLATFRONT.JPG",
+              "rightsStatus": "UNKNOWN",
+              "ingestionStatus": "NOT_INGESTED",
+              "hostAllowed": true,
+              "assetClass": "PRODUCT_MEDIA"
+            }
+          ],
+          "uniquenessStatus": "CODE_COLOUR_IDENTITY_CANDIDATE_REQUIRES_GLOBAL_REVIEW",
+          "evidenceStatus": "OFFICIAL_PRODUCT_LINK_EXTRACTED",
+          "laneVectorKey": "GB|HERITAGE",
+          "sourceMarket": "GB",
+          "sourceLocale": "en-GB",
+          "sourceRegionGroup": "EUROPE",
+          "sourceDiscoveryScope": "HERITAGE",
+          "sourceOccurrences": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive"
+          ],
+          "sourceSlots": [
+            "F37"
+          ],
+          "identityKey": "SG8181|129",
+          "preferredProductUrl": "https://www.fredperry.com/back-catalogue-exclusive/bustier-fred-perry-shirt-sg8181-129.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/back-catalogue-exclusive/bustier-fred-perry-shirt-sg8181-129.html"
+          ],
+          "aliasCount": 1,
+          "sourceMarkets": [
+            "GB"
+          ],
+          "sourceLocales": [
+            "en-GB"
+          ],
+          "sourceRegionGroups": [
+            "EUROPE"
+          ],
+          "sourceDiscoveryScopes": [
+            "HERITAGE"
+          ],
+          "sourceLaneVectorKeys": [
+            "GB|HERITAGE"
+          ]
+        }
+      ]
+    }
+  ],
+  "sourceMarketCounts": {
+    "AE": 264,
+    "AU": 201,
+    "DE": 257,
+    "EG": 187,
+    "ES": 184,
+    "FR": 262,
+    "GB": 342,
+    "ID": 233,
+    "IT": 281,
+    "PT": 289,
+    "SA": 136,
+    "US": 247
+  },
+  "sourceScopeCounts": {
+    "ACCESSORIES_KIDS": 132,
+    "COLLABORATIONS": 150,
+    "HERITAGE": 67,
+    "MEN_CORE": 451,
+    "WOMEN_CORE": 205
+  },
+  "frontierSha256": "ab0eebcb27357d170f3b1b4b008a98cbfadac1f095e97ba43c78f89386f18422"
+}
