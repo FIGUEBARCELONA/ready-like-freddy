@@ -1,13 +1,87 @@
 {
   "schemaVersion": 5,
-  "recordedAt": "2026-08-24T21:17:03.579Z",
-  "sourceCommitSha": "6bb461260bfce2a03767315690ecf8f750e2b9f3",
-  "runId": "32778633048",
+  "recordedAt": "2026-08-24T21:18:16.659Z",
+  "sourceCommitSha": "f97cc151651f754e01bf57651f71c985023fc0ab",
+  "runId": "32778727059",
   "runAttempt": 1,
-  "validationOutcome": "failure",
+  "validationOutcome": "success",
   "nodeVersion": "v22.23.2",
-  "logSha256": "c8bcb3806bf4c3bb6f3508e8b180bbb03174f091241c853d4d9a12f55dc014e2",
-  "ledgerCheckpoint": null,
+  "logSha256": "ed4fe69f4ae152f472ae0b6a5d66b931be9703f69668db50f66dbb6f04ac5d6d",
+  "ledgerCheckpoint": {
+    "schemaVersion": 4,
+    "sourceRunId": "32777623316",
+    "generatedAt": "2026-08-24T21:18:04.793Z",
+    "expected": {
+      "identity": {
+        "completedIdentityCount": 1348,
+        "productUrlCaptureCount": 2144,
+        "officialProductImageReferenceCount": 11626,
+        "materialEvidenceCount": 1737,
+        "manufacturingClaimCount": 63,
+        "descriptionMissingIdentityCount": 817,
+        "priceMissingIdentityCount": 761,
+        "materialMissingIdentityCount": 86,
+        "retryIdentityKeys": [
+          "G3636|Z77",
+          "HW2300|843",
+          "M1588|81B",
+          "M1588|84B",
+          "M4613|41A",
+          "SY3660|46A"
+        ],
+        "deltaCount": 7,
+        "latestRunId": "32777623316",
+        "factoryVerifiedCount": 0,
+        "globalCanonicalProductCount": 0,
+        "ledgerSha256": "c57080c5befb8df5d00f8403b3a2b8c384017ed975441523498062b4f8b1edf9"
+      },
+      "sourcePages": {
+        "deltaCount": 5,
+        "attemptedObservationCount": 979,
+        "uniqueAttemptedSourcePageCount": 694,
+        "ledgerSha256": "f1733b93b06210411820a9feb94bbc0492f8da3b1a4f21e78811664ee0402efd"
+      }
+    },
+    "actual": {
+      "identity": {
+        "completedIdentityCount": 1348,
+        "productUrlCaptureCount": 2144,
+        "officialProductImageReferenceCount": 11626,
+        "materialEvidenceCount": 1737,
+        "manufacturingClaimCount": 63,
+        "descriptionMissingIdentityCount": 817,
+        "priceMissingIdentityCount": 761,
+        "materialMissingIdentityCount": 86,
+        "retryIdentityKeys": [
+          "G3636|Z77",
+          "HW2300|843",
+          "M1588|81B",
+          "M1588|84B",
+          "M4613|41A",
+          "SY3660|46A"
+        ],
+        "deltaCount": 7,
+        "latestRunId": "32777623316",
+        "factoryVerifiedCount": 0,
+        "globalCanonicalProductCount": 0,
+        "ledgerSha256": "c57080c5befb8df5d00f8403b3a2b8c384017ed975441523498062b4f8b1edf9"
+      },
+      "sourcePages": {
+        "deltaCount": 5,
+        "attemptedObservationCount": 979,
+        "uniqueAttemptedSourcePageCount": 694,
+        "ledgerSha256": "f1733b93b06210411820a9feb94bbc0492f8da3b1a4f21e78811664ee0402efd"
+      }
+    },
+    "sequence12": {
+      "completedIdentityCount": 107,
+      "failedIdentityCount": 4,
+      "attemptedSourcePageCount": 197,
+      "sourcePageDeltaSha256": "75ac3ad8894d8a13ed6a6eb544abd8f301d68e3cd5da54cb9c6e2e9b4207fdd0"
+    },
+    "mismatches": [],
+    "passed": true
+  },
   "requiredChecks": [
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
