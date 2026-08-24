@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-24T17:16:52Z",
+  "revision": "4",
+  "totalCount": 103,
+  "page2Count": 3,
+  "jobs": [
+    {
+      "id": 97521598971,
+      "name": "Product F36",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-08-24T17:14:16Z",
+      "completed_at": "2026-08-24T17:14:41Z",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32754804084/job/97521598971"
+    },
+    {
+      "id": 97521599031,
+      "name": "Product F46",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-08-24T17:14:18Z",
+      "completed_at": "2026-08-24T17:14:36Z",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32754804084/job/97521599031"
+    },
+    {
+      "id": 97522046956,
+      "name": "Consolidate identity evidence",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-08-24T17:14:59Z",
+      "completed_at": "2026-08-24T17:15:24Z",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32754804084/job/97522046956"
+    }
+  ]
+}
