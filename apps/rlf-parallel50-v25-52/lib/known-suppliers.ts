@@ -14,13 +14,18 @@ export const KNOWN_IDENTITY_KEYS=new Set([
 ]);
 
 export const KNOWN_REJECTED_DOMAINS=new Set([
-  '2dehands.be','adverts.ie','cybo.com','fashiola.com','fashiola.de','fashiola.fr','gem.app','goldenpages.ie','headlock.co','joinfleek.com','kingpinclothingstore.com','kurpirkt.lv','mainlinemenswear.com','mapcarta.com','near-place.com','novacircle.com','pagesmode.com','roundrobinclassics.com','stockholmfashiondistrict.se','taobao.com','thelabelfinder.com','twintipuk.myshopify.com','vintageclothingguides.com','wikipedia.org','world.taobao.com','worthpoint.com','yellow.com.mt','yelp.com'
+  '2dehands.be','adverts.ie','cybo.com','fashiola.com','fashiola.de','fashiola.fr','gem.app','goldenpages.ie','headlock.co','joinfleek.com','kingpinclothingstore.com','kurpirkt.lv','loopi.com','mainlinemenswear.com','mapcarta.com','near-place.com','novacircle.com','pagesmode.com','roundrobinclassics.com','stockholmfashiondistrict.se','taobao.com','thelabelfinder.com','twintipuk.myshopify.com','vintageclothingguides.com','wikipedia.org','world.taobao.com','worthpoint.com','yellow.com.mt','yelp.com'
+]);
+
+export const KNOWN_IDENTITY_QUARANTINE_DOMAINS=new Set([
+  'vintagegyvulys.com','vintagecloset.gr','vintagebulgariashop.com'
 ]);
 
 export const CANONICAL_REGISTRY_COVERAGE={
   expectedIdentities:CANONICAL_REGISTRY_EXPECTED_IDENTITIES,
   materializedDomains:KNOWN_SUPPLIER_DOMAINS.size,
   materializedIdentityKeys:KNOWN_IDENTITY_KEYS.size,
+  identityQuarantineDomains:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,
   complete:false,
   acceptanceMode:'MANUAL_MASTER_DEDUP_REQUIRED' as const,
   source:CANONICAL_REGISTRY_SOURCE,

@@ -5,7 +5,7 @@ import {domainOf} from './search';
 import {evidence} from './evidence';
 import {LEGAL,MARKETPLACES,NEW_RETAIL,PRELOVED,PROFESSIONAL,PURCHASE,UK_OPERATORS} from './policy';
 import {analyzeIdentity,detectCountry} from './identity';
-import {KNOWN_IDENTITY_KEYS,KNOWN_REJECTED_DOMAINS,KNOWN_SUPPLIER_DOMAINS,STAGED_SUPPLIER_DOMAINS} from '@/lib/known-suppliers';
+import {KNOWN_IDENTITY_KEYS,KNOWN_IDENTITY_QUARANTINE_DOMAINS,KNOWN_REJECTED_DOMAINS,KNOWN_SUPPLIER_DOMAINS,STAGED_SUPPLIER_DOMAINS} from '@/lib/known-suppliers';
 
 export function assess(input:DiscoverInput,query:string,queryTemplate:number,identityQueryTemplate:number,result:SearchItem,bundle:Bundle):Candidate {
   const url=bundle.target.url||result.url;
@@ -19,6 +19,7 @@ export function assess(input:DiscoverInput,query:string,queryTemplate:number,ide
   const marketplace=MARKETPLACES.some(item=>domain.includes(item));
   const knownRejected=KNOWN_REJECTED_DOMAINS.has(domain);
   const knownDuplicateDomain=KNOWN_SUPPLIER_DOMAINS.has(domain)||STAGED_SUPPLIER_DOMAINS.has(domain);
+  const identityQuarantine=KNOWN_IDENTITY_QUARANTINE_DOMAINS.has(domain);
   const uk=UK_OPERATORS.includes(domain)||domain.endsWith('.co.uk')||domain.endsWith('.uk')||/\b(united kingdom|company registered in england|companies house)\b/i.test(legalText)||/\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i.test(legalText);
   const country=detectCountry(domain,legalText);
   const detectedCountryCode=uk?'NON_EU':country.code;
@@ -41,9 +42,9 @@ export function assess(input:DiscoverInput,query:string,queryTemplate:number,ide
   const price=(joined.match(/(?:€|eur|ron|pln|czk|sek|dkk|huf|bgn)\s?\d{1,5}(?:[.,]\d{2})?|\d{1,5}(?:[.,]\d{2})?\s?(?:€|eur|ron|pln|czk|sek|dkk|huf|bgn|лв)/i)||[])[0]||bundle.shopifyProducts.find(product=>product.price)?.price||null;
   const knownFirstHand=NEW_RETAIL.some(item=>domain.includes(item));
   const knownDuplicate=knownDuplicateDomain||knownDuplicateIdentity;
-  const supplierReady=sourceHealthy&&legalHealthy&&!marketplace&&!knownRejected&&!knownDuplicate&&!uk&&!nonEU&&!knownFirstHand&&fred&&preloved&&professional&&euEvidence;
+  const supplierReady=sourceHealthy&&legalHealthy&&!marketplace&&!knownRejected&&!knownDuplicate&&!identityQuarantine&&!uk&&!nonEU&&!knownFirstHand&&fred&&preloved&&professional&&euEvidence;
   const productReady=supplierReady&&direct&&productPath&&Boolean(price)&&availableProducts>0;
-  const score=(fred?30:0)+(preloved?20:0)+(professional?15:0)+(legalHealthy?20:0)+(euEvidence?10:0)+(sourceHealthy?5:0)+(direct?6:0)+(productPath?4:0)+(price?3:0)-(knownDuplicate?45:0);
+  const score=(fred?30:0)+(preloved?20:0)+(professional?15:0)+(legalHealthy?20:0)+(euEvidence?10:0)+(sourceHealthy?5:0)+(direct?6:0)+(productPath?4:0)+(price?3:0)-(knownDuplicate?45:0)-(identityQuarantine?20:0);
   let status:Candidate['status']='EVIDENCE_INCOMPLETE';
   let duplicateBasis:Candidate['duplicateBasis']='NONE';
   if(marketplace) status='REJECT_MARKETPLACE';
@@ -52,10 +53,11 @@ export function assess(input:DiscoverInput,query:string,queryTemplate:number,ide
   else if(uk) status='REJECT_UK';
   else if(nonEU) status='REJECT_NON_EU';
   else if(knownRejected||knownFirstHand) status='REJECT_NOT_PRELOVED';
+  else if(identityQuarantine) status='QUARANTINE_IDENTITY';
   else if(supplierReady) status='QUALIFIED_PROVISIONAL';
   const records=[evidence(bundle.target,'TARGET')];
   if(bundle.home) records.push(evidence(bundle.home,'HOME'));
   if(bundle.legal) records.push(evidence(bundle.legal,'LEGAL'));
   if(bundle.shopify) records.push(evidence(bundle.shopify,'SHOPIFY_SEARCH'));
-  return {slot:input.lane.slot,cycle:input.cycle,countryCode:input.lane.countryCode,country:input.lane.country,query,queryTemplate,identityQueryTemplate,searchProviders:[result.provider],title:result.title,url,domain,httpStatus:bundle.target.status,status,score,supplierEvidence:supplierReady?'READY_TO_REVIEW':knownDuplicate?'DUPLICATE':'INCOMPLETE',productEvidence:productReady?'DIRECT_PRODUCT_PROVISIONAL':'SUPPLIER_EVIDENCE_ONLY',fredPerryEvidence:fred,prelovedEvidence:preloved,professionalEvidence:professional,directPurchaseSignal:direct,legalSignal:legalHealthy,uniqueProductPathSignal:productPath,euEvidence,detectedCountryCode,countryBasis:country.basis,laneCountryMatch:detectedCountryCode===input.lane.countryCode,knownDuplicate,duplicateBasis,identityKey:identity.identityKey,identityBasis:identity.identityBasis,vatId:identity.vatId,registrationId:identity.registrationId,contractingName:identity.contractingName,addressSignal:identity.addressSignal,priceSignal:price,availableProductSignals:availableProducts,evidence:records,checkedAt:new Date().toISOString()};
+  return {slot:input.lane.slot,cycle:input.cycle,countryCode:input.lane.countryCode,country:input.lane.country,query,queryTemplate,identityQueryTemplate,searchProviders:[result.provider],title:result.title,url,domain,httpStatus:bundle.target.status,status,score,supplierEvidence:supplierReady?'READY_TO_REVIEW':knownDuplicate?'DUPLICATE':identityQuarantine?'IDENTITY_QUARANTINE':'INCOMPLETE',productEvidence:productReady?'DIRECT_PRODUCT_PROVISIONAL':'SUPPLIER_EVIDENCE_ONLY',fredPerryEvidence:fred,prelovedEvidence:preloved,professionalEvidence:professional,directPurchaseSignal:direct,legalSignal:legalHealthy,uniqueProductPathSignal:productPath,euEvidence,detectedCountryCode,countryBasis:country.basis,laneCountryMatch:detectedCountryCode===input.lane.countryCode,knownDuplicate,identityQuarantine,duplicateBasis,identityKey:identity.identityKey,identityBasis:identity.identityBasis,vatId:identity.vatId,registrationId:identity.registrationId,contractingName:identity.contractingName,addressSignal:identity.addressSignal,priceSignal:price,availableProductSignals:availableProducts,evidence:records,checkedAt:new Date().toISOString()};
 }
