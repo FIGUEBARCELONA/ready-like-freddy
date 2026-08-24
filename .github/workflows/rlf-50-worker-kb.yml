@@ -262,6 +262,15 @@ jobs:
             --input=execution/downloaded-product-workers \
             --frontier=execution/product-frontier/product-frontier.json \
             --out=execution/products-consolidated
+      - name: Generate canonical append-only ledger delta
+        run: |
+          node scripts/execution/generate-ledger-delta.mjs \
+            --products=execution/products-consolidated \
+            --frontier=execution/product-frontier/product-frontier.json \
+            --progress=data/execution/product-progress.json \
+            --progressDeltas=data/execution/progress-deltas \
+            --out=execution/products-consolidated/ledger-delta.json \
+            --audit=execution/products-consolidated/ledger-delta-audit.json
       - name: Generate product SHA-256 evidence manifest
         run: |
           find execution/product-frontier execution/downloaded-product-workers execution/products-consolidated -type f -print0 \
@@ -275,23 +284,47 @@ jobs:
             execution/PRODUCT_EVIDENCE_SHA256SUMS.txt
           if-no-files-found: warn
           retention-days: 30
-      - name: Assert complete identity batch
+      - name: Assert audited full or partial strict identity batch
         run: |
           node - <<'NODE'
           const manifest = require('./execution/products-consolidated/product-manifest.json');
+          const sourceDelta = require('./execution/products-consolidated/product-progress-delta.json');
+          const ledgerDelta = require('./execution/products-consolidated/ledger-delta.json');
+          const audit = require('./execution/products-consolidated/ledger-delta-audit.json');
           const totals = manifest.totals;
           if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
             throw new Error('Product manifest does not contain exactly 50 workers');
           }
-          if (!manifest.qualityGatePassed || totals.successfulIdentityCaptureCount !== totals.expectedProductCaptureCount) {
-            throw new Error(`Identity capture gate failed: ${JSON.stringify(totals)}`);
+          if (totals.attemptedIdentityCount !== totals.expectedProductCaptureCount) {
+            throw new Error(`Attempted identity count mismatch: ${JSON.stringify(totals)}`);
           }
+          if (totals.successfulIdentityCaptureCount + totals.failedIdentityCaptureCount !== totals.expectedProductCaptureCount) {
+            throw new Error(`Selected identities are not fully accounted for: ${JSON.stringify(totals)}`);
+          }
+          if (totals.successfulIdentityCaptureCount < 1) {
+            throw new Error('No strict identity evidence was captured');
+          }
+          if (totals.rejectedImageReferenceCount !== 0) {
+            throw new Error(`Rejected images reached consolidation: ${totals.rejectedImageReferenceCount}`);
+          }
+          if (sourceDelta.completedIdentityKeys.length !== totals.successfulIdentityCaptureCount ||
+              ledgerDelta.completedIdentityKeys.length !== totals.successfulIdentityCaptureCount) {
+            throw new Error('Completed identity keys do not match strict successful captures');
+          }
+          if (!audit.passed || audit.batch.overlapWithPrior.length || audit.batch.completedAndFailedOverlap.length) {
+            throw new Error(`Ledger delta audit failed: ${JSON.stringify(audit)}`);
+          }
+          console.log(JSON.stringify({
+            acceptance: ledgerDelta.acceptance,
+            strictSuccesses: totals.successfulIdentityCaptureCount,
+            retries: totals.failedIdentityCaptureCount,
+            ledgerDeltaSha256: ledgerDelta.ledgerDeltaSha256,
+          }, null, 2));
           NODE
-      - name: Persist immutable run checkpoint
-        if: github.event_name == 'workflow_dispatch'
+      - name: Persist immutable audited run checkpoint
+        shell: bash
         run: |
           set -euo pipefail
-          git pull --rebase origin "${SOURCE_BRANCH}"
           destination="data/execution/runs/${GITHUB_RUN_ID}"
           delta_destination="data/execution/progress-deltas/${GITHUB_RUN_ID}.json"
           mkdir -p "$destination" "$(dirname "$delta_destination")"
@@ -299,10 +332,30 @@ jobs:
           cp execution/products-consolidated/product-records.ndjson "$destination/product-records.ndjson"
           cp execution/products-consolidated/image-manifest.ndjson "$destination/image-manifest.ndjson"
           cp execution/products-consolidated/product-progress-delta.json "$destination/product-progress-delta.json"
-          cp execution/products-consolidated/product-progress-delta.json "$delta_destination"
+          cp execution/products-consolidated/ledger-delta.json "$destination/ledger-delta.json"
+          cp execution/products-consolidated/ledger-delta-audit.json "$destination/ledger-delta-audit.json"
+          cp execution/products-consolidated/ledger-delta.json "$delta_destination"
           cp execution/PRODUCT_EVIDENCE_SHA256SUMS.txt "$destination/PRODUCT_EVIDENCE_SHA256SUMS.txt"
+          node --input-type=module - <<'NODE'
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          const state = await loadProgressLedger();
+          if (String(state.latestRunId) !== String(process.env.GITHUB_RUN_ID)) {
+            throw new Error(`Persisted ledger latest run mismatch: ${state.latestRunId}`);
+          }
+          if (state.counters.factoryVerifiedCount !== 0 || state.counters.globalCanonicalProductCount !== 0) {
+            throw new Error('Factory or global canonical counts changed without their independent gates');
+          }
+          console.log(JSON.stringify({
+            latestRunId: state.latestRunId,
+            completedIdentityCount: state.completed.identityCount,
+            retryIdentityCount: state.retry.identityCount,
+            ledgerSha256: state.ledgerSha256,
+          }, null, 2));
+          NODE
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$destination" "$delta_destination"
-          git commit -m "Persist immutable RLF evidence run ${GITHUB_RUN_ID}"
+          git commit -m "Persist audited RLF evidence run ${GITHUB_RUN_ID}"
+          git fetch origin "${SOURCE_BRANCH}"
+          git rebase "origin/${SOURCE_BRANCH}"
           git push origin "HEAD:${SOURCE_BRANCH}"
