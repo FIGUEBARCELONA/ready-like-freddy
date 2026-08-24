@@ -8,106 +8,247 @@ const diagDir = path.resolve('diagnostics');
 fs.mkdirSync(outDir, { recursive: true });
 fs.mkdirSync(diagDir, { recursive: true });
 
-const targets = [
-  {
-    id: 'RLF-EXT-020', code: 'J1518/A25/01975/336', stem: 'RLF-EXT-020_J1518_Vietnam',
-    sourcePage: 'https://us.vestiairecollective.com/men-clothing/jackets/fred-perry/burgundy-cotton-fred-perry-jacket-29492494.shtml',
-    imageNeedle: 'burgundy-cotton-fred-perry-jacket-29492494-7_1',
-    direct: 'https://images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg',
-    query: 'J1518/A25/01975/336 Fred Perry label'
-  },
-  {
-    id: 'RLF-EXT-026', code: 'M12/1576/35237', stem: 'RLF-EXT-026_M12_1576_England',
-    sourcePage: 'https://us.vestiairecollective.com/men-clothing/polo-shirts/fred-perry/black-cotton-fred-perry-polo-shirt-43131917.shtml',
-    imageNeedle: 'black-cotton-fred-perry-polo-shirt-43131917-3_2',
-    direct: 'https://images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/black-cotton-fred-perry-polo-shirt-43131917-3_2.jpg',
-    query: 'M12/1576/35237 Fred Perry label'
+const target = {
+  id: 'RLF-EXT-020',
+  exactCode: 'J1518/A25/01975/336',
+  expectedOrigin: 'MADE IN VIETNAM',
+  sourcePage: 'https://www.instagram.com/p/DVvOqMrAh5i/',
+  query: '"J1518/A25/01975/336" "FRED PERRY"',
+};
+
+const sha256 = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex');
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function mimeFromMagic(buffer) {
+  if (buffer.length >= 12 && buffer.subarray(0, 4).toString('hex') === '52494646' && buffer.subarray(8, 12).toString() === 'WEBP') return 'image/webp';
+  if (buffer.length >= 8 && buffer.subarray(0, 8).toString('hex') === '89504e470d0a1a0a') return 'image/png';
+  if (buffer.length >= 3 && buffer.subarray(0, 3).toString('hex') === 'ffd8ff') return 'image/jpeg';
+  return 'application/octet-stream';
+}
+
+function extForMime(mime) {
+  return mime === 'image/webp' ? 'webp' : mime === 'image/png' ? 'png' : mime === 'image/jpeg' ? 'jpg' : 'bin';
+}
+
+const seenHashes = new Set();
+const candidates = [];
+
+function preserveCandidate(buffer, provenance) {
+  const mime = mimeFromMagic(buffer);
+  const digest = sha256(buffer);
+  const acceptedBinary = /^image\/(jpeg|png|webp)$/.test(mime) && buffer.length >= 1024;
+  const record = {
+    ...provenance,
+    bytes: buffer.length,
+    sha256: digest,
+    magicMime: mime,
+    acceptedBinary,
+    exactIdentityVerified: false,
+    admission: acceptedBinary ? 'CANDIDATE_ONLY_MANUAL_VISUAL_GATE' : 'REJECT_BINARY_GATE',
+  };
+  if (acceptedBinary && !seenHashes.has(digest)) {
+    seenHashes.add(digest);
+    const ordinal = String(candidates.filter((x) => x.acceptedBinary).length + 1).padStart(2, '0');
+    const file = `${target.id}_J1518_01975_336_candidate_${ordinal}.${extForMime(mime)}`;
+    fs.writeFileSync(path.join(outDir, file), buffer);
+    record.file = file;
   }
-];
-const blocked = [
-  { id:'RLF-EXT-021', code:'J6319/170/2990/154', url:'https://img.gem.app/449928663/5f/1695627431/fred-perry-fred-ferry-vintage-made-in-portugal.jpg' },
-  { id:'RLF-EXT-022', code:'J6327/330/2090/196', url:'https://img.gem.app/317472623/7f/1658213994/fred-perry-fred-perry-laurel-wreath-track-jacket.jpg' }
-];
-
-const sha256 = b => crypto.createHash('sha256').update(b).digest('hex');
-const acceptedImage = (ct,b) => /^image\/(jpeg|png|webp)$/i.test(ct||'') && b.length >= 1024;
-
-async function requestAttempt(context, target, report) {
-  try {
-    const r = await context.request.get(target.direct, { headers:{Referer:target.sourcePage}, timeout:120000, failOnStatusCode:false });
-    const b = await r.body(); const ct=r.headers()['content-type']||'';
-    const row={mode:'direct_request',status:r.status(),contentType:ct,bytes:b.length,sha256:sha256(b),accepted:r.ok()&&acceptedImage(ct,b)};
-    report.attempts.push(row);
-    if(row.accepted){ const f=`${target.stem}_original.jpg`; fs.writeFileSync(path.join(outDir,f),b); report.accepted={file:f,evidenceClass:'ORIGINAL_BINARY',...row}; return true; }
-    fs.writeFileSync(path.join(diagDir,`${target.id}_direct_rejected.bin`),b);
-  } catch(e){ report.attempts.push({mode:'direct_request',error:String(e),accepted:false}); }
-  return false;
+  candidates.push(record);
+  return record;
 }
 
-async function sourcePageAttempt(context, target, report) {
-  const page=await context.newPage();
+async function fetchUrl(request, url, provenance) {
+  if (!url || !/^https?:\/\//i.test(url)) return null;
   try {
-    const nav=await page.goto(target.sourcePage,{waitUntil:'domcontentloaded',timeout:120000});
-    await page.waitForTimeout(10000);
-    await page.screenshot({path:path.join(diagDir,`${target.id}_source_page.png`),fullPage:true});
-    const meta=await page.locator('img').evaluateAll((nodes,needle)=>nodes.map((n,i)=>({i,src:n.currentSrc||n.src||'',srcset:n.srcset||'',alt:n.alt||'',nw:n.naturalWidth,nh:n.naturalHeight,visible:!!(n.offsetWidth||n.offsetHeight||n.getClientRects().length)})).filter(x=>(x.src+x.srcset).includes(needle)),target.imageNeedle).catch(()=>[]);
-    fs.writeFileSync(path.join(diagDir,`${target.id}_source_images.json`),JSON.stringify({status:nav&&nav.status(),url:page.url(),title:await page.title(),matches:meta},null,2));
-    if(meta.length){
-      const loc=page.locator('img').nth(meta[0].i);
-      if(await loc.isVisible().catch(()=>false)){
-        const f=`${target.stem}_rendered_source.png`;
-        await loc.screenshot({path:path.join(outDir,f),timeout:60000});
-        const b=fs.readFileSync(path.join(outDir,f));
-        report.accepted={file:f,evidenceClass:'RENDERED_SOURCE_ELEMENT',bytes:b.length,sha256:sha256(b),accepted:true};
-        report.attempts.push({mode:'source_element_screenshot',matches:meta.length,bytes:b.length,accepted:true});
-        return true;
+    const response = await request.get(url, {
+      timeout: 120000,
+      failOnStatusCode: false,
+      headers: { Referer: target.sourcePage },
+    });
+    const body = await response.body();
+    return preserveCandidate(body, {
+      ...provenance,
+      url,
+      status: response.status(),
+      headerContentType: response.headers()['content-type'] || '',
+    });
+  } catch (error) {
+    candidates.push({ ...provenance, url, error: String(error), acceptedBinary: false, admission: 'REQUEST_ERROR' });
+    return null;
+  }
+}
+
+async function collectPageImages(page, stage) {
+  const images = await page.locator('img').evaluateAll((nodes) => nodes.map((node, index) => ({
+    index,
+    src: node.currentSrc || node.src || '',
+    srcset: node.srcset || '',
+    alt: node.alt || '',
+    naturalWidth: node.naturalWidth || 0,
+    naturalHeight: node.naturalHeight || 0,
+    visible: Boolean(node.offsetWidth || node.offsetHeight || node.getClientRects().length),
+  }))).catch(() => []);
+  fs.writeFileSync(path.join(diagDir, `${stage}_images.json`), JSON.stringify(images, null, 2));
+
+  const urls = new Set();
+  for (const image of images) {
+    if (image.src) urls.add(image.src);
+    for (const part of String(image.srcset || '').split(',')) {
+      const url = part.trim().split(/\s+/)[0];
+      if (url) urls.add(url);
+    }
+  }
+  let ordinal = 0;
+  for (const url of urls) {
+    ordinal += 1;
+    await fetchUrl(page.context().request, url, { mode: 'page_img_request', stage, ordinal });
+  }
+  return images;
+}
+
+async function inspectInstagram(context, report) {
+  const page = await context.newPage();
+  const networkImageUrls = new Set();
+  page.on('response', (response) => {
+    const ct = response.headers()['content-type'] || '';
+    const url = response.url();
+    if (/^image\//i.test(ct) && /(cdninstagram|fbcdn|instagram)/i.test(url)) networkImageUrls.add(url);
+  });
+
+  try {
+    const nav = await page.goto(target.sourcePage, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await sleep(15000);
+    report.instagram = {
+      status: nav ? nav.status() : null,
+      finalUrl: page.url(),
+      title: await page.title(),
+    };
+    await page.screenshot({ path: path.join(diagDir, 'instagram_full_page.png'), fullPage: true });
+
+    const meta = await page.evaluate(() => {
+      const value = (selector, attribute = 'content') => document.querySelector(selector)?.getAttribute(attribute) || '';
+      return {
+        ogImage: value('meta[property="og:image"]'),
+        ogDescription: value('meta[property="og:description"]'),
+        description: value('meta[name="description"]'),
+        canonical: value('link[rel="canonical"]', 'href'),
+        bodyText: (document.body?.innerText || '').slice(0, 30000),
+      };
+    }).catch((error) => ({ error: String(error) }));
+    fs.writeFileSync(path.join(diagDir, 'instagram_metadata.json'), JSON.stringify(meta, null, 2));
+    if (meta.bodyText) fs.writeFileSync(path.join(diagDir, 'instagram_body_text.txt'), meta.bodyText);
+    if (meta.ogImage) await fetchUrl(context.request, meta.ogImage, { mode: 'instagram_og_image' });
+
+    await collectPageImages(page, 'instagram_slide_00');
+
+    for (let slide = 1; slide <= 10; slide += 1) {
+      const selectors = [
+        'button[aria-label="Next"]',
+        'button[aria-label="Següent"]',
+        'button[aria-label="Siguiente"]',
+        'button:has(svg[aria-label="Next"])',
+      ];
+      let clicked = false;
+      for (const selector of selectors) {
+        const button = page.locator(selector).last();
+        if (await button.isVisible().catch(() => false)) {
+          await button.click({ timeout: 10000 }).catch(() => {});
+          clicked = true;
+          break;
+        }
       }
+      if (!clicked) break;
+      await sleep(2500);
+      const stage = `instagram_slide_${String(slide).padStart(2, '0')}`;
+      await page.screenshot({ path: path.join(diagDir, `${stage}.png`), fullPage: false });
+      await collectPageImages(page, stage);
     }
-    report.attempts.push({mode:'source_element_screenshot',matches:meta.length,accepted:false});
-  } catch(e){ report.attempts.push({mode:'source_page',error:String(e),accepted:false}); }
-  finally { await page.close(); }
-  return false;
-}
 
-async function bingAttempt(context,target,report){
-  const page=await context.newPage();
-  try{
-    const url='https://www.bing.com/images/search?q='+encodeURIComponent(target.query);
-    const nav=await page.goto(url,{waitUntil:'domcontentloaded',timeout:120000});
-    await page.waitForTimeout(8000);
-    await page.screenshot({path:path.join(diagDir,`${target.id}_bing_page.png`),fullPage:true});
-    const imgs=await page.locator('img.mimg').evaluateAll(nodes=>nodes.map((n,i)=>({i,src:n.currentSrc||n.src||'',alt:n.alt||'',nw:n.naturalWidth,nh:n.naturalHeight,visible:!!(n.offsetWidth||n.offsetHeight||n.getClientRects().length)})).filter(x=>x.visible&&x.nw>=200&&x.nh>=200)).catch(()=>[]);
-    fs.writeFileSync(path.join(diagDir,`${target.id}_bing_images.json`),JSON.stringify({status:nav&&nav.status(),url:page.url(),title:await page.title(),images:imgs.slice(0,20)},null,2));
-    if(imgs.length){
-      const loc=page.locator('img.mimg').nth(imgs[0].i);
-      const f=`${target.stem}_rendered_search.png`;
-      await loc.screenshot({path:path.join(outDir,f),timeout:60000});
-      const b=fs.readFileSync(path.join(outDir,f));
-      report.accepted={file:f,evidenceClass:'RENDERED_SEARCH_RESULT',bytes:b.length,sha256:sha256(b),accepted:true,query:target.query};
-      report.attempts.push({mode:'bing_result_screenshot',candidates:imgs.length,bytes:b.length,accepted:true});
-      return true;
+    let netOrdinal = 0;
+    for (const url of networkImageUrls) {
+      netOrdinal += 1;
+      await fetchUrl(context.request, url, { mode: 'instagram_network_image', ordinal: netOrdinal });
     }
-    report.attempts.push({mode:'bing_result_screenshot',candidates:0,accepted:false});
-  }catch(e){report.attempts.push({mode:'bing_search',error:String(e),accepted:false});}
-  finally{await page.close();}
-  return false;
+  } catch (error) {
+    report.instagram = { ...(report.instagram || {}), error: String(error) };
+  } finally {
+    await page.close();
+  }
 }
 
-async function blockedAttempt(context,item){
-  try{const r=await context.request.get(item.url,{timeout:90000,failOnStatusCode:false}); const b=await r.body(); return {id:item.id,code:item.code,status:r.status(),contentType:r.headers()['content-type']||'',bytes:b.length,sha256:sha256(b),accepted:r.ok()&&acceptedImage(r.headers()['content-type'],b)};}catch(e){return {id:item.id,code:item.code,error:String(e),accepted:false};}
+async function inspectBing(context, report) {
+  const page = await context.newPage();
+  try {
+    const url = `https://www.bing.com/images/search?q=${encodeURIComponent(target.query)}`;
+    const nav = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await sleep(10000);
+    report.bing = { status: nav ? nav.status() : null, finalUrl: page.url(), title: await page.title() };
+    await page.screenshot({ path: path.join(diagDir, 'bing_exact_query_full_page.png'), fullPage: true });
+
+    const tiles = await page.locator('a.iusc').evaluateAll((nodes) => nodes.slice(0, 40).map((node, index) => {
+      let metadata = {};
+      try { metadata = JSON.parse(node.getAttribute('m') || '{}'); } catch (_) {}
+      return { index, href: node.href || '', metadata };
+    })).catch(() => []);
+    fs.writeFileSync(path.join(diagDir, 'bing_exact_query_tiles.json'), JSON.stringify(tiles, null, 2));
+
+    let ordinal = 0;
+    for (const tile of tiles) {
+      const mediaUrl = tile.metadata?.murl || tile.metadata?.turl || '';
+      if (!mediaUrl) continue;
+      ordinal += 1;
+      await fetchUrl(context.request, mediaUrl, {
+        mode: 'bing_exact_query_media',
+        ordinal,
+        sourcePage: tile.metadata?.purl || '',
+        title: tile.metadata?.t || '',
+      });
+    }
+  } catch (error) {
+    report.bing = { ...(report.bing || {}), error: String(error) };
+  } finally {
+    await page.close();
+  }
 }
 
-async function main(){
-  const browser=await chromium.launch({headless:true});
-  const context=await browser.newContext({locale:'en-US',viewport:{width:1440,height:1200},userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36'});
-  const reports=[];
-  for(const target of targets){const r={id:target.id,code:target.code,sourcePage:target.sourcePage,directUrl:target.direct,accepted:null,attempts:[]}; if(!await requestAttempt(context,target,r) && !await sourcePageAttempt(context,target,r)) await bingAttempt(context,target,r); reports.push(r);}
-  const blockedReports=[]; for(const item of blocked) blockedReports.push(await blockedAttempt(context,item));
+async function main() {
+  const browser = await chromium.launch({ headless: true });
+  const context = await browser.newContext({
+    locale: 'en-US',
+    viewport: { width: 1440, height: 1400 },
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36',
+  });
+
+  const report = {
+    schema: 'rlf-v625-exact-instagram-recovery-v1',
+    policy: 'APPEND_ONLY_FAIL_CLOSED',
+    target,
+    generatedAt: new Date().toISOString(),
+    instagram: null,
+    bing: null,
+  };
+
+  await inspectInstagram(context, report);
+  await inspectBing(context, report);
   await browser.close();
-  const files=fs.readdirSync(outDir).sort().map(file=>{const b=fs.readFileSync(path.join(outDir,file));return {file,bytes:b.length,sha256:sha256(b)};});
-  const manifest={schema:'rlf-v624-browser-recovery-v2',policy:'APPEND_ONLY_FAIL_CLOSED',generatedAt:new Date().toISOString(),acceptedFiles:files,targets:reports,blocked:blockedReports};
-  fs.writeFileSync(path.join(diagDir,'rlf-v624-fetch-report.json'),JSON.stringify(manifest,null,2));
-  fs.writeFileSync(path.join(diagDir,'RLF_V624_SHA256SUMS.txt'),files.map(x=>`${x.sha256}  ${x.file}`).join('\n')+'\n');
-  console.log(JSON.stringify({accepted:files.length,files,blocked:blockedReports},null,2));
+
+  const files = fs.readdirSync(outDir).sort().map((file) => {
+    const buffer = fs.readFileSync(path.join(outDir, file));
+    return { file, bytes: buffer.length, sha256: sha256(buffer), magicMime: mimeFromMagic(buffer) };
+  });
+  report.candidates = candidates;
+  report.preservedFiles = files;
+  report.exactIdentityVerified = false;
+  report.canonicalPromotion = false;
+  report.nextGate = 'Manual visual inspection must confirm exact J1518/A25/01975/336 and MADE IN VIETNAM on a same-piece physical label.';
+
+  fs.writeFileSync(path.join(diagDir, 'rlf-v625-instagram-recovery-report.json'), JSON.stringify(report, null, 2));
+  fs.writeFileSync(path.join(diagDir, 'RLF_V625_SHA256SUMS.txt'), files.map((item) => `${item.sha256}  ${item.file}`).join('\n') + '\n');
+  console.log(JSON.stringify({ preservedCandidates: files.length, files, canonicalPromotion: false }, null, 2));
 }
-main().catch(e=>{fs.writeFileSync(path.join(diagDir,'fatal-error.txt'),String(e));console.error(e);process.exitCode=1;});
+
+main().catch((error) => {
+  fs.writeFileSync(path.join(diagDir, 'fatal-error.txt'), String(error));
+  console.error(error);
+  process.exitCode = 1;
+});
