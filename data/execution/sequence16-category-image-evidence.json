@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "purpose": "STRICT_RETRY_RECOVERY_WITH_EXACT_CODE_COLOUR_OFFICIAL_MEDIA",
+  "records": [
+    {
+      "identityKey": "G3636|Z77",
+      "productCode": "G3636",
+      "colourCode": "Z77",
+      "preferredProductUrl": "https://www.fredperry.com/id-en/women/the-gift-list-id/g3636-g3636-z77.html",
+      "sourcePageUrl": "https://www.fredperry.com/id-en/women/the-gift-list-id",
+      "sourcePageSha256": "f26314f88d197b5c73f674a0099c7d035d6a86f5ffabe72eab1026148a3e4e20",
+      "sourceQueueId": "RLF-OFFICIAL-20260824174151723",
+      "sourceQueueSha256": "da7a5cbc2c2fd6deea6c3083ad1cfee2a52dcc099c38581a2e3e325a0e7c0008",
+      "sourceArtifact": {
+        "runId": "32758087459",
+        "artifactId": 9531737243,
+        "artifactDigest": "sha256:ef94513a6efafee18bc19c147ee1ff56a5fea52537ad9fdbe8980590681710d6"
+      },
+      "imageReferences": [
+        {
+          "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/bd7c0e85d450ed569e8321a5a4cfd14c/G/3/G3636_Z77_V2_Q325_MOD1_FRONT.JPG",
+          "rightsStatus": "UNKNOWN",
+          "ingestionStatus": "NOT_INGESTED",
+          "hostAllowed": true,
+          "assetClass": "PRODUCT_MEDIA"
+        }
+      ],
+      "evidenceStatus": "OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"
+    },
+    {
+      "identityKey": "SY3660|46A",
+      "productCode": "SY3660",
+      "colourCode": "46A",
+      "preferredProductUrl": "https://www.fredperry.com/id-en/kids/kids-twin-tipped-fred-perry-shirt-sy3660-46a.html",
+      "sourcePageUrl": "https://www.fredperry.com/id-en/kids",
+      "sourcePageSha256": "2a0d24c0cf20946e4f14fff7439477c9a33e614e459d914ca74444e4388313ae",
+      "sourceQueueId": "RLF-OFFICIAL-20260824174151723",
+      "sourceQueueSha256": "da7a5cbc2c2fd6deea6c3083ad1cfee2a52dcc099c38581a2e3e325a0e7c0008",
+      "sourceArtifact": {
+        "runId": "32758087459",
+        "artifactId": 9531737243,
+        "artifactDigest": "sha256:ef94513a6efafee18bc19c147ee1ff56a5fea52537ad9fdbe8980590681710d6"
+      },
+      "imageReferences": [
+        {
+          "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/47999abab475dd652fef8cdb7ddad83f/S/Y/SY3660_46A_V2_Q425_FLATSQUARE.JPG",
+          "rightsStatus": "UNKNOWN",
+          "ingestionStatus": "NOT_INGESTED",
+          "hostAllowed": true,
+          "assetClass": "PRODUCT_MEDIA"
+        }
+      ],
+      "evidenceStatus": "OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"
+    },
+    {
+      "identityKey": "M4613|41A",
+      "productCode": "M4613",
+      "colourCode": "41A",
+      "preferredProductUrl": "https://www.fredperry.com/id-en/men/t-shirts/contrast-tape-ringer-t-shirt-m4613-41a.html",
+      "sourcePageUrl": "https://www.fredperry.com/id-en/men/t-shirts",
+      "sourcePageSha256": "8e05f7c891568ec3ceafd51522e4661e2d6fc96d6ac38b764149d356250d6763",
+      "sourceQueueId": "RLF-OFFICIAL-20260824210614389",
+      "sourceQueueSha256": "2b04b82516ece50c9977f70f5226b1a601795eb88596bcec90a1474a78b3f40c",
+      "sourceArtifact": {
+        "runId": "32777623316",
+        "artifactId": 9538670301,
+        "artifactDigest": "sha256:abba93dce9bd9a70fe6167ec321402ff723970a64234b7b154430a94f8992fdd"
+      },
+      "imageReferences": [
+        {
+          "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/d1d2575542ae7cf224a096c50cc35900/M/4/M4613_41A_V2_Q425_MOD1_FRONT.JPG",
+          "rightsStatus": "UNKNOWN",
+          "ingestionStatus": "NOT_INGESTED",
+          "hostAllowed": true,
+          "assetClass": "PRODUCT_MEDIA"
+        }
+      ],
+      "evidenceStatus": "OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"
+    }
+  ]
+}
