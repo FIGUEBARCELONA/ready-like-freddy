@@ -6,11 +6,6 @@ on:
     paths:
       - 'apps/rlf-parallel50-v25-52/**'
       - '.github/workflows/rlf-v2555-qa.yml'
-  pull_request:
-    branches: [rlf-parallel50-v25-54]
-    paths:
-      - 'apps/rlf-parallel50-v25-52/**'
-      - '.github/workflows/rlf-v2555-qa.yml'
   workflow_dispatch:
 
 permissions:
@@ -28,9 +23,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: apps/rlf-parallel50-v25-52/package-lock.json
-      - name: Install exact dependency graph
+      - name: Install dependency graph
         run: npm install --ignore-scripts --no-fund
       - name: TypeScript strict gate
         run: npx tsc --noEmit
@@ -38,8 +31,12 @@ jobs:
         run: npm run build
       - name: Dependency audit evidence
         run: npm audit --json > dependency-audit-v2555.json || true
+      - name: Package deployable source
+        run: zip -qr rlf-v2555-source.zip app lib workflows package.json next.config.ts tsconfig.json vercel.json RLF_V25_55_DEDUP_GATE.md
       - uses: actions/upload-artifact@v4
         with:
           name: rlf-v2555-qa-evidence
-          path: apps/rlf-parallel50-v25-52/dependency-audit-v2555.json
+          path: |
+            apps/rlf-parallel50-v25-52/dependency-audit-v2555.json
+            apps/rlf-parallel50-v25-52/rlf-v2555-source.zip
           retention-days: 7
