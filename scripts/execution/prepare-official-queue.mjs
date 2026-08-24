@@ -96,9 +96,10 @@ function discoveryPriority(entry) {
 function isEligibleDiscoveryUrl(url) {
   const path = url.pathname.toLowerCase();
   if (/\.(?:jpg|jpeg|png|webp|gif|svg|css|js|ico|pdf|xml)(?:$|\?)/i.test(path)) return false;
-  if (/\/(?:account|checkout|cart|customer|privacy|terms|help|contact|returns|delivery|stores?|shops?|community|size-guides?)(?:\/|$)/i.test(path)) return false;
+  if (/\/(?:account|checkout|cart|customer|terms|contact|returns|delivery|stores?|shops?|community|size-guides?|auth|login|register|site-map|sitemap)(?:\/|$)/i.test(path)) return false;
+  if (/\/(?:shop-finder|store-finder|helpcentre|help-center|help-centre|df-social-connect|social-connect)(?:\/|$)/i.test(path)) return false;
+  if (/(?:privacy|privacidad|privacidade|datenschutz|confidentialit|cookies?|legal|accessibility)/i.test(path)) return false;
   if (/\/[a-z0-9-]+-[a-z]{1,5}\d{3,6}(?:-[a-z])?-[a-z0-9]{2,5}\.html$/i.test(path)) return false;
-  if (/\/site-map\/?$/i.test(path)) return false;
   return true;
 }
 
