@@ -1,0 +1,49 @@
+name: TEMP recover v6.21 CAND-034 originals
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Fetch fixed originals
+        shell: bash
+        run: |
+          set -u
+          mkdir -p evidence/original evidence/reports
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
+          fetch() {
+            key="$1"; url="$2"; referer="$3"; out="evidence/original/${key}"
+            set +e
+            meta=$(curl --location --retry 2 --retry-all-errors --connect-timeout 20 --max-time 180 \
+              --user-agent "$UA" --referer "$referer" \
+              --header 'Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8' \
+              "$url" --output "$out" --write-out '%{http_code}|%{url_effective}|%{content_type}|%{size_download}')
+            rc=$?
+            set -e
+            mime=$(file -b --mime-type "$out" 2>/dev/null || true)
+            size=$(stat -c%s "$out" 2>/dev/null || echo 0)
+            printf '%s|curl_rc=%s|mime=%s|bytes=%s\n' "$meta" "$rc" "$mime" "$size" > "evidence/reports/${key}.meta"
+            if [ "$rc" -ne 0 ] || [ "$size" -lt 1024 ]; then rm -f "$out"; return 0; fi
+            case "$mime" in image/*) ;; *) rm -f "$out" ;; esac
+          }
+          set -e
+          fetch 'CAND-034_ALT_technical.jpg' 'https://i.ebayimg.com/images/g/zPMAAOSwMfZlkGv2/s-l400.jpg' 'https://www.ebay.com/'
+          fetch 'CAND-034_ALT_neck.jpg' 'https://u-mercari-images.mercdn.net/photos/m35593253134_11.jpg' 'https://www.mercari.com/'
+          fetch 'CAND-034_ALT_garment.jpg' 'https://baseec-img-mng.akamaized.net/images/item/origin/89263c15ff9e43156abce268161575a2.jpg?imformat=generic' 'https://baseec-img-mng.akamaized.net/'
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME.txt || true
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-v621-cand034-recovery
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
