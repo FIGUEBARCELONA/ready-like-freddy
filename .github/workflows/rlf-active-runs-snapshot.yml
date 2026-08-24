@@ -14,8 +14,8 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '5'
-  TARGET_SHA: 'adb03d116dea229cdd9dec296e80016899d6bde5'
+  SNAPSHOT_REVISION: '6'
+  TARGET_SHA: '8af115e91e7b4918a538a352cd929c0e6a0c0825'
 
 jobs:
   snapshot:
@@ -57,7 +57,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot balanced sequence 12 preflight run'
+          git commit -m 'Snapshot sequence 12 massive run'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
