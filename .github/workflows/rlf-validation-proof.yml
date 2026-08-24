@@ -54,16 +54,16 @@ jobs:
           import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
           const state = await loadProgressLedger();
           const expected = {
-            completedIdentityCount: 906,
-            productUrlCaptureCount: 1418,
-            officialProductImageReferenceCount: 7963,
-            materialEvidenceCount: 1232,
-            manufacturingClaimCount: 54,
-            descriptionMissingIdentityCount: 375,
-            priceMissingIdentityCount: 319,
-            materialMissingIdentityCount: 44,
+            completedIdentityCount: 1001,
+            productUrlCaptureCount: 1641,
+            officialProductImageReferenceCount: 8847,
+            materialEvidenceCount: 1332,
+            manufacturingClaimCount: 59,
+            descriptionMissingIdentityCount: 470,
+            priceMissingIdentityCount: 414,
+            materialMissingIdentityCount: 66,
             retryIdentityKeys: ['B2328|560', 'HW2300|843'],
-            deltaCount: 3,
+            deltaCount: 4,
             factoryVerifiedCount: 0,
             globalCanonicalProductCount: 0,
           };
@@ -94,7 +94,7 @@ jobs:
           if (completedRetries.length) mismatches.push(['completedRetries', completedRetries, []]);
           const checkpoint = {
             schemaVersion: 1,
-            sourceRunId: '32746322369',
+            sourceRunId: '32748405808',
             generatedAt: new Date().toISOString(),
             expected,
             actual,
@@ -139,7 +139,7 @@ jobs:
               'pnpm_install_frozen_lockfile',
               'execution_script_syntax',
               'canonical_json_and_delta_parse',
-              'exact_sequence_8_append_only_ledger_checkpoint',
+              'exact_sequence_9_append_only_ledger_checkpoint',
               'typescript_no_emit',
               'production_build'
             ]
