@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 env:
-  PREFLIGHT_REVISION: '5'
+  PREFLIGHT_REVISION: '6'
 
 concurrency:
   group: rlf-source-page-rotation-validation
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Build sequence 14 preflight without activating mass workflow
+      - name: Build sequence 15 preflight without activating mass workflow
         shell: bash
         run: |
           set -euo pipefail
@@ -37,20 +37,20 @@ jobs:
           const fs = require('node:fs');
           const path = 'data/execution/rlf-kb-run-plan.json';
           const plan = JSON.parse(fs.readFileSync(path, 'utf8'));
-          plan.schemaVersion = 13;
-          plan.planId = 'RLF-KB-SOURCE-PAGE-ROTATION-20260824-S14-PREFLIGHT';
-          plan.pilotRunSequence = 14;
-          plan.phaseId = 'OFFICIAL_ARCHIVE_SOURCE_PAGE_ROTATION_05_PREFLIGHT';
+          plan.schemaVersion = 14;
+          plan.planId = 'RLF-KB-SOURCE-PAGE-ROTATION-20260824-S15-PREFLIGHT';
+          plan.pilotRunSequence = 15;
+          plan.phaseId = 'OFFICIAL_ARCHIVE_SOURCE_PAGE_ROTATION_06_PREFLIGHT';
           plan.discoveryPolicy = {
             ...plan.discoveryPolicy,
             strategy: 'EXCLUDE_AUDITED_SOURCE_PAGES_THEN_STRATIFY_50_LANES',
             requiredPriorityEntryPointCount: 0,
             previousPriorityEntryPointCount: 23,
             sourcePageDeltaDirectory: 'data/execution/source-page-deltas',
-            minimumPreviouslyAttemptedSourcePageExclusions: 850,
-            minimumEffectiveCategoryBatchSize: 150,
+            minimumPreviouslyAttemptedSourcePageExclusions: 1100,
+            minimumEffectiveCategoryBatchSize: 200,
             excludePreviouslyAttemptedSourcePages: true,
-            sourcePageRotationSequence: 5,
+            sourcePageRotationSequence: 6,
           };
           fs.writeFileSync(path, `${JSON.stringify(plan, null, 2)}\n`);
           NODE
@@ -68,10 +68,10 @@ jobs:
           const allUrls = queue.assignments.flatMap(assignment => assignment.urls.map(entry => entry.url));
           const emptySlots = queue.assignments.filter(assignment => assignment.urls.length === 0).map(assignment => assignment.slot);
           const result = {
-            schemaVersion: 5,
+            schemaVersion: 6,
             validatedAt: new Date().toISOString(),
             sourceCommitSha: process.env.GITHUB_SHA,
-            targetSequence: 14,
+            targetSequence: 15,
             workerCount: queue.assignments.length,
             sourcePageLedgerDeltaCount: ledger.deltaCount,
             sourcePageLedgerObservationCount: ledger.attemptedObservationCount,
@@ -85,7 +85,7 @@ jobs:
             balancedLaneTransfers: queue.balancedLaneTransfers ?? [],
             remainingQueueUrlCount: allUrls.length,
             theoreticalBatchCapacity,
-            minimumRequiredEffectiveBatchCapacity: 150,
+            minimumRequiredEffectiveBatchCapacity: 200,
             effectiveBatchCapacity: firstBatch.length,
             effectiveBatchUtilization: firstBatch.length / theoreticalBatchCapacity,
             repeatedFirstBatchUrlCount: repeated.length,
@@ -98,11 +98,11 @@ jobs:
           };
           result.passed =
             result.workerCount === 50 &&
-            result.sourcePageLedgerDeltaCount === 6 &&
-            result.sourcePageLedgerObservationCount === 1198 &&
-            result.uniquePreviouslyAttemptedSourcePageCount === 913 &&
-            result.sourcePageLedgerSha256 === '958615fe3ff5d8192371a8d1c2f0ed65308b31309ef03fcebd6b10b20d23f339' &&
-            result.excludedPreviouslyAttemptedSourcePageCount >= 850 &&
+            result.sourcePageLedgerDeltaCount === 7 &&
+            result.sourcePageLedgerObservationCount === 1448 &&
+            result.uniquePreviouslyAttemptedSourcePageCount === 1163 &&
+            result.sourcePageLedgerSha256 === '8de01546abe681f1c271755341f19641083cb59f32cbd63bd7eae1f8980fee24' &&
+            result.excludedPreviouslyAttemptedSourcePageCount >= 1100 &&
             result.skippedPriorityEntryPointCount === 23 &&
             result.injectedPriorityEntryPointCount === 0 &&
             result.effectiveBatchCapacity >= result.minimumRequiredEffectiveBatchCapacity &&
@@ -120,11 +120,11 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/source-page-rotation-validation.json
-          git commit -m 'Persist sequence 14 source page rotation preflight'
+          git commit -m 'Persist sequence 15 source page rotation preflight'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
-      - name: Enforce sequence 14 preflight gate
+      - name: Enforce sequence 15 preflight gate
         shell: bash
         run: |
           set -euo pipefail
@@ -133,6 +133,6 @@ jobs:
           const result = JSON.parse(await readFile('data/execution/source-page-rotation-validation.json', 'utf8'));
           if (!result.passed) {
             console.error(JSON.stringify(result, null, 2));
-            throw new Error('Sequence 14 source-page rotation preflight failed');
+            throw new Error('Sequence 15 source-page rotation preflight failed');
           }
           NODE
