@@ -14,6 +14,7 @@ on:
       - 'data/execution/progress-deltas/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
 
 permissions:
   contents: read
