@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "runId": "32781308211",
+  "frontierId": "RLF-OFFICIAL-20260824214659535-PRODUCTS",
+  "frontierSha256": "1342bf12ecb32aae7e8fa08052e915b3fdd3cbb8f3a2dd5e7e513a4bba97c62c",
+  "selectedIdentitySha256": "78b0ec8d32d3066e71085c32476a5715f74f6afbc269a4081181ff24c5fe7332",
+  "completedIdentityKeys": [
+    "B9352|X89",
+    "M2407|X86",
+    "M3574|84A"
+  ],
+  "capturedProductUrlCount": 3,
+  "failedIdentities": [],
+  "counters": {
+    "successfulIdentityCaptureCount": 3,
+    "failedIdentityCaptureCount": 0,
+    "officialProductImageReferenceCount": 28,
+    "materialEvidenceCount": 3,
+    "manufacturingClaimCount": 1,
+    "factoryVerifiedCount": 0
+  },
+  "metadataGaps": {
+    "descriptionMissingIdentityCount": 3,
+    "priceMissingIdentityCount": 3,
+    "materialMissingIdentityCount": 0
+  },
+  "qualityGatePassed": true,
+  "status": "FULL_STRICT_IDENTITY_BATCH_ACCEPTED_NOT_GLOBAL_CANONICAL",
+  "deltaSha256": "406983b9380d7a6336130dc495e31f8280ec51edddf329e17618a66ccff3ec99"
+}
