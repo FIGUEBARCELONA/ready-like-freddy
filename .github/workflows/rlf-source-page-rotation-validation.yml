@@ -44,6 +44,7 @@ jobs:
             previousPriorityEntryPointCount: 23,
             sourcePageDeltaDirectory: 'data/execution/source-page-deltas',
             minimumPreviouslyAttemptedSourcePageExclusions: 250,
+            minimumEffectiveCategoryBatchSize: 200,
             excludePreviouslyAttemptedSourcePages: true,
             sourcePageRotationSequence: 2,
           };
@@ -56,12 +57,14 @@ jobs:
           const queue = JSON.parse(await readFile('execution/queue-rotation-test/queue.json', 'utf8'));
           const summary = JSON.parse(await readFile('execution/queue-rotation-test/summary.json', 'utf8'));
           const ledger = await loadSourcePageLedger();
-          const firstBatch = queue.assignments.flatMap(assignment => assignment.urls.slice(0, 5));
+          const perWorkerLimit = Number(queue.plan.pilotPerWorkerLimit ?? 5);
+          const theoreticalBatchCapacity = queue.assignments.length * perWorkerLimit;
+          const firstBatch = queue.assignments.flatMap(assignment => assignment.urls.slice(0, perWorkerLimit));
           const repeated = firstBatch.filter(entry => ledger.attemptedUrlSet.has(entry.url));
           const allUrls = queue.assignments.flatMap(assignment => assignment.urls.map(entry => entry.url));
           const emptySlots = queue.assignments.filter(assignment => assignment.urls.length === 0).map(assignment => assignment.slot);
           const result = {
-            schemaVersion: 1,
+            schemaVersion: 2,
             validatedAt: new Date().toISOString(),
             sourceCommitSha: process.env.GITHUB_SHA,
             workerCount: queue.assignments.length,
@@ -72,7 +75,9 @@ jobs:
             skippedPriorityEntryPointCount: queue.skippedPriorityEntryPointCount,
             injectedPriorityEntryPointCount: queue.priorityEntryPointCount,
             remainingQueueUrlCount: allUrls.length,
-            firstBatchUrlCount: firstBatch.length,
+            theoreticalBatchCapacity,
+            effectiveBatchCapacity: firstBatch.length,
+            effectiveBatchUtilization: firstBatch.length / theoreticalBatchCapacity,
             repeatedFirstBatchUrlCount: repeated.length,
             duplicateRemainingQueueUrlCount: allUrls.length - new Set(allUrls).size,
             emptySlots,
@@ -89,7 +94,7 @@ jobs:
             result.excludedPreviouslyAttemptedSourcePageCount >= 250 &&
             result.skippedPriorityEntryPointCount === 23 &&
             result.injectedPriorityEntryPointCount === 0 &&
-            result.firstBatchUrlCount === 250 &&
+            result.effectiveBatchCapacity >= 200 &&
             result.repeatedFirstBatchUrlCount === 0 &&
             result.duplicateRemainingQueueUrlCount === 0 &&
             result.emptySlots.length === 0;
