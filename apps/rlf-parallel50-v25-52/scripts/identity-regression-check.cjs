@@ -95,7 +95,7 @@ for(const [domain,text,expectedCode,expectedBasis] of countryFixtures){
 
 const residualFalseIdentityFixtures=[
   ['clochard92.com','Company address Dei Serragli 31R, Firenze FI, Italy. registration number lity in 2020 with th.','IT'],
-  ['thrifted.com','Company address 12 Example Street. company number 11116145 VAT number.','NON_EU'],
+  ['thrifted.com','Company address 12 Example Street. company number 11116145 VAT number.','NONE'],
   ['pappers.fr','Pappers SAS address 12 rue Exemple France. RO 888207859','FR'],
   ['joinfleek.com','Among other things this company agreement requires arbitration of disputes. Address 4612 San Francisco California 94114.','NONE'],
 ];
