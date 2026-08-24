@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Build sequence 11 preflight without activating mass workflow
+      - name: Build sequence 12 preflight without activating mass workflow
         shell: bash
         run: |
           set -euo pipefail
@@ -33,20 +33,20 @@ jobs:
           const fs = require('node:fs');
           const path = 'data/execution/rlf-kb-run-plan.json';
           const plan = JSON.parse(fs.readFileSync(path, 'utf8'));
-          plan.schemaVersion = 10;
-          plan.planId = 'RLF-KB-SOURCE-PAGE-ROTATION-20260824-S11-PREFLIGHT';
-          plan.pilotRunSequence = 11;
-          plan.phaseId = 'OFFICIAL_ARCHIVE_SOURCE_PAGE_ROTATION_02_PREFLIGHT';
+          plan.schemaVersion = 11;
+          plan.planId = 'RLF-KB-SOURCE-PAGE-ROTATION-20260824-S12-PREFLIGHT';
+          plan.pilotRunSequence = 12;
+          plan.phaseId = 'OFFICIAL_ARCHIVE_SOURCE_PAGE_ROTATION_03_PREFLIGHT';
           plan.discoveryPolicy = {
             ...plan.discoveryPolicy,
             strategy: 'EXCLUDE_AUDITED_SOURCE_PAGES_THEN_STRATIFY_50_LANES',
             requiredPriorityEntryPointCount: 0,
             previousPriorityEntryPointCount: 23,
             sourcePageDeltaDirectory: 'data/execution/source-page-deltas',
-            minimumPreviouslyAttemptedSourcePageExclusions: 250,
-            minimumEffectiveCategoryBatchSize: 200,
+            minimumPreviouslyAttemptedSourcePageExclusions: 450,
+            minimumEffectiveCategoryBatchSize: 180,
             excludePreviouslyAttemptedSourcePages: true,
-            sourcePageRotationSequence: 2,
+            sourcePageRotationSequence: 3,
           };
           fs.writeFileSync(path, `${JSON.stringify(plan, null, 2)}\n`);
           NODE
@@ -64,9 +64,10 @@ jobs:
           const allUrls = queue.assignments.flatMap(assignment => assignment.urls.map(entry => entry.url));
           const emptySlots = queue.assignments.filter(assignment => assignment.urls.length === 0).map(assignment => assignment.slot);
           const result = {
-            schemaVersion: 2,
+            schemaVersion: 3,
             validatedAt: new Date().toISOString(),
             sourceCommitSha: process.env.GITHUB_SHA,
+            targetSequence: 12,
             workerCount: queue.assignments.length,
             sourcePageLedgerDeltaCount: ledger.deltaCount,
             sourcePageLedgerObservationCount: ledger.attemptedObservationCount,
@@ -88,19 +89,20 @@ jobs:
           };
           result.passed =
             result.workerCount === 50 &&
-            result.sourcePageLedgerDeltaCount === 3 &&
-            result.sourcePageLedgerObservationCount === 550 &&
-            result.uniquePreviouslyAttemptedSourcePageCount === 265 &&
-            result.excludedPreviouslyAttemptedSourcePageCount >= 250 &&
+            result.sourcePageLedgerDeltaCount === 4 &&
+            result.sourcePageLedgerObservationCount === 782 &&
+            result.uniquePreviouslyAttemptedSourcePageCount === 497 &&
+            result.sourcePageLedgerSha256 === 'f995a567dc82018bcdad0ab53d4fc68b58ef1ba5e573e48191ef94e0519cb347' &&
+            result.excludedPreviouslyAttemptedSourcePageCount >= 450 &&
             result.skippedPriorityEntryPointCount === 23 &&
             result.injectedPriorityEntryPointCount === 0 &&
-            result.effectiveBatchCapacity >= 200 &&
+            result.effectiveBatchCapacity >= 180 &&
             result.repeatedFirstBatchUrlCount === 0 &&
             result.duplicateRemainingQueueUrlCount === 0 &&
             result.emptySlots.length === 0;
           await writeFile('data/execution/source-page-rotation-validation.json', `${JSON.stringify(result, null, 2)}\n`);
           console.log(JSON.stringify(result, null, 2));
-          if (!result.passed) throw new Error('Source-page rotation preflight failed');
+          if (!result.passed) throw new Error('Sequence 12 source-page rotation preflight failed');
           NODE
       - name: Publish auditable preflight
         shell: bash
@@ -110,7 +112,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/source-page-rotation-validation.json
-          git commit -m 'Persist source page rotation preflight'
+          git commit -m 'Persist sequence 12 source page rotation preflight'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
