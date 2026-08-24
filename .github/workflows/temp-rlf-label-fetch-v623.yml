@@ -31,8 +31,11 @@ jobs:
               --write-out '%{http_code}|%{url_effective}|%{content_type}|%{size_download}')
             rc=$?
             set -e
-            printf '%s|curl_rc=%s\n' "$meta" "$rc" > "evidence/reports/${key}.meta"
-            if [ "$rc" -ne 0 ] || [ ! -s "$out" ]; then rm -f "$out"; fi
+            mime=$(file -b --mime-type "$out" 2>/dev/null || true)
+            size=$(stat -c%s "$out" 2>/dev/null || echo 0)
+            printf '%s|curl_rc=%s|mime=%s|bytes=%s\n' "$meta" "$rc" "$mime" "$size" > "evidence/reports/${key}.meta"
+            if [ "$rc" -ne 0 ] || [ "$size" -lt 1024 ]; then rm -f "$out"; return 0; fi
+            case "$mime" in image/*) ;; *) rm -f "$out" ;; esac
           }
           set -e
           fetch 'RLF-EXT-020_J1518_Vietnam.jpg' 'https://images.weserv.nl/?url=images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/burgundy-cotton-fred-perry-jacket-29492494-7_1.jpg' 'https://us.vestiairecollective.com/'
@@ -42,36 +45,18 @@ jobs:
           fetch 'RLF-EXT-026_M12_1576_England.jpg' 'https://images.weserv.nl/?url=images.vestiairecollective.com/images/resized/w%3D1246%2Cq%3D75%2Cf%3Dauto%2C/produit/black-cotton-fred-perry-polo-shirt-43131917-3_2.jpg' 'https://us.vestiairecollective.com/'
           fetch 'RLF-EXT-027_M12_C92_England.jpg' 'https://pictr.com/images/2019/06/01/5Pl0aY.md.jpg' 'https://forum.lowyat.net/topic/2742387/all'
           fetch 'RLF-EXT-028_91CM_England.jpg' 'https://i.ebayimg.com/images/g/IDsAAOSwTYBi4POf/s-l1200.jpg' 'https://www.ebay.com/itm/226944092124'
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME.txt || true
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
           python - <<'PY'
           import hashlib, json, pathlib
-          from PIL import Image
           root=pathlib.Path('evidence')
-          original=root/'original'
-          for p in list(original.glob('*')):
-              meta=root/'reports'/f'{p.name}.meta'
-              try:
-                  with Image.open(p) as im:
-                      im.verify()
-                  with Image.open(p) as im:
-                      w,h=im.size
-                      fmt=im.format
-                  with meta.open('a',encoding='utf-8') as f:
-                      f.write(f'pil_format={fmt}|dims={w}x{h}\n')
-                  if w <= 1 or h <= 1:
-                      p.unlink()
-              except Exception as exc:
-                  with meta.open('a',encoding='utf-8') as f:
-                      f.write(f'pil_error={type(exc).__name__}:{exc}\n')
-                  p.unlink(missing_ok=True)
           rows=[]
           for p in sorted(root.rglob('*')):
               if p.is_file() and p.name!='manifest.json':
                   data=p.read_bytes()
                   rows.append({'path':p.as_posix(),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
-          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v623-fetch-v2','files':rows},indent=2),encoding='utf-8')
+          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v623-fetch-v3','files':rows},indent=2),encoding='utf-8')
           PY
-          find evidence/original -type f -exec file {} \; > evidence/reports/MIME.txt || true
-          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
       - name: Upload evidence artifact
         uses: actions/upload-artifact@v4
         with:
