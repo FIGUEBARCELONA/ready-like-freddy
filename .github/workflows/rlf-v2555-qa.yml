@@ -6,6 +6,11 @@ on:
     paths:
       - 'apps/rlf-parallel50-v25-52/**'
       - '.github/workflows/rlf-v2555-qa.yml'
+  pull_request:
+    branches: [rlf-parallel50-v25-54]
+    paths:
+      - 'apps/rlf-parallel50-v25-52/**'
+      - '.github/workflows/rlf-v2555-qa.yml'
   workflow_dispatch:
 
 permissions:
