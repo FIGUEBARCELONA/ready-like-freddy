@@ -41,12 +41,15 @@ function verifyDelta(delta, path) {
 
 export async function loadProgressLedger(options = {}) {
   const basePath = resolve(options.basePath ?? "data/execution/product-progress.json");
-  const deltasDir = resolve(options.deltasDir ?? resolve(dirname(basePath), "progress-deltas"));
+  const deltasDir = resolve(
+    options.deltasDir ?? resolve(dirname(basePath), "progress-deltas"),
+  );
   const base = await optionalJson(basePath, {
     schemaVersion: 1,
     completed: { identityKeys: [], productUrlCaptureCount: 0 },
     retry: { identities: [] },
     counters: {},
+    metadataGaps: {},
   });
 
   let names = [];
@@ -78,11 +81,28 @@ export async function loadProgressLedger(options = {}) {
       base.counters?.officialProductImageReferenceCount ?? 0,
     ),
     materialEvidenceCount: Number(base.counters?.materialEvidenceCount ?? 0),
-    manufacturingClaimCount: Number(base.counters?.manufacturingClaimCount ?? 0),
+    manufacturingClaimCount: Number(
+      base.counters?.manufacturingClaimCount ?? 0,
+    ),
     factoryVerifiedCount: Number(base.counters?.factoryVerifiedCount ?? 0),
-    globalCanonicalProductCount: Number(base.counters?.globalCanonicalProductCount ?? 0),
+    globalCanonicalProductCount: Number(
+      base.counters?.globalCanonicalProductCount ?? 0,
+    ),
   };
-  let productUrlCaptureCount = Number(base.completed?.productUrlCaptureCount ?? 0);
+  const metadataGaps = {
+    descriptionMissingIdentityCount: Number(
+      base.metadataGaps?.descriptionMissingIdentityCount ?? 0,
+    ),
+    priceMissingIdentityCount: Number(
+      base.metadataGaps?.priceMissingIdentityCount ?? 0,
+    ),
+    materialMissingIdentityCount: Number(
+      base.metadataGaps?.materialMissingIdentityCount ?? 0,
+    ),
+  };
+  let productUrlCaptureCount = Number(
+    base.completed?.productUrlCaptureCount ?? 0,
+  );
 
   for (const delta of deltas) {
     for (const identityKey of delta.completedIdentityKeys) {
@@ -98,9 +118,20 @@ export async function loadProgressLedger(options = {}) {
     counters.officialProductImageReferenceCount += Number(
       delta.counters?.officialProductImageReferenceCount ?? 0,
     );
-    counters.materialEvidenceCount += Number(delta.counters?.materialEvidenceCount ?? 0);
+    counters.materialEvidenceCount += Number(
+      delta.counters?.materialEvidenceCount ?? 0,
+    );
     counters.manufacturingClaimCount += Number(
       delta.counters?.manufacturingClaimCount ?? 0,
+    );
+    metadataGaps.descriptionMissingIdentityCount += Number(
+      delta.metadataGaps?.descriptionMissingIdentityCount ?? 0,
+    );
+    metadataGaps.priceMissingIdentityCount += Number(
+      delta.metadataGaps?.priceMissingIdentityCount ?? 0,
+    );
+    metadataGaps.materialMissingIdentityCount += Number(
+      delta.metadataGaps?.materialMissingIdentityCount ?? 0,
     );
   }
 
@@ -112,7 +143,7 @@ export async function loadProgressLedger(options = {}) {
   );
   const latestDelta = deltas.at(-1) ?? null;
   const state = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     basePath,
     deltaCount: deltas.length,
     deltaRunIds: deltas.map(delta => String(delta.runId)),
@@ -127,6 +158,7 @@ export async function loadProgressLedger(options = {}) {
       identities: retryIdentities,
     },
     counters,
+    metadataGaps,
     latestFrontier: latestDelta?.frontier ?? base.frontier ?? null,
     status: latestDelta?.status ?? base.status ?? null,
   };
