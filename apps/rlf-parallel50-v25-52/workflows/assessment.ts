@@ -20,12 +20,10 @@ export function assess(input:DiscoverInput,query:string,queryTemplate:number,ide
   const knownRejected=KNOWN_REJECTED_DOMAINS.has(domain);
   const knownDuplicateDomain=KNOWN_SUPPLIER_DOMAINS.has(domain)||KNOWN_SUPPLIER_ALIAS_DOMAINS.has(domain)||STAGED_SUPPLIER_DOMAINS.has(domain);
   const identityQuarantine=KNOWN_IDENTITY_QUARANTINE_DOMAINS.has(domain);
-  const explicitUK=/\b(united kingdom|england|scotland|wales|northern ireland|company registered in england|companies house)\b/i.test(legalText);
-  const contextualUKPostcode=/\b(?:registered office|return address|business address|postal address|based in|located in)[^.;|]{0,180}\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i.test(legalText);
-  const uk=UK_OPERATORS.includes(domain)||domain.endsWith('.co.uk')||domain.endsWith('.uk')||explicitUK||contextualUKPostcode;
   const country=detectCountry(domain,legalText);
-  const detectedCountryCode=uk?'NON_EU':country.code;
-  const nonEU=detectedCountryCode==='NON_EU';
+  const uk=UK_OPERATORS.includes(domain)||domain.endsWith('.co.uk')||domain.endsWith('.uk')||country.basis==='UK_LEGAL';
+  const detectedCountryCode=country.code;
+  const nonEU=detectedCountryCode==='NON_EU'&&!uk;
   const euEvidence=Boolean(detectedCountryCode&&detectedCountryCode!=='NON_EU'&&country.basis!=='NONE');
   const identity=analyzeIdentity(domain,legalText,country);
   const knownDuplicateIdentity=Boolean(identity.identityKey&&KNOWN_IDENTITY_KEYS.has(identity.identityKey));
