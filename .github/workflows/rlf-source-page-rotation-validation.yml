@@ -6,6 +6,7 @@ on:
       - feature/rlf-execution-backend-20260823
     paths:
       - '.github/workflows/rlf-source-page-rotation-validation.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -102,7 +103,6 @@ jobs:
             result.emptySlots.length === 0;
           await writeFile('data/execution/source-page-rotation-validation.json', `${JSON.stringify(result, null, 2)}\n`);
           console.log(JSON.stringify(result, null, 2));
-          if (!result.passed) throw new Error('Sequence 12 source-page rotation preflight failed');
           NODE
       - name: Publish auditable preflight
         shell: bash
@@ -116,3 +116,15 @@ jobs:
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
+      - name: Enforce sequence 12 preflight gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+          const result = JSON.parse(await readFile('data/execution/source-page-rotation-validation.json', 'utf8'));
+          if (!result.passed) {
+            console.error(JSON.stringify(result, null, 2));
+            throw new Error('Sequence 12 source-page rotation preflight failed');
+          }
+          NODE
