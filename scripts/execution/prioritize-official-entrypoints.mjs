@@ -148,6 +148,53 @@ for (const entryPoint of unvisitedEntryPoints) {
   });
 }
 
+const reassignedEmptyLanes = [];
+const emptyAssignments = queue.assignments
+  .filter(assignment => assignment.urls.length === 0)
+  .sort((a, b) => a.slot.localeCompare(b.slot));
+for (const target of emptyAssignments) {
+  const preferredMarket = target.laneProfile?.market ?? null;
+  const preferredScope = target.laneProfile?.scope ?? null;
+  const donorCandidates = queue.assignments
+    .filter(assignment => assignment.slot !== target.slot && assignment.urls.length > 1)
+    .map(assignment => {
+      const candidate = assignment.urls.at(-1);
+      return {
+        assignment,
+        candidate,
+        marketPenalty: candidate?.market === preferredMarket ? 0 : 1,
+        scopePenalty: candidate?.discoveryScope === preferredScope ? 0 : 1,
+      };
+    })
+    .filter(item => item.candidate)
+    .sort(
+      (a, b) =>
+        a.marketPenalty - b.marketPenalty ||
+        a.scopePenalty - b.scopePenalty ||
+        b.assignment.urls.length - a.assignment.urls.length ||
+        a.assignment.slot.localeCompare(b.assignment.slot),
+    );
+  const donor = donorCandidates[0]?.assignment;
+  if (!donor) break;
+  const movedEntry = donor.urls.pop();
+  if (!movedEntry) break;
+  target.urls = [movedEntry];
+  target.laneProfile = {
+    vectorKey: `${movedEntry.market}|${movedEntry.discoveryScope}#ROTATION-${target.slot}`,
+    market: movedEntry.market,
+    locale: movedEntry.locale ?? movedEntry.seedLocale,
+    regionGroup: movedEntry.regionGroup,
+    scope: movedEntry.discoveryScope,
+  };
+  reassignedEmptyLanes.push({
+    slot: target.slot,
+    donorSlot: donor.slot,
+    market: movedEntry.market,
+    scope: movedEntry.discoveryScope,
+    url: movedEntry.url,
+  });
+}
+
 if (queue.assignments.some(assignment => assignment.urls.length === 0)) {
   const emptySlots = queue.assignments
     .filter(assignment => assignment.urls.length === 0)
@@ -186,6 +233,8 @@ queue.priorityEntryPointCount = injected.length;
 queue.priorityEntryPoints = injected;
 queue.skippedPriorityEntryPointCount = skippedEntryPoints.length;
 queue.skippedPriorityEntryPoints = skippedEntryPoints;
+queue.reassignedEmptyLaneCount = reassignedEmptyLanes.length;
+queue.reassignedEmptyLanes = reassignedEmptyLanes;
 queue.sourcePageLedgerDeltaCount = sourcePageLedger.deltaCount;
 queue.sourcePageLedgerObservationCount = sourcePageLedger.attemptedObservationCount;
 queue.uniquePreviouslyAttemptedSourcePageCount =
@@ -207,6 +256,8 @@ const summary = {
   priorityEntryPoints: injected,
   skippedPriorityEntryPointCount: skippedEntryPoints.length,
   skippedPriorityEntryPoints: skippedEntryPoints,
+  reassignedEmptyLaneCount: reassignedEmptyLanes.length,
+  reassignedEmptyLanes,
   sourcePageLedgerDeltaCount: sourcePageLedger.deltaCount,
   sourcePageLedgerObservationCount: sourcePageLedger.attemptedObservationCount,
   uniquePreviouslyAttemptedSourcePageCount:
