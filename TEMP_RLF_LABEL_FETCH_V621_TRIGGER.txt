@@ -1,0 +1,2 @@
+RLF v6.21 evidence fetch trigger
+2026-08-24
