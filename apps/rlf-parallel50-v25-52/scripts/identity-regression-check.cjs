@@ -41,7 +41,7 @@ function assert(condition,message){
 
 function analyze(domain,text){
   const country=identity.detectCountry(domain,text);
-  return identity.analyzeIdentity(domain,text,country);
+  return {country,result:identity.analyzeIdentity(domain,text,country)};
 }
 
 const falseVatFixtures=[
@@ -52,7 +52,7 @@ const falseVatFixtures=[
   ['example.de','best company company address 12 main street'],
 ];
 for(const [domain,text] of falseVatFixtures){
-  const result=analyze(domain,text);
+  const {result}=analyze(domain,text);
   assert(result.vatId===null,`False VAT accepted for ${domain}: ${result.vatId}`);
   assert(!result.identityKey?.startsWith('EU-VAT:'),`False EU VAT key accepted for ${domain}: ${result.identityKey}`);
 }
@@ -65,7 +65,7 @@ const validVatFixtures=[
   ['shop.nl','BV company address 12 Street. VAT NL 123456789 B 01','NL123456789B01'],
 ];
 for(const [domain,text,expected] of validVatFixtures){
-  const result=analyze(domain,text);
+  const {result}=analyze(domain,text);
   assert(result.vatId===expected,`Valid VAT missed for ${domain}: expected ${expected}, got ${result.vatId}`);
   assert(result.identityKey===`EU-VAT:${expected}`,`Wrong VAT key for ${domain}: ${result.identityKey}`);
 }
@@ -78,8 +78,34 @@ const registrationFixtures=[
   ['shop.it','SRL address Via Roma 12. Partita IVA: 07431160485','IT-PIVA:07431160485'],
 ];
 for(const [domain,text,expected] of registrationFixtures){
-  const result=analyze(domain,text);
+  const {result}=analyze(domain,text);
   assert(result.identityKey===expected,`Registration key mismatch for ${domain}: expected ${expected}, got ${result.identityKey}`);
 }
 
-console.log(`identity regression fixtures passed: ${falseVatFixtures.length+validVatFixtures.length+registrationFixtures.length}`);
+const countryFixtures=[
+  ['shop.com','Company registered in England. Registered office 76 Temperance St Manchester M12 6HU','NON_EU','UK_LEGAL'],
+  ['shop.com','Business address 76 Temperance St Manchester M12 6HU','NON_EU','UK_LEGAL'],
+  ['clochard92.com','Company address Dei Serragli 31R, Firenze FI, Italy. Vintage clothing store.','IT','LEGAL_COUNTRY'],
+  ['shop.fr','SAS address 12 rue Exemple France. Company registered in England.','NON_EU','UK_LEGAL'],
+];
+for(const [domain,text,expectedCode,expectedBasis] of countryFixtures){
+  const {country}=analyze(domain,text);
+  assert(country.code===expectedCode&&country.basis===expectedBasis,`Country mismatch for ${domain}: expected ${expectedCode}/${expectedBasis}, got ${country.code}/${country.basis}`);
+}
+
+const residualFalseIdentityFixtures=[
+  ['clochard92.com','Company address Dei Serragli 31R, Firenze FI, Italy. registration number lity in 2020 with th.','IT'],
+  ['thrifted.com','Company address 12 Example Street. company number 11116145 VAT number.','NON_EU'],
+  ['pappers.fr','Pappers SAS address 12 rue Exemple France. RO 888207859','FR'],
+  ['joinfleek.com','Among other things this company agreement requires arbitration of disputes. Address 4612 San Francisco California 94114.','NONE'],
+];
+for(const [domain,text,expectedCountry] of residualFalseIdentityFixtures){
+  const {country,result}=analyze(domain,text);
+  if(expectedCountry!=='NONE') assert(country.code===expectedCountry,`Residual fixture country mismatch for ${domain}: ${country.code}`);
+  assert(result.identityKey===null,`Residual false identity accepted for ${domain}: ${result.identityKey}`);
+  assert(result.vatId===null,`Residual false VAT accepted for ${domain}: ${result.vatId}`);
+  assert(result.registrationId===null,`Residual false registration accepted for ${domain}: ${result.registrationId}`);
+}
+
+const total=falseVatFixtures.length+validVatFixtures.length+registrationFixtures.length+countryFixtures.length+residualFalseIdentityFixtures.length;
+console.log(`identity regression fixtures passed: ${total}`);
