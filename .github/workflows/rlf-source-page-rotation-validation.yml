@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 env:
-  PREFLIGHT_REVISION: '2'
+  PREFLIGHT_REVISION: '3'
 
 concurrency:
   group: rlf-source-page-rotation-validation
@@ -81,6 +81,8 @@ jobs:
             injectedPriorityEntryPointCount: queue.priorityEntryPointCount,
             reassignedEmptyLaneCount: queue.reassignedEmptyLaneCount ?? 0,
             reassignedEmptyLanes: queue.reassignedEmptyLanes ?? [],
+            balancedLaneTransferCount: queue.balancedLaneTransferCount ?? 0,
+            balancedLaneTransfers: queue.balancedLaneTransfers ?? [],
             remainingQueueUrlCount: allUrls.length,
             theoreticalBatchCapacity,
             effectiveBatchCapacity: firstBatch.length,
