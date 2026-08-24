@@ -1,0 +1,180 @@
+name: TEMP RLF label fetch v6.20
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Recover exact and candidate label imagery
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/original evidence/pages evidence/reports evidence/probes
+          python - <<'PY'
+          import hashlib, html, json, pathlib, re, time, urllib.parse
+          import requests
+
+          root = pathlib.Path('evidence')
+          out = root / 'original'
+          pages = root / 'pages'
+          probes = root / 'probes'
+          reports = root / 'reports'
+          for p in (out, pages, probes, reports):
+              p.mkdir(parents=True, exist_ok=True)
+
+          UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131 Safari/537.36'
+          S = requests.Session()
+          S.headers.update({'User-Agent': UA, 'Accept-Language': 'en-GB,en;q=0.9', 'Accept': '*/*'})
+
+          targets = {
+              'CAND-050': {
+                  'page': 'https://www.etsy.com/uk/listing/4487487836/rare-vintage-1970s-fred-perry-ladies',
+                  'queries': [
+                      '"4487487836" Fred Perry ladies tennis shorts label',
+                      '"Rare Vintage 1970s Fred Perry Ladies Tennis Shorts"',
+                  ],
+                  'domains': ('i.etsystatic.com',),
+              },
+              'CAND-065': {
+                  'page': 'https://www.ebay.com/itm/188039279302',
+                  'queries': [
+                      '"188039279302" Fred Perry funnel neck',
+                      '"Vintage Fred Perry Funnel Neck Knit Jumper Made in Italy Size L"',
+                  ],
+                  'domains': ('i.ebayimg.com',),
+              },
+              'CAND-053_ALT': {
+                  'page': 'https://www.ebay.com/itm/318134995694',
+                  'queries': [
+                      '"318134995694" Fred Perry Harrington Made in Italy',
+                      '"Vintage Fred Perry Harrington Bomber Jacket M"',
+                  ],
+                  'domains': ('i.ebayimg.com',),
+              },
+              'CAND-055': {
+                  'page': '',
+                  'queries': [
+                      '"M3/157/835/273" Fred Perry',
+                      '"M3 157 835 273" Fred Perry label',
+                  ],
+                  'domains': ('i.ebayimg.com','i.etsystatic.com','media-assets.grailed.com','cdn.shopify.com'),
+              },
+          }
+
+          def fetch(url, timeout=40):
+              try:
+                  r = S.get(url, timeout=timeout, allow_redirects=True)
+                  return r
+              except Exception as exc:
+                  return exc
+
+          def save_probe(name, url, response):
+              safe = re.sub(r'[^A-Za-z0-9_.-]+', '_', name)
+              if isinstance(response, Exception):
+                  (probes/f'{safe}.json').write_text(json.dumps({'url':url,'error':repr(response)}, indent=2), encoding='utf-8')
+                  return ''
+              meta = {
+                  'url': url, 'final_url': response.url, 'status': response.status_code,
+                  'content_type': response.headers.get('content-type'), 'bytes': len(response.content),
+                  'sha256': hashlib.sha256(response.content).hexdigest(),
+              }
+              (probes/f'{safe}.json').write_text(json.dumps(meta, indent=2), encoding='utf-8')
+              ext = '.html' if 'html' in (response.headers.get('content-type') or '') else '.body'
+              (pages/f'{safe}{ext}').write_bytes(response.content)
+              try: return response.text
+              except Exception: return ''
+
+          def extract_urls(text):
+              if not text: return set()
+              text = html.unescape(text.replace('\\u002F','/').replace('\\/','/'))
+              found = set(re.findall(r'https?://[^\s"\'<>]+', text))
+              for m in re.findall(r'"murl"\s*:\s*"([^"]+)"', text):
+                  found.add(html.unescape(m).replace('\\/','/'))
+              return {u.rstrip('),.;') for u in found}
+
+          def normalize_image(url):
+              url = html.unescape(url).replace('\\/','/')
+              if 'i.ebayimg.com' in url:
+                  url = re.sub(r'/s-l\d+\.(jpg|webp|jpeg|png)', r'/s-l1600.\1', url, flags=re.I)
+                  url = re.sub(r'/s-l\d+$', '/s-l1600', url, flags=re.I)
+              if 'i.etsystatic.com' in url:
+                  url = re.sub(r'/il_(?:\d+xN|fullxfull|794xN|680x540)\.', '/il_fullxfull.', url)
+              return url
+
+          def image_like(url, domains):
+              low = url.lower()
+              return any(d in low for d in domains) and any(x in low for x in ('.jpg','.jpeg','.png','.webp','/images/','/r/il/'))
+
+          all_rows = []
+          for target, cfg in targets.items():
+              candidates = set()
+              if cfg['page']:
+                  variants = [
+                      cfg['page'],
+                      cfg['page'] + ('&' if '?' in cfg['page'] else '?') + 'output=1',
+                      'https://r.jina.ai/http://' + cfg['page'].replace('https://','').replace('http://',''),
+                  ]
+                  if 'etsy.com' in cfg['page']:
+                      variants += [
+                          'https://www.etsy.com/api/oembed?format=json&url=' + urllib.parse.quote(cfg['page'], safe=''),
+                          'https://www.etsy.com/listing/4487487836',
+                      ]
+                  for i, url in enumerate(variants):
+                      r = fetch(url)
+                      text = save_probe(f'{target}_page_{i}', url, r)
+                      candidates.update(extract_urls(text))
+              for qi, query in enumerate(cfg['queries']):
+                  for engine, url in [
+                      ('bing_web','https://www.bing.com/search?q='+urllib.parse.quote(query)),
+                      ('bing_images','https://www.bing.com/images/search?q='+urllib.parse.quote(query)),
+                  ]:
+                      r = fetch(url)
+                      text = save_probe(f'{target}_{engine}_{qi}', url, r)
+                      candidates.update(extract_urls(text))
+              images = []
+              for url in sorted(candidates):
+                  nu = normalize_image(url)
+                  if image_like(nu, cfg['domains']):
+                      images.append(nu)
+              images = list(dict.fromkeys(images))[:60]
+              for idx, url in enumerate(images):
+                  r = fetch(url)
+                  row = {'target':target,'index':idx,'url':url}
+                  if isinstance(r, Exception):
+                      row.update({'status':'ERROR','error':repr(r)})
+                      all_rows.append(row); continue
+                  row.update({'status':r.status_code,'final_url':r.url,'content_type':r.headers.get('content-type'),'bytes':len(r.content),'sha256':hashlib.sha256(r.content).hexdigest()})
+                  ctype = (r.headers.get('content-type') or '').lower()
+                  if r.status_code == 200 and ctype.startswith('image/') and len(r.content) > 5000:
+                      ext = '.webp' if 'webp' in ctype else '.png' if 'png' in ctype else '.jpg'
+                      path = out / f'{target}_{idx:02d}{ext}'
+                      path.write_bytes(r.content)
+                      row['local_path'] = path.as_posix()
+                  all_rows.append(row)
+                  time.sleep(0.05)
+
+          (reports/'download_registry.json').write_text(json.dumps(all_rows, indent=2), encoding='utf-8')
+          files=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file() and p.name != 'manifest.json':
+                  b=p.read_bytes()
+                  files.append({'path':p.as_posix(),'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+          (reports/'manifest.json').write_text(json.dumps({'schema':'rlf-v620-fetch-v1','files':files},indent=2),encoding='utf-8')
+          PY
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME_AND_DIMENSIONS.txt
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-label-evidence-v620
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
