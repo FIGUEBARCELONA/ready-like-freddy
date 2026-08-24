@@ -1,18 +1,18 @@
 {
-  "schemaVersion": 1,
-  "indexedAt": "2026-08-24T15:32:26.223Z",
-  "sourceCommitSha": "be1d7937e77a5807d50909c245bde4e851f92574",
+  "schemaVersion": 2,
+  "indexedAt": "2026-08-24T17:18:57.970Z",
+  "sourceCommitSha": "ebecfc375f421e9424877da98bf5ba79cf2684d0",
   "workflowName": "RLF code and ledger validation",
   "workflowId": 340716025,
-  "runId": "32745460064",
-  "runNumber": 7,
+  "runId": "32755864023",
+  "runNumber": 21,
   "runAttempt": 1,
   "event": "push",
   "status": "completed",
-  "conclusion": "failure",
-  "createdAt": "2026-08-24T15:32:18Z",
-  "updatedAt": "2026-08-24T15:32:25Z",
-  "htmlUrl": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32745460064",
+  "conclusion": "success",
+  "createdAt": "2026-08-24T17:18:26Z",
+  "updatedAt": "2026-08-24T17:18:54Z",
+  "htmlUrl": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32755864023",
   "headBranch": "feature/rlf-execution-backend-20260823",
-  "headSha": "be1d7937e77a5807d50909c245bde4e851f92574"
+  "headSha": "ebecfc375f421e9424877da98bf5ba79cf2684d0"
 }
