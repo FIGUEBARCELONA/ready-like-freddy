@@ -1,0 +1,283 @@
+name: RLF sequence 16 retry recovery
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence16-retry-recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: rlf-sequence16-retry-recovery
+  cancel-in-progress: true
+
+env:
+  SOURCE_BRANCH: feature/rlf-execution-backend-20260823
+
+jobs:
+  prepare:
+    name: Prepare six-retry immutable frontier
+    runs-on: ubuntu-24.04
+    outputs:
+      frontier_sha256: ${{ steps.frontier.outputs.frontier_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - id: frontier
+        name: Aggregate historical official aliases and category evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p execution/sequence16-frontier
+          node --input-type=module <<'NODE'
+          import { readdir, readFile, writeFile } from 'node:fs/promises';
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          import { sha256 } from './scripts/execution/common.mjs';
+
+          const expectedKeys = ['G3636|Z77','HW2300|843','M1588|81B','M1588|84B','M4613|41A','SY3660|46A'];
+          const ledger = await loadProgressLedger();
+          const completed = new Set(ledger.completed.identityKeys);
+          const currentRetries = new Map(ledger.retry.identities.map(item => [item.identityKey,item]));
+          const aliasMap = new Map(expectedKeys.map(key => [key,new Set()]));
+          for (const name of (await readdir('data/execution/progress-deltas')).filter(name => name.endsWith('.json')).sort((a,b)=>a.localeCompare(b,'en',{numeric:true}))) {
+            const delta = JSON.parse(await readFile(`data/execution/progress-deltas/${name}`,'utf8'));
+            for (const retry of delta.failedIdentities ?? []) {
+              if (!aliasMap.has(retry.identityKey)) continue;
+              for (const url of [retry.requestedProductUrl,...(retry.aliasUrls ?? [])].filter(Boolean)) aliasMap.get(retry.identityKey).add(url);
+            }
+          }
+          const categoryEvidenceFile = JSON.parse(await readFile('data/execution/sequence16-category-image-evidence.json','utf8'));
+          const categoryEvidence = new Map(categoryEvidenceFile.records.map(record => [record.identityKey,record]));
+          const slots = Array.from({length:50},(_,i)=>`F${String(i+1).padStart(2,'0')}`);
+          const candidates = expectedKeys.map((identityKey,index) => {
+            const retry = currentRetries.get(identityKey);
+            if (!retry) throw new Error(`Missing current retry ${identityKey}`);
+            const aliases = [...aliasMap.get(identityKey)];
+            const preferred = retry.requestedProductUrl;
+            aliases.sort((a,b) => Number(b===preferred)-Number(a===preferred) || a.localeCompare(b));
+            const candidate = {
+              schemaVersion: 5,
+              queueId: 'RLF-SEQUENCE16-RETRY-RECOVERY',
+              queueSha256: ledger.ledgerSha256,
+              slot: slots[index],
+              candidateKey: sha256(Buffer.from(JSON.stringify({identityKey,aliases}))),
+              productUrl: preferred,
+              preferredProductUrl: preferred,
+              productCode: retry.productCode,
+              colourCode: retry.colourCode,
+              displayName: null,
+              observedPrice: null,
+              sourceTransport: retry.sourceTransport,
+              transportHttpStatus: retry.transportHttpStatus,
+              identityKey,
+              aliasUrls: aliases,
+              aliasCount: aliases.length,
+              sourcePageUrls: categoryEvidence.has(identityKey) ? [categoryEvidence.get(identityKey).sourcePageUrl] : [],
+              sourceSlots: [slots[index]],
+              sourceMarkets: [...new Set(aliases.map(url => new URL(url).pathname.split('/').filter(Boolean)[0] ?? 'GLOBAL'))],
+              sourceLocales: [],
+              sourceRegionGroups: [],
+              sourceDiscoveryScopes: ['RETRY_RECOVERY'],
+              sourceLaneVectorKeys: [`${slots[index]}|RETRY_RECOVERY`],
+              categoryImageEvidence: categoryEvidence.get(identityKey) ?? null,
+              priorFailureReasons: retry.failureReasons,
+              uniquenessStatus: 'CURRENT_RETRY_CODE_COLOUR_IDENTITY',
+              evidenceStatus: 'OFFICIAL_RETRY_RECOVERY_CANDIDATE',
+            };
+            return candidate;
+          });
+          const assignments = slots.map((slot,index) => ({
+            slot,
+            index,
+            products: index < candidates.length ? [candidates[index]] : [],
+          }));
+          const selectedIdentitySha256 = sha256(Buffer.from(expectedKeys.join('\n')));
+          const unsigned = {
+            schemaVersion: 5,
+            frontierId: `RLF-SEQUENCE16-RETRY-${process.env.GITHUB_RUN_ID}`,
+            createdAt: new Date().toISOString(),
+            sourceQueueId: 'RLF-SEQUENCE16-RETRY-RECOVERY',
+            sourceQueueSha256: ledger.ledgerSha256,
+            workerCount: 50,
+            uniqueProductUrlCount: new Set(candidates.flatMap(item => item.aliasUrls)).size,
+            uniqueProductIdentityCount: 6,
+            aliasProductUrlCount: candidates.reduce((sum,item)=>sum+Math.max(0,item.aliasUrls.length-1),0),
+            previouslyCompletedIdentityCount: ledger.completed.identityCount,
+            remainingIdentityCountBeforeSelection: 6,
+            retryIdentityCount: 6,
+            productPerWorkerLimit: 1,
+            batchCapacity: 50,
+            selectedIdentityCount: 6,
+            expectedProductCaptureCount: 6,
+            selectedIdentitySha256,
+            progressSha256: ledger.ledgerSha256,
+            progressDeltaCount: ledger.deltaCount,
+            assignments,
+            sourceMarketCounts: {},
+            sourceScopeCounts: { RETRY_RECOVERY: 6 },
+          };
+          const frontier = {...unsigned,frontierSha256:sha256(Buffer.from(JSON.stringify(unsigned)))};
+          const allAliases = candidates.flatMap(item => item.aliasUrls);
+          const invalid = allAliases.filter(url => {
+            try { const u=new URL(url); return u.protocol!=='https:' || !(u.hostname==='fredperry.com'||u.hostname.endsWith('.fredperry.com')); } catch { return true; }
+          });
+          if (ledger.ledgerSha256 !== '843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b') throw new Error('Sequence 16 prior ledger SHA mismatch');
+          if (ledger.completed.identityCount !== 1354 || ledger.retry.identityCount !== 6 || ledger.deltaCount !== 10) throw new Error('Sequence 16 prior ledger counters mismatch');
+          if (JSON.stringify([...currentRetries.keys()].sort()) !== JSON.stringify(expectedKeys)) throw new Error('Retry identity set mismatch');
+          if (expectedKeys.some(key => completed.has(key))) throw new Error('Retry identity overlaps completed ledger');
+          if (assignments.length !== 50 || assignments.filter(a=>a.products.length).length !== 6 || assignments.filter(a=>!a.products.length).length !== 44) throw new Error('50-lane retry assignment mismatch');
+          if (invalid.length || allAliases.length < 8) throw new Error(`Official historical alias validation failed: ${JSON.stringify({invalid,allAliases})}`);
+          if (categoryEvidence.size !== 3) throw new Error('Expected exactly three immutable category image evidence records');
+          await writeFile('execution/sequence16-frontier/product-frontier.json',`${JSON.stringify(frontier,null,2)}\n`);
+          await writeFile('execution/sequence16-frontier/preparation-proof.json',`${JSON.stringify({schemaVersion:1,runId:process.env.GITHUB_RUN_ID,priorLedgerSha256:ledger.ledgerSha256,retryIdentityKeys:expectedKeys,uniqueOfficialAliasUrlCount:new Set(allAliases).size,categoryImageEvidenceIdentityKeys:[...categoryEvidence.keys()].sort(),activeLaneCount:6,auditedIdleLaneCount:44,frontierSha256:frontier.frontierSha256,passed:true},null,2)}\n`);
+          console.log(JSON.stringify(frontier,null,2));
+          console.log(`frontier_sha256=${frontier.frontierSha256}`);
+          NODE
+          printf 'frontier_sha256=%s\n' "$(node -p "require('./execution/sequence16-frontier/product-frontier.json').frontierSha256")" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence16-retry-frontier
+          path: execution/sequence16-frontier
+          if-no-files-found: error
+          retention-days: 30
+
+  product_worker:
+    name: Product ${{ matrix.slot }}
+    needs: prepare
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix:
+        slot: [F01, F02, F03, F04, F05, F06, F07, F08, F09, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33, F34, F35, F36, F37, F38, F39, F40, F41, F42, F43, F44, F45, F46, F47, F48, F49, F50]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download immutable retry frontier
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh --name rlf-sequence16-retry-frontier --dest execution/product-frontier
+      - name: Capture retry identity with official aliases and exact media evidence
+        run: |
+          node scripts/execution/run-product-worker.mjs --slot=${{ matrix.slot }} --frontier=execution/product-frontier/product-frontier.json --out=execution/product-workers/${{ matrix.slot }} --limit=1
+          node scripts/execution/enrich-product-worker.mjs --slot=${{ matrix.slot }} --frontier=execution/product-frontier/product-frontier.json --dir=execution/product-workers/${{ matrix.slot }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rlf-sequence16-product-worker-${{ matrix.slot }}
+          path: execution/product-workers/${{ matrix.slot }}
+          if-no-files-found: error
+          retention-days: 30
+
+  consolidate:
+    name: Consolidate sequence 16 retry evidence
+    needs: [prepare, product_worker]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download retry frontier and 50 worker outputs
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh --name rlf-sequence16-retry-frontier --dest execution/product-frontier
+          bash scripts/execution/download-artifact-retry.sh --pattern 'rlf-sequence16-product-worker-*' --dest execution/downloaded-product-workers
+      - name: Consolidate and generate append-only audited delta
+        run: |
+          node scripts/execution/consolidate-product-results.mjs --input=execution/downloaded-product-workers --frontier=execution/product-frontier/product-frontier.json --out=execution/products-consolidated
+          node scripts/execution/generate-ledger-delta.mjs --products=execution/products-consolidated --frontier=execution/product-frontier/product-frontier.json --progress=data/execution/product-progress.json --progressDeltas=data/execution/progress-deltas --out=execution/products-consolidated/ledger-delta.json --audit=execution/products-consolidated/ledger-delta-audit.json
+          find execution/product-frontier execution/downloaded-product-workers execution/products-consolidated -type f -print0 | sort -z | xargs -0 sha256sum > execution/SEQUENCE16_EVIDENCE_SHA256SUMS.txt
+      - name: Enforce factual retry recovery accounting
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const manifest=require('./execution/products-consolidated/product-manifest.json');
+          const delta=require('./execution/products-consolidated/ledger-delta.json');
+          const audit=require('./execution/products-consolidated/ledger-delta-audit.json');
+          const records=require('fs').readFileSync('./execution/products-consolidated/product-records.ndjson','utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
+          const expected=['G3636|Z77','HW2300|843','M1588|81B','M1588|84B','M4613|41A','SY3660|46A'];
+          const recovered=[...delta.completedIdentityKeys].sort();
+          const failed=delta.failedIdentities.map(item=>item.identityKey).sort();
+          const accounted=[...recovered,...failed].sort();
+          const requiredCategoryRecoveries=['G3636|Z77','M4613|41A','SY3660|46A'];
+          const categoryRecovered=records.filter(r=>r.fetchOk && r.imageEvidenceSources?.includes('OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE')).map(r=>r.identityKey).sort();
+          if(manifest.workerCount!==50||manifest.workerSummaries.length!==50) throw new Error('Sequence 16 requires 50 worker summaries');
+          if(manifest.totals.selectedIdentityCount!==6||manifest.totals.expectedProductCaptureCount!==6||manifest.totals.attemptedIdentityCount!==6) throw new Error(`Sequence 16 identity accounting mismatch: ${JSON.stringify(manifest.totals)}`);
+          if(manifest.totals.successfulIdentityCaptureCount+manifest.totals.failedIdentityCaptureCount!==6) throw new Error('All six retries must be accounted for');
+          if(JSON.stringify(accounted)!==JSON.stringify(expected)) throw new Error(`Retry set mismatch: ${JSON.stringify({recovered,failed})}`);
+          if(requiredCategoryRecoveries.some(key=>!recovered.includes(key))) throw new Error(`Expected exact-media recoveries missing: ${JSON.stringify({recovered,categoryRecovered})}`);
+          if(requiredCategoryRecoveries.some(key=>!categoryRecovered.includes(key))) throw new Error(`Category evidence provenance missing: ${JSON.stringify(categoryRecovered)}`);
+          if(manifest.totals.rejectedImageReferenceCount!==0||manifest.totals.soft404IdentityCount!==0) throw new Error('Rejected media or soft404 reached recovery');
+          if(manifest.totals.factoryVerifiedCount!==0||manifest.totals.verifiedPriceCount!==0) throw new Error('Factory or price guard changed');
+          if(!audit.passed||audit.batch.overlapWithPrior.length||audit.batch.completedAndFailedOverlap.length) throw new Error(`Sequence 16 delta audit failed: ${JSON.stringify(audit)}`);
+          console.log(JSON.stringify({recovered,failed,categoryRecovered,totals:manifest.totals,ledgerDeltaSha256:delta.ledgerDeltaSha256},null,2));
+          NODE
+      - uses: actions/upload-artifact@v4
+        id: upload_products
+        if: always()
+        with:
+          name: rlf-sequence16-retry-results-${{ github.run_id }}
+          path: |
+            execution/products-consolidated
+            execution/SEQUENCE16_EVIDENCE_SHA256SUMS.txt
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Persist immutable sequence 16 checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id="$GITHUB_RUN_ID"
+          destination="data/execution/runs/${run_id}"
+          delta_destination="data/execution/progress-deltas/${run_id}.json"
+          mkdir -p "$destination"
+          cp execution/products-consolidated/product-manifest.json "$destination/product-manifest.json"
+          cp execution/products-consolidated/product-records.ndjson "$destination/product-records.ndjson"
+          cp execution/products-consolidated/image-manifest.ndjson "$destination/image-manifest.ndjson"
+          cp execution/products-consolidated/product-progress-delta.json "$destination/product-progress-delta.json"
+          cp execution/products-consolidated/ledger-delta.json "$destination/ledger-delta.json"
+          cp execution/products-consolidated/ledger-delta-audit.json "$destination/ledger-delta-audit.json"
+          cp execution/products-consolidated/ledger-delta.json "$delta_destination"
+          cp execution/product-frontier/product-frontier.json "$destination/product-frontier.json"
+          cp execution/product-frontier/preparation-proof.json "$destination/preparation-proof.json"
+          cp execution/SEQUENCE16_EVIDENCE_SHA256SUMS.txt "$destination/SEQUENCE16_EVIDENCE_SHA256SUMS.txt"
+          node --input-type=module <<'NODE'
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          const state=await loadProgressLedger();
+          if(String(state.latestRunId)!==String(process.env.GITHUB_RUN_ID)) throw new Error(`Latest run mismatch ${state.latestRunId}`);
+          if(state.counters.factoryVerifiedCount!==0||state.counters.globalCanonicalProductCount!==0) throw new Error('Protected counters changed');
+          console.log(JSON.stringify({latestRunId:state.latestRunId,completedIdentityCount:state.completed.identityCount,retryIdentityCount:state.retry.identityCount,ledgerSha256:state.ledgerSha256},null,2));
+          NODE
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$destination" "$delta_destination"
+          git commit -m "Persist audited sequence 16 retry run ${run_id}"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$SOURCE_BRANCH"
+            if git rebase "origin/$SOURCE_BRANCH" && git push origin "HEAD:$SOURCE_BRANCH"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt*3))
+          done
+          exit 1
