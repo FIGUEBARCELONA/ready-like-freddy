@@ -24,11 +24,12 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
+          import re
           from pathlib import Path
           path = Path('scripts/execution/run-product-worker.mjs')
           text = path.read_text(encoding='utf-8')
 
-          marker = '''function isSoft404(fields, content) {'''
+          marker = 'function isSoft404(fields, content) {'
           insertion = '''function collectCategoryEvidenceImages(candidate, productCode, colourCode) {
             const evidence = candidate.categoryImageEvidence ?? null;
             const references = evidence?.imageReferences ?? [];
@@ -68,50 +69,53 @@ jobs:
               raise SystemExit(f'Expected one soft404 marker, found {text.count(marker)}')
           text = text.replace(marker, insertion)
 
-          old_images = '''      const imageReferences = response.ok
-                ? collectProductImages(content, productCode, colourCode)
-                : [];'''
-          new_images = '''      const pageImageReferences = response.ok
-                ? collectProductImages(content, productCode, colourCode)
-                : [];
-              const categoryEvidenceImageReferences =
-                response.ok && !isSoft404(fields, content)
-                  ? collectCategoryEvidenceImages(candidate, productCode, colourCode)
-                  : [];
-              const imageReferences = mergeImageReferences(
-                pageImageReferences,
-                categoryEvidenceImageReferences,
-              );
-              const imageEvidenceSources = [
-                ...(pageImageReferences.length
-                  ? ["OFFICIAL_PRODUCT_PAGE_MEDIA_CAPTURE"]
-                  : []),
-                ...(categoryEvidenceImageReferences.length
-                  ? ["OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"]
-                  : []),
-              ];'''
-          if text.count(old_images) != 1:
-              raise SystemExit(f'Expected one image collection block, found {text.count(old_images)}')
-          text = text.replace(old_images, new_images)
+          image_pattern = re.compile(
+              r'(?m)^(\s*)const imageReferences = response\.ok\n\s*\? collectProductImages\(content, productCode, colourCode\)\n\s*: \[\];$'
+          )
+          match = image_pattern.search(text)
+          if not match:
+              raise SystemExit('Image collection block not found structurally')
+          indent = match.group(1)
+          new_images = f'''{indent}const pageImageReferences = response.ok
+          {indent}  ? collectProductImages(content, productCode, colourCode)
+          {indent}  : [];
+          {indent}const categoryEvidenceImageReferences =
+          {indent}  response.ok && !isSoft404(fields, content)
+          {indent}    ? collectCategoryEvidenceImages(candidate, productCode, colourCode)
+          {indent}    : [];
+          {indent}const imageReferences = mergeImageReferences(
+          {indent}  pageImageReferences,
+          {indent}  categoryEvidenceImageReferences,
+          {indent});
+          {indent}const imageEvidenceSources = [
+          {indent}  ...(pageImageReferences.length
+          {indent}    ? ["OFFICIAL_PRODUCT_PAGE_MEDIA_CAPTURE"]
+          {indent}    : []),
+          {indent}  ...(categoryEvidenceImageReferences.length
+          {indent}    ? ["OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"]
+          {indent}    : []),
+          {indent}];'''
+          text, count = image_pattern.subn(new_images, text, count=1)
+          if count != 1:
+              raise SystemExit(f'Expected one image block replacement, got {count}')
 
-          old_current = '''        imageReferences,
-                validationReasons: reasons,'''
-          new_current = '''        imageReferences,
-                imageEvidenceSources,
-                validationReasons: reasons,'''
-          if text.count(old_current) != 1:
-              raise SystemExit(f'Expected one current image marker, found {text.count(old_current)}')
-          text = text.replace(old_current, new_current)
+          text, count = re.subn(
+              r'(?m)^(\s*)imageReferences,\n(\s*)validationReasons: reasons,$',
+              r'\1imageReferences,\n\1imageEvidenceSources,\n\2validationReasons: reasons,',
+              text,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit(f'Expected one current result replacement, got {count}')
 
-          old_record = '''      imageReferences: result.imageReferences ?? [],
-              sourceTransport: fetched?.sourceTransport ?? null,'''
-          new_record = '''      imageReferences: result.imageReferences ?? [],
-              imageEvidenceSources: result.imageEvidenceSources ?? [],
-              categoryImageEvidence: candidate.categoryImageEvidence ?? null,
-              sourceTransport: fetched?.sourceTransport ?? null,'''
-          if text.count(old_record) != 1:
-              raise SystemExit(f'Expected one record image marker, found {text.count(old_record)}')
-          text = text.replace(old_record, new_record)
+          text, count = re.subn(
+              r'(?m)^(\s*)imageReferences: result\.imageReferences \?\? \[\],\n(\s*)sourceTransport: fetched\?\.sourceTransport \?\? null,$',
+              r'\1imageReferences: result.imageReferences ?? [],\n\1imageEvidenceSources: result.imageEvidenceSources ?? [],\n\1categoryImageEvidence: candidate.categoryImageEvidence ?? null,\n\2sourceTransport: fetched?.sourceTransport ?? null,',
+              text,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit(f'Expected one persisted record replacement, got {count}')
 
           path.write_text(text, encoding='utf-8')
           PY
