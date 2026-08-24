@@ -21,56 +21,60 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-      - name: Patch prepare stage exactly once
+      - name: Integrate priority entry points into queue preparation
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
 
-          path = Path('.github/workflows/rlf-50-worker-kb.yml')
+          path = Path('scripts/execution/prepare-official-queue.mjs')
           text = path.read_text()
-          needle = '          node scripts/execution/prepare-official-queue.mjs --out=execution/queue\n'
-          replacement = '''          node scripts/execution/prepare-official-queue.mjs --out=execution/queue
-          node scripts/execution/prioritize-official-entrypoints.mjs \\
-            --queue=execution/queue/queue.json \\
-            --seeds=data/execution/rlf-kb-official-seeds.json \\
-            --summary=execution/queue/summary.json \\
-            --urls=execution/queue/urls.txt
-          '''
-          existing = text.count('prioritize-official-entrypoints.mjs')
-          prepare_count = text.count(needle)
-          if existing == 1:
-              print('Prioritizer already connected; no patch required')
-          elif existing == 0 and prepare_count == 1:
+          marker = 'RLF_PRIORITY_ENTRYPOINTS_INTEGRATED'
+          needle = 'console.log(JSON.stringify(await readJson(`${outDir}/summary.json`), null, 2));\n'
+          replacement = "\n".join([
+              '// RLF_PRIORITY_ENTRYPOINTS_INTEGRATED',
+              'const { spawnSync } = await import("node:child_process");',
+              'const priorityResult = spawnSync(process.execPath, [',
+              '  new URL("./prioritize-official-entrypoints.mjs", import.meta.url).pathname,',
+              '  `--queue=${outDir}/queue.json`,',
+              '  `--seeds=${seedsPath}`,',
+              '  `--summary=${outDir}/summary.json`,',
+              '  `--urls=${outDir}/urls.txt`,',
+              '], { stdio: "inherit" });',
+              'if (priorityResult.status !== 0) {',
+              '  throw new Error(`Priority entry-point integration failed with status ${priorityResult.status}`);',
+              '}',
+              'console.log(JSON.stringify(await readJson(`${outDir}/summary.json`), null, 2));',
+              '',
+          ])
+          marker_count = text.count(marker)
+          needle_count = text.count(needle)
+          if marker_count == 1:
+              print('Priority entry-point integration already present')
+          elif marker_count == 0 and needle_count == 1:
               path.write_text(text.replace(needle, replacement, 1))
           else:
               raise SystemExit(
-                  f'Unsafe workflow state: prepare_count={prepare_count}, prioritizer_count={existing}'
+                  f'Unsafe prepare script state: marker_count={marker_count}, needle_count={needle_count}'
               )
           PY
-          test "$(grep -c 'prioritize-official-entrypoints.mjs' .github/workflows/rlf-50-worker-kb.yml)" = 1
-          grep -A7 -B2 'prioritize-official-entrypoints.mjs' .github/workflows/rlf-50-worker-kb.yml
-      - name: Validate scripts and workflow invariants
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --check scripts/execution/prioritize-official-entrypoints.mjs
+          test "$(grep -c 'RLF_PRIORITY_ENTRYPOINTS_INTEGRATED' scripts/execution/prepare-official-queue.mjs)" = 1
           node --check scripts/execution/prepare-official-queue.mjs
-          grep -q "data/execution/rlf-kb-official-seeds.json" .github/workflows/rlf-50-worker-kb.yml
-          grep -q "data/execution/rlf-kb-run-plan.json" .github/workflows/rlf-50-worker-kb.yml
-      - name: Commit exact workflow connection when changed
+          node --check scripts/execution/prioritize-official-entrypoints.mjs
+          tail -n 20 scripts/execution/prepare-official-queue.mjs
+      - name: Commit integration when changed
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet -- .github/workflows/rlf-50-worker-kb.yml; then
-            echo 'No workflow change required'
+          if git diff --quiet -- scripts/execution/prepare-official-queue.mjs; then
+            echo 'No script change required'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .github/workflows/rlf-50-worker-kb.yml
-          git commit -m 'Connect verified archive entry points to 50-lane prepare stage'
+          git add scripts/execution/prepare-official-queue.mjs
+          git commit -m 'Integrate verified priority entry points into queue preparation'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
