@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "runId": "32780333417",
+  "generatedAt": "2026-08-24T21:39:26.192Z",
+  "sourceCommitSha": "0656536125800390f8b403d26fda2103debb205d",
+  "sourceArtifact": {
+    "artifactId": 9539604901,
+    "artifactDigest": "sha256:29b36e146cc3a69a98b45d292c9e056a517c614459d0b6a0e4985741dee7cd52",
+    "artifactName": "rlf-kb-official-discovery-32780333417"
+  },
+  "prior": {
+    "deltaCount": 5,
+    "attemptedObservationCount": 979,
+    "uniqueAttemptedSourcePageCount": 694,
+    "ledgerSha256": "f1733b93b06210411820a9feb94bbc0492f8da3b1a4f21e78811664ee0402efd"
+  },
+  "batch": {
+    "attemptedSourcePageCount": 219,
+    "uniqueSourcePageCount": 219,
+    "successfulSourcePageCount": 219,
+    "overlapWithPrior": [],
+    "sourcePageDeltaSha256": "be4c1f1bf8a7e3e825a94a399462f6bac0697a619b1de2948302fe090f028a67"
+  },
+  "projected": {
+    "deltaCount": 6,
+    "attemptedObservationCount": 1198,
+    "uniqueAttemptedSourcePageCount": 913,
+    "ledgerSha256": "958615fe3ff5d8192371a8d1c2f0ed65308b31309ef03fcebd6b10b20d23f339"
+  },
+  "passed": true
+}
