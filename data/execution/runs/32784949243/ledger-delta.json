@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 3,
+  "runId": "32784949243",
+  "acceptedAt": "2026-08-24T22:36:04.880Z",
+  "qualityGatePassed": false,
+  "strictQualityGatePassed": false,
+  "acceptance": "PARTIAL_STRICT_EVIDENCE_3_COMPLETE_3_RETRY",
+  "sourceEvidence": {
+    "productManifestSha256": "40c21346e4f77b5fc3c2503992d5112c0b95d2af36ed28f891c833af9b3a0055",
+    "productManifestFileSha256": "48e4a85338de0958ddc463cd66484857fe45fff62d8673b001f7f77bc6dc4be9",
+    "sourceProgressDeltaSha256": "6a1a016c84bded04535c8675181898e46710bc5f4ee0958ee3138a9603e74f4d",
+    "sourceProgressDeltaFileSha256": "01c918d0efbd982fcbdba409e6e18f2513a4b3a272a1d9a52d3e618cc59992a2",
+    "frontierFileSha256": "9ead75e1a1791775578e0a8dbab1893b9bd7704f0997a3d855952ed92c3864b5"
+  },
+  "frontier": {
+    "frontierId": "RLF-SEQUENCE16-RETRY-32784949243",
+    "candidateUrlCount": 11,
+    "candidateIdentityCount": 6,
+    "previouslyCompletedIdentityCount": 1354,
+    "remainingIdentityCountBeforeSelection": 6,
+    "selectedIdentityCount": 6,
+    "expectedProductCaptureCount": 6,
+    "retryIdentityCount": 6,
+    "frontierSha256": "ee2d122e85d2db19521b50d0bd6248067b719e26d66d5221a8273096b203f3df",
+    "selectedIdentitySha256": "f71c3b1c5d2c7356c6f4b2183115ccbca2ce6427db5dbf534cbfef89ae509aa7",
+    "priorLedgerSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+    "priorDeltaCount": 10
+  },
+  "completedIdentityKeys": [
+    "G3636|Z77",
+    "M4613|41A",
+    "SY3660|46A"
+  ],
+  "capturedProductUrlCount": 3,
+  "failedIdentities": [
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "requestedProductUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+        "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+        "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    }
+  ],
+  "counters": {
+    "successfulIdentityCaptureCount": 3,
+    "failedIdentityCaptureCount": 3,
+    "officialProductImageReferenceCount": 26,
+    "materialEvidenceCount": 3,
+    "manufacturingClaimCount": 0,
+    "factoryVerifiedCount": 0
+  },
+  "metadataGaps": {
+    "descriptionMissingIdentityCount": 3,
+    "priceMissingIdentityCount": 3,
+    "materialMissingIdentityCount": 0
+  },
+  "status": "PARTIAL_STRICT_BATCH_ACCEPTED_WITH_RETRIES_NOT_GLOBAL_CANONICAL",
+  "ledgerDeltaSha256": "969b177b95cc8a45e239ca41626354e9fd3a43839aa269b756bbe0eadc3c8f80"
+}
