@@ -14,8 +14,8 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '29'
-  TARGET_SHA: '49de5fc2eb2d5760a557c22f7da713b048d4606a'
+  SNAPSHOT_REVISION: '30'
+  TARGET_SHA: '288aaaeec22e1527179175e4ecf6861064ce20f6'
 
 jobs:
   snapshot:
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/rlf-execution-backend-20260823
-      - name: Capture repaired preflight run
+      - name: Capture recalibration and downstream preflight runs
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -44,7 +44,7 @@ jobs:
             --arg targetSha "$TARGET_SHA" \
             --slurpfile runs /tmp/runs.json \
             --slurpfile checks /tmp/checks.json \
-            '{schemaVersion:13,capturedAt:$capturedAt,targetSha:$targetSha,targetRuns:$runs[0],targetChecks:$checks[0]}' \
+            '{schemaVersion:14,capturedAt:$capturedAt,targetSha:$targetSha,targetRuns:$runs[0],targetChecks:$checks[0]}' \
             > data/execution/workflow-runs-snapshot.json
           cat data/execution/workflow-runs-snapshot.json
       - name: Publish snapshot
@@ -55,7 +55,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot repaired sequence 15 preflight'
+          git commit -m 'Snapshot sequence 15 gate recalibration'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
