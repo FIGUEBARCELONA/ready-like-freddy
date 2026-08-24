@@ -43,6 +43,7 @@ jobs:
             'data/execution/rlf-kb-official-seeds.json',
             'data/execution/rlf-kb-run-plan.json',
             'data/execution/product-progress.json',
+            'data/execution/sequence13-ledger-snapshot.json',
             ...readdirSync('data/execution/progress-deltas')
               .filter(name => name.endsWith('.json'))
               .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
@@ -66,18 +67,33 @@ jobs:
 
           const identityState = await loadProgressLedger();
           const sourcePageState = await loadSourcePageLedger();
-          const sequence12Delta = JSON.parse(
-            await readFile('data/execution/progress-deltas/32777623316.json', 'utf8'),
+          const sequence13Delta = JSON.parse(
+            await readFile('data/execution/progress-deltas/32780333417.json', 'utf8'),
+          );
+          const sequence13SourceDelta = JSON.parse(
+            await readFile('data/execution/source-page-deltas/32780333417.json', 'utf8'),
+          );
+          const sequence13SourceAudit = JSON.parse(
+            await readFile('data/execution/source-page-delta-audits/32780333417.json', 'utf8'),
+          );
+          const sequence13ProductManifest = JSON.parse(
+            await readFile('data/execution/runs/32780333417/product-manifest.json', 'utf8'),
+          );
+          const sequence13LedgerAudit = JSON.parse(
+            await readFile('data/execution/runs/32780333417/ledger-delta-audit.json', 'utf8'),
+          );
+          const sequence13Snapshot = JSON.parse(
+            await readFile('data/execution/sequence13-ledger-snapshot.json', 'utf8'),
           );
 
           const expectedIdentity = {
-            completedIdentityCount: 1348,
-            productUrlCaptureCount: 2144,
-            officialProductImageReferenceCount: 11626,
-            materialEvidenceCount: 1737,
+            completedIdentityCount: 1351,
+            productUrlCaptureCount: 2149,
+            officialProductImageReferenceCount: 11654,
+            materialEvidenceCount: 1742,
             manufacturingClaimCount: 63,
-            descriptionMissingIdentityCount: 817,
-            priceMissingIdentityCount: 761,
+            descriptionMissingIdentityCount: 820,
+            priceMissingIdentityCount: 764,
             materialMissingIdentityCount: 86,
             retryIdentityKeys: [
               'G3636|Z77',
@@ -87,11 +103,11 @@ jobs:
               'M4613|41A',
               'SY3660|46A',
             ],
-            deltaCount: 7,
-            latestRunId: '32777623316',
+            deltaCount: 8,
+            latestRunId: '32780333417',
             factoryVerifiedCount: 0,
             globalCanonicalProductCount: 0,
-            ledgerSha256: 'c57080c5befb8df5d00f8403b3a2b8c384017ed975441523498062b4f8b1edf9',
+            ledgerSha256: 'd20d264b5508091d3052fdd95e7ac9bfab928072537d2e45d0f8069a288990d7',
           };
           const actualIdentity = {
             completedIdentityCount: identityState.completed.identityCount,
@@ -111,10 +127,10 @@ jobs:
           };
 
           const expectedSourcePages = {
-            deltaCount: 5,
-            attemptedObservationCount: 979,
-            uniqueAttemptedSourcePageCount: 694,
-            ledgerSha256: 'f1733b93b06210411820a9feb94bbc0492f8da3b1a4f21e78811664ee0402efd',
+            deltaCount: 6,
+            attemptedObservationCount: 1198,
+            uniqueAttemptedSourcePageCount: 913,
+            ledgerSha256: '958615fe3ff5d8192371a8d1c2f0ed65308b31309ef03fcebd6b10b20d23f339',
           };
           const actualSourcePages = {
             deltaCount: sourcePageState.deltaCount,
@@ -150,41 +166,92 @@ jobs:
           if (!completed.has('B2328|560')) {
             mismatches.push(['identity.resolvedRetry.B2328|560', false, true]);
           }
-          if (String(sequence12Delta.runId) !== '32777623316' || sequence12Delta.completedIdentityKeys.length !== 107) {
+
+          const expectedSequence13Keys = ['J3301|608', 'J5557|37C', 'T5505|420'];
+          if (String(sequence13Delta.runId) !== '32780333417') {
+            mismatches.push(['sequence13.identityRunId', sequence13Delta.runId, '32780333417']);
+          }
+          if (JSON.stringify(sequence13Delta.completedIdentityKeys) !== JSON.stringify(expectedSequence13Keys)) {
             mismatches.push([
-              'identity.sequence12CompletedIdentityCount',
-              sequence12Delta?.completedIdentityKeys?.length ?? null,
-              107,
+              'sequence13.completedIdentityKeys',
+              sequence13Delta.completedIdentityKeys,
+              expectedSequence13Keys,
             ]);
           }
-          if ((sequence12Delta.failedIdentities ?? []).length !== 4) {
+          if ((sequence13Delta.failedIdentities ?? []).length !== 0) {
             mismatches.push([
-              'identity.sequence12FailedIdentityCount',
-              sequence12Delta?.failedIdentities?.length ?? null,
-              4,
+              'sequence13.failedIdentityCount',
+              sequence13Delta.failedIdentities?.length ?? null,
+              0,
             ]);
           }
-          const sequence12SourceDelta = sourcePageState.deltas.find(
-            delta => String(delta.runId) === '32777623316',
-          );
-          if (!sequence12SourceDelta || sequence12SourceDelta.attemptedSourcePageCount !== 197) {
+          if (sequence13Delta.capturedProductUrlCount !== 5) {
             mismatches.push([
-              'sourcePages.sequence12AttemptedSourcePageCount',
-              sequence12SourceDelta?.attemptedSourcePageCount ?? null,
-              197,
+              'sequence13.capturedProductUrlCount',
+              sequence13Delta.capturedProductUrlCount,
+              5,
             ]);
           }
-          if (sequence12SourceDelta?.sourcePageDeltaSha256 !== '75ac3ad8894d8a13ed6a6eb544abd8f301d68e3cd5da54cb9c6e2e9b4207fdd0') {
+          if (sequence13Delta.ledgerDeltaSha256 !== 'af1f5a2b2589ecadbfd95c0e891614ffde17d0f210dd5dbc51be0b9c149f4437') {
             mismatches.push([
-              'sourcePages.sequence12DeltaSha256',
-              sequence12SourceDelta?.sourcePageDeltaSha256 ?? null,
-              '75ac3ad8894d8a13ed6a6eb544abd8f301d68e3cd5da54cb9c6e2e9b4207fdd0',
+              'sequence13.identityDeltaSha256',
+              sequence13Delta.ledgerDeltaSha256,
+              'af1f5a2b2589ecadbfd95c0e891614ffde17d0f210dd5dbc51be0b9c149f4437',
+            ]);
+          }
+          if (sequence13SourceDelta.attemptedSourcePageCount !== 219) {
+            mismatches.push([
+              'sequence13.attemptedSourcePageCount',
+              sequence13SourceDelta.attemptedSourcePageCount,
+              219,
+            ]);
+          }
+          if (sequence13SourceDelta.sourcePageDeltaSha256 !== 'be4c1f1bf8a7e3e825a94a399462f6bac0697a619b1de2948302fe090f028a67') {
+            mismatches.push([
+              'sequence13.sourcePageDeltaSha256',
+              sequence13SourceDelta.sourcePageDeltaSha256,
+              'be4c1f1bf8a7e3e825a94a399462f6bac0697a619b1de2948302fe090f028a67',
+            ]);
+          }
+          if (!sequence13SourceAudit.passed || sequence13SourceAudit.batch.overlapWithPrior.length !== 0) {
+            mismatches.push([
+              'sequence13.sourcePageAudit',
+              sequence13SourceAudit,
+              { passed: true, overlapWithPrior: [] },
             ]);
           }
 
+          const totals = sequence13ProductManifest.totals;
+          if (
+            sequence13ProductManifest.workerCount !== 50 ||
+            !sequence13ProductManifest.qualityGatePassed ||
+            totals.selectedIdentityCount !== 3 ||
+            totals.attemptedIdentityCount !== 3 ||
+            totals.successfulIdentityCaptureCount !== 3 ||
+            totals.failedIdentityCaptureCount !== 0 ||
+            totals.soft404IdentityCount !== 0 ||
+            totals.missingImageIdentityCount !== 0 ||
+            totals.officialProductImageReferenceCount !== 28 ||
+            totals.rejectedImageReferenceCount !== 0 ||
+            totals.verifiedPriceCount !== 0 ||
+            totals.factoryVerifiedCount !== 0
+          ) {
+            mismatches.push(['sequence13.productManifestTotals', totals, 'strict expected totals']);
+          }
+          if (
+            !sequence13LedgerAudit.passed ||
+            sequence13LedgerAudit.batch.overlapWithPrior.length !== 0 ||
+            sequence13LedgerAudit.batch.completedAndFailedOverlap.length !== 0
+          ) {
+            mismatches.push(['sequence13.ledgerDeltaAudit', sequence13LedgerAudit, 'passed with zero overlap']);
+          }
+          if (!sequence13Snapshot.passed) {
+            mismatches.push(['sequence13.exactLedgerSnapshotPassed', sequence13Snapshot.passed, true]);
+          }
+
           const checkpoint = {
-            schemaVersion: 4,
-            sourceRunId: '32777623316',
+            schemaVersion: 5,
+            sourceRunId: '32780333417',
             generatedAt: new Date().toISOString(),
             expected: {
               identity: expectedIdentity,
@@ -194,11 +261,17 @@ jobs:
               identity: actualIdentity,
               sourcePages: actualSourcePages,
             },
-            sequence12: {
-              completedIdentityCount: sequence12Delta?.completedIdentityKeys?.length ?? null,
-              failedIdentityCount: sequence12Delta?.failedIdentities?.length ?? null,
-              attemptedSourcePageCount: sequence12SourceDelta?.attemptedSourcePageCount ?? null,
-              sourcePageDeltaSha256: sequence12SourceDelta?.sourcePageDeltaSha256 ?? null,
+            sequence13: {
+              completedIdentityKeys: sequence13Delta.completedIdentityKeys,
+              failedIdentityCount: sequence13Delta.failedIdentities?.length ?? null,
+              capturedProductUrlCount: sequence13Delta.capturedProductUrlCount,
+              identityDeltaSha256: sequence13Delta.ledgerDeltaSha256,
+              attemptedSourcePageCount: sequence13SourceDelta.attemptedSourcePageCount,
+              sourcePageDeltaSha256: sequence13SourceDelta.sourcePageDeltaSha256,
+              productWorkerCount: sequence13ProductManifest.workerCount,
+              productTotals: totals,
+              sourcePageAuditPassed: sequence13SourceAudit.passed,
+              ledgerDeltaAuditPassed: sequence13LedgerAudit.passed,
             },
             mismatches,
             passed: mismatches.length === 0,
@@ -230,7 +303,7 @@ jobs:
             ? JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json', 'utf8'))
             : null;
           const proof = {
-            schemaVersion: 5,
+            schemaVersion: 6,
             recordedAt: new Date().toISOString(),
             sourceCommitSha: process.env.GITHUB_SHA,
             runId: process.env.GITHUB_RUN_ID,
@@ -242,10 +315,14 @@ jobs:
             requiredChecks: [
               'pnpm_install_frozen_lockfile',
               'execution_script_syntax',
-              'canonical_json_seven_identity_deltas_five_source_page_deltas',
-              'exact_sequence_12_identity_and_source_page_ledgers',
-              'sequence12_107_complete_4_retry_no_overlap',
-              'sequence12_197_unique_source_pages_no_overlap',
+              'canonical_json_eight_identity_deltas_six_source_page_deltas',
+              'exact_sequence_13_identity_and_source_page_ledgers',
+              'sequence13_3_complete_0_retry_no_overlap',
+              'sequence13_219_unique_source_pages_no_overlap',
+              'fifty_of_fifty_discovery_workers',
+              'fifty_of_fifty_product_workers',
+              'zero_soft404_zero_missing_images_zero_rejected_images',
+              'zero_verified_transformed_prices',
               'resolved_retry_b2328_560',
               'factory_verified_zero',
               'global_canonical_products_zero',
@@ -264,7 +341,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/validation-proof.json
-          git commit -m "Persist RLF sequence 12 validation proof ${GITHUB_RUN_ID}"
+          git commit -m "Persist RLF sequence 13 validation proof ${GITHUB_RUN_ID}"
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
