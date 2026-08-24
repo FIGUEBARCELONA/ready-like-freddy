@@ -9,10 +9,12 @@ on:
 
 permissions:
   actions: read
+  checks: read
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '2'
+  SNAPSHOT_REVISION: '3'
+  TARGET_SHA: 'b6396bec869bf935157ae0073cba0e5dee96de27'
 
 jobs:
   snapshot:
@@ -21,35 +23,40 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/rlf-execution-backend-20260823
-      - name: Capture recent execution and validation runs
+      - name: Capture recent runs and target checks
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p data/execution
-          gh api \
-            -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/workflows/340557520/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=15" \
+          gh api -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/actions/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=30" \
             --jq '[.workflow_runs[] | {id, name, run_number, event, status, conclusion, head_sha, created_at, updated_at, html_url}]' \
-            > /tmp/execution-runs.json
-          gh api \
-            -H 'Accept: application/vnd.github+json' \
-            "/repos/${GITHUB_REPOSITORY}/actions/workflows/340716025/runs?branch=feature%2Frlf-execution-backend-20260823&per_page=15" \
+            > /tmp/all-runs.json
+          gh api -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${TARGET_SHA}&event=push&per_page=30" \
             --jq '[.workflow_runs[] | {id, name, run_number, event, status, conclusion, head_sha, created_at, updated_at, html_url}]' \
-            > /tmp/validation-runs.json
+            > /tmp/target-runs.json
+          gh api -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/commits/${TARGET_SHA}/check-runs?per_page=100" \
+            --jq '[.check_runs[] | {id, name, status, conclusion, started_at, completed_at, details_url}]' \
+            > /tmp/target-checks.json
           jq -n \
             --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --slurpfile execution /tmp/execution-runs.json \
-            --slurpfile validation /tmp/validation-runs.json \
-            '{capturedAt: $capturedAt, executionRuns: $execution[0], validationRuns: $validation[0]}' \
+            --arg targetSha "$TARGET_SHA" \
+            --slurpfile all /tmp/all-runs.json \
+            --slurpfile target /tmp/target-runs.json \
+            --slurpfile checks /tmp/target-checks.json \
+            '{schemaVersion: 2, capturedAt: $capturedAt, targetSha: $targetSha, targetRuns: $target[0], targetChecks: $checks[0], recentRuns: $all[0]}' \
             > data/execution/workflow-runs-snapshot.json
       - name: Publish snapshot
         run: |
           set -euo pipefail
-          git pull --rebase origin feature/rlf-execution-backend-20260823
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot RLF execution and validation runs'
+          git commit -m 'Snapshot RLF workflow runs and active patch'
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
