@@ -14,8 +14,8 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '26'
-  TARGET_SHA: '073c346299b1a291c97b106f499be67f30a9fc61'
+  SNAPSHOT_REVISION: '27'
+  TARGET_SHA: '9c8588bcbb652acb56d680730ed90d11f7c8d5ac'
 
 jobs:
   snapshot:
@@ -41,7 +41,7 @@ jobs:
             "/repos/${GITHUB_REPOSITORY}/commits/${TARGET_SHA}/check-runs?per_page=100" \
             --jq '[.check_runs[] | {id, name, status, conclusion, started_at, completed_at, details_url}]' > /tmp/checks.json
           jq -n --arg capturedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg targetSha "$TARGET_SHA" --slurpfile recent /tmp/recent.json --slurpfile target /tmp/target.json --slurpfile checks /tmp/checks.json \
-            '{schemaVersion:10,capturedAt:$capturedAt,targetSha:$targetSha,targetRuns:$target[0],targetChecks:$checks[0],recentRuns:$recent[0]}' > data/execution/workflow-runs-snapshot.json
+            '{schemaVersion:11,capturedAt:$capturedAt,targetSha:$targetSha,targetRuns:$target[0],targetChecks:$checks[0],recentRuns:$recent[0]}' > data/execution/workflow-runs-snapshot.json
           cat data/execution/workflow-runs-snapshot.json
       - name: Publish snapshot
         shell: bash
@@ -51,7 +51,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Snapshot sequence 15 preflight run'
+          git commit -m 'Snapshot sequence 15 massive run'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
