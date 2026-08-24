@@ -1,0 +1,102 @@
+name: TEMP RLF label fetch v6.18
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Fetch source pages and enumerate images
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/pages evidence/original evidence/reports
+          cat > /tmp/fetch.py <<'PY'
+          import pathlib, re, json, hashlib, html, urllib.parse, urllib.request
+
+          ROOT=pathlib.Path('evidence')
+          UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36 RLF-Label-Audit/6.18'
+          TARGETS={
+            'CAND-072':'https://www.ebay.com/itm/317781354098',
+            'CAND-073':'https://www.ebay.com/itm/358285983712',
+            'CAND-033':'https://www.etsy.com/ie/listing/4344763128/fred-perry-striped-polo-mens-xl-made-in',
+            'CAND-040':'https://www.etsy.com/listing/1788195875/rare-fred-perry-vintage-parka-jacket',
+          }
+
+          def get(url):
+            req=urllib.request.Request(url,headers={
+              'User-Agent':UA,'Accept':'text/html,application/xhtml+xml,image/avif,image/webp,image/apng,*/*;q=0.8',
+              'Accept-Language':'en-GB,en;q=0.9','Cache-Control':'no-cache'
+            })
+            with urllib.request.urlopen(req,timeout=120) as r:
+              return r.geturl(), r.status, r.headers.get('content-type',''), r.read()
+
+          def variants(url):
+            u=html.unescape(url).replace('\\u002F','/').replace('\\/','/')
+            u=urllib.parse.unquote(u)
+            if 'i.ebayimg.com/images/g/' in u:
+              u=re.sub(r'/s-l\d+\.(?:jpg|webp)', '/s-l1600.webp', u)
+              u=re.sub(r'/s-l\d+$', '/s-l1600.webp', u)
+            if 'i.etsystatic.com/' in u:
+              u=re.sub(r'/il_[^/]+\.(?:jpg|jpeg|webp)', '/il_794xN.jpg', u)
+            return u
+
+          manifest=[]
+          for cand,url in TARGETS.items():
+            try:
+              final,status,ctype,body=get(url)
+              (ROOT/'pages'/f'{cand}.html').write_bytes(body)
+              text=body.decode('utf-8','replace')
+              raw=set()
+              patterns=[
+                r'https://i\.ebayimg\.com/images/g/[^"\'<>\\ ]+',
+                r'https:\\/\\/i\.ebayimg\.com\\/images\\/g\\/[^"\'<> ]+',
+                r'https://i\.etsystatic\.com/[^"\'<>\\ ]+',
+                r'https:\\/\\/i\.etsystatic\.com\\/[^"\'<> ]+',
+              ]
+              for pat in patterns:
+                raw.update(re.findall(pat,text))
+              urls=[]
+              for item in sorted(raw):
+                item=variants(item)
+                item=item.rstrip('\\,}]&quot;')
+                if item.startswith('https://') and item not in urls:
+                  urls.append(item)
+              downloaded=[]
+              for idx,imgurl in enumerate(urls[:40],1):
+                ext='.webp' if 'ebayimg' in imgurl else '.jpg'
+                out=ROOT/'original'/f'{cand}_{idx:02d}{ext}'
+                try:
+                  f2,s2,c2,b2=get(imgurl)
+                  if s2==200 and len(b2)>1000 and ('image/' in c2 or b2[:4] in (b'RIFF',b'\xff\xd8\xff\xe0',b'\xff\xd8\xff\xe1')):
+                    out.write_bytes(b2)
+                    downloaded.append({'path':out.as_posix(),'url':imgurl,'final_url':f2,'status':s2,'content_type':c2,'bytes':len(b2),'sha256':hashlib.sha256(b2).hexdigest()})
+                except Exception as e:
+                  downloaded.append({'url':imgurl,'error':repr(e)})
+              manifest.append({'candidate':cand,'source_url':url,'final_url':final,'status':status,'content_type':ctype,'page_bytes':len(body),'page_sha256':hashlib.sha256(body).hexdigest(),'image_urls_found':len(urls),'downloads':downloaded})
+            except Exception as e:
+              manifest.append({'candidate':cand,'source_url':url,'error':repr(e)})
+
+          (ROOT/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v618-fetch-v1','targets':manifest},indent=2),encoding='utf-8')
+          rows=[]
+          for p in sorted(ROOT.rglob('*')):
+            if p.is_file():
+              b=p.read_bytes(); rows.append({'path':p.as_posix(),'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+          (ROOT/'reports'/'SHA256SUMS.json').write_text(json.dumps(rows,indent=2),encoding='utf-8')
+          PY
+          python /tmp/fetch.py
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME_AND_DIMENSIONS.txt || true
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-label-evidence-v618
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
