@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Recalculate and document the canonical delta hash
+      - name: Audit overlap, recalculate and document canonical delta hash
         shell: bash
         run: |
           set -euo pipefail
@@ -33,8 +33,10 @@ jobs:
           export ORIGINAL_BLOB_SHA
           node - <<'NODE'
           const fs = require('node:fs');
+          const path = require('node:path');
           const crypto = require('node:crypto');
           const deltaPath = 'data/execution/progress-deltas/32748405808.json';
+          const deltasDir = 'data/execution/progress-deltas';
           const correctionPath = 'data/execution/progress-delta-corrections/32748405808.json';
           const expectedOriginalBlobSha = 'd83da1132dab8e5e917d43b7fd390be031672ae6';
           const expectedPreviousClaim = '35bb930c717de65b61d1a5aa4b4602575d703bf45fe70cdca20dbb01fe4c2b03';
@@ -52,21 +54,49 @@ jobs:
           if (delta.ledgerDeltaSha256 !== expectedPreviousClaim) {
             throw new Error(`Unexpected previous ledger hash claim: ${delta.ledgerDeltaSha256}`);
           }
+          const prior = new Set(
+            JSON.parse(fs.readFileSync('data/execution/product-progress.json', 'utf8')).completed?.identityKeys ?? [],
+          );
+          const priorDeltaNames = fs.readdirSync(deltasDir)
+            .filter(name => name.endsWith('.json') && name !== '32748405808.json')
+            .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+          for (const name of priorDeltaNames) {
+            const priorDelta = JSON.parse(fs.readFileSync(path.join(deltasDir, name), 'utf8'));
+            for (const identityKey of priorDelta.completedIdentityKeys ?? []) prior.add(identityKey);
+          }
+          const successfulCaptureRecordCount = delta.completedIdentityKeys.length;
+          const duplicateCompletedIdentityKeys = delta.completedIdentityKeys
+            .filter(identityKey => prior.has(identityKey))
+            .sort();
+          const netNewIdentityCount = delta.completedIdentityKeys
+            .filter(identityKey => !prior.has(identityKey)).length;
+          if (successfulCaptureRecordCount !== 95) {
+            throw new Error(`Unexpected successful capture record count: ${successfulCaptureRecordCount}`);
+          }
+          if (duplicateCompletedIdentityKeys.length !== 1 || netNewIdentityCount !== 94) {
+            throw new Error(`Unexpected overlap audit: ${JSON.stringify({duplicateCompletedIdentityKeys, netNewIdentityCount})}`);
+          }
           const unsigned = { ...delta };
           delete unsigned.ledgerDeltaSha256;
           const corrected = crypto.createHash('sha256').update(stableJson(unsigned)).digest('hex');
-          if (corrected === expectedPreviousClaim) throw new Error('Repair is unnecessary: hash already matches');
+          if (corrected !== 'dfa9761504b20df5f16ac04b8b5455f077ea7ad0d87bc6e00d50bd689dcd9317') {
+            throw new Error(`Unexpected corrected delta hash: ${corrected}`);
+          }
           const correction = {
-            schemaVersion: 1,
+            schemaVersion: 2,
             runId: delta.runId,
             correctedAt: new Date().toISOString(),
             targetPath: deltaPath,
             originalBlobSha: process.env.ORIGINAL_BLOB_SHA,
             previousClaimedLedgerDeltaSha256: expectedPreviousClaim,
             correctedLedgerDeltaSha256: corrected,
-            correctionScope: 'HASH_METADATA_ONLY',
+            correctionScope: 'HASH_METADATA_AND_NET_NEW_IDENTITY_AUDIT',
             identityAndCounterFieldsChanged: false,
-            reason: 'PERSISTED_DELTA_HASH_DID_NOT_MATCH_STABLE_JSON_OF_PERSISTED_LOGICAL_CONTENT',
+            successfulCaptureRecordCount,
+            netNewIdentityCount,
+            duplicateCompletedIdentityKeys,
+            priorCompletedIdentityCount: prior.size,
+            reason: 'PERSISTED_DELTA_HASH_MISMATCH_AND_ONE_SUCCESSFUL_CAPTURE_ALREADY_PRESENT_IN_PRIOR_LEDGER',
             sourceProductManifestSha256: delta.productManifestSha256,
             sourceDiscoveryManifestSha256: delta.discoveryManifestSha256,
           };
@@ -80,11 +110,12 @@ jobs:
         run: |
           set -euo pipefail
           node --input-type=module - <<'NODE'
-          import { writeFile } from 'node:fs/promises';
+          import { readFile, writeFile } from 'node:fs/promises';
           import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
           const state = await loadProgressLedger();
+          const correction = JSON.parse(await readFile('data/execution/progress-delta-corrections/32748405808.json', 'utf8'));
           const expected = {
-            identityCount: 1001,
+            identityCount: 1000,
             productUrlCaptureCount: 1641,
             imageCount: 8847,
             materialCount: 1332,
@@ -94,6 +125,9 @@ jobs:
             materialMissing: 66,
             retryKeys: ['B2328|560', 'HW2300|843'],
             deltaCount: 4,
+            successfulCaptureRecordCount: 95,
+            netNewIdentityCount: 94,
+            duplicateCompletedIdentityCount: 1,
           };
           const actual = {
             identityCount: state.completed.identityCount,
@@ -106,12 +140,16 @@ jobs:
             materialMissing: state.metadataGaps.materialMissingIdentityCount,
             retryKeys: state.retry.identities.map(item => item.identityKey).sort(),
             deltaCount: state.deltaCount,
+            successfulCaptureRecordCount: correction.successfulCaptureRecordCount,
+            netNewIdentityCount: correction.netNewIdentityCount,
+            duplicateCompletedIdentityCount: correction.duplicateCompletedIdentityKeys.length,
+            duplicateCompletedIdentityKeys: correction.duplicateCompletedIdentityKeys,
             factoryVerifiedCount: state.counters.factoryVerifiedCount,
             globalCanonicalProductCount: state.counters.globalCanonicalProductCount,
             ledgerSha256: state.ledgerSha256,
           };
           const mismatches = [];
-          for (const key of ['identityCount','productUrlCaptureCount','imageCount','materialCount','manufacturingClaimCount','descriptionMissing','priceMissing','materialMissing','deltaCount']) {
+          for (const key of ['identityCount','productUrlCaptureCount','imageCount','materialCount','manufacturingClaimCount','descriptionMissing','priceMissing','materialMissing','deltaCount','successfulCaptureRecordCount','netNewIdentityCount','duplicateCompletedIdentityCount']) {
             if (actual[key] !== expected[key]) mismatches.push([key, actual[key], expected[key]]);
           }
           if (JSON.stringify(actual.retryKeys) !== JSON.stringify(expected.retryKeys)) {
@@ -120,7 +158,7 @@ jobs:
           if (actual.factoryVerifiedCount !== 0) mismatches.push(['factoryVerifiedCount', actual.factoryVerifiedCount, 0]);
           if (actual.globalCanonicalProductCount !== 0) mismatches.push(['globalCanonicalProductCount', actual.globalCanonicalProductCount, 0]);
           const checkpoint = {
-            schemaVersion: 1,
+            schemaVersion: 2,
             sourceRunId: '32748405808',
             generatedAt: new Date().toISOString(),
             expected,
@@ -142,7 +180,7 @@ jobs:
             data/execution/progress-deltas/32748405808.json \
             data/execution/progress-delta-corrections/32748405808.json \
             data/execution/sequence9-ledger-checkpoint.json
-          git commit -m 'Repair and audit sequence 9 delta hash'
+          git commit -m 'Repair sequence 9 hash and audit net-new identities'
           git fetch origin feature/rlf-execution-backend-20260823
           git rebase origin/feature/rlf-execution-backend-20260823
           git push origin HEAD:feature/rlf-execution-backend-20260823
