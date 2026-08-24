@@ -1,0 +1,72 @@
+name: TEMP RLF label fetch v6.19
+
+on:
+  pull_request:
+    branches:
+      - rlf-parallel50-v25-53
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Fetch exact candidate evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/original evidence/pages evidence/reports
+          UA='Mozilla/5.0 (compatible; RLF-Label-Audit/6.19; +https://github.com/FIGUEBARCELONA/ready-like-freddy)'
+          fetch_required() {
+            curl --fail --location --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 \
+              --user-agent "$UA" --header 'Accept: */*' "$1" --output "$2"
+          }
+          probe_page() {
+            curl --location --connect-timeout 20 --max-time 120 --user-agent "$UA" \
+              --dump-header "$2.headers" --output "$2.body" \
+              --write-out '%{http_code}\n%{url_effective}\n%{content_type}\n%{size_download}\n' "$1" > "$2.meta" || true
+          }
+
+          # CAND-056 — exact Made in Italy shawl-collar cardigan, five physical label faces.
+          fetch_required 'https://i.etsystatic.com/47607296/r/il/0aa87f/7543974633/il_794xN.7543974633_4ljs.jpg' 'evidence/original/CAND-056_neck.jpg'
+          fetch_required 'https://i.etsystatic.com/47607296/r/il/6838d0/7543974629/il_794xN.7543974629_1t8d.jpg' 'evidence/original/CAND-056_code.jpg'
+          fetch_required 'https://i.etsystatic.com/47607296/r/il/2c4c04/7496040194/il_794xN.7496040194_m1sz.jpg' 'evidence/original/CAND-056_composition.jpg'
+          fetch_required 'https://i.etsystatic.com/47607296/r/il/278a56/7543974627/il_794xN.7543974627_20vw.jpg' 'evidence/original/CAND-056_care.jpg'
+          fetch_required 'https://i.etsystatic.com/47607296/r/il/1a2040/7496040200/il_794xN.7496040200_e5ed.jpg' 'evidence/original/CAND-056_beta.jpg'
+          probe_page 'https://www.etsy.com/de-en/listing/4421991263/fred-perry-wool-shawl-collar-cardigan' 'evidence/pages/CAND-056_source'
+
+          # CAND-058 — exact vintage Made in Italy polo; physical label contradicts seller composition.
+          fetch_required 'https://i.etsystatic.com/15863308/r/il/076084/4888123062/il_794xN.4888123062_s8bv.jpg' 'evidence/original/CAND-058_neck.jpg'
+          fetch_required 'https://i.etsystatic.com/15863308/r/il/11b50b/4888123052/il_794xN.4888123052_nb3o.jpg' 'evidence/original/CAND-058_composition.jpg'
+          fetch_required 'https://i.etsystatic.com/15863308/r/il/0a54b8/4888123042/il_794xN.4888123042_44y2.jpg' 'evidence/original/CAND-058_technical.jpg'
+          probe_page 'https://www.etsy.com/listing/1477924271/fred-perry-london-vintage-80s-made-in' 'evidence/pages/CAND-058_source'
+
+          # CAND-068 — exact Fred Perry x Comme des Garçons argyle jumper, brand and care faces.
+          fetch_required 'https://i.ebayimg.com/images/g/CEQAAOSw1l9llxCD/s-l1600.webp' 'evidence/original/CAND-068_neck.webp'
+          fetch_required 'https://i.ebayimg.com/images/g/uDcAAOSwlf5llxB2/s-l1600.webp' 'evidence/original/CAND-068_care.webp'
+          probe_page 'https://www.ebay.com/itm/176154703965' 'evidence/pages/CAND-068_source'
+
+          find evidence/original -type f -exec file {} \; > evidence/reports/MIME_AND_DIMENSIONS.txt
+          find evidence -type f -print0 | sort -z | xargs -0 sha256sum > evidence/reports/SHA256SUMS.txt
+          python - <<'PY'
+          import json, pathlib, hashlib
+          root=pathlib.Path('evidence')
+          rows=[]
+          for p in sorted(root.rglob('*')):
+              if not p.is_file() or p.name=='manifest.json':
+                  continue
+              b=p.read_bytes()
+              rows.append({'path':p.as_posix(),'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+          (root/'reports'/'manifest.json').write_text(json.dumps({'schema':'rlf-v619-fetch-v1','files':rows},indent=2),encoding='utf-8')
+          PY
+
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-label-evidence-v619
+          path: evidence
+          if-no-files-found: error
+          retention-days: 7
