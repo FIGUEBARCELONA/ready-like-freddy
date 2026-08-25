@@ -67,7 +67,7 @@ export function extractBrandUrls(body:string,base:string,contentType:string|null
 function rankBrandUrl(url:string){
   let score=0;
   try{
-    const path=decodeURIComponent(new URL(url).pathname+new URL(url).search).toLowerCase();
+    const parsed=new URL(url);const path=decodeURIComponent(parsed.pathname+parsed.search).toLowerCase();
     if(/\/products?\//.test(path))score+=40;
     if(/\/items?\//.test(path))score+=30;
     if(/fred[-_+\s%]*perry|fredperry/.test(path))score+=20;
@@ -117,7 +117,6 @@ function probeEvidence(probe:Probe):EvidenceRecord{
 }
 
 export async function verifyTargetedLane(input:TargetedInput):Promise<LaneCycleResult>{
-  'use step';
   const searchedAt=new Date().toISOString();const home=await fetchProbe(input.target.url,'home',input.lane.language);
   const adapters=adapterUrls(input.target,home.body);
   const probes=[home,...await Promise.all(adapters.map(adapter=>fetchProbe(adapter.url,adapter.provider,input.lane.language)))];
