@@ -43,165 +43,104 @@ jobs:
           import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
 
           const runId = '32784949243';
-          const jsonPaths = [
-            'data/execution/rlf-kb-official-seeds.json',
-            'data/execution/rlf-kb-run-plan.json',
-            'data/execution/product-progress.json',
-            'data/execution/sequence16-ledger-snapshot.json',
-            'data/execution/workflow-runs-snapshot.json',
-            `data/execution/runs/${runId}/product-manifest.json`,
-            `data/execution/runs/${runId}/ledger-delta-audit.json`,
-            `data/execution/runs/${runId}/product-frontier.json`,
-          ];
-          const directoryCounts = {};
-          for (const directory of ['data/execution/progress-deltas','data/execution/source-page-deltas','data/execution/source-page-delta-audits']) {
-            const names = (await readdir(directory)).filter(name => name.endsWith('.json')).sort((a,b) => a.localeCompare(b,'en',{numeric:true}));
-            directoryCounts[directory] = names.length;
-            jsonPaths.push(...names.map(name => `${directory}/${name}`));
-          }
-          for (const path of jsonPaths) JSON.parse(await readFile(path, 'utf8'));
-
+          const countJson = async directory => (await readdir(directory)).filter(name => name.endsWith('.json')).length;
           const identity = await loadProgressLedger();
           const sourcePages = await loadSourcePageLedger();
           const snapshot = JSON.parse(await readFile('data/execution/sequence16-ledger-snapshot.json','utf8'));
           const dashboard = JSON.parse(await readFile('data/execution/workflow-runs-snapshot.json','utf8'));
           const delta = JSON.parse(await readFile(`data/execution/progress-deltas/${runId}.json`,'utf8'));
           const manifest = JSON.parse(await readFile(`data/execution/runs/${runId}/product-manifest.json`,'utf8'));
-          const ledgerAudit = JSON.parse(await readFile(`data/execution/runs/${runId}/ledger-delta-audit.json`,'utf8'));
+          const audit = JSON.parse(await readFile(`data/execution/runs/${runId}/ledger-delta-audit.json`,'utf8'));
           const frontier = JSON.parse(await readFile(`data/execution/runs/${runId}/product-frontier.json`,'utf8'));
 
           const expectedCompleted = ['G3636|Z77','M4613|41A','SY3660|46A'];
           const expectedRetries = ['HW2300|843','M1588|81B','M1588|84B'];
-          const actual = {
-            identity: {
-              completedIdentityCount: identity.completed.identityCount,
-              productUrlCaptureCount: identity.completed.productUrlCaptureCount,
-              officialProductImageReferenceCount: identity.counters.officialProductImageReferenceCount,
-              materialEvidenceCount: identity.counters.materialEvidenceCount,
-              manufacturingClaimCount: identity.counters.manufacturingClaimCount,
-              descriptionMissingIdentityCount: identity.metadataGaps.descriptionMissingIdentityCount,
-              priceMissingIdentityCount: identity.metadataGaps.priceMissingIdentityCount,
-              materialMissingIdentityCount: identity.metadataGaps.materialMissingIdentityCount,
-              retryIdentityKeys: identity.retry.identities.map(item => item.identityKey).sort(),
-              deltaCount: identity.deltaCount,
-              latestRunId: String(identity.latestRunId),
-              factoryVerifiedCount: identity.counters.factoryVerifiedCount,
-              globalCanonicalProductCount: identity.counters.globalCanonicalProductCount,
-              ledgerSha256: identity.ledgerSha256,
-            },
-            sourcePages: {
-              deltaCount: sourcePages.deltaCount,
-              attemptedObservationCount: sourcePages.attemptedObservationCount,
-              uniqueAttemptedSourcePageCount: sourcePages.uniqueAttemptedSourcePageCount,
-              ledgerSha256: sourcePages.ledgerSha256,
-            },
-          };
-          const expected = {
-            identity: {
-              completedIdentityCount: 1357,
-              productUrlCaptureCount: 2155,
-              officialProductImageReferenceCount: 11708,
-              materialEvidenceCount: 1748,
-              manufacturingClaimCount: 64,
-              descriptionMissingIdentityCount: 826,
-              priceMissingIdentityCount: 770,
-              materialMissingIdentityCount: 86,
-              retryIdentityKeys: expectedRetries,
-              deltaCount: 11,
-              latestRunId: runId,
-              factoryVerifiedCount: 0,
-              globalCanonicalProductCount: 0,
-              ledgerSha256: '0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7',
-            },
-            sourcePages: {
-              deltaCount: 8,
-              attemptedObservationCount: 1524,
-              uniqueAttemptedSourcePageCount: 1239,
-              ledgerSha256: '19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3',
-            },
-          };
-
-          const mismatches = [];
-          for (const section of ['identity','sourcePages']) {
-            for (const [key,value] of Object.entries(expected[section])) {
-              if (JSON.stringify(actual[section][key]) !== JSON.stringify(value)) mismatches.push([`${section}.${key}`,actual[section][key],value]);
-            }
-          }
-          if (directoryCounts['data/execution/progress-deltas'] !== 11) mismatches.push(['canonicalJson.identityDeltaCount',directoryCounts['data/execution/progress-deltas'],11]);
-          if (directoryCounts['data/execution/source-page-deltas'] !== 8) mismatches.push(['canonicalJson.sourcePageDeltaCount',directoryCounts['data/execution/source-page-deltas'],8]);
-          if (directoryCounts['data/execution/source-page-delta-audits'] !== 8) mismatches.push(['canonicalJson.sourcePageAuditCount',directoryCounts['data/execution/source-page-delta-audits'],8]);
-
-          const completedKeys = [...delta.completedIdentityKeys].sort();
-          const failedKeys = delta.failedIdentities.map(item => item.identityKey).sort();
-          if (delta.acceptance !== 'PARTIAL_STRICT_EVIDENCE_3_COMPLETE_3_RETRY') mismatches.push(['sequence16.acceptance',delta.acceptance,'PARTIAL_STRICT_EVIDENCE_3_COMPLETE_3_RETRY']);
-          if (JSON.stringify(completedKeys) !== JSON.stringify(expectedCompleted)) mismatches.push(['sequence16.completedIdentityKeys',completedKeys,expectedCompleted]);
-          if (JSON.stringify(failedKeys) !== JSON.stringify(expectedRetries)) mismatches.push(['sequence16.failedIdentityKeys',failedKeys,expectedRetries]);
-          if (delta.capturedProductUrlCount !== 3) mismatches.push(['sequence16.capturedProductUrlCount',delta.capturedProductUrlCount,3]);
-          if (delta.ledgerDeltaSha256 !== '969b177b95cc8a45e239ca41626354e9fd3a43839aa269b756bbe0eadc3c8f80') mismatches.push(['sequence16.identityDeltaSha256',delta.ledgerDeltaSha256,'969b177b95cc8a45e239ca41626354e9fd3a43839aa269b756bbe0eadc3c8f80']);
-
-          if (frontier.workerCount !== 50 || frontier.selectedIdentityCount !== 6 || frontier.expectedProductCaptureCount !== 6 || frontier.previouslyCompletedIdentityCount !== 1354) mismatches.push(['sequence16.frontier',[frontier.workerCount,frontier.selectedIdentityCount,frontier.expectedProductCaptureCount,frontier.previouslyCompletedIdentityCount],[50,6,6,1354]]);
-          const assignmentSlots = frontier.assignments.map(item => item.slot);
-          if (assignmentSlots.length !== 50 || new Set(assignmentSlots).size !== 50) mismatches.push(['sequence16.frontierAssignments',[assignmentSlots.length,new Set(assignmentSlots).size],[50,50]]);
-
-          const totals = manifest.totals;
-          const expectedTotals = {
-            frontierProductUrlCount:11,
-            frontierProductIdentityCount:6,
-            previouslyCompletedIdentityCount:1354,
-            selectedIdentityCount:6,
-            expectedProductCaptureCount:6,
-            attemptedProductCount:6,
-            attemptedIdentityCount:6,
-            httpFetchSuccessCount:6,
-            successfulProductFetchCount:3,
-            failedProductFetchCount:3,
-            successfulIdentityCaptureCount:3,
-            failedIdentityCaptureCount:3,
-            soft404IdentityCount:0,
-            missingImageIdentityCount:3,
-            imageReferenceCount:26,
-            officialProductImageReferenceCount:26,
-            rejectedImageReferenceCount:0,
-            verifiedPriceCount:0,
-            materialEvidenceCount:3,
-            materialMissingIdentityCount:0,
-            manufacturingClaimCount:0,
+          const expectedIdentity = {
+            completedIdentityCount:1357,
+            productUrlCaptureCount:2155,
+            officialProductImageReferenceCount:11708,
+            materialEvidenceCount:1748,
+            manufacturingClaimCount:64,
+            descriptionMissingIdentityCount:826,
+            priceMissingIdentityCount:770,
+            materialMissingIdentityCount:86,
+            retryIdentityKeys:expectedRetries,
+            deltaCount:11,
+            latestRunId:runId,
             factoryVerifiedCount:0,
+            globalCanonicalProductCount:0,
+            ledgerSha256:'0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7',
           };
-          if (manifest.workerCount !== 50 || manifest.qualityGatePassed !== false || manifest.orchestrationStatus !== 'FIFTY_OF_FIFTY_PRODUCT_WORKERS_CONSOLIDATED') mismatches.push(['sequence16.productManifestGate',[manifest.workerCount,manifest.qualityGatePassed,manifest.orchestrationStatus],[50,false,'FIFTY_OF_FIFTY_PRODUCT_WORKERS_CONSOLIDATED']]);
-          for (const [key,value] of Object.entries(expectedTotals)) if (totals[key] !== value) mismatches.push([`sequence16.productTotals.${key}`,totals[key],value]);
-          if (!ledgerAudit.passed || ledgerAudit.batch.overlapWithPrior.length || ledgerAudit.batch.completedAndFailedOverlap.length) mismatches.push(['sequence16.ledgerAudit',ledgerAudit,'passed with zero overlap']);
-
-          const c = dashboard.counts;
-          if (!dashboard.passed || dashboard.run.status !== 'completed' || dashboard.run.conclusion !== 'success' || dashboard.run.head_sha !== '2dd77901661cf282f4771e2d2b666986397de8cd') mismatches.push(['dashboard.run',dashboard.run,'completed success exact sequence16 head']);
-          for (const [key,value] of Object.entries({totalJobs:52,prepareTotal:1,prepareSuccess:1,productTotal:50,productSuccess:50,productFailed:0,productActive:0,consolidateTotal:1,consolidateSuccess:1,productWorkerArtifacts:50,frontierArtifacts:1,consolidatedProductArtifacts:1,totalArtifacts:52})) if (c[key] !== value) mismatches.push([`dashboard.${key}`,c[key],value]);
-
-          if (!snapshot.passed || snapshot.identity.ledgerSha256 !== expected.identity.ledgerSha256 || snapshot.sourcePages.ledgerSha256 !== expected.sourcePages.ledgerSha256) mismatches.push(['sequence16.snapshot',snapshot,'passed exact snapshot']);
-          const completed = new Set(identity.completed.identityKeys);
-          const unresolvedOverlap = expectedRetries.filter(key => completed.has(key));
-          if (unresolvedOverlap.length) mismatches.push(['retry.completedOverlap',unresolvedOverlap,[]]);
-          for (const key of expectedCompleted) if (!completed.has(key)) mismatches.push([`resolvedRetry.${key}`,false,true]);
-          const failedReasonsValid = delta.failedIdentities.every(item => item.failureReasons?.includes('NO_MATCHING_OFFICIAL_PRODUCT_IMAGE') && item.failureReasons?.includes('IDENTITY_CAPTURE_NOT_VALID'));
-          if (!failedReasonsValid) mismatches.push(['sequence16.remainingRetryReasons',delta.failedIdentities,'exact missing-image retry reasons']);
-
-          const checkpoint = {
-            schemaVersion: 9,
-            sourceRunId: runId,
-            generatedAt: new Date().toISOString(),
-            expected,
-            actual,
-            sequence16: {
-              acceptance: delta.acceptance,
-              completedIdentityKeys: completedKeys,
-              failedIdentityKeys: failedKeys,
-              identityDeltaSha256: delta.ledgerDeltaSha256,
-              productTotals: totals,
-              dashboardCounts: c,
-              ledgerAuditPassed: ledgerAudit.passed,
-            },
-            mismatches,
-            passed: mismatches.length === 0,
+          const actualIdentity = {
+            completedIdentityCount:identity.completed.identityCount,
+            productUrlCaptureCount:identity.completed.productUrlCaptureCount,
+            officialProductImageReferenceCount:identity.counters.officialProductImageReferenceCount,
+            materialEvidenceCount:identity.counters.materialEvidenceCount,
+            manufacturingClaimCount:identity.counters.manufacturingClaimCount,
+            descriptionMissingIdentityCount:identity.metadataGaps.descriptionMissingIdentityCount,
+            priceMissingIdentityCount:identity.metadataGaps.priceMissingIdentityCount,
+            materialMissingIdentityCount:identity.metadataGaps.materialMissingIdentityCount,
+            retryIdentityKeys:identity.retry.identities.map(item=>item.identityKey).sort(),
+            deltaCount:identity.deltaCount,
+            latestRunId:String(identity.latestRunId),
+            factoryVerifiedCount:identity.counters.factoryVerifiedCount,
+            globalCanonicalProductCount:identity.counters.globalCanonicalProductCount,
+            ledgerSha256:identity.ledgerSha256,
           };
+          const expectedSourcePages = {
+            deltaCount:8,
+            attemptedObservationCount:1524,
+            uniqueAttemptedSourcePageCount:1239,
+            ledgerSha256:'19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3',
+          };
+          const actualSourcePages = {
+            deltaCount:sourcePages.deltaCount,
+            attemptedObservationCount:sourcePages.attemptedObservationCount,
+            uniqueAttemptedSourcePageCount:sourcePages.uniqueAttemptedSourcePageCount,
+            ledgerSha256:sourcePages.ledgerSha256,
+          };
+          const mismatches = [];
+          const compareObject = (prefix,actual,expected) => {
+            for (const [key,value] of Object.entries(expected)) {
+              if (JSON.stringify(actual[key]) !== JSON.stringify(value)) mismatches.push([`${prefix}.${key}`,actual[key],value]);
+            }
+          };
+          compareObject('identity',actualIdentity,expectedIdentity);
+          compareObject('sourcePages',actualSourcePages,expectedSourcePages);
+
+          const inventory = {
+            identityDeltas:await countJson('data/execution/progress-deltas'),
+            sourcePageDeltas:await countJson('data/execution/source-page-deltas'),
+            sourcePageAudits:await countJson('data/execution/source-page-delta-audits'),
+          };
+          compareObject('canonicalJson',inventory,{identityDeltas:11,sourcePageDeltas:8,sourcePageAudits:4});
+
+          const completedKeys=[...delta.completedIdentityKeys].sort();
+          const failedKeys=delta.failedIdentities.map(item=>item.identityKey).sort();
+          if (delta.acceptance!=='PARTIAL_STRICT_EVIDENCE_3_COMPLETE_3_RETRY') mismatches.push(['sequence16.acceptance',delta.acceptance,'PARTIAL_STRICT_EVIDENCE_3_COMPLETE_3_RETRY']);
+          if (JSON.stringify(completedKeys)!==JSON.stringify(expectedCompleted)) mismatches.push(['sequence16.completedIdentityKeys',completedKeys,expectedCompleted]);
+          if (JSON.stringify(failedKeys)!==JSON.stringify(expectedRetries)) mismatches.push(['sequence16.failedIdentityKeys',failedKeys,expectedRetries]);
+          if (delta.capturedProductUrlCount!==3) mismatches.push(['sequence16.capturedProductUrlCount',delta.capturedProductUrlCount,3]);
+          if (delta.ledgerDeltaSha256!=='969b177b95cc8a45e239ca41626354e9fd3a43839aa269b756bbe0eadc3c8f80') mismatches.push(['sequence16.deltaSha',delta.ledgerDeltaSha256,'969b177b95cc8a45e239ca41626354e9fd3a43839aa269b756bbe0eadc3c8f80']);
+
+          if (frontier.workerCount!==50 || frontier.selectedIdentityCount!==6 || frontier.expectedProductCaptureCount!==6 || frontier.assignments.length!==50 || new Set(frontier.assignments.map(item=>item.slot)).size!==50) mismatches.push(['sequence16.frontier',[frontier.workerCount,frontier.selectedIdentityCount,frontier.expectedProductCaptureCount,frontier.assignments.length,new Set(frontier.assignments.map(item=>item.slot)).size],[50,6,6,50,50]]);
+
+          const expectedTotals={frontierProductUrlCount:11,frontierProductIdentityCount:6,previouslyCompletedIdentityCount:1354,selectedIdentityCount:6,expectedProductCaptureCount:6,attemptedProductCount:6,attemptedIdentityCount:6,httpFetchSuccessCount:6,successfulProductFetchCount:3,failedProductFetchCount:3,successfulIdentityCaptureCount:3,failedIdentityCaptureCount:3,soft404IdentityCount:0,missingImageIdentityCount:3,imageReferenceCount:26,officialProductImageReferenceCount:26,rejectedImageReferenceCount:0,verifiedPriceCount:0,materialEvidenceCount:3,materialMissingIdentityCount:0,manufacturingClaimCount:0,factoryVerifiedCount:0};
+          if (manifest.workerCount!==50 || manifest.qualityGatePassed!==false || manifest.orchestrationStatus!=='FIFTY_OF_FIFTY_PRODUCT_WORKERS_CONSOLIDATED') mismatches.push(['sequence16.manifestGate',[manifest.workerCount,manifest.qualityGatePassed,manifest.orchestrationStatus],[50,false,'FIFTY_OF_FIFTY_PRODUCT_WORKERS_CONSOLIDATED']]);
+          compareObject('sequence16.productTotals',manifest.totals,expectedTotals);
+          if (!audit.passed || audit.batch.overlapWithPrior.length || audit.batch.completedAndFailedOverlap.length) mismatches.push(['sequence16.audit',audit,'passed with zero overlap']);
+
+          const expectedDashboard={totalJobs:52,prepareTotal:1,prepareSuccess:1,productTotal:50,productSuccess:50,productFailed:0,productActive:0,consolidateTotal:1,consolidateSuccess:1,productWorkerArtifacts:50,frontierArtifacts:1,consolidatedProductArtifacts:1,totalArtifacts:52};
+          if (!dashboard.passed || dashboard.run.status!=='completed' || dashboard.run.conclusion!=='success' || dashboard.run.head_sha!=='2dd77901661cf282f4771e2d2b666986397de8cd') mismatches.push(['dashboard.run',dashboard.run,'completed success exact head']);
+          compareObject('dashboard',dashboard.counts,expectedDashboard);
+          if (!snapshot.passed || snapshot.identity.ledgerSha256!==expectedIdentity.ledgerSha256 || snapshot.sourcePages.ledgerSha256!==expectedSourcePages.ledgerSha256) mismatches.push(['sequence16.snapshot',snapshot,'passed exact snapshot']);
+
+          const completedSet=new Set(identity.completed.identityKeys);
+          for (const key of expectedCompleted) if (!completedSet.has(key)) mismatches.push([`resolvedRetry.${key}`,false,true]);
+          for (const key of expectedRetries) if (completedSet.has(key)) mismatches.push([`unresolvedRetry.${key}`,true,false]);
+          if (!delta.failedIdentities.every(item=>item.failureReasons?.includes('NO_MATCHING_OFFICIAL_PRODUCT_IMAGE')&&item.failureReasons?.includes('IDENTITY_CAPTURE_NOT_VALID'))) mismatches.push(['sequence16.retryReasons',delta.failedIdentities,'missing-image identity retry only']);
+
+          const checkpoint={schemaVersion:10,sourceRunId:runId,generatedAt:new Date().toISOString(),expected:{identity:expectedIdentity,sourcePages:expectedSourcePages,canonicalJson:{identityDeltas:11,sourcePageDeltas:8,sourcePageAudits:4}},actual:{identity:actualIdentity,sourcePages:actualSourcePages,canonicalJson:inventory},sequence16:{acceptance:delta.acceptance,completedIdentityKeys:completedKeys,failedIdentityKeys:failedKeys,identityDeltaSha256:delta.ledgerDeltaSha256,productTotals:manifest.totals,dashboardCounts:dashboard.counts,ledgerAuditPassed:audit.passed},mismatches,passed:mismatches.length===0};
           await writeFile('/tmp/rlf-ledger-checkpoint.json',`${JSON.stringify(checkpoint,null,2)}\n`);
           console.log(JSON.stringify(checkpoint,null,2));
           if (mismatches.length) throw new Error(`Sequence 16 validation mismatch: ${JSON.stringify(mismatches)}`);
@@ -220,33 +159,7 @@ jobs:
           const fs=require('node:fs'); const crypto=require('node:crypto');
           const log=fs.existsSync('/tmp/rlf-validation.log')?fs.readFileSync('/tmp/rlf-validation.log'):Buffer.from('missing validation log');
           const checkpoint=fs.existsSync('/tmp/rlf-ledger-checkpoint.json')?JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json','utf8')):null;
-          const proof={
-            schemaVersion:9,
-            recordedAt:new Date().toISOString(),
-            sourceCommitSha:process.env.GITHUB_SHA,
-            runId:process.env.GITHUB_RUN_ID,
-            runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT||'1'),
-            validationOutcome:process.env.VALIDATION_OUTCOME,
-            nodeVersion:process.version,
-            logSha256:crypto.createHash('sha256').update(log).digest('hex'),
-            ledgerCheckpoint:checkpoint,
-            requiredChecks:[
-              'pnpm_install_frozen_lockfile',
-              'execution_script_syntax',
-              'canonical_json_eleven_identity_deltas_eight_source_page_deltas',
-              'exact_sequence16_ledgers',
-              'fifty_of_fifty_product_workers',
-              'sequence16_six_retry_frontier',
-              'sequence16_three_complete_three_retry',
-              'sequence16_zero_overlap',
-              'zero_soft404_or_rejected_images',
-              'zero_verified_transformed_prices',
-              'factory_verified_zero',
-              'global_canonical_products_zero',
-              'typescript_no_emit',
-              'production_build'
-            ]
-          };
+          const proof={schemaVersion:10,recordedAt:new Date().toISOString(),sourceCommitSha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT||'1'),validationOutcome:process.env.VALIDATION_OUTCOME,nodeVersion:process.version,logSha256:crypto.createHash('sha256').update(log).digest('hex'),ledgerCheckpoint:checkpoint,requiredChecks:['pnpm_install_frozen_lockfile','execution_script_syntax','canonical_json_11_identity_8_source_page_4_persisted_audits','exact_sequence16_ledgers','fifty_of_fifty_product_workers','sequence16_six_retry_frontier','sequence16_three_complete_three_retry','sequence16_zero_overlap','zero_soft404_or_rejected_images','zero_verified_transformed_prices','factory_verified_zero','global_canonical_products_zero','typescript_no_emit','production_build']};
           fs.writeFileSync('data/execution/validation-proof.json',`${JSON.stringify(proof,null,2)}\n`);
           NODE
       - name: Publish proof
