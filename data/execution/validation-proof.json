@@ -1,16 +1,16 @@
 {
-  "schemaVersion": 10,
-  "recordedAt": "2026-08-25T14:39:46.290Z",
-  "sourceCommitSha": "5096d5f60e8acab062141f4c7291d95296426ae2",
-  "runId": "32860832297",
+  "schemaVersion": 11,
+  "recordedAt": "2026-08-25T14:49:16.005Z",
+  "sourceCommitSha": "b746c7afb9011242ae59a6d69f22a0e01f765cd9",
+  "runId": "32861854446",
   "runAttempt": 1,
   "validationOutcome": "success",
   "nodeVersion": "v22.23.2",
-  "logSha256": "fe1872b8dffb9163c04ac4970a498528aef26a69ea41346212d008f06c1eb6bc",
+  "logSha256": "686ff832d84009daba27e508f0e978a44b4d72db08b6be9c472fa0de0b9f7d9b",
   "ledgerCheckpoint": {
-    "schemaVersion": 10,
-    "sourceRunId": "32784949243",
-    "generatedAt": "2026-08-25T14:39:38.086Z",
+    "schemaVersion": 11,
+    "sourceRunId": "32861233493",
+    "generatedAt": "2026-08-25T14:49:04.003Z",
     "expected": {
       "identity": {
         "completedIdentityCount": 1357,
@@ -77,63 +77,118 @@
         "sourcePageAudits": 4
       }
     },
-    "sequence16": {
-      "acceptance": "PARTIAL_STRICT_EVIDENCE_3_COMPLETE_3_RETRY",
-      "completedIdentityKeys": [
-        "G3636|Z77",
-        "M4613|41A",
-        "SY3660|46A"
-      ],
-      "failedIdentityKeys": [
-        "HW2300|843",
-        "M1588|81B",
-        "M1588|84B"
-      ],
-      "identityDeltaSha256": "969b177b95cc8a45e239ca41626354e9fd3a43839aa269b756bbe0eadc3c8f80",
-      "productTotals": {
-        "frontierProductUrlCount": 11,
-        "frontierProductIdentityCount": 6,
-        "previouslyCompletedIdentityCount": 1354,
-        "selectedIdentityCount": 6,
-        "expectedProductCaptureCount": 6,
-        "attemptedProductCount": 6,
-        "attemptedIdentityCount": 6,
-        "httpFetchSuccessCount": 6,
-        "successfulProductFetchCount": 3,
-        "failedProductFetchCount": 3,
-        "successfulIdentityCaptureCount": 3,
-        "failedIdentityCaptureCount": 3,
-        "soft404IdentityCount": 0,
-        "missingImageIdentityCount": 3,
-        "aliasFallbackSuccessCount": 0,
-        "directSourceCount": 0,
-        "transformedReaderSourceCount": 3,
-        "imageReferenceCount": 26,
-        "officialProductImageReferenceCount": 26,
-        "rejectedImageReferenceCount": 0,
-        "descriptionEvidenceCount": 0,
-        "verifiedPriceCount": 0,
-        "materialEvidenceCount": 3,
-        "materialMissingIdentityCount": 0,
-        "manufacturingClaimCount": 0,
-        "factoryVerifiedCount": 0
+    "sequence17": {
+      "planSha256": "d9e30f2ff37d662064521e3dea2812892c5bfd4301020c16eb63405f3423e3b3",
+      "manifestSha256": "b18f5d822114ec663beff2492117af224eb40fb99f1e1a13ae5f708302ef2230",
+      "status": "IMMUTABLE_OFFICIAL_CORPUS_EXHAUSTED_NO_EXACT_MEDIA",
+      "corpus": {
+        "expectedFileCount": 80,
+        "assignedFileCount": 80,
+        "scannedFileCount": 80,
+        "uniqueScannedFileCount": 80,
+        "overlappingAssignments": [],
+        "missingFiles": [],
+        "unexpectedFiles": []
       },
+      "totals": {
+        "rawEvidenceCount": 95,
+        "deduplicatedEvidenceCount": 43,
+        "officialMediaUrlCount": 0,
+        "officialPageUrlCount": 8,
+        "textOccurrenceEvidenceCount": 35,
+        "identitiesWithOfficialMedia": 0
+      },
+      "identityResults": [
+        {
+          "identityKey": "HW2300|843",
+          "productCode": "HW2300",
+          "colourCode": "843",
+          "officialMediaUrls": [],
+          "officialPageUrls": [
+            "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html"
+          ],
+          "textOccurrenceFiles": [
+            "32746322369/consolidated/product-candidates.ndjson",
+            "32746322369/consolidated/product-frontier.json",
+            "32746322369/consolidated/product-identities.ndjson",
+            "32746322369/consolidated/product-identity-aliases.json",
+            "32746322369/consolidated/product-link-candidates.ndjson",
+            "32748405808/consolidated/product-candidates.ndjson",
+            "32748405808/consolidated/product-frontier.json",
+            "32748405808/consolidated/product-identities.ndjson",
+            "32748405808/consolidated/product-identity-aliases.json",
+            "32748405808/consolidated/product-link-candidates.ndjson",
+            "32754804084/consolidated/product-candidates.ndjson",
+            "32754804084/consolidated/product-frontier.json",
+            "32754804084/consolidated/product-identities.ndjson",
+            "32754804084/consolidated/product-identity-aliases.json",
+            "32754804084/consolidated/product-link-candidates.ndjson",
+            "32777623316/consolidated/product-candidates.ndjson",
+            "32777623316/consolidated/product-frontier.json",
+            "32777623316/consolidated/product-identities.ndjson",
+            "32777623316/consolidated/product-link-candidates.ndjson"
+          ]
+        },
+        {
+          "identityKey": "M1588|81B",
+          "productCode": "M1588",
+          "colourCode": "81B",
+          "officialMediaUrls": [],
+          "officialPageUrls": [
+            "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+            "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html"
+          ],
+          "textOccurrenceFiles": [
+            "32758087459/consolidated/product-candidates.ndjson",
+            "32758087459/consolidated/product-frontier.json",
+            "32758087459/consolidated/product-identities.ndjson",
+            "32758087459/consolidated/product-link-candidates.ndjson",
+            "32777623316/consolidated/product-candidates.ndjson",
+            "32777623316/consolidated/product-frontier.json",
+            "32777623316/consolidated/product-identities.ndjson",
+            "32777623316/consolidated/product-link-candidates.ndjson"
+          ]
+        },
+        {
+          "identityKey": "M1588|84B",
+          "productCode": "M1588",
+          "colourCode": "84B",
+          "officialMediaUrls": [],
+          "officialPageUrls": [
+            "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+            "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html"
+          ],
+          "textOccurrenceFiles": [
+            "32758087459/consolidated/product-candidates.ndjson",
+            "32758087459/consolidated/product-frontier.json",
+            "32758087459/consolidated/product-identities.ndjson",
+            "32758087459/consolidated/product-link-candidates.ndjson",
+            "32777623316/consolidated/product-candidates.ndjson",
+            "32777623316/consolidated/product-frontier.json",
+            "32777623316/consolidated/product-identities.ndjson",
+            "32777623316/consolidated/product-link-candidates.ndjson"
+          ]
+        }
+      ],
       "dashboardCounts": {
         "totalJobs": 52,
         "prepareTotal": 1,
         "prepareSuccess": 1,
-        "productTotal": 50,
-        "productSuccess": 50,
-        "productFailed": 0,
-        "productActive": 0,
+        "mediaTotal": 50,
+        "mediaSuccess": 50,
+        "mediaFailed": 0,
+        "mediaActive": 0,
         "consolidateTotal": 1,
         "consolidateSuccess": 1,
-        "productWorkerArtifacts": 50,
-        "frontierArtifacts": 1,
-        "consolidatedProductArtifacts": 1,
+        "mediaWorkerArtifacts": 50,
+        "planArtifacts": 1,
+        "consolidatedArtifacts": 1,
         "totalArtifacts": 52
       },
-      "ledgerAuditPassed": true
+      "consolidatedArtifactDigest": "sha256:9d89a69a18d1119dd8936a99bdba88099ef83f391e82bdc96448962642a9c749"
     },
     "mismatches": [],
     "passed": true
@@ -142,13 +197,13 @@
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
     "canonical_json_11_identity_8_source_page_4_persisted_audits",
-    "exact_sequence16_ledgers",
-    "fifty_of_fifty_product_workers",
-    "sequence16_six_retry_frontier",
-    "sequence16_three_complete_three_retry",
-    "sequence16_zero_overlap",
-    "zero_soft404_or_rejected_images",
-    "zero_verified_transformed_prices",
+    "exact_sequence17_no_mutation_ledgers",
+    "fifty_of_fifty_media_workers",
+    "eighty_exclusive_corpus_files",
+    "sequence17_immutable_corpus_exhausted",
+    "zero_exact_official_media_urls",
+    "eight_official_product_page_urls",
+    "three_retries_remain_open",
     "factory_verified_zero",
     "global_canonical_products_zero",
     "typescript_no_emit",
