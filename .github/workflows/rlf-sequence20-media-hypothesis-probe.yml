@@ -1,0 +1,181 @@
+name: RLF sequence 20 official media hypothesis probes
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence20-media-hypothesis-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-sequence20-media-hypothesis-probe
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare immutable 50-hypothesis plan
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      plan_sha: ${{ steps.plan.outputs.plan_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - id: plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFile,appendFile } from 'node:fs/promises';
+          const plan=JSON.parse(await readFile('data/execution/sequence20-media-hypothesis-preflight.json','utf8'));
+          if(!plan.passed||plan.targetSequence!==20||plan.planSha256!=='027c9a9f501a6316b011aa10be5a223612cf3215aad2e639775eb41ffabb637f')throw new Error('Sequence 20 preflight gate failed');
+          if(plan.assignmentCount!==50||plan.uniqueCandidateUrlCount!==50||plan.duplicateCandidateUrls.length)throw new Error('Sequence 20 candidate partition invalid');
+          const slots=plan.assignments.map(item=>item.slot);
+          if(slots.length!==50||new Set(slots).size!==50)throw new Error('Sequence 20 slot matrix invalid');
+          await appendFile(process.env.GITHUB_OUTPUT,`matrix=${JSON.stringify({slot:slots})}\nplan_sha=${plan.planSha256}\n`);
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence20-media-plan
+          path: data/execution/sequence20-media-hypothesis-preflight.json
+          retention-days: 30
+
+  probe:
+    name: Media hypothesis ${{ matrix.slot }}
+    needs: prepare
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Probe one exclusive observed-pattern media URL
+        shell: bash
+        env:
+          SLOT: ${{ matrix.slot }}
+          EXPECTED_PLAN_SHA: ${{ needs.prepare.outputs.plan_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "execution/sequence20-workers/${SLOT}"
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readFile,writeFile } from 'node:fs/promises';
+          const slot=process.env.SLOT;
+          const plan=JSON.parse(await readFile('data/execution/sequence20-media-hypothesis-preflight.json','utf8'));
+          if(plan.planSha256!==process.env.EXPECTED_PLAN_SHA)throw new Error('Sequence 20 plan SHA mismatch');
+          const assignment=plan.assignments.find(item=>item.slot===slot);
+          if(!assignment)throw new Error(`No assignment for ${slot}`);
+          const allowedHost=host=>host==='fredperry.com'||host.endsWith('.fredperry.com');
+          const identityPattern=new RegExp(`${assignment.productCode}[-_]${assignment.colourCode}(?:[-_.]|$)`,'i');
+          let responseRecord;
+          let verifiedMedia=null;
+          try{
+            const response=await fetch(assignment.candidateUrl,{redirect:'follow',signal:AbortSignal.timeout(45000),headers:{'user-agent':'Mozilla/5.0 (compatible; RLF-EvidenceBot/1.0; +https://readylikefreddy.shop)','accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'}});
+            const buffer=Buffer.from(await response.arrayBuffer()).subarray(0,12*1024*1024);
+            const contentType=response.headers.get('content-type')??'';
+            const finalUrl=response.url;
+            const final=new URL(finalUrl);
+            let pathname;try{pathname=decodeURIComponent(final.pathname);}catch{pathname=final.pathname;}
+            const exactPath=identityPattern.test(pathname);
+            const valid=response.status===200&&contentType.toLowerCase().startsWith('image/')&&allowedHost(final.hostname.toLowerCase())&&exactPath&&buffer.length>0;
+            const bodySha256=createHash('sha256').update(buffer).digest('hex');
+            responseRecord={ok:response.ok,status:response.status,contentType,finalUrl,bytes:buffer.length,bodySha256,officialHost:allowedHost(final.hostname.toLowerCase()),exactCodeColourPath:exactPath,error:null};
+            if(valid)verifiedMedia={schemaVersion:1,identityKey:assignment.identityKey,productCode:assignment.productCode,colourCode:assignment.colourCode,sourceUrl:finalUrl,httpStatus:200,contentType,bytes:buffer.length,sha256:bodySha256,sourceSlot:slot,sourceCandidateUrl:assignment.candidateUrl,derivation:assignment.derivation,sourcePatternImageUrl:assignment.sourceImageUrl,sourcePatternCacheHash:assignment.cacheHash,sourcePatternSuffix:assignment.suffix,verificationStatus:'DIRECT_OFFICIAL_HTTP_200_IMAGE_EXACT_CODE_COLOUR',rightsStatus:'UNKNOWN',ingestionStatus:'NOT_INGESTED',observedAt:new Date().toISOString()};
+          }catch(error){responseRecord={ok:false,status:null,contentType:null,finalUrl:null,bytes:0,bodySha256:null,officialHost:false,exactCodeColourPath:false,error:error instanceof Error?error.message:String(error)};}
+          const record={schemaVersion:1,slot,planSha256:plan.planSha256,assignment,response:responseRecord,verifiedMedia,verifiedMediaCount:verifiedMedia?1:0,observedAt:new Date().toISOString()};
+          record.recordSha256=createHash('sha256').update(JSON.stringify(record)).digest('hex');
+          const out=`execution/sequence20-workers/${slot}`;
+          await writeFile(`${out}/record.json`,`${JSON.stringify(record,null,2)}\n`);
+          await writeFile(`${out}/verified-media.json`,`${JSON.stringify(verifiedMedia?[verifiedMedia]:[],null,2)}\n`);
+          console.log(JSON.stringify({slot,identityKey:assignment.identityKey,status:responseRecord.status,contentType:responseRecord.contentType,bytes:responseRecord.bytes,verifiedMediaCount:record.verifiedMediaCount},null,2));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence20-media-worker-${{ matrix.slot }}
+          path: execution/sequence20-workers/${{ matrix.slot }}
+          retention-days: 30
+
+  consolidate:
+    name: Consolidate sequence 20 media hypotheses
+    needs: [prepare,probe]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rlf-sequence20-media-worker-*
+          path: /tmp/rlf-sequence20/workers
+      - name: Audit F01-F50 and consolidate verified bytes
+        shell: bash
+        env:
+          EXPECTED_PLAN_SHA: ${{ needs.prepare.outputs.plan_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p execution/sequence20-consolidated data/execution
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readdir,readFile,writeFile } from 'node:fs/promises';
+          import { join } from 'node:path';
+          const plan=JSON.parse(await readFile('data/execution/sequence20-media-hypothesis-preflight.json','utf8'));
+          if(plan.planSha256!==process.env.EXPECTED_PLAN_SHA)throw new Error('Sequence 20 consolidator plan mismatch');
+          async function walk(path){const out=[];for(const entry of await readdir(path,{withFileTypes:true})){const full=join(path,entry.name);if(entry.isDirectory())out.push(...await walk(full));else out.push(full);}return out;}
+          const files=await walk('/tmp/rlf-sequence20/workers');
+          const records=[];for(const path of files.filter(path=>path.endsWith('/record.json')))records.push(JSON.parse(await readFile(path,'utf8')));
+          const slots=records.map(item=>item.slot).sort(),expectedSlots=Array.from({length:50},(_,i)=>`F${String(i+1).padStart(2,'0')}`);
+          if(records.length!==50||new Set(slots).size!==50||JSON.stringify(slots)!==JSON.stringify(expectedSlots))throw new Error('Sequence 20 requires 50 unique records');
+          if(records.some(item=>item.planSha256!==plan.planSha256))throw new Error('Sequence 20 worker plan mismatch');
+          const candidateUrls=records.map(item=>item.assignment.candidateUrl);
+          if(new Set(candidateUrls).size!==50)throw new Error('Sequence 20 candidate overlap');
+          const verifiedRaw=records.flatMap(item=>item.verifiedMedia?[item.verifiedMedia]:[]);
+          const verified=[...new Map(verifiedRaw.map(item=>[`${item.identityKey}|${item.sourceUrl}|${item.sha256}`,item])).values()].sort((a,b)=>a.identityKey.localeCompare(b.identityKey)||a.sourceUrl.localeCompare(b.sourceUrl));
+          const statusCounts=records.reduce((m,item)=>{const k=String(item.response.status??'null');m[k]=(m[k]??0)+1;return m;},{});
+          const contentTypeCounts=records.reduce((m,item)=>{const k=String(item.response.contentType??'null');m[k]=(m[k]??0)+1;return m;},{});
+          const identityResults={};for(const assignment of plan.assignments)identityResults[assignment.identityKey]??={identityKey:assignment.identityKey,productCode:assignment.productCode,colourCode:assignment.colourCode,probeCount:0,verifiedMedia:[]};for(const record of records){const row=identityResults[record.assignment.identityKey];row.probeCount++;if(record.verifiedMedia)row.verifiedMedia.push(record.verifiedMedia);}
+          const identityRows=Object.values(identityResults).sort((a,b)=>a.identityKey.localeCompare(b.identityKey));
+          const totals={probeCount:records.length,uniqueCandidateUrlCount:new Set(candidateUrls).size,httpOkCount:records.filter(item=>item.response.ok).length,httpErrorCount:records.filter(item=>!item.response.ok).length,directImageResponseCount:records.filter(item=>String(item.response.contentType??'').toLowerCase().startsWith('image/')).length,verifiedMediaRawCount:verifiedRaw.length,verifiedMediaCount:verified.length,identitiesWithVerifiedMedia:identityRows.filter(item=>item.verifiedMedia.length>0).length};
+          const manifest={schemaVersion:1,runId:process.env.GITHUB_RUN_ID,generatedAt:new Date().toISOString(),sourceCommitSha:process.env.GITHUB_SHA,phaseId:'OBSERVED_OFFICIAL_MEDIA_PATTERN_PROBE_01',planSha256:plan.planSha256,workerCount:50,orchestrationStatus:'FIFTY_OF_FIFTY_EXCLUSIVE_MEDIA_HYPOTHESES_CONSOLIDATED',acceptancePolicy:plan.acceptancePolicy,statusCounts,contentTypeCounts,totals,identityResults:identityRows,status:verified.length?'DIRECT_OFFICIAL_MEDIA_VERIFIED_REQUIRES_RETRY_RECOVERY':'OBSERVED_PATTERN_MEDIA_PROBES_COMPLETE_NO_VERIFIED_MEDIA'};
+          manifest.passed=manifest.workerCount===50&&totals.probeCount===50&&totals.uniqueCandidateUrlCount===50;
+          manifest.manifestSha256=createHash('sha256').update(JSON.stringify(manifest)).digest('hex');
+          const evidence={schemaVersion:1,runId:manifest.runId,planSha256:plan.planSha256,verifiedMedia:verified,records};
+          await writeFile('execution/sequence20-consolidated/records.json',`${JSON.stringify(records,null,2)}\n`);
+          await writeFile('execution/sequence20-consolidated/verified-media.json',`${JSON.stringify(verified,null,2)}\n`);
+          await writeFile('execution/sequence20-consolidated/manifest.json',`${JSON.stringify(manifest,null,2)}\n`);
+          await writeFile('data/execution/sequence20-media-hypothesis-manifest.json',`${JSON.stringify(manifest,null,2)}\n`);
+          await writeFile('data/execution/sequence20-media-hypothesis-evidence.json',`${JSON.stringify(evidence,null,2)}\n`);
+          console.log(JSON.stringify(manifest,null,2));if(!manifest.passed)throw new Error('Sequence 20 consolidated audit failed');
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence20-media-hypotheses-${{ github.run_id }}
+          path: execution/sequence20-consolidated
+          retention-days: 30
+      - name: Persist sequence 20 checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence20-media-hypothesis-manifest.json data/execution/sequence20-media-hypothesis-evidence.json
+          git commit -m "Persist sequence 20 media hypotheses ${GITHUB_RUN_ID}"
+          for attempt in 1 2 3 4 5;do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch"&&git push origin "HEAD:$branch";then exit 0;fi
+            git rebase --abort 2>/dev/null||true
+            sleep $((attempt*3))
+          done
+          exit 1
