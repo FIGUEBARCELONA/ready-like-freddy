@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-25T14:47:51.789Z",
+  "sourceCommitSha": "0cd3d3182450329652e0b71f79234630ad12a6ab",
+  "sourceRunId": "32861233493",
+  "identity": {
+    "completedIdentityCount": 1357,
+    "productUrlCaptureCount": 2155,
+    "officialProductImageReferenceCount": 11708,
+    "materialEvidenceCount": 1748,
+    "manufacturingClaimCount": 64,
+    "descriptionMissingIdentityCount": 826,
+    "priceMissingIdentityCount": 770,
+    "materialMissingIdentityCount": 86,
+    "retryIdentityCount": 3,
+    "retryIdentityKeys": [
+      "HW2300|843",
+      "M1588|81B",
+      "M1588|84B"
+    ],
+    "deltaCount": 11,
+    "latestRunId": "32784949243",
+    "factoryVerifiedCount": 0,
+    "globalCanonicalProductCount": 0,
+    "ledgerSha256": "0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7"
+  },
+  "sourcePages": {
+    "deltaCount": 8,
+    "attemptedObservationCount": 1524,
+    "uniqueAttemptedSourcePageCount": 1239,
+    "ledgerSha256": "19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3"
+  },
+  "sequence17": {
+    "planSha256": "d9e30f2ff37d662064521e3dea2812892c5bfd4301020c16eb63405f3423e3b3",
+    "manifestSha256": "b18f5d822114ec663beff2492117af224eb40fb99f1e1a13ae5f708302ef2230",
+    "status": "IMMUTABLE_OFFICIAL_CORPUS_EXHAUSTED_NO_EXACT_MEDIA",
+    "archaeologyPassed": true,
+    "workerCount": 50,
+    "orchestrationStatus": "FIFTY_OF_FIFTY_EXCLUSIVE_MEDIA_SHARDS_CONSOLIDATED",
+    "corpus": {
+      "expectedFileCount": 80,
+      "assignedFileCount": 80,
+      "scannedFileCount": 80,
+      "uniqueScannedFileCount": 80,
+      "overlappingAssignments": [],
+      "missingFiles": [],
+      "unexpectedFiles": []
+    },
+    "totals": {
+      "rawEvidenceCount": 95,
+      "deduplicatedEvidenceCount": 43,
+      "officialMediaUrlCount": 0,
+      "officialPageUrlCount": 8,
+      "textOccurrenceEvidenceCount": 35,
+      "identitiesWithOfficialMedia": 0
+    },
+    "identityResults": [
+      {
+        "identityKey": "HW2300|843",
+        "productCode": "HW2300",
+        "colourCode": "843",
+        "officialMediaUrls": [],
+        "officialPageUrls": [
+          "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+          "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+          "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+          "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html"
+        ],
+        "textOccurrenceFiles": [
+          "32746322369/consolidated/product-candidates.ndjson",
+          "32746322369/consolidated/product-frontier.json",
+          "32746322369/consolidated/product-identities.ndjson",
+          "32746322369/consolidated/product-identity-aliases.json",
+          "32746322369/consolidated/product-link-candidates.ndjson",
+          "32748405808/consolidated/product-candidates.ndjson",
+          "32748405808/consolidated/product-frontier.json",
+          "32748405808/consolidated/product-identities.ndjson",
+          "32748405808/consolidated/product-identity-aliases.json",
+          "32748405808/consolidated/product-link-candidates.ndjson",
+          "32754804084/consolidated/product-candidates.ndjson",
+          "32754804084/consolidated/product-frontier.json",
+          "32754804084/consolidated/product-identities.ndjson",
+          "32754804084/consolidated/product-identity-aliases.json",
+          "32754804084/consolidated/product-link-candidates.ndjson",
+          "32777623316/consolidated/product-candidates.ndjson",
+          "32777623316/consolidated/product-frontier.json",
+          "32777623316/consolidated/product-identities.ndjson",
+          "32777623316/consolidated/product-link-candidates.ndjson"
+        ]
+      },
+      {
+        "identityKey": "M1588|81B",
+        "productCode": "M1588",
+        "colourCode": "81B",
+        "officialMediaUrls": [],
+        "officialPageUrls": [
+          "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+          "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html"
+        ],
+        "textOccurrenceFiles": [
+          "32758087459/consolidated/product-candidates.ndjson",
+          "32758087459/consolidated/product-frontier.json",
+          "32758087459/consolidated/product-identities.ndjson",
+          "32758087459/consolidated/product-link-candidates.ndjson",
+          "32777623316/consolidated/product-candidates.ndjson",
+          "32777623316/consolidated/product-frontier.json",
+          "32777623316/consolidated/product-identities.ndjson",
+          "32777623316/consolidated/product-link-candidates.ndjson"
+        ]
+      },
+      {
+        "identityKey": "M1588|84B",
+        "productCode": "M1588",
+        "colourCode": "84B",
+        "officialMediaUrls": [],
+        "officialPageUrls": [
+          "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+          "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html"
+        ],
+        "textOccurrenceFiles": [
+          "32758087459/consolidated/product-candidates.ndjson",
+          "32758087459/consolidated/product-frontier.json",
+          "32758087459/consolidated/product-identities.ndjson",
+          "32758087459/consolidated/product-link-candidates.ndjson",
+          "32777623316/consolidated/product-candidates.ndjson",
+          "32777623316/consolidated/product-frontier.json",
+          "32777623316/consolidated/product-identities.ndjson",
+          "32777623316/consolidated/product-link-candidates.ndjson"
+        ]
+      }
+    ],
+    "evidenceRunId": "32861233493",
+    "evidencePlanSha256": "d9e30f2ff37d662064521e3dea2812892c5bfd4301020c16eb63405f3423e3b3",
+    "evidenceRecordCount": 43,
+    "dashboardPassed": true,
+    "dashboardCounts": {
+      "totalJobs": 52,
+      "prepareTotal": 1,
+      "prepareSuccess": 1,
+      "mediaTotal": 50,
+      "mediaSuccess": 50,
+      "mediaFailed": 0,
+      "mediaActive": 0,
+      "consolidateTotal": 1,
+      "consolidateSuccess": 1,
+      "mediaWorkerArtifacts": 50,
+      "planArtifacts": 1,
+      "consolidatedArtifacts": 1,
+      "totalArtifacts": 52
+    }
+  },
+  "passed": true
+}
