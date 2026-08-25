@@ -13,9 +13,9 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '37'
-  TARGET_RUN_ID: '32862115918'
-  TARGET_SHA: '886c7cda029663c960902095e23ff0311359e577'
+  SNAPSHOT_REVISION: '38'
+  TARGET_RUN_ID: '32862831870'
+  TARGET_SHA: 'b68b0b55ded4eb9dd24c3cedb0f4d4983ef757e5'
 
 jobs:
   snapshot:
@@ -25,7 +25,7 @@ jobs:
         with:
           ref: feature/rlf-execution-backend-20260823
           fetch-depth: 0
-      - name: Capture and certify paginated sequence 18 dashboard
+      - name: Capture and certify paginated sequence 19 dashboard
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -43,24 +43,24 @@ jobs:
             --slurpfile jobs /tmp/jobs.json \
             --slurpfile artifacts /tmp/artifacts.json \
             '{
-              schemaVersion:20,
+              schemaVersion:21,
               capturedAt:$capturedAt,
               targetRunId:$targetRunId,
               targetSha:$targetSha,
               run:($run[0] | {id,run_number,run_attempt,status,conclusion,head_sha,event,created_at,updated_at,html_url}),
               counts:{
                 totalJobs:($jobs[0]|length),
-                prepareTotal:([$jobs[0][]|select(.name=="Prepare immutable 50-probe live plan")]|length),
-                prepareSuccess:([$jobs[0][]|select(.name=="Prepare immutable 50-probe live plan" and .conclusion=="success")]|length),
-                liveTotal:([$jobs[0][]|select(.name|test("^Live FF[0-9]{2}$"))]|length),
-                liveSuccess:([$jobs[0][]|select((.name|test("^Live FF[0-9]{2}$")) and .conclusion=="success")]|length),
-                liveFailed:([$jobs[0][]|select((.name|test("^Live FF[0-9]{2}$")) and (.conclusion!=null and .conclusion!="success"))]|length),
-                liveActive:([$jobs[0][]|select((.name|test("^Live FF[0-9]{2}$")) and .status!="completed")]|length),
-                consolidateTotal:([$jobs[0][]|select(.name=="Consolidate sequence 18 live official probes")]|length),
-                consolidateSuccess:([$jobs[0][]|select(.name=="Consolidate sequence 18 live official probes" and .conclusion=="success")]|length),
-                liveWorkerArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence18-live-worker-F[0-9]{2}$"))]|length),
-                planArtifacts:([$artifacts[0][]|select(.name=="rlf-sequence18-live-plan")]|length),
-                consolidatedArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence18-live-media-"))]|length),
+                prepareTotal:([$jobs[0][]|select(.name=="Prepare immutable reader transport plan")]|length),
+                prepareSuccess:([$jobs[0][]|select(.name=="Prepare immutable reader transport plan" and .conclusion=="success")]|length),
+                readerTotal:([$jobs[0][]|select(.name|test("^Reader F[0-9]{2}$"))]|length),
+                readerSuccess:([$jobs[0][]|select((.name|test("^Reader F[0-9]{2}$")) and .conclusion=="success")]|length),
+                readerFailed:([$jobs[0][]|select((.name|test("^Reader F[0-9]{2}$")) and (.conclusion!=null and .conclusion!="success"))]|length),
+                readerActive:([$jobs[0][]|select((.name|test("^Reader F[0-9]{2}$")) and .status!="completed")]|length),
+                consolidateTotal:([$jobs[0][]|select(.name=="Consolidate sequence 19 reader candidates")]|length),
+                consolidateSuccess:([$jobs[0][]|select(.name=="Consolidate sequence 19 reader candidates" and .conclusion=="success")]|length),
+                readerWorkerArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence19-reader-worker-F[0-9]{2}$"))]|length),
+                planArtifacts:([$artifacts[0][]|select(.name=="rlf-sequence19-reader-plan")]|length),
+                consolidatedArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence19-reader-media-"))]|length),
                 totalArtifacts:($artifacts[0]|length)
               },
               jobs:$jobs[0],
@@ -68,9 +68,9 @@ jobs:
             } | .passed = (
               .run.status=="completed" and .run.conclusion=="success" and .run.head_sha==$targetSha and
               .counts.totalJobs==52 and .counts.prepareTotal==1 and .counts.prepareSuccess==1 and
-              .counts.liveTotal==50 and .counts.liveSuccess==50 and .counts.liveFailed==0 and .counts.liveActive==0 and
+              .counts.readerTotal==50 and .counts.readerSuccess==50 and .counts.readerFailed==0 and .counts.readerActive==0 and
               .counts.consolidateTotal==1 and .counts.consolidateSuccess==1 and
-              .counts.liveWorkerArtifacts==50 and .counts.planArtifacts==1 and .counts.consolidatedArtifacts==1 and .counts.totalArtifacts==52
+              .counts.readerWorkerArtifacts==50 and .counts.planArtifacts==1 and .counts.consolidatedArtifacts==1 and .counts.totalArtifacts==52
             )' > data/execution/workflow-runs-snapshot.json
           cat data/execution/workflow-runs-snapshot.json
           jq -e '.passed == true' data/execution/workflow-runs-snapshot.json >/dev/null
@@ -82,7 +82,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Certify sequence 18 fifty-lane live probe dashboard'
+          git commit -m 'Certify sequence 19 fifty-lane reader dashboard'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
