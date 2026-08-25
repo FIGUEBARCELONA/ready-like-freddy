@@ -1,0 +1,104 @@
+name: RLF sequence 19 reader media candidate preflight
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence19-reader-media-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-sequence19-reader-media-preflight
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Build exact exclusive F01-F50 reader transport plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/execution
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readFile, writeFile } from 'node:fs/promises';
+          import { readerUrlsFor } from './scripts/execution/source-transport.mjs';
+
+          const prior=JSON.parse(await readFile('data/execution/sequence18-live-media-preflight.json','utf8'));
+          if(!prior.passed||prior.probeCount!==50||prior.uniqueProbeUrlCount!==50)throw new Error('Sequence 18 source plan is not exact');
+          const assignments=prior.assignments.map(item=>{
+            const readerUrls=readerUrlsFor(item.probeUrl);
+            return {
+              slot:item.slot,
+              index:item.index,
+              identityKey:item.identityKey,
+              productCode:item.productCode,
+              colourCode:item.colourCode,
+              sourceProbeType:item.probeType,
+              sourceUrl:item.probeUrl,
+              sourceDerivation:item.derivation,
+              readerUrls,
+              primaryReaderUrl:readerUrls[0],
+              fallbackReaderUrl:readerUrls[1],
+            };
+          });
+          const sourceUrls=assignments.map(item=>item.sourceUrl);
+          const readerUrls=assignments.flatMap(item=>item.readerUrls);
+          const invalidReaderUrls=readerUrls.filter(value=>{const u=new URL(value);return u.protocol!=='https:'||u.hostname!=='r.jina.ai'||!/^\/(?:https|http):\/\//.test(u.pathname);});
+          const unsigned={
+            schemaVersion:1,
+            generatedAt:new Date().toISOString(),
+            sourceCommitSha:process.env.GITHUB_SHA,
+            targetSequence:19,
+            phaseId:'READER_OFFICIAL_MEDIA_CANDIDATE_DISCOVERY_01',
+            sourceSequence:18,
+            sourcePlanSha256:prior.planSha256,
+            acceptancePolicy:{
+              readerOutputIsTransformedCandidateDiscoveryOnly:true,
+              readerOutputCannotVerifyPrice:true,
+              readerOutputCannotVerifyFactory:true,
+              readerOutputCannotCloseRetry:true,
+              officialFredPerryMediaHostRequired:true,
+              exactCodeColourPathRequired:true,
+              candidateMediaRequiresIndependentDirectVerification:true,
+              directVerificationHttpStatusRequired:200,
+              directVerificationContentTypePrefixRequired:'image/',
+              imageBytesSha256Required:true,
+            },
+            sourceUrlCount:sourceUrls.length,
+            uniqueSourceUrlCount:new Set(sourceUrls).size,
+            readerUrlCount:readerUrls.length,
+            uniqueReaderUrlCount:new Set(readerUrls).size,
+            assignmentCount:assignments.length,
+            nonemptyLaneCount:assignments.filter(item=>item.readerUrls.length===2).length,
+            duplicateSourceUrls:sourceUrls.filter((value,index)=>sourceUrls.indexOf(value)!==index),
+            duplicateReaderUrls:readerUrls.filter((value,index)=>readerUrls.indexOf(value)!==index),
+            invalidReaderUrls,
+            assignments,
+          };
+          const plan={...unsigned,planSha256:createHash('sha256').update(JSON.stringify(unsigned)).digest('hex')};
+          plan.passed=
+            plan.sourcePlanSha256==='83213579b078493e719a9159c97ac12651f605ba09130bb380b5d3a399dabd3f'&&
+            plan.sourceUrlCount===50&&plan.uniqueSourceUrlCount===50&&
+            plan.readerUrlCount===100&&plan.uniqueReaderUrlCount===100&&
+            plan.assignmentCount===50&&plan.nonemptyLaneCount===50&&
+            plan.duplicateSourceUrls.length===0&&plan.duplicateReaderUrls.length===0&&plan.invalidReaderUrls.length===0&&
+            plan.assignments.every((item,index)=>item.slot===`F${String(index+1).padStart(2,'0')}`&&item.readerUrls.length===2);
+          await writeFile('data/execution/sequence19-reader-media-preflight.json',`${JSON.stringify(plan,null,2)}\n`);
+          console.log(JSON.stringify({...plan,assignments:plan.assignments.map(item=>({slot:item.slot,identityKey:item.identityKey,sourceUrl:item.sourceUrl,readerUrls:item.readerUrls}))},null,2));
+          if(!plan.passed)throw new Error('Sequence 19 reader media preflight failed');
+          NODE
+      - name: Publish exact sequence 19 preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823';git config user.name 'github-actions[bot]';git config user.email '41898282+github-actions[bot]@users.noreply.github.com';git add data/execution/sequence19-reader-media-preflight.json;git commit -m 'Persist sequence 19 fifty-lane reader media preflight';for attempt in 1 2 3 4 5;do git fetch origin "$branch";if git rebase "origin/$branch"&&git push origin "HEAD:$branch";then exit 0;fi;git rebase --abort 2>/dev/null||true;sleep $((attempt*3));done;exit 1
