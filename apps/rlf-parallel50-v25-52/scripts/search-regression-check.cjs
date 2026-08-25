@@ -17,6 +17,7 @@ const search=evaluate(searchFile,(id)=>{if(id==='node:crypto')return require('no
 const lane={slot:'F06',countryCode:'CZ',country:'Czechia',language:'cs-CZ,cs;q=.9,en;q=.7',tld:'cz',localSecondhand:'použité oblečení',index:5};
 const input={cycle:19,maxCandidates:8,lane};
 const query=search.overpassQuery(input,36);
+const tile=search.countryTile(input);
 const exactCrawl=search.commonCrawlExactUrl('https://new-vintage-store.cz/products/fred-perry-polo?utm_source=test',5);
 const osmFixture=JSON.stringify({elements:[
   {type:'node',id:1,tags:{name:'New Vintage Store',shop:'clothes',second_hand:'only',website:'https://new-vintage-store.cz/?utm_source=osm'}},
@@ -31,18 +32,22 @@ const parsed=search.overpassResults(osmFixture,10);
 const retryBase={name:'overpass',status:200,bodyLength:10,linkCount:0,challenge:false,durationMs:1,error:null,contentType:'application/json',responseHash:'x'};
 
 const fixtures=[
-  [search.primaryCorpus(input),'overpass-json','V22 uses Overpass primary'],
-  [search.overpassVariant(input),0,'country lane receives deterministic variant'],
-  [query.includes('["ISO3166-1"="CZ"]'),true,'query keeps ISO country boundary'],
+  [search.primaryCorpus(input),'overpass-json','V22R2 uses Overpass primary'],
+  [search.overpassVariant(input),0,'lane receives deterministic source variant'],
+  [search.tileIndex(input),2,'lane receives deterministic geographic tile'],
+  [JSON.stringify(tile),JSON.stringify([49.805,12.09,51.06,15.48]),'Czech tile boundaries are deterministic'],
+  [query.includes('(49.805,12.09,51.06,15.48)'),true,'query contains only selected bbox'],
+  [query.includes('ISO3166-1'),false,'query never expands to whole country area'],
+  [query.includes('area.country'),false,'query has no national area traversal'],
   [query.includes('shop"="second_hand'),true,'query includes dedicated second-hand shops'],
   [query.includes('shop"="clothes'),true,'query includes clothing shops'],
   [query.includes('contact:website'),true,'query includes contact website tags'],
-  [query.endsWith('out tags 36;'),true,'query output is bounded'],
+  [query.endsWith('out tags qt 36;'),true,'query output is bounded and quadtile sorted'],
   [search.primaryEndpoint(input),'https://overpass-api.de/api/interpreter','lane selects deterministic primary endpoint'],
-  [search.secondaryEndpoint(input),'https://overpass.private.coffee/api/interpreter','retry selects the other endpoint'],
-  [search.shouldRetryOverpass(retryBase),false,'HTTP 200 without challenge does not retry'],
+  [search.secondaryEndpoint(input),'https://z.overpass-api.de/api/interpreter','retry selects alternate endpoint'],
+  [search.shouldRetryOverpass(retryBase),false,'HTTP 200 without remark does not retry'],
   [search.shouldRetryOverpass({...retryBase,status:429}),true,'rate limit retries'],
-  [search.shouldRetryOverpass({...retryBase,challenge:true}),true,'challenge retries'],
+  [search.shouldRetryOverpass({...retryBase,challenge:true}),true,'runtime remark retries'],
   [search.shouldRetryOverpass({...retryBase,status:null,error:'TimeoutError'}),true,'transport error retries'],
   [parsed.length,2,'only two new operator domains survive prefilter'],
   [parsed[0]?.url,'https://new-vintage-store.cz','highest-quality clothing seed ranks first'],
