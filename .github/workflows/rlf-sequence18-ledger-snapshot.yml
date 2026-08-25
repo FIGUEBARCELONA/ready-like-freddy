@@ -1,0 +1,139 @@
+name: RLF sequence 18 WAF-blocked no-mutation checkpoint
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence18-ledger-snapshot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-sequence18-ledger-snapshot
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Rebuild exact ledgers and certify WAF-blocked no-mutation result
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/execution
+          node --input-type=module <<'NODE'
+          import { readFile, writeFile } from 'node:fs/promises';
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
+
+          const identity=await loadProgressLedger();
+          const sourcePages=await loadSourcePageLedger();
+          const preflight=JSON.parse(await readFile('data/execution/sequence18-live-media-preflight.json','utf8'));
+          const manifest=JSON.parse(await readFile('data/execution/sequence18-live-media-manifest.json','utf8'));
+          const evidence=JSON.parse(await readFile('data/execution/sequence18-live-media-evidence.json','utf8'));
+          const dashboard=JSON.parse(await readFile('data/execution/workflow-runs-snapshot.json','utf8'));
+          const expectedRetries=['HW2300|843','M1588|81B','M1588|84B'];
+          const statuses=evidence.records.reduce((map,item)=>{const key=String(item.response?.status??'null');map[key]=(map[key]??0)+1;return map;},{});
+          const contentTypes=evidence.records.reduce((map,item)=>{const key=String(item.response?.contentType??'null');map[key]=(map[key]??0)+1;return map;},{});
+          const snapshot={
+            schemaVersion:1,
+            generatedAt:new Date().toISOString(),
+            sourceCommitSha:process.env.GITHUB_SHA,
+            sourceRunId:'32862115918',
+            identity:{
+              completedIdentityCount:identity.completed.identityCount,
+              productUrlCaptureCount:identity.completed.productUrlCaptureCount,
+              officialProductImageReferenceCount:identity.counters.officialProductImageReferenceCount,
+              materialEvidenceCount:identity.counters.materialEvidenceCount,
+              manufacturingClaimCount:identity.counters.manufacturingClaimCount,
+              descriptionMissingIdentityCount:identity.metadataGaps.descriptionMissingIdentityCount,
+              priceMissingIdentityCount:identity.metadataGaps.priceMissingIdentityCount,
+              materialMissingIdentityCount:identity.metadataGaps.materialMissingIdentityCount,
+              retryIdentityCount:identity.retry.identityCount,
+              retryIdentityKeys:identity.retry.identities.map(item=>item.identityKey).sort(),
+              deltaCount:identity.deltaCount,
+              latestRunId:String(identity.latestRunId),
+              factoryVerifiedCount:identity.counters.factoryVerifiedCount,
+              globalCanonicalProductCount:identity.counters.globalCanonicalProductCount,
+              ledgerSha256:identity.ledgerSha256,
+            },
+            sourcePages:{
+              deltaCount:sourcePages.deltaCount,
+              attemptedObservationCount:sourcePages.attemptedObservationCount,
+              uniqueAttemptedSourcePageCount:sourcePages.uniqueAttemptedSourcePageCount,
+              ledgerSha256:sourcePages.ledgerSha256,
+            },
+            sequence18:{
+              planSha256:preflight.planSha256,
+              preflightPassed:preflight.passed,
+              probeCount:preflight.probeCount,
+              uniqueProbeUrlCount:preflight.uniqueProbeUrlCount,
+              knownOfficialPageProbeCount:preflight.knownOfficialPageProbeCount,
+              officialSearchProbeCount:preflight.officialSearchProbeCount,
+              manifestSha256:manifest.manifestSha256,
+              manifestPassed:manifest.passed,
+              status:'DIRECT_OFFICIAL_TRANSPORT_BLOCKED_BY_WAF_NO_MEDIA_DECISION',
+              sourceManifestStatus:manifest.status,
+              workerCount:manifest.workerCount,
+              orchestrationStatus:manifest.orchestrationStatus,
+              totals:manifest.totals,
+              responseStatusCounts:statuses,
+              responseContentTypeCounts:contentTypes,
+              evidenceRecordCount:evidence.records.length,
+              verifiedMediaCount:evidence.verifiedMedia.length,
+              dashboardPassed:dashboard.passed,
+              dashboardCounts:dashboard.counts,
+            },
+          };
+          const i=snapshot.identity,s=snapshot.sourcePages,q=snapshot.sequence18,c=q.dashboardCounts;
+          snapshot.passed=
+            i.completedIdentityCount===1357&&i.productUrlCaptureCount===2155&&
+            i.officialProductImageReferenceCount===11708&&i.materialEvidenceCount===1748&&
+            i.manufacturingClaimCount===64&&i.descriptionMissingIdentityCount===826&&
+            i.priceMissingIdentityCount===770&&i.materialMissingIdentityCount===86&&
+            i.retryIdentityCount===3&&JSON.stringify(i.retryIdentityKeys)===JSON.stringify(expectedRetries)&&
+            i.deltaCount===11&&i.latestRunId==='32784949243'&&i.factoryVerifiedCount===0&&i.globalCanonicalProductCount===0&&
+            i.ledgerSha256==='0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7'&&
+            s.deltaCount===8&&s.attemptedObservationCount===1524&&s.uniqueAttemptedSourcePageCount===1239&&
+            s.ledgerSha256==='19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3'&&
+            q.preflightPassed===true&&q.planSha256==='83213579b078493e719a9159c97ac12651f605ba09130bb380b5d3a399dabd3f'&&
+            q.probeCount===50&&q.uniqueProbeUrlCount===50&&q.knownOfficialPageProbeCount===8&&q.officialSearchProbeCount===42&&
+            q.manifestPassed===true&&q.manifestSha256==='a08bd163e69c125ec924f778edce86424245dbeacd78ff4d1243b96fc5544365'&&
+            q.workerCount===50&&q.orchestrationStatus==='FIFTY_OF_FIFTY_EXCLUSIVE_LIVE_PROBES_CONSOLIDATED'&&
+            q.totals.probeCount===50&&q.totals.uniqueProbeUrlCount===50&&q.totals.httpOkCount===0&&q.totals.httpErrorCount===50&&
+            q.totals.exactTextOccurrenceProbeCount===29&&q.totals.observedCandidateMediaCount===0&&q.totals.verifiedMediaCount===0&&
+            q.responseStatusCounts['403']===50&&Object.keys(q.responseStatusCounts).length===1&&
+            q.responseContentTypeCounts['text/html; charset=UTF-8']===50&&Object.keys(q.responseContentTypeCounts).length===1&&
+            q.evidenceRecordCount===50&&q.verifiedMediaCount===0&&q.dashboardPassed===true&&
+            c.totalJobs===52&&c.prepareSuccess===1&&c.liveTotal===50&&c.liveSuccess===50&&c.liveFailed===0&&c.liveActive===0&&
+            c.consolidateSuccess===1&&c.liveWorkerArtifacts===50&&c.planArtifacts===1&&c.consolidatedArtifacts===1&&c.totalArtifacts===52;
+          await writeFile('data/execution/sequence18-ledger-snapshot.json',`${JSON.stringify(snapshot,null,2)}\n`);
+          console.log(JSON.stringify(snapshot,null,2));
+          if(!snapshot.passed) throw new Error('Sequence 18 exact WAF-blocked checkpoint failed');
+          NODE
+      - name: Publish exact sequence 18 checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence18-ledger-snapshot.json
+          git commit -m 'Persist exact sequence 18 WAF-blocked checkpoint'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch"&&git push origin "HEAD:$branch";then exit 0;fi
+            git rebase --abort 2>/dev/null||true
+            sleep $((attempt*3))
+          done
+          exit 1
