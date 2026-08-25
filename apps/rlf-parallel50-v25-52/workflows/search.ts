@@ -3,9 +3,15 @@ import {INTERNAL,MARKETPLACES,NEW_RETAIL} from './policy';
 import {KNOWN_REJECTED_DOMAINS,KNOWN_SUPPLIER_ALIAS_DOMAINS,KNOWN_SUPPLIER_DOMAINS,STAGED_SUPPLIER_DOMAINS} from '@/lib/known-suppliers';
 
 export type SearchItem={title:string;url:string;snippet:string;provider:string};
-type Provider={name:string;url:(query:string,language:string)=>string;rss?:boolean};
+type Provider={name:string;url:(query:string,language:string)=>string};
 
-const BING_RSS:Provider={name:'bing-rss',rss:true,url:(query,language)=>`https://www.bing.com/search?format=rss&q=${encodeURIComponent(query)}&count=50&setlang=${encodeURIComponent(language.split('-')[0])}`};
+export const COMMON_CRAWL_INDEX='CC-MAIN-2026-30' as const;
+const COMMON_CRAWL_PROVIDER='commoncrawl-cdx';
+const DUCKDUCKGO_PROVIDER='duckduckgo-html';
+const BING_PROVIDER='bing-rss';
+const BING_RSS:Provider={name:BING_PROVIDER,url:(query,language)=>`https://www.bing.com/search?format=rss&q=${encodeURIComponent(query)}&count=50&setlang=${encodeURIComponent(language.split('-')[0])}`};
+const DUCKDUCKGO_HTML:Provider={name:DUCKDUCKGO_PROVIDER,url:(query)=>`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`};
+
 const PURCHASE_TERM:Record<string,string>={
   AT:'in den warenkorb',BE:'toevoegen aan winkelwagen',BG:'добави в количката',HR:'dodaj u košaricu',CY:'add to cart',CZ:'přidat do košíku',DK:'tilføj til kurv',EE:'lisa ostukorvi',FI:'lisää ostoskoriin',FR:'ajouter au panier',DE:'in den warenkorb',GR:'προσθήκη στο καλάθι',HU:'kosárba',IE:'add to cart',IT:'aggiungi al carrello',LV:'pievienot grozam',LT:'į krepšelį',LU:'ajouter au panier',MT:'add to cart',NL:'toevoegen aan winkelwagen',PL:'dodaj do koszyka',PT:'adicionar ao carrinho',RO:'adaugă în coș',SK:'pridať do košíka',SI:'dodaj v košarico',ES:'añadir al carrito',SE:'lägg i varukorg',
 };
@@ -29,7 +35,7 @@ export function domainOf(raw:string) {
 }
 
 export function relevant(title:string,url:string,description='') {
-  const text=`${strip(title)} ${url} ${strip(description)}`.toLowerCase().replace(/[-_/%]+/g,' ');
+  const text=`${strip(title)} ${url} ${strip(description)}`.toLowerCase().replace(/[-_/%+]+/g,' ');
   if(/federal reserve|economic data|st\. louis fed|\bfred\b.*econom/i.test(text)) return false;
   return /fred\s+perry/.test(text)||/fredperry/.test(text);
 }
@@ -44,31 +50,100 @@ export function eligibleSearchDomain(domain:string) {
   return true;
 }
 
+function pushUnique(output:SearchItem[],seen:Set<string>,item:SearchItem,limit:number) {
+  const url=canonical(item.url);
+  const domain=domainOf(url);
+  if(!url.startsWith('http')||!domain||seen.has(url)||!relevant(item.title,url,item.snippet)||!eligibleSearchDomain(domain)) return;
+  seen.add(url);
+  output.push({...item,url});
+  if(output.length>limit) output.length=limit;
+}
+
 function rssResults(xml:string,provider:string,limit:number) {
-  const output:SearchItem[]=[];
-  const seen=new Set<string>();
+  const output:SearchItem[]=[];const seen=new Set<string>();
   for(const match of xml.matchAll(/<item>[\s\S]*?<title>([\s\S]*?)<\/title>[\s\S]*?<link>([\s\S]*?)<\/link>[\s\S]*?<description>([\s\S]*?)<\/description>[\s\S]*?<\/item>/gi)) {
-    const title=strip(match[1]).slice(0,260);
-    const url=canonical(strip(match[2]));
-    const snippet=strip(match[3]).slice(0,500);
-    const domain=domainOf(url);
-    if(!url.startsWith('http')||!domain||seen.has(url)||!relevant(title,url,snippet)||!eligibleSearchDomain(domain)) continue;
-    seen.add(url);output.push({title,url,snippet,provider});
+    pushUnique(output,seen,{title:strip(match[1]).slice(0,260),url:strip(match[2]),snippet:strip(match[3]).slice(0,500),provider},limit);
     if(output.length>=limit) break;
   }
   return output;
 }
 
-async function searchProvider(provider:Provider,query:string,language:string,limit:number) {
+export function unwrapDuckDuckGo(raw:string) {
+  const decoded=decode(raw);
+  try {
+    const candidate=decoded.startsWith('//')?`https:${decoded}`:decoded;
+    const url=new URL(candidate,'https://html.duckduckgo.com');
+    const redirected=url.searchParams.get('uddg');
+    return canonical(redirected?decodeURIComponent(redirected):url.toString());
+  } catch {return '';}
+}
+
+function duckDuckGoResults(html:string,limit:number) {
+  const output:SearchItem[]=[];const seen=new Set<string>();
+  for(const match of html.matchAll(/<a[^>]+class=["'][^"']*result__a[^"']*["'][^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)) {
+    const url=unwrapDuckDuckGo(match[1]);
+    const title=strip(match[2]).slice(0,260);
+    pushUnique(output,seen,{title,url,snippet:'',provider:DUCKDUCKGO_PROVIDER},limit);
+    if(output.length>=limit) break;
+  }
+  return output;
+}
+
+type CommonCrawlRecord={url?:string;timestamp?:string;status?:string;mime?:string};
+
+export function commonCrawlUrl(input:DiscoverInput,limit:number) {
+  const params=new URLSearchParams();
+  params.set('url',`*.${input.lane.tld}`);
+  params.set('matchType','domain');
+  params.set('output','json');
+  params.append('filter','=status:200');
+  params.append('filter','=mime:text/html');
+  params.append('filter','~url:.*fred[^/?#]{0,12}perry.*');
+  params.set('collapse','urlkey');
+  params.set('limit',String(limit));
+  params.set('fields','url,timestamp,status,mime');
+  return `https://index.commoncrawl.org/${COMMON_CRAWL_INDEX}-index?${params.toString()}`;
+}
+
+function commonCrawlResults(body:string,limit:number) {
+  const output:SearchItem[]=[];const seen=new Set<string>();
+  for(const line of body.split(/\r?\n/)) {
+    if(!line.trim()) continue;
+    try {
+      const record=JSON.parse(line) as CommonCrawlRecord;
+      if(!record.url) continue;
+      const domain=domainOf(record.url);
+      pushUnique(output,seen,{title:`Common Crawl Fred Perry URL match — ${domain}`,url:record.url,snippet:`${COMMON_CRAWL_INDEX} ${record.timestamp??''}`,provider:COMMON_CRAWL_PROVIDER},limit);
+      if(output.length>=limit) break;
+    } catch {}
+  }
+  return output;
+}
+
+async function fetchProvider(provider:Provider,query:string,language:string,limit:number,parser:(body:string,limit:number)=>SearchItem[]) {
   const started=Date.now();
   try {
-    const response=await fetch(provider.url(query,language),{redirect:'follow',signal:AbortSignal.timeout(13000),headers:{accept:'application/rss+xml,application/xml,text/xml;q=.9,*/*;q=.8','accept-language':language,'user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131 Safari/537.36'}});
+    const response=await fetch(provider.url(query,language),{redirect:'follow',signal:AbortSignal.timeout(13000),headers:{accept:'text/html,application/xhtml+xml,application/rss+xml,application/xml;q=.9,*/*;q=.8','accept-language':language,'user-agent':'Mozilla/5.0 (compatible; RLF-Research/1.0; +https://readylikefreddy.shop)'}});
     const body=await response.text();
-    const results=response.ok?rssResults(body,provider.name,limit):[];
-    const attempt:ProviderAttempt={name:provider.name,status:response.status,bodyLength:body.length,linkCount:results.length,challenge:/captcha|unusual traffic|verify you are human|access denied|error getting results|automated queries/i.test(body),durationMs:Date.now()-started,error:null};
+    const results=response.ok?parser(body,limit):[];
+    const attempt:ProviderAttempt={name:provider.name,status:response.status,bodyLength:body.length,linkCount:results.length,challenge:/captcha|unusual traffic|verify you are human|access denied|automated queries|anomaly-modal/i.test(body),durationMs:Date.now()-started,error:null};
     return {attempt,results};
   } catch(error) {
     const attempt:ProviderAttempt={name:provider.name,status:null,bodyLength:0,linkCount:0,challenge:false,durationMs:Date.now()-started,error:error instanceof Error?error.name:'SEARCH_ERROR'};
+    return {attempt,results:[] as SearchItem[]};
+  }
+}
+
+async function searchCommonCrawl(input:DiscoverInput,limit:number) {
+  const started=Date.now();
+  try {
+    const response=await fetch(commonCrawlUrl(input,limit),{redirect:'follow',signal:AbortSignal.timeout(15000),headers:{accept:'application/x-ndjson,application/json,text/plain;q=.9,*/*;q=.8','user-agent':'RLF-Research/1.0 (public supplier discovery; https://readylikefreddy.shop)'}});
+    const body=await response.text();
+    const results=response.ok?commonCrawlResults(body,limit):[];
+    const attempt:ProviderAttempt={name:COMMON_CRAWL_PROVIDER,status:response.status,bodyLength:body.length,linkCount:results.length,challenge:/rate limit|too many requests|temporarily unavailable/i.test(body),durationMs:Date.now()-started,error:null};
+    return {attempt,results};
+  } catch(error) {
+    const attempt:ProviderAttempt={name:COMMON_CRAWL_PROVIDER,status:null,bodyLength:0,linkCount:0,challenge:false,durationMs:Date.now()-started,error:error instanceof Error?error.name:'SEARCH_ERROR'};
     return {attempt,results:[] as SearchItem[]};
   }
 }
@@ -107,12 +182,26 @@ export function alternateCommerceQuery(input:DiscoverInput) {
   return {index,query:templates[index]};
 }
 
-export function shouldRunAlternateSearch(primaryCount:number) {
+export function primaryCorpus(input:DiscoverInput) {
+  return input.lane.index<27?COMMON_CRAWL_PROVIDER:DUCKDUCKGO_PROVIDER;
+}
+
+export function shouldRunFallbackSearch(primaryCount:number) {
   return primaryCount===0;
 }
 
-export async function searchAll(query:string,input:DiscoverInput) {
+export async function searchPrimary(query:string,input:DiscoverInput) {
   const limit=Math.max(input.maxCandidates*6,36);
-  const response=await searchProvider(BING_RSS,query,input.lane.language,limit);
+  if(primaryCorpus(input)===COMMON_CRAWL_PROVIDER) {
+    const response=await searchCommonCrawl(input,limit);
+    return {attempts:[response.attempt],results:response.results.slice(0,limit)};
+  }
+  const response=await fetchProvider(DUCKDUCKGO_HTML,query,input.lane.language,limit,duckDuckGoResults);
+  return {attempts:[response.attempt],results:response.results.slice(0,limit)};
+}
+
+export async function searchFallback(query:string,input:DiscoverInput) {
+  const limit=Math.max(input.maxCandidates*6,36);
+  const response=await fetchProvider(BING_RSS,query,input.lane.language,limit,(body,max)=>rssResults(body,BING_PROVIDER,max));
   return {attempts:[response.attempt],results:response.results.slice(0,limit)};
 }
