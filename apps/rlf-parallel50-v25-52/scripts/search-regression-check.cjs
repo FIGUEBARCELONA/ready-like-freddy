@@ -48,7 +48,7 @@ const fixtures=[
   [parsed[0]?.url,'https://new-vintage-store.cz','highest-quality clothing seed ranks first'],
   [parsed[0]?.title,'New Vintage Store','OSM name retained'],
   [parsed[0]?.snippet.includes('second_hand=only'),true,'OSM provenance retained in snippet'],
-  [parsed[1]?.url,'https://charity-vintage.cz','contact website normalized with HTTPS'],
+  [parsed[1]?.url,'https://www.charity-vintage.cz','contact website normalized with HTTPS while preserving host'],
   [search.websiteValues({website:'https://one.example; https://two.example'}).length,2,'semicolon website values split'],
   [search.websiteValues({website:'https://instagram.com/nope'}).length,0,'social profile rejected as operator website'],
   [search.eligibleSearchDomain('new-vintage-store.cz'),true,'new professional candidate remains eligible'],
