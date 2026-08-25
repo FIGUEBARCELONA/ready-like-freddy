@@ -1,0 +1,551 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-25T14:50:22.601Z",
+  "sourceCommitSha": "ae2dfb767d4d19f6dbaadea33468bfab04c07040",
+  "targetSequence": 18,
+  "phaseId": "LIVE_OFFICIAL_MEDIA_PROBE_01",
+  "acceptancePolicy": {
+    "officialHostRequired": true,
+    "exactCodeColourPathRequired": true,
+    "mediaHttpStatusRequired": 200,
+    "mediaContentTypePrefixRequired": "image/",
+    "candidateProbeIsNotEvidence": true,
+    "transformedReaderMediaVerificationProhibited": true,
+    "factoryInferenceProhibited": true,
+    "priceVerificationProhibited": true
+  },
+  "targetIdentities": [
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843"
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B"
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B"
+    }
+  ],
+  "probeCount": 50,
+  "uniqueProbeUrlCount": 50,
+  "assignmentCount": 50,
+  "nonemptyLaneCount": 50,
+  "knownOfficialPageProbeCount": 8,
+  "officialSearchProbeCount": 42,
+  "targetCounts": {
+    "HW2300|843": 18,
+    "M1588|81B": 16,
+    "M1588|84B": 16
+  },
+  "duplicateProbeUrls": [],
+  "invalidHosts": [],
+  "assignments": [
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+      "derivation": "SEQUENCE17_VERIFIED_OFFICIAL_PAGE_ALIAS",
+      "slot": "F01",
+      "index": 0
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+      "derivation": "SEQUENCE17_VERIFIED_OFFICIAL_PAGE_ALIAS",
+      "slot": "F02",
+      "index": 1
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+      "derivation": "SEQUENCE17_VERIFIED_OFFICIAL_PAGE_ALIAS",
+      "slot": "F03",
+      "index": 2
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+      "derivation": "SEQUENCE17_VERIFIED_OFFICIAL_PAGE_ALIAS",
+      "slot": "F04",
+      "index": 3
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+      "derivation": "SEQUENCE17_VERIFIED_OFFICIAL_PAGE_ALIAS",
+      "slot": "F05",
+      "index": 4
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+      "derivation": "SEQUENCE17_VERIFIED_OFFICIAL_PAGE_ALIAS",
+      "slot": "F06",
+      "index": 5
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+      "derivation": "SEQUENCE17_VERIFIED_OFFICIAL_PAGE_ALIAS",
+      "slot": "F07",
+      "index": 6
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+      "derivation": "SEQUENCE17_VERIFIED_OFFICIAL_PAGE_ALIAS",
+      "slot": "F08",
+      "index": 7
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300+843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_ae-en_SPACE",
+      "slot": "F09",
+      "index": 8
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300-843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_ae-en_HYPHEN",
+      "slot": "F10",
+      "index": 9
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300+843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eg-en_SPACE",
+      "slot": "F11",
+      "index": 10
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300-843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eg-en_HYPHEN",
+      "slot": "F12",
+      "index": 11
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300+843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_sa-en_SPACE",
+      "slot": "F13",
+      "index": 12
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300-843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_sa-en_HYPHEN",
+      "slot": "F14",
+      "index": 13
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300+843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_gb-en_SPACE",
+      "slot": "F15",
+      "index": 14
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300-843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_gb-en_HYPHEN",
+      "slot": "F16",
+      "index": 15
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300+843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-en_SPACE",
+      "slot": "F17",
+      "index": 16
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300-843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-en_HYPHEN",
+      "slot": "F18",
+      "index": 17
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300+843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_au-en_SPACE",
+      "slot": "F19",
+      "index": 18
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300-843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_au-en_HYPHEN",
+      "slot": "F20",
+      "index": 19
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300+843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_us-en_SPACE",
+      "slot": "F21",
+      "index": 20
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300-843",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_us-en_HYPHEN",
+      "slot": "F22",
+      "index": 21
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-de_SPACE",
+      "slot": "F23",
+      "index": 22
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-de_HYPHEN",
+      "slot": "F24",
+      "index": 23
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-es_SPACE",
+      "slot": "F25",
+      "index": 24
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-es_HYPHEN",
+      "slot": "F26",
+      "index": 25
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_gb-en_SPACE",
+      "slot": "F27",
+      "index": 26
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_gb-en_HYPHEN",
+      "slot": "F28",
+      "index": 27
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-en_SPACE",
+      "slot": "F29",
+      "index": 28
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-en_HYPHEN",
+      "slot": "F30",
+      "index": 29
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_us-en_SPACE",
+      "slot": "F31",
+      "index": 30
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_us-en_HYPHEN",
+      "slot": "F32",
+      "index": 31
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_au-en_SPACE",
+      "slot": "F33",
+      "index": 32
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_au-en_HYPHEN",
+      "slot": "F34",
+      "index": 33
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_ae-en_SPACE",
+      "slot": "F35",
+      "index": 34
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-81B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_ae-en_HYPHEN",
+      "slot": "F36",
+      "index": 35
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-de_SPACE",
+      "slot": "F37",
+      "index": 36
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-de_HYPHEN",
+      "slot": "F38",
+      "index": 37
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-es_SPACE",
+      "slot": "F39",
+      "index": 38
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-es_HYPHEN",
+      "slot": "F40",
+      "index": 39
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_gb-en_SPACE",
+      "slot": "F41",
+      "index": 40
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_gb-en_HYPHEN",
+      "slot": "F42",
+      "index": 41
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-en_SPACE",
+      "slot": "F43",
+      "index": 42
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_eu-en_HYPHEN",
+      "slot": "F44",
+      "index": 43
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_us-en_SPACE",
+      "slot": "F45",
+      "index": 44
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_us-en_HYPHEN",
+      "slot": "F46",
+      "index": 45
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_au-en_SPACE",
+      "slot": "F47",
+      "index": 46
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_au-en_HYPHEN",
+      "slot": "F48",
+      "index": 47
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_ae-en_SPACE",
+      "slot": "F49",
+      "index": 48
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-84B",
+      "derivation": "EXACT_CODE_COLOUR_SEARCH_ae-en_HYPHEN",
+      "slot": "F50",
+      "index": 49
+    }
+  ],
+  "planSha256": "83213579b078493e719a9159c97ac12651f605ba09130bb380b5d3a399dabd3f",
+  "passed": true
+}
