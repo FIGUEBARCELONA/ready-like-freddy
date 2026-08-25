@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "runId": "32862115918",
+  "generatedAt": "2026-08-25T14:52:11.597Z",
+  "sourceCommitSha": "886c7cda029663c960902095e23ff0311359e577",
+  "phaseId": "LIVE_OFFICIAL_MEDIA_PROBE_01",
+  "planSha256": "83213579b078493e719a9159c97ac12651f605ba09130bb380b5d3a399dabd3f",
+  "workerCount": 50,
+  "orchestrationStatus": "FIFTY_OF_FIFTY_EXCLUSIVE_LIVE_PROBES_CONSOLIDATED",
+  "acceptancePolicy": {
+    "officialHostRequired": true,
+    "exactCodeColourPathRequired": true,
+    "mediaHttpStatusRequired": 200,
+    "mediaContentTypePrefixRequired": "image/",
+    "candidateProbeIsNotEvidence": true,
+    "transformedReaderMediaVerificationProhibited": true,
+    "factoryInferenceProhibited": true,
+    "priceVerificationProhibited": true
+  },
+  "totals": {
+    "probeCount": 50,
+    "uniqueProbeUrlCount": 50,
+    "httpOkCount": 0,
+    "httpErrorCount": 50,
+    "exactTextOccurrenceProbeCount": 29,
+    "observedCandidateMediaCount": 0,
+    "verifiedMediaRawCount": 0,
+    "verifiedMediaCount": 0,
+    "identitiesWithVerifiedMedia": 0
+  },
+  "identityResults": [
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeCount": 18,
+      "successfulHttpProbeCount": 0,
+      "exactTextOccurrenceProbeCount": 11,
+      "observedCandidateMediaCount": 0,
+      "verifiedMedia": []
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeCount": 16,
+      "successfulHttpProbeCount": 0,
+      "exactTextOccurrenceProbeCount": 9,
+      "observedCandidateMediaCount": 0,
+      "verifiedMedia": []
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeCount": 16,
+      "successfulHttpProbeCount": 0,
+      "exactTextOccurrenceProbeCount": 9,
+      "observedCandidateMediaCount": 0,
+      "verifiedMedia": []
+    }
+  ],
+  "status": "LIVE_OFFICIAL_PROBES_EXHAUSTED_NO_VERIFIED_MEDIA",
+  "passed": true,
+  "manifestSha256": "a08bd163e69c125ec924f778edce86424245dbeacd78ff4d1243b96fc5544365"
+}
