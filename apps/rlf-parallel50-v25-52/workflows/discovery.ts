@@ -1,5 +1,6 @@
 import type {DiscoverInput,LaneCycleResult,Candidate,ProviderAttempt} from './types';
 import {CYCLE20_TARGETS} from '@/lib/cycle20-targets';
+import {discoverCommonCrawlLane} from './common-crawl';
 import {domainOf,overpassVariant,primaryCorpus,searchPrimary,searchSecondary,shouldRetryOverpass,type SearchItem} from './search';
 import {verifyTargetedLane} from './targeted';
 import {evidence,fetchBundle} from './evidence';
@@ -7,6 +8,7 @@ import {assess} from './assessment';
 
 export async function discoverLaneCycle(input:DiscoverInput):Promise<LaneCycleResult> {
   'use step';
+  if(input.cycle===22)return discoverCommonCrawlLane(input);
   if(input.cycle===20||input.cycle===21){
     const target=CYCLE20_TARGETS[input.lane.index];
     if(!target)throw new Error(`TARGETED_CYCLE_TARGET_MISSING_${input.cycle}_${input.lane.index}`);
