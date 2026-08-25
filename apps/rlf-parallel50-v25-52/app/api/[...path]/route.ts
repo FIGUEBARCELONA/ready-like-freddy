@@ -18,7 +18,7 @@ async function runState(id:string,includeOutput=false){if(!id)return{status:'not
 
 export async function GET(request:Request,{params}:{params:Promise<{path:string[]}>}){
   const parts=(await params).path??[];const path=parts.join('/');void request;
-  const base={version:'25.55.55',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_TARGETED_DIRECT_BRAND_VERIFICATION_V23',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0}};
+  const base={version:'25.55.56',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_TARGETED_DIRECT_INVENTORY_V23R1',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0},strictDirectBrandGate:true,correctedCycle:21};
   if(path==='health')return json({ok:true,...base,executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'CLOSED',oneShotSweep:'CLOSED',targetedQueueSize:CYCLE20_TARGETS.length,replacementEngineVersion:REPLACEMENT_POLICY.version,replacementSourcePool:REPLACEMENT_POLICY.sourcePool,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0,checkedAt:new Date().toISOString()});
   if(path==='provider/smoke')return json({ok:true,...base,smoke:await providerSmoke()});
   if(path==='targeted/smoke')return json({ok:true,...base,smoke:await targetedSmoke(CYCLE20_TARGETS[0],'en-IE,en;q=.9')});
