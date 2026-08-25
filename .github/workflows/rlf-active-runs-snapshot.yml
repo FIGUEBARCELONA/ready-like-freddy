@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '34'
+  SNAPSHOT_REVISION: '35'
   TARGET_RUN_ID: '32784949243'
   TARGET_SHA: '2dd77901661cf282f4771e2d2b666986397de8cd'
 
@@ -61,8 +61,8 @@ jobs:
                 productSuccess:([$jobs[0][]|select((.name|test("^Product F[0-9]{2}$")) and .conclusion=="success")]|length),
                 productFailed:([$jobs[0][]|select((.name|test("^Product F[0-9]{2}$")) and (.conclusion!=null and .conclusion!="success"))]|length),
                 productActive:([$jobs[0][]|select((.name|test("^Product F[0-9]{2}$")) and .status!="completed")]|length),
-                consolidateTotal:([$jobs[0][]|select(.name=="Consolidate, audit and persist sequence 16")]|length),
-                consolidateSuccess:([$jobs[0][]|select(.name=="Consolidate, audit and persist sequence 16" and .conclusion=="success")]|length),
+                consolidateTotal:([$jobs[0][]|select(.name=="Consolidate sequence 16 retry evidence")]|length),
+                consolidateSuccess:([$jobs[0][]|select(.name=="Consolidate sequence 16 retry evidence" and .conclusion=="success")]|length),
                 productWorkerArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence16-product-worker-F[0-9]{2}$"))]|length),
                 frontierArtifacts:([$artifacts[0][]|select(.name=="rlf-sequence16-retry-frontier")]|length),
                 consolidatedProductArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence16-retry-results-"))]|length),
