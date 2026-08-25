@@ -40,6 +40,7 @@ const htmlUrls=targeted.extractBrandUrls(html,'https://new-vintage-store.cz/sear
 const xmlUrls=targeted.extractBrandUrls('<urlset><url><loc>https://new-vintage-store.cz/products/fred-perry-jacket</loc></url><url><loc>https://external.example/fred-perry</loc></url></urlset>','https://new-vintage-store.cz/sitemap.xml','application/xml');
 const jsonUrls=targeted.extractBrandUrls(JSON.stringify({products:[{title:'Fred Perry Twin Tipped Polo',handle:'fred-perry-twin-tipped-polo',available:true},{title:'Other brand',handle:'other-brand'}]}),'https://new-vintage-store.cz/products.json','application/json');
 const emptyUrls=targeted.extractBrandUrls('<html><a href="/products/other">Other brand</a></html>','https://new-vintage-store.cz/search?q=Fred+Perry','text/html');
+const reflectedUrls=targeted.extractBrandUrls('<html><h1>Search results for Fred Perry</h1><p>No products found.</p><link rel="canonical" href="https://new-vintage-store.cz/search?q=Fred+Perry"></html>','https://new-vintage-store.cz/search?q=Fred+Perry','text/html');
 
 const checks=[
   [targets.CYCLE20_TARGETS.length,50,'target queue has exactly fifty lanes'],
@@ -57,7 +58,8 @@ const checks=[
   [xmlUrls.some(url=>url.includes('external.example')),false,'external sitemap URL rejected'],
   [jsonUrls.includes('https://new-vintage-store.cz/products/fred-perry-twin-tipped-polo'),true,'Shopify-like JSON handle resolved'],
   [jsonUrls.some(url=>url.includes('other-brand')),false,'unrelated JSON product rejected'],
-  [emptyUrls.length,0,'query text alone cannot manufacture Fred Perry evidence'],
+  [emptyUrls.length,0,'query URL alone cannot manufacture Fred Perry evidence'],
+  [reflectedUrls.length,0,'reflected Fred Perry query text cannot manufacture evidence'],
   [provenance.sameRegistrableDomain('https://shop.example.cz/a','https://www.example.cz/b'),true,'subdomains share operator provenance'],
   [provenance.sameRegistrableDomain('https://example.cz','https://marketplace.cz'),false,'different operators rejected'],
 ];
