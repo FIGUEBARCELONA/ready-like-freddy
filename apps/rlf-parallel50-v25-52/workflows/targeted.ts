@@ -24,6 +24,12 @@ const resolveInternal=(raw:string,base:string)=>{
     return url;
   }catch{return '';}
 };
+const searchOnly=(raw:string)=>{
+  try{
+    const url=new URL(raw);const value=decodeURIComponent(`${url.pathname}${url.search}`).toLowerCase();
+    return /(?:\/search\b|[?&](?:q|s|search)=)/.test(value)&&!/(?:\/products?\/|\/items?\/|\/collections?\/)/.test(value);
+  }catch{return false;}
+};
 
 function jsonBrandUrls(body:string,base:string){
   const output:string[]=[];
@@ -37,10 +43,9 @@ function jsonBrandUrls(body:string,base:string){
       const serialized=JSON.stringify(row).slice(0,24000);
       if(BRAND.test(serialized)){
         for(const key of ['url','permalink','link','href','handle']){
-          const candidate=row[key];
-          if(typeof candidate!=='string')continue;
+          const candidate=row[key];if(typeof candidate!=='string')continue;
           const raw=key==='handle'&&!candidate.startsWith('/')?`/products/${candidate}`:candidate;
-          const resolved=resolveInternal(raw,base);if(resolved)output.push(resolved);
+          const resolved=resolveInternal(raw,base);if(resolved&&!searchOnly(resolved))output.push(resolved);
         }
       }
       for(const child of Object.values(row).slice(0,200))walk(child,depth+1);
@@ -52,7 +57,7 @@ function jsonBrandUrls(body:string,base:string){
 
 export function extractBrandUrls(body:string,base:string,contentType:string|null){
   const output:string[]=[];
-  const add=(raw:string)=>{const resolved=resolveInternal(raw,base);if(resolved)output.push(resolved);};
+  const add=(raw:string)=>{const resolved=resolveInternal(raw,base);if(resolved&&!searchOnly(resolved))output.push(resolved);};
   for(const match of body.matchAll(/<a\b([^>]*)href\s*=\s*["']([^"']+)["']([^>]*)>([\s\S]*?)<\/a>/gi)){
     const context=strip(`${match[1]} ${match[3]} ${match[4]}`);
     if(BRAND.test(context)||BRAND.test(match[2]))add(match[2]);
@@ -60,7 +65,6 @@ export function extractBrandUrls(body:string,base:string,contentType:string|null
   for(const match of body.matchAll(/<loc>\s*([^<]+)\s*<\/loc>/gi))if(BRAND.test(match[1]))add(match[1]);
   for(const match of body.matchAll(/https?:\\?\/\\?\/[^\s"'<>]{0,500}(?:fred(?:%20|[-_+\s]|\\u002d)*perry|fredperry)[^\s"'<>]{0,500}/gi))add(match[0].replaceAll('\\/','/').replaceAll('\\u0026','&'));
   if(/json/i.test(contentType??''))output.push(...jsonBrandUrls(body,base));
-  if(BRAND.test(strip(body))&&/\b(search|s=|wp-json|sitemap|products?)\b/i.test(base))add(base);
   return [...new Set(output)].sort((a,b)=>rankBrandUrl(b)-rankBrandUrl(a)||a.localeCompare(b));
 }
 
@@ -116,14 +120,22 @@ function probeEvidence(probe:Probe):EvidenceRecord{
   return {role:/sitemap|robots/.test(probe.provider)?'SITEMAP':'BRAND_PROBE',url:probe.url,status:probe.status,contentType:probe.contentType,sha256:probe.sha256,length:probe.length};
 }
 
+export async function targetedSmoke(target:Cycle20Target,language='en-GB,en;q=.9'){
+  const home=await fetchProbe(target.url,'home',language);const adapters=adapterUrls(target,home.body);
+  const probes=[home,...await Promise.all(adapters.map(adapter=>fetchProbe(adapter.url,adapter.provider,language)))];
+  const brandUrls=[...new Set(probes.flatMap(probe=>probe.brandUrls))].filter(url=>sameRegistrableDomain(url,target.url));
+  const homeBrand=home.status===200&&BRAND.test(strip(home.body));
+  return {target:target.domain,transportReady:probes.some(probe=>probe.status===200&&!probe.challenge&&!probe.error),directBrandEvidence:brandUrls.length>0||homeBrand,brandUrlCount:brandUrls.length,probes:probes.map(probe=>({provider:probe.provider,status:probe.status,length:probe.length,contentType:probe.contentType,sha256:probe.sha256,challenge:probe.challenge,error:probe.error,brandUrls:probe.brandUrls.length,durationMs:probe.durationMs}))};
+}
+
 export async function verifyTargetedLane(input:TargetedInput):Promise<LaneCycleResult>{
   const searchedAt=new Date().toISOString();const home=await fetchProbe(input.target.url,'home',input.lane.language);
   const adapters=adapterUrls(input.target,home.body);
   const probes=[home,...await Promise.all(adapters.map(adapter=>fetchProbe(adapter.url,adapter.provider,input.lane.language)))];
   const brandUrls=[...new Set(probes.flatMap(probe=>probe.brandUrls))].filter(url=>sameRegistrableDomain(url,input.target.url)).sort((a,b)=>rankBrandUrl(b)-rankBrandUrl(a)||a.localeCompare(b));
-  const brandProbe=probes.find(probe=>BRAND.test(strip(probe.body)));
-  const evidenceUrl=brandUrls[0]??brandProbe?.url??input.target.url;
-  const directBrandEvidence=brandUrls.length>0||Boolean(brandProbe);
+  const homeBrand=home.status===200&&BRAND.test(strip(home.body));
+  const evidenceUrl=brandUrls[0]??input.target.url;
+  const directBrandEvidence=brandUrls.length>0||homeBrand;
   const result:SearchItem={
     title:directBrandEvidence?`${input.target.title} Fred Perry`:input.target.title,
     url:evidenceUrl,
