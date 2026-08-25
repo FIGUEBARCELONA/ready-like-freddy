@@ -41,6 +41,9 @@ const xmlUrls=targeted.extractBrandUrls('<urlset><url><loc>https://new-vintage-s
 const jsonUrls=targeted.extractBrandUrls(JSON.stringify({products:[{title:'Fred Perry Twin Tipped Polo',handle:'fred-perry-twin-tipped-polo',available:true},{title:'Other brand',handle:'other-brand'}]}),'https://new-vintage-store.cz/products.json','application/json');
 const emptyUrls=targeted.extractBrandUrls('<html><a href="/products/other">Other brand</a></html>','https://new-vintage-store.cz/search?q=Fred+Perry','text/html');
 const reflectedUrls=targeted.extractBrandUrls('<html><h1>Search results for Fred Perry</h1><p>No products found.</p><link rel="canonical" href="https://new-vintage-store.cz/search?q=Fred+Perry"></html>','https://new-vintage-store.cz/search?q=Fred+Perry','text/html');
+const inferredCandidate={status:'QUALIFIED_PROVISIONAL',supplierEvidence:'READY_TO_REVIEW',productEvidence:'DIRECT_PRODUCT_PROVISIONAL',fredPerryEvidence:true,uniqueProductPathSignal:true,availableProductSignals:4,score:91};
+const closedCandidate=targeted.applyDirectBrandGate(inferredCandidate,false);
+const directCandidate=targeted.applyDirectBrandGate({...inferredCandidate,fredPerryEvidence:false},true);
 
 const checks=[
   [targets.CYCLE20_TARGETS.length,50,'target queue has exactly fifty lanes'],
@@ -60,6 +63,17 @@ const checks=[
   [jsonUrls.some(url=>url.includes('other-brand')),false,'unrelated JSON product rejected'],
   [emptyUrls.length,0,'query URL alone cannot manufacture Fred Perry evidence'],
   [reflectedUrls.length,0,'reflected Fred Perry query text cannot manufacture evidence'],
+  [targeted.hasDirectBrandEvidence([]),false,'empty URL set cannot activate brand evidence'],
+  [targeted.hasDirectBrandEvidence(htmlUrls),true,'captured internal product URL activates brand evidence'],
+  [closedCandidate.fredPerryEvidence,false,'assessor inference is overridden without direct URL'],
+  [closedCandidate.status,'EVIDENCE_INCOMPLETE','non-direct candidate is fail-closed'],
+  [closedCandidate.supplierEvidence,'INCOMPLETE','non-direct supplier evidence is incomplete'],
+  [closedCandidate.productEvidence,'SUPPLIER_EVIDENCE_ONLY','non-direct product evidence is removed'],
+  [closedCandidate.score,35,'non-direct score is capped'],
+  [closedCandidate.uniqueProductPathSignal,false,'non-direct unique path signal is cleared'],
+  [closedCandidate.availableProductSignals,0,'non-direct availability signal is cleared'],
+  [directCandidate.fredPerryEvidence,true,'direct URL preserves brand evidence'],
+  [directCandidate.status,'QUALIFIED_PROVISIONAL','direct gate does not manufacture a rejection'],
   [provenance.sameRegistrableDomain('https://shop.example.cz/a','https://www.example.cz/b'),true,'subdomains share operator provenance'],
   [provenance.sameRegistrableDomain('https://example.cz','https://marketplace.cz'),false,'different operators rejected'],
 ];
