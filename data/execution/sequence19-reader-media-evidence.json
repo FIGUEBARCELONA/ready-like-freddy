@@ -1,0 +1,1658 @@
+{
+  "schemaVersion": 1,
+  "runId": "32862831870",
+  "planSha256": "e8167be1c91516f5f75f0698304385eb44fc427ed4d32fd6cfd2bb9d4477eb8d",
+  "candidateUrls": [
+    "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+    "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html#",
+    "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html#additional",
+    "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html#contentarea",
+    "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html#gallery-next-area",
+    "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html#gallery-prev-area",
+    "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+    "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html#",
+    "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html#additional",
+    "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html#contentarea",
+    "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html#gallery-next-area",
+    "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html#gallery-prev-area",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html#",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html#additional",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html#contentarea",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html#gallery-next-area",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html#gallery-prev-area",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html#",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html#additional",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html#contentarea",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html#gallery-next-area",
+    "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html#gallery-prev-area",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html#",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html#additional",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html#contentarea",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html#gallery-next-area",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html#gallery-prev-area",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html#",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html#additional",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html#contentarea",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html#gallery-next-area",
+    "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html#gallery-prev-area",
+    "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+    "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html#",
+    "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html#additional",
+    "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html#contentarea",
+    "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html#gallery-next-area",
+    "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html#gallery-prev-area",
+    "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+    "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html#",
+    "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html#additional",
+    "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html#contentarea",
+    "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html#gallery-next-area",
+    "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html#gallery-prev-area"
+  ],
+  "verifiedMedia": [],
+  "records": [
+    {
+      "slot": "F01",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+          "bytes": 29128,
+          "bodySha256": "4281e5544ad2c109b261344c1bee47ca41fc941bcdbdbaa3836083b3cbd13c4e",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+        "bytes": 29128,
+        "bodySha256": "4281e5544ad2c109b261344c1bee47ca41fc941bcdbdbaa3836083b3cbd13c4e",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 15,
+      "officialCandidateCount": 6,
+      "verifiedMediaCount": 0,
+      "recordSha256": "861f66961c3378b5c5e85d819d65e1a2d3d5a614b5c15f946d820da4052d9880"
+    },
+    {
+      "slot": "F02",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+          "bytes": 29713,
+          "bodySha256": "496027b636e9622cdf9c9f8c9be5b3a305e920af410bcd5af4988865198f98ca",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+        "bytes": 29713,
+        "bodySha256": "496027b636e9622cdf9c9f8c9be5b3a305e920af410bcd5af4988865198f98ca",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 17,
+      "officialCandidateCount": 6,
+      "verifiedMediaCount": 0,
+      "recordSha256": "042c03a0e413c96e73da3a0b90b7e18a145de08167747e0d5413a258461745e1"
+    },
+    {
+      "slot": "F03",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+          "bytes": 28728,
+          "bodySha256": "e56fc0d760982a1fad24efb3b0a6b63dcb0b9fc958239be3fe5931daf07ef514",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+        "bytes": 28728,
+        "bodySha256": "e56fc0d760982a1fad24efb3b0a6b63dcb0b9fc958239be3fe5931daf07ef514",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 15,
+      "officialCandidateCount": 6,
+      "verifiedMediaCount": 0,
+      "recordSha256": "0c94e92037deb27f580257e5327635f2290cf5e7bbdc400be7ed412397832007"
+    },
+    {
+      "slot": "F04",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+          "bytes": 30238,
+          "bodySha256": "1e9930425bd16c1afa6da86df7bbe6b15e5a17b1cc76111410d3ef36d7bdca5b",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+        "bytes": 30238,
+        "bodySha256": "1e9930425bd16c1afa6da86df7bbe6b15e5a17b1cc76111410d3ef36d7bdca5b",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 17,
+      "officialCandidateCount": 6,
+      "verifiedMediaCount": 0,
+      "recordSha256": "acda57610276f47684823967ba6af510c09bca4f4da61487e0c83b873a47c6ad"
+    },
+    {
+      "slot": "F05",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+          "bytes": 44672,
+          "bodySha256": "c4505a378c2036554f9b4c92d10c7952d4a096d59e882832053fda53765ff72e",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+        "bytes": 44672,
+        "bodySha256": "c4505a378c2036554f9b4c92d10c7952d4a096d59e882832053fda53765ff72e",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 42,
+      "officialCandidateCount": 6,
+      "verifiedMediaCount": 0,
+      "recordSha256": "c1c693332278062010647c94b230aa4e47fd05138124f07786243569f76c8c9b"
+    },
+    {
+      "slot": "F06",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+          "bytes": 45879,
+          "bodySha256": "134aa7d0211396e84f6712b01df4df4ddc81e2f524aa039124099ae19d8b3ece",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+        "bytes": 45879,
+        "bodySha256": "134aa7d0211396e84f6712b01df4df4ddc81e2f524aa039124099ae19d8b3ece",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 42,
+      "officialCandidateCount": 6,
+      "verifiedMediaCount": 0,
+      "recordSha256": "61f602543770c8aca913ed123f6b774aae273b5789ff0d0d807cf2c53e71bda2"
+    },
+    {
+      "slot": "F07",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+          "bytes": 46092,
+          "bodySha256": "c940860d010eb3efd4a43f505f2714ef7c198e5907996b7a9995997e69e2c2e5",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+        "bytes": 46092,
+        "bodySha256": "c940860d010eb3efd4a43f505f2714ef7c198e5907996b7a9995997e69e2c2e5",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 44,
+      "officialCandidateCount": 6,
+      "verifiedMediaCount": 0,
+      "recordSha256": "c50262c84a8a52d5b78ecdce1c6e27df46b5c366b7f67e40f9a8bfac1903ed20"
+    },
+    {
+      "slot": "F08",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+          "bytes": 46290,
+          "bodySha256": "f8770ae200f1eb3b72b5a45627f426df52a5ad788e6a14d5e9bbcdd76a1d8e62",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+        "bytes": 46290,
+        "bodySha256": "f8770ae200f1eb3b72b5a45627f426df52a5ad788e6a14d5e9bbcdd76a1d8e62",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 42,
+      "officialCandidateCount": 6,
+      "verifiedMediaCount": 0,
+      "recordSha256": "c7c8cd7f790e0e4f67fb8cc2e0e80f818eb1672d3f3712ea9454d4a4e453fc84"
+    },
+    {
+      "slot": "F09",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300+843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300+843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300+843",
+          "bytes": 27859,
+          "bodySha256": "7bc2016d41a2dc197c2b03865c38abaef8436dfd6f9424716cac41f954e6f0c9",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300+843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 27859,
+        "bodySha256": "7bc2016d41a2dc197c2b03865c38abaef8436dfd6f9424716cac41f954e6f0c9",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 1,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "08647da5df5b29f087ccf715dabb6f207c32355059652cc5e839eb72329a8cdf"
+    },
+    {
+      "slot": "F10",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300-843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300-843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300-843",
+          "bytes": 27848,
+          "bodySha256": "6df4987a5e4c342ba1b06586d82a1748dd3fc785ac6c3fbb7078be56a152bf71",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300-843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 27848,
+        "bodySha256": "6df4987a5e4c342ba1b06586d82a1748dd3fc785ac6c3fbb7078be56a152bf71",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 51,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "41858db5bbf7fb8c8f8c6bd2571aec2d794d3171f0bdc262aaf78abeaad8f8cf"
+    },
+    {
+      "slot": "F11",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300+843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300+843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300+843",
+          "bytes": 28266,
+          "bodySha256": "78717b04560ee301f85dd5d9cbddd6d6e2e7280c6589194808758d1cce16b5e7",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300+843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 28266,
+        "bodySha256": "78717b04560ee301f85dd5d9cbddd6d6e2e7280c6589194808758d1cce16b5e7",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 1,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "fb397b027bb4f67d0224273b8c942d7b5333d0386d901eb08e7dee599a6786cd"
+    },
+    {
+      "slot": "F12",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300-843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300-843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300-843",
+          "bytes": 26970,
+          "bodySha256": "37ea00747aed06e4c6d732f1c3fc1e533c5bb545314b3e8572af3dd6333c63ae",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300-843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 26970,
+        "bodySha256": "37ea00747aed06e4c6d732f1c3fc1e533c5bb545314b3e8572af3dd6333c63ae",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 51,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "fbb8ecffc0ac54cba11d8b26e7fd4bc6d7b2d8c47ca89906cda3bc6f6b5e7de0"
+    },
+    {
+      "slot": "F13",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300+843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300+843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300+843",
+          "bytes": 27282,
+          "bodySha256": "f6393bef960e557e88b3cf86455974696134ce2972810fd1da02b487d9990a2c",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300+843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 27282,
+        "bodySha256": "f6393bef960e557e88b3cf86455974696134ce2972810fd1da02b487d9990a2c",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 1,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "6294b2c63a93f2cd2d9f941489db54d81340bf0b414c933d7fb41fecae998ba3"
+    },
+    {
+      "slot": "F14",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300-843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300-843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300-843",
+          "bytes": 28548,
+          "bodySha256": "3957aba0f804ce226ee7d61d210c19e31884a42b021f9d1c97ed392b69a7a1ce",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300-843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 28548,
+        "bodySha256": "3957aba0f804ce226ee7d61d210c19e31884a42b021f9d1c97ed392b69a7a1ce",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 55,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "9c1a2acda7b2b798f6cd15c5a3c3977cd12b3573219f8913d8db97700f58d493"
+    },
+    {
+      "slot": "F15",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300+843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300+843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300+843",
+          "bytes": 22555,
+          "bodySha256": "333566dd2fe2784df8fd54af866de215b81dc445a57e53f55f7e80466cd2ea68",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300+843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 22555,
+        "bodySha256": "333566dd2fe2784df8fd54af866de215b81dc445a57e53f55f7e80466cd2ea68",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "6f75bd995dc06c880f3b2db137cc561a8264b85ef011eab3d08d35d17f4a40f2"
+    },
+    {
+      "slot": "F16",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300-843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300-843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300-843",
+          "bytes": 28610,
+          "bodySha256": "170c5be98034062ffba1360c72bf907e8fa522fc9a7b97b2de6a2c0380fde445",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300-843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 28610,
+        "bodySha256": "170c5be98034062ffba1360c72bf907e8fa522fc9a7b97b2de6a2c0380fde445",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 9,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "a910d357a31b57693a496a3f7cc93dddc63437608d6ba233cb4cfb775c8579f0"
+    },
+    {
+      "slot": "F17",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300+843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300+843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300+843",
+          "bytes": 30220,
+          "bodySha256": "f15d95e3d89036a8beb2d958e181ff5705d23c1e1175380ef2ca726ef5f56204",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300+843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 30220,
+        "bodySha256": "f15d95e3d89036a8beb2d958e181ff5705d23c1e1175380ef2ca726ef5f56204",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "e4deb04be77f15b333504e0aa481cbb0f5985c495c567912de25cd7264a7305b"
+    },
+    {
+      "slot": "F18",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300-843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300-843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300-843",
+          "bytes": 30228,
+          "bodySha256": "e58b261a7abfa2c870730475833945b24d8690d9ce2eae750db848b6807f37f7",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300-843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 30228,
+        "bodySha256": "e58b261a7abfa2c870730475833945b24d8690d9ce2eae750db848b6807f37f7",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 11,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "922a548bda18d4678c6784f85f8c23aff23a5244e037689280547d54360c5a9b"
+    },
+    {
+      "slot": "F19",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300+843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300+843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300+843",
+          "bytes": 30161,
+          "bodySha256": "343a2a222e9f61fad732620bcc0c63822c230dad9e34ab1dbf9a12a6a7496cfc",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300+843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 30161,
+        "bodySha256": "343a2a222e9f61fad732620bcc0c63822c230dad9e34ab1dbf9a12a6a7496cfc",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "12c9bdfd44c776f65723327ae27c97505a7eddd1111a706993abdb74612b4fb7"
+    },
+    {
+      "slot": "F20",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300-843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300-843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300-843",
+          "bytes": 34205,
+          "bodySha256": "1272146d4e27caa76e44bcd2398a958117916138ba250f8941fa0b186ff93c3b",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300-843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 34205,
+        "bodySha256": "1272146d4e27caa76e44bcd2398a958117916138ba250f8941fa0b186ff93c3b",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 77,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "e33ed5b61898bdcb8df35ad87d98c42b528eaad0798f13ad3ca0034d72ef36fe"
+    },
+    {
+      "slot": "F21",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300+843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300+843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300+843",
+          "bytes": 30238,
+          "bodySha256": "272d558eaca85aa65475134d562a2d0f162060dc26625a761314beda3c3810b4",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300+843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 30238,
+        "bodySha256": "272d558eaca85aa65475134d562a2d0f162060dc26625a761314beda3c3810b4",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "4bdfe05d35485c946d670bfbaf3973c8a987040b4782fc6276ece27ee4a6cba9"
+    },
+    {
+      "slot": "F22",
+      "identityKey": "HW2300|843",
+      "sourceUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300-843",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300-843",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300-843",
+          "bytes": 30213,
+          "bodySha256": "7d990f3191282d585ce44b79cd58b9342ac586eca945b7e4ba7b6109221d16ef",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300-843",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 30213,
+        "bodySha256": "7d990f3191282d585ce44b79cd58b9342ac586eca945b7e4ba7b6109221d16ef",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 11,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "3345f45494cb0e3aaa35313ea07990830827e2e9377cfbb9c72e637979afaec3"
+    },
+    {
+      "slot": "F23",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+81B",
+          "bytes": 37627,
+          "bodySha256": "72a5c41c32887aa1dad35bccc205d18e23a485b7f84cb1fbc3cf01b1ced7285e",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+81B",
+        "bytes": 37627,
+        "bodySha256": "72a5c41c32887aa1dad35bccc205d18e23a485b7f84cb1fbc3cf01b1ced7285e",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 1,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "acfca7d6ccbd71caccf774051b83416bc142b58b0f9f562baa3dd42c5abc20f2"
+    },
+    {
+      "slot": "F24",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-81B",
+          "bytes": 35156,
+          "bodySha256": "b693d33b2c3e687bc540f0486b224098a3c7f25be18e4eaf1e1f90f61568c94e",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-81B",
+        "bytes": 35156,
+        "bodySha256": "b693d33b2c3e687bc540f0486b224098a3c7f25be18e4eaf1e1f90f61568c94e",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 58,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "9a7e25f1668b72d32d6ea5fb0f338e12965ab1baa831195f9aa38b22d28bf693"
+    },
+    {
+      "slot": "F25",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+81B",
+          "bytes": 36462,
+          "bodySha256": "6b34ca96030bfdb6723005b16937d110616ffedf17511c44bea05f43cbbba833",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+81B",
+        "bytes": 36462,
+        "bodySha256": "6b34ca96030bfdb6723005b16937d110616ffedf17511c44bea05f43cbbba833",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 1,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "b1b241644d5939e17d4e02fea03dc63a4d4bbc51a8a7c5beb6abbbfd8ed9749c"
+    },
+    {
+      "slot": "F26",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-81B",
+          "bytes": 36871,
+          "bodySha256": "4531d50d3839a294e775ae5b00d76707876f655ec1e1dbada55cc4d1fef40554",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-81B",
+        "bytes": 36871,
+        "bodySha256": "4531d50d3839a294e775ae5b00d76707876f655ec1e1dbada55cc4d1fef40554",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 58,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "4c14e553fe25edd3b3e7148ea240c9f3e53b8aed691acc5dbc126e30642eae04"
+    },
+    {
+      "slot": "F27",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+81B",
+          "bytes": 28956,
+          "bodySha256": "33aedf68ad17d06a57d6e1ccfa454e0eea3165975d8f026892bef5187f74773c",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 28956,
+        "bodySha256": "33aedf68ad17d06a57d6e1ccfa454e0eea3165975d8f026892bef5187f74773c",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "69fd21a9aa8be1ffd8621f4d1b8c8a2f52a84740ee101055f13017701b7cd428"
+    },
+    {
+      "slot": "F28",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-81B",
+          "bytes": 30202,
+          "bodySha256": "68a4dff5c26b163673ea1844b950ddf244d466076d7e848e71566cde476abea2",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 30202,
+        "bodySha256": "68a4dff5c26b163673ea1844b950ddf244d466076d7e848e71566cde476abea2",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 11,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "11f6b6b155734301893d374cd987799a6460167e4b8835e9a5c3d480888ffb9f"
+    },
+    {
+      "slot": "F29",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+81B",
+          "bytes": 28269,
+          "bodySha256": "40bb94c0cef407923e55fff05b6fda411ab0c78286d0df3d36cf485c1513e53b",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 28269,
+        "bodySha256": "40bb94c0cef407923e55fff05b6fda411ab0c78286d0df3d36cf485c1513e53b",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "3fc9c44ab0c414d1ff552fcc2520c284b0f3cd1de5c70f729efee4a734d7b3d3"
+    },
+    {
+      "slot": "F30",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-81B",
+          "bytes": 28949,
+          "bodySha256": "6d273881c5ff3e590f60919210d6663c67a17337d8b69ed03452ed008f4eb565",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 28949,
+        "bodySha256": "6d273881c5ff3e590f60919210d6663c67a17337d8b69ed03452ed008f4eb565",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 9,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "bb242a65e04ad196c84f130c8560e34e7a6973983222aa0ab2b219b40a71a2b2"
+    },
+    {
+      "slot": "F31",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+81B",
+          "bytes": 28611,
+          "bodySha256": "7f4c1884c32143595b96769c6fdbc0269402e5ce142e5b04fd63872f713495d2",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 28611,
+        "bodySha256": "7f4c1884c32143595b96769c6fdbc0269402e5ce142e5b04fd63872f713495d2",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "a36479faf3bb854e90d0bedc83c2e82ad9ffd9706bc5fd5b619c908a0b006d3c"
+    },
+    {
+      "slot": "F32",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-81B",
+          "bytes": 28941,
+          "bodySha256": "2a0ffa845eacd120a2d609b726142122af098bcd58a4c0db1f973fcf3d755c46",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 28941,
+        "bodySha256": "2a0ffa845eacd120a2d609b726142122af098bcd58a4c0db1f973fcf3d755c46",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 9,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "334476617403974bbc0196cf74b68102de70b024f0d0fd266d7d42d37cf43f7d"
+    },
+    {
+      "slot": "F33",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+81B",
+          "bytes": 29349,
+          "bodySha256": "2f53bf08115d198539783386c2f73f6db90d6589ba6a8a1350d33f0ba0ace678",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 29349,
+        "bodySha256": "2f53bf08115d198539783386c2f73f6db90d6589ba6a8a1350d33f0ba0ace678",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "b11e5849eb36cbf4e33da3f07d023bff45b2d252917c933131614dcda8f414b6"
+    },
+    {
+      "slot": "F34",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-81B",
+          "bytes": 29333,
+          "bodySha256": "8d8dea08e39a57a26a252c0c09cdc964960645ce8c0eadf7eec2129559a87106",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 29333,
+        "bodySha256": "8d8dea08e39a57a26a252c0c09cdc964960645ce8c0eadf7eec2129559a87106",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 55,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "2a9c8dfb1ea579ca46f309cc581d66aa4313b4fc14ce8b0fd3dc81f36f8e3412"
+    },
+    {
+      "slot": "F35",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+81B",
+          "bytes": 31247,
+          "bodySha256": "28ac548682132e45a28c042e1f63e9429b6455f4f04a64040a70e1d52dc30889",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 31247,
+        "bodySha256": "28ac548682132e45a28c042e1f63e9429b6455f4f04a64040a70e1d52dc30889",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "c141f2751f9637d80eb7ad6bac14f4c7dbc339ea6c51b24171154716159ee5ea"
+    },
+    {
+      "slot": "F36",
+      "identityKey": "M1588|81B",
+      "sourceUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-81B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-81B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-81B",
+          "bytes": 30149,
+          "bodySha256": "f8985ad6459345439a68ca21273f23798305994dcc7d924adf6c8706e8ceb746",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-81B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 30149,
+        "bodySha256": "f8985ad6459345439a68ca21273f23798305994dcc7d924adf6c8706e8ceb746",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 64,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "b73b62edeba3af97be49916442f4f32969ce3a6f7091db5aaaea371b08c858e6"
+    },
+    {
+      "slot": "F37",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+84B",
+          "bytes": 37623,
+          "bodySha256": "9be52a5457571a549e905c2d310bb1dacccd776ac79dfc7841c337f758a1c752",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+84B",
+        "bytes": 37623,
+        "bodySha256": "9be52a5457571a549e905c2d310bb1dacccd776ac79dfc7841c337f758a1c752",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 1,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "3a0917305adee3b799cdefd4700d5b99675b431a9b784585a8a3f21c502282b5"
+    },
+    {
+      "slot": "F38",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-84B",
+          "bytes": 36303,
+          "bodySha256": "7352ce28ea4312e2f5d71c0738d7b4e35353c694eeb27ad44b9816cbd03a7622",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-84B",
+        "bytes": 36303,
+        "bodySha256": "7352ce28ea4312e2f5d71c0738d7b4e35353c694eeb27ad44b9816cbd03a7622",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 58,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "f01ff1cd18d17973f4534348705451120f06edc855f5f398f939bca724d1aa0c"
+    },
+    {
+      "slot": "F39",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+84B",
+          "bytes": 36830,
+          "bodySha256": "0ae766f7d86909219f8550c28ac45605e557d5648e3099d6716b9e0782a05700",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+84B",
+        "bytes": 36830,
+        "bodySha256": "0ae766f7d86909219f8550c28ac45605e557d5648e3099d6716b9e0782a05700",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 1,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "8f2bcc7afb13b00adb2f4c62a38e96f490714524bf4ef576a895a017cbeebcb4"
+    },
+    {
+      "slot": "F40",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-84B",
+          "bytes": 36822,
+          "bodySha256": "ea6e5fdc61d89e140e4129ff52e0deb1091fba14947fee1ae87621b361e44e3e",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-84B",
+        "bytes": 36822,
+        "bodySha256": "ea6e5fdc61d89e140e4129ff52e0deb1091fba14947fee1ae87621b361e44e3e",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 58,
+      "officialCandidateCount": 1,
+      "verifiedMediaCount": 0,
+      "recordSha256": "086ea84b15a05e79ae590aaa22f5b478cc6405844f23580147c8e3abe2a77f20"
+    },
+    {
+      "slot": "F41",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+84B",
+          "bytes": 28949,
+          "bodySha256": "fcb5547ee5117c0cc73fe51c19bd65110152cd56489b22e9b96b8255222a8737",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 28949,
+        "bodySha256": "fcb5547ee5117c0cc73fe51c19bd65110152cd56489b22e9b96b8255222a8737",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "0636f5d888b412c4bfd88eff08574436d56be174fb32f25c580203f7393477c2"
+    },
+    {
+      "slot": "F42",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-84B",
+          "bytes": 30202,
+          "bodySha256": "3dd46791200148e0f46bc736214a833d54bf44063be4e23f9c9cbe0b5d0dc9f3",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 30202,
+        "bodySha256": "3dd46791200148e0f46bc736214a833d54bf44063be4e23f9c9cbe0b5d0dc9f3",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 11,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "f184207869d563e4042afe607d817cab318f217865fd557eddadfc19c61eded2"
+    },
+    {
+      "slot": "F43",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+84B",
+          "bytes": 28269,
+          "bodySha256": "507307a87b7e5ef491fadc1f7a7f6a6aace0c064bc39d8b554b88941cc8ee9f5",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 28269,
+        "bodySha256": "507307a87b7e5ef491fadc1f7a7f6a6aace0c064bc39d8b554b88941cc8ee9f5",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "68ba88fe83c7ea4f0181fa414a9b4d8be554f1e9f92825d1a13c4af56877dee2"
+    },
+    {
+      "slot": "F44",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-84B",
+          "bytes": 28948,
+          "bodySha256": "6b2baaf00b0247fa1494b2b05a77d3bac88bd3aa7021554d0f5b22da70184a08",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 28948,
+        "bodySha256": "6b2baaf00b0247fa1494b2b05a77d3bac88bd3aa7021554d0f5b22da70184a08",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 9,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "be2450a25b273b0262c16e16b453556619b91f97c5c061725148b805dee945ca"
+    },
+    {
+      "slot": "F45",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+84B",
+          "bytes": 28954,
+          "bodySha256": "219c1523b1d89f6bcd917988d13c7e95a66e2211a615bfd6be6d2752dd224d55",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 28954,
+        "bodySha256": "219c1523b1d89f6bcd917988d13c7e95a66e2211a615bfd6be6d2752dd224d55",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "28314f309a4e1395c6f4a0be81d3c2ff1d958fe2dd11f29856b091ef59859a96"
+    },
+    {
+      "slot": "F46",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-84B",
+          "bytes": 28651,
+          "bodySha256": "db7a4d0f244645f9ebe9b08047b552b8c0956e10322a6755a834d94877436e73",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 28651,
+        "bodySha256": "db7a4d0f244645f9ebe9b08047b552b8c0956e10322a6755a834d94877436e73",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 9,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "c1842b6bd51714669009bf27da8f3bcdf1650509fd3d13372c031b8f79ae34ff"
+    },
+    {
+      "slot": "F47",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+84B",
+          "bytes": 30302,
+          "bodySha256": "c86661bb7b9be1be538894023f03f6e21a7e6095899b9a7f480dbd982cfb69a2",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 30302,
+        "bodySha256": "c86661bb7b9be1be538894023f03f6e21a7e6095899b9a7f480dbd982cfb69a2",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "91199f41749e5b79cbeacf05d9992465b3b5ddfef86f002323778f756eadc406"
+    },
+    {
+      "slot": "F48",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-84B",
+          "bytes": 29331,
+          "bodySha256": "588a76fd2b3393b6b4776d500f1e0af195dac7f3753345dc2859efb63ee8347b",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 29331,
+        "bodySha256": "588a76fd2b3393b6b4776d500f1e0af195dac7f3753345dc2859efb63ee8347b",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 55,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "6f6bcc2fd460725d6bf1ea5dd7b230940e86ba909f66d34b2fe10395371f1ea9"
+    },
+    {
+      "slot": "F49",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+84B",
+          "bytes": 31223,
+          "bodySha256": "041cc52635de1997f6d6f6b24eb2b1d826ae96ace4098131c862a817c5bb2c3d",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 31223,
+        "bodySha256": "041cc52635de1997f6d6f6b24eb2b1d826ae96ace4098131c862a817c5bb2c3d",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 0,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "0230c7fef2b855f4b95eed975aeac7ae769c3ec74d38b69c7c26968522facec2"
+    },
+    {
+      "slot": "F50",
+      "identityKey": "M1588|84B",
+      "sourceUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-84B",
+      "readerAttempts": [
+        {
+          "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-84B",
+          "status": 200,
+          "ok": true,
+          "contentType": "text/plain; charset=utf-8",
+          "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-84B",
+          "bytes": 30146,
+          "bodySha256": "bf49ee601856f4dafe5adadd9d562591ad1e9efc7d3c52c57629e1f18a665c48",
+          "error": null
+        }
+      ],
+      "selectedReader": {
+        "readerUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-84B",
+        "status": 200,
+        "ok": true,
+        "contentType": "text/plain; charset=utf-8",
+        "effectiveUrl": "https://r.jina.ai/https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 30146,
+        "bodySha256": "bf49ee601856f4dafe5adadd9d562591ad1e9efc7d3c52c57629e1f18a665c48",
+        "error": null
+      },
+      "readerFetchOk": true,
+      "exactTextOccurrenceCount": 64,
+      "officialCandidateCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "9eb8519459a9d6996f0d06296d461b7e6036a257d2042a70a61ea6e77e38868c"
+    }
+  ]
+}
