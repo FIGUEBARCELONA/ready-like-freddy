@@ -1,7 +1,7 @@
 import type {Lane} from '@/lib/lanes';
 
 export type ProviderAttempt={name:string;status:number|null;bodyLength:number;linkCount:number;challenge:boolean;durationMs:number;error:string|null;contentType:string|null;responseHash:string|null};
-export type EvidenceRecord={role:'TARGET'|'HOME'|'LEGAL'|'SHOPIFY_SEARCH'|'BRAND_PROBE'|'SITEMAP';url:string;status:number|null;contentType:string|null;sha256:string|null;length:number};
+export type EvidenceRecord={role:'TARGET'|'HOME'|'LEGAL'|'SHOPIFY_SEARCH'|'BRAND_PROBE'|'SITEMAP'|'ARCHIVE_INDEX';url:string;status:number|null;contentType:string|null;sha256:string|null;length:number};
 export type CandidateStatus='QUALIFIED_PROVISIONAL'|'DUPLICATE_KNOWN'|'DUPLICATE_IDENTITY_IN_SWEEP'|'QUARANTINE_IDENTITY'|'EVIDENCE_INCOMPLETE'|'REJECT_MARKETPLACE'|'REJECT_NOT_PRELOVED'|'REJECT_UK'|'REJECT_NON_EU'|'FETCH_FAILED';
 
 export type Candidate={
