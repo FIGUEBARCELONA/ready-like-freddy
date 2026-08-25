@@ -1,16 +1,16 @@
 {
-  "schemaVersion": 12,
-  "recordedAt": "2026-08-25T14:56:21.328Z",
-  "sourceCommitSha": "77eda511833bf8511bf35d9b0a504283bdd69c8b",
-  "runId": "32862609682",
+  "schemaVersion": 13,
+  "recordedAt": "2026-08-25T15:08:31.407Z",
+  "sourceCommitSha": "cfe8fea55423a8a72d8495f837db05fb18f15f00",
+  "runId": "32863876426",
   "runAttempt": 1,
   "validationOutcome": "success",
   "nodeVersion": "v22.23.2",
-  "logSha256": "2d7c7bcc424ed24ed6e97ed4ceddcace95efe5a62c75904da5208722cb047c3e",
+  "logSha256": "80babf74c6d3a3c9e558fd4e0a1ab338638989e62cdb0534a3753bff011d368d",
   "ledgerCheckpoint": {
-    "schemaVersion": 12,
-    "sourceRunId": "32862115918",
-    "generatedAt": "2026-08-25T14:56:13.191Z",
+    "schemaVersion": 13,
+    "sourceRunId": "32862831870",
+    "generatedAt": "2026-08-25T15:08:19.796Z",
     "expected": {
       "identity": {
         "completedIdentityCount": 1357,
@@ -77,44 +77,46 @@
         "sourcePageAudits": 4
       }
     },
-    "sequence18": {
-      "planSha256": "83213579b078493e719a9159c97ac12651f605ba09130bb380b5d3a399dabd3f",
-      "manifestSha256": "a08bd163e69c125ec924f778edce86424245dbeacd78ff4d1243b96fc5544365",
-      "status": "DIRECT_OFFICIAL_TRANSPORT_BLOCKED_BY_WAF_NO_MEDIA_DECISION",
-      "sourceManifestStatus": "LIVE_OFFICIAL_PROBES_EXHAUSTED_NO_VERIFIED_MEDIA",
+    "sequence19": {
+      "planSha256": "e8167be1c91516f5f75f0698304385eb44fc427ed4d32fd6cfd2bb9d4477eb8d",
+      "manifestSha256": "659ddcd44507de5d6577f8904d771412c693874b76fe6d4acaabd6fdd6a3d0bd",
+      "status": "READER_CANDIDATE_DISCOVERY_COMPLETE_NO_DIRECTLY_VERIFIED_MEDIA",
+      "readerStatusCounts": {
+        "200": 50
+      },
       "totals": {
-        "probeCount": 50,
-        "uniqueProbeUrlCount": 50,
-        "httpOkCount": 0,
-        "httpErrorCount": 50,
-        "exactTextOccurrenceProbeCount": 29,
-        "observedCandidateMediaCount": 0,
+        "sourceCount": 50,
+        "uniqueSourceCount": 50,
+        "readerAttemptCount": 50,
+        "readerSuccessCount": 50,
+        "readerFailureCount": 0,
+        "exactTextOccurrenceSourceCount": 36,
+        "officialCandidateRawCount": 62,
+        "officialCandidateUniqueCount": 48,
+        "directVerificationAttemptCount": 62,
         "verifiedMediaRawCount": 0,
         "verifiedMediaCount": 0,
         "identitiesWithVerifiedMedia": 0
       },
-      "responseStatusCounts": {
-        "403": 50
-      },
-      "responseContentTypeCounts": {
-        "text/html; charset=UTF-8": 50
+      "candidateKinds": {
+        "PAGE_OR_FRAGMENT": 48
       },
       "dashboardCounts": {
         "totalJobs": 52,
         "prepareTotal": 1,
         "prepareSuccess": 1,
-        "liveTotal": 50,
-        "liveSuccess": 50,
-        "liveFailed": 0,
-        "liveActive": 0,
+        "readerTotal": 50,
+        "readerSuccess": 50,
+        "readerFailed": 0,
+        "readerActive": 0,
         "consolidateTotal": 1,
         "consolidateSuccess": 1,
-        "liveWorkerArtifacts": 50,
+        "readerWorkerArtifacts": 50,
         "planArtifacts": 1,
         "consolidatedArtifacts": 1,
         "totalArtifacts": 52
       },
-      "consolidatedArtifactDigest": "sha256:b4e0381e0d78e477edc059d987752c975710387040470843f60500f702d34044"
+      "consolidatedArtifactDigest": "sha256:18d4e12a6e5b1f9c715e9a9151b9ea957eb1993144689479e93261e872022c91"
     },
     "mismatches": [],
     "passed": true
@@ -123,13 +125,14 @@
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
     "canonical_json_11_identity_8_source_page_4_persisted_audits",
-    "exact_sequence18_no_mutation_ledgers",
-    "fifty_of_fifty_live_workers",
-    "fifty_unique_official_probe_urls",
-    "fifty_http_403_waf_responses",
-    "zero_observed_candidate_media",
+    "exact_sequence19_no_mutation_ledgers",
+    "fifty_of_fifty_reader_workers",
+    "fifty_unique_official_sources",
+    "one_hundred_unique_reader_urls",
+    "fifty_reader_http_200",
+    "forty_eight_page_or_fragment_candidates",
+    "zero_media_path_candidates",
     "zero_verified_media",
-    "transport_blocked_not_evidence_absent",
     "three_retries_remain_open",
     "factory_verified_zero",
     "global_canonical_products_zero",
