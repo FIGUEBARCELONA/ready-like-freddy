@@ -25,33 +25,43 @@ const searchFile=path.join(root,'workflows','search.ts');
 const policy=evaluate(policyFile,(id)=>{throw new Error(`Unexpected policy import: ${id}`);});
 const registry=evaluate(registryFile,(id)=>{throw new Error(`Unexpected registry import: ${id}`);});
 const search=evaluate(searchFile,(id)=>{
+  if(id==='node:crypto')return require('node:crypto');
   if(id==='./policy')return policy;
   if(id==='@/lib/known-suppliers')return registry;
   throw new Error(`Unexpected search import: ${id}`);
 });
 
 const baseLane={slot:'F06',countryCode:'CZ',country:'Czechia',language:'cs-CZ,cs;q=.9,en;q=.7',tld:'cz',localSecondhand:'použité oblečení',index:5};
-const commonInput={cycle:17,maxCandidates:8,lane:baseLane};
-const ddgInput={cycle:17,maxCandidates:8,lane:{...baseLane,slot:'F33',index:32}};
-const primary=search.primaryCommerceQuery(commonInput);
-const alternate=search.alternateCommerceQuery(commonInput);
-const ccUrl=search.commonCrawlUrl(commonInput,48);
-const unwrapped=search.unwrapDuckDuckGo('//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.cz%2Fproducts%2Ffred-perry-polo%3Futm_source%3Dddg');
+const input={cycle:18,maxCandidates:8,lane:baseLane};
+const extraInput={cycle:18,maxCandidates:8,lane:{...baseLane,slot:'F33',index:32}};
+const primary=search.primaryCommerceQuery(input);
+const alternate=search.alternateCommerceQuery(input);
+const exactCrawl=search.commonCrawlExactUrl('https://example.cz/products/fred-perry-polo?utm_source=test',5);
+const redirect='//duckduckgo.com/l/?uddg=https%3A%2F%2Fnew-vintage-store.cz%2Fproducts%2Ffred-perry-polo%3Futm_source%3Dddg';
+const classFirst=`<div class="result"><a class="result__a" href="${redirect}">Fred Perry vintage polo</a></div>`;
+const hrefFirst=`<div class="result"><a href="${redirect}" class="result__a">Fred Perry vintage polo</a></div>`;
+const lite=`<a href="${redirect}" class="result-link">Fred Perry vintage polo</a>`;
+const parsedClassFirst=search.duckDuckGoResults(classFirst,10);
+const parsedHrefFirst=search.duckDuckGoResults(hrefFirst,10);
+const parsedLite=search.duckDuckGoResults(lite,10);
+const unwrapped=search.unwrapDuckDuckGo(redirect);
 
 const fixtures=[
-  [search.COMMON_CRAWL_INDEX,'CC-MAIN-2026-30','Common Crawl collection is pinned'],
-  [search.primaryCorpus(commonInput),'commoncrawl-cdx','first EU-27 lane uses Common Crawl'],
-  [search.primaryCorpus(ddgInput),'duckduckgo-html','duplicate-country lane uses DuckDuckGo'],
-  [search.shouldRunFallbackSearch(0),true,'empty primary corpus triggers one Bing fallback'],
-  [search.shouldRunFallbackSearch(1),false,'one primary result suppresses Bing fallback'],
-  [ccUrl.includes('index.commoncrawl.org/CC-MAIN-2026-30-index'),true,'Common Crawl endpoint is pinned'],
-  [decodeURIComponent(ccUrl).includes('*.cz'),true,'Common Crawl query keeps ccTLD boundary'],
-  [decodeURIComponent(ccUrl).includes('matchType=domain'),true,'Common Crawl query uses domain match'],
-  [decodeURIComponent(ccUrl).includes('status:200'),true,'Common Crawl query filters HTTP 200'],
-  [decodeURIComponent(ccUrl).includes('mime:text/html'),true,'Common Crawl query filters HTML'],
-  [decodeURIComponent(ccUrl).includes('fred[^/?#]{0,12}perry'),true,'Common Crawl query filters Fred Perry URL forms'],
-  [decodeURIComponent(ccUrl).includes('limit=48'),true,'Common Crawl query is bounded'],
-  [unwrapped,'https://example.cz/products/fred-perry-polo','DuckDuckGo redirect is unwrapped and tracking removed'],
+  [search.COMMON_CRAWL_INDEX,'CC-MAIN-2026-30','Common Crawl collection remains pinned'],
+  [search.primaryCorpus(input),'duckduckgo-html','base lane uses DuckDuckGo primary'],
+  [search.primaryCorpus(extraInput),'duckduckgo-html','extra lane uses DuckDuckGo primary'],
+  [search.shouldRunFallbackSearch(0),true,'empty DuckDuckGo result triggers one Bing fallback'],
+  [search.shouldRunFallbackSearch(1),false,'one DuckDuckGo result suppresses Bing fallback'],
+  [parsedClassFirst.length,1,'parser accepts class before href'],
+  [parsedHrefFirst.length,1,'parser accepts href before class'],
+  [parsedLite.length,1,'parser accepts DuckDuckGo lite result-link'],
+  [parsedHrefFirst[0]?.domain,undefined,'search items do not fabricate domain fields'],
+  [parsedHrefFirst[0]?.url,'https://new-vintage-store.cz/products/fred-perry-polo','parsed redirect is canonical'],
+  [unwrapped,'https://new-vintage-store.cz/products/fred-perry-polo','DuckDuckGo redirect is unwrapped and tracking removed'],
+  [exactCrawl.includes('index.commoncrawl.org/CC-MAIN-2026-30-index'),true,'exact Common Crawl endpoint is pinned'],
+  [decodeURIComponent(exactCrawl).includes('https://example.cz/products/fred-perry-polo'),true,'Common Crawl query is exact candidate URL'],
+  [decodeURIComponent(exactCrawl).includes('*.cz'),false,'Common Crawl query is not TLD-wide'],
+  [decodeURIComponent(exactCrawl).includes('limit=5'),true,'Common Crawl corroboration is bounded'],
   [primary.query.includes('Fred Perry'),true,'primary keeps brand constraint'],
   [primary.query.includes('.cz')||primary.query.includes('Czechia'),true,'primary keeps country constraint'],
   [alternate.query.includes('Fred Perry'),true,'fallback keeps brand constraint'],
