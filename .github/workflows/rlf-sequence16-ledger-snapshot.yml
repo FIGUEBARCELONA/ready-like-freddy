@@ -1,0 +1,165 @@
+name: RLF sequence 16 ledger snapshot
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence16-ledger-snapshot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-sequence16-ledger-snapshot
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Rebuild exact sequence 16 identity and source-page ledgers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/execution
+          node --input-type=module <<'NODE'
+          import { readFile, writeFile } from 'node:fs/promises';
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
+
+          const runId = '32784949243';
+          const identity = await loadProgressLedger();
+          const sourcePages = await loadSourcePageLedger();
+          const identityDelta = JSON.parse(await readFile(`data/execution/progress-deltas/${runId}.json`, 'utf8'));
+          const productManifest = JSON.parse(await readFile(`data/execution/runs/${runId}/product-manifest.json`, 'utf8'));
+          const ledgerAudit = JSON.parse(await readFile(`data/execution/runs/${runId}/ledger-delta-audit.json`, 'utf8'));
+          const dashboard = JSON.parse(await readFile('data/execution/workflow-runs-snapshot.json', 'utf8'));
+
+          const snapshot = {
+            schemaVersion: 1,
+            generatedAt: new Date().toISOString(),
+            sourceCommitSha: process.env.GITHUB_SHA,
+            sourceRunId: runId,
+            identity: {
+              completedIdentityCount: identity.completed.identityCount,
+              productUrlCaptureCount: identity.completed.productUrlCaptureCount,
+              officialProductImageReferenceCount: identity.counters.officialProductImageReferenceCount,
+              materialEvidenceCount: identity.counters.materialEvidenceCount,
+              manufacturingClaimCount: identity.counters.manufacturingClaimCount,
+              descriptionMissingIdentityCount: identity.metadataGaps.descriptionMissingIdentityCount,
+              priceMissingIdentityCount: identity.metadataGaps.priceMissingIdentityCount,
+              materialMissingIdentityCount: identity.metadataGaps.materialMissingIdentityCount,
+              retryIdentityCount: identity.retry.identityCount,
+              retryIdentityKeys: identity.retry.identities.map(item => item.identityKey).sort(),
+              deltaCount: identity.deltaCount,
+              latestRunId: String(identity.latestRunId),
+              factoryVerifiedCount: identity.counters.factoryVerifiedCount,
+              globalCanonicalProductCount: identity.counters.globalCanonicalProductCount,
+              ledgerSha256: identity.ledgerSha256,
+            },
+            sourcePages: {
+              deltaCount: sourcePages.deltaCount,
+              attemptedObservationCount: sourcePages.attemptedObservationCount,
+              uniqueAttemptedSourcePageCount: sourcePages.uniqueAttemptedSourcePageCount,
+              ledgerSha256: sourcePages.ledgerSha256,
+            },
+            sequence16: {
+              acceptance: identityDelta.acceptance,
+              identityDeltaSha256: identityDelta.ledgerDeltaSha256,
+              completedIdentityKeys: identityDelta.completedIdentityKeys,
+              failedIdentityKeys: identityDelta.failedIdentities.map(item => item.identityKey).sort(),
+              capturedProductUrlCount: identityDelta.capturedProductUrlCount,
+              productWorkerCount: productManifest.workerCount,
+              productQualityGatePassed: productManifest.qualityGatePassed,
+              productTotals: productManifest.totals,
+              ledgerDeltaAuditPassed: ledgerAudit.passed,
+              ledgerDeltaOverlapWithPrior: ledgerAudit.batch.overlapWithPrior,
+              completedAndFailedOverlap: ledgerAudit.batch.completedAndFailedOverlap,
+              dashboardPassed: dashboard.passed,
+              dashboardCounts: dashboard.counts,
+            },
+          };
+
+          const expectedCompleted = ['G3636|Z77','M4613|41A','SY3660|46A'];
+          const expectedRetries = ['HW2300|843','M1588|81B','M1588|84B'];
+          const t = snapshot.sequence16.productTotals;
+          const c = snapshot.sequence16.dashboardCounts;
+          snapshot.passed =
+            snapshot.identity.completedIdentityCount === 1357 &&
+            snapshot.identity.productUrlCaptureCount === 2155 &&
+            snapshot.identity.officialProductImageReferenceCount === 11708 &&
+            snapshot.identity.materialEvidenceCount === 1748 &&
+            snapshot.identity.manufacturingClaimCount === 64 &&
+            snapshot.identity.descriptionMissingIdentityCount === 826 &&
+            snapshot.identity.priceMissingIdentityCount === 770 &&
+            snapshot.identity.materialMissingIdentityCount === 86 &&
+            snapshot.identity.retryIdentityCount === 3 &&
+            JSON.stringify(snapshot.identity.retryIdentityKeys) === JSON.stringify(expectedRetries) &&
+            snapshot.identity.deltaCount === 11 &&
+            snapshot.identity.latestRunId === runId &&
+            snapshot.identity.factoryVerifiedCount === 0 &&
+            snapshot.identity.globalCanonicalProductCount === 0 &&
+            snapshot.sourcePages.deltaCount === 8 &&
+            snapshot.sourcePages.attemptedObservationCount === 1524 &&
+            snapshot.sourcePages.uniqueAttemptedSourcePageCount === 1239 &&
+            snapshot.sourcePages.ledgerSha256 === '19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3' &&
+            snapshot.sequence16.acceptance === 'PARTIAL_STRICT_EVIDENCE_3_COMPLETE_3_RETRY' &&
+            snapshot.sequence16.identityDeltaSha256 === '969b177b95cc8a45e239ca41626354e9fd3a43839aa269b756bbe0eadc3c8f80' &&
+            JSON.stringify(snapshot.sequence16.completedIdentityKeys) === JSON.stringify(expectedCompleted) &&
+            JSON.stringify(snapshot.sequence16.failedIdentityKeys) === JSON.stringify(expectedRetries) &&
+            snapshot.sequence16.capturedProductUrlCount === 3 &&
+            snapshot.sequence16.productWorkerCount === 50 &&
+            snapshot.sequence16.productQualityGatePassed === false &&
+            t.selectedIdentityCount === 6 &&
+            t.expectedProductCaptureCount === 6 &&
+            t.attemptedIdentityCount === 6 &&
+            t.successfulIdentityCaptureCount === 3 &&
+            t.failedIdentityCaptureCount === 3 &&
+            t.soft404IdentityCount === 0 &&
+            t.missingImageIdentityCount === 3 &&
+            t.officialProductImageReferenceCount === 26 &&
+            t.rejectedImageReferenceCount === 0 &&
+            t.verifiedPriceCount === 0 &&
+            t.materialEvidenceCount === 3 &&
+            t.manufacturingClaimCount === 0 &&
+            t.factoryVerifiedCount === 0 &&
+            snapshot.sequence16.ledgerDeltaAuditPassed === true &&
+            snapshot.sequence16.ledgerDeltaOverlapWithPrior.length === 0 &&
+            snapshot.sequence16.completedAndFailedOverlap.length === 0 &&
+            snapshot.sequence16.dashboardPassed === true &&
+            c.totalJobs === 52 && c.prepareSuccess === 1 &&
+            c.productTotal === 50 && c.productSuccess === 50 &&
+            c.productFailed === 0 && c.productActive === 0 &&
+            c.consolidateSuccess === 1 && c.productWorkerArtifacts === 50 &&
+            c.frontierArtifacts === 1 && c.consolidatedProductArtifacts === 1 &&
+            c.totalArtifacts === 52;
+
+          await writeFile('data/execution/sequence16-ledger-snapshot.json', `${JSON.stringify(snapshot, null, 2)}\n`);
+          console.log(JSON.stringify(snapshot, null, 2));
+          if (!snapshot.passed) throw new Error('Sequence 16 exact ledger snapshot failed');
+          NODE
+      - name: Publish exact sequence 16 ledger snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence16-ledger-snapshot.json
+          git commit -m 'Persist exact sequence 16 ledger snapshot'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1
