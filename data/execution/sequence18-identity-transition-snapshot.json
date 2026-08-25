@@ -1,0 +1,1382 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-25T05:09:15.560Z",
+  "targetSequence": 18,
+  "phaseId": "IDENTITY_TRANSITION_ARCHIVE_EVIDENCE_GATE_01",
+  "phaseCheckpointStatus": "COMPLETED_NO_STRICT_IDENTITY_TRANSITION_EVIDENCE_3_RETRIES_RETAINED",
+  "sourceRun": {
+    "runId": "32810809315",
+    "workflowName": "RLF sequence 18 identity transition archive gate",
+    "workflowId": 341780633,
+    "workflowPath": ".github/workflows/rlf-sequence18-identity-transition-archive-gate.yml",
+    "runNumber": 1,
+    "runAttempt": 1,
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "createdAt": "2026-08-25T04:55:32Z",
+    "startedAt": "2026-08-25T04:55:32Z",
+    "updatedAt": "2026-08-25T04:56:48Z",
+    "headBranch": "feature/rlf-execution-backend-20260823",
+    "headSha": "d2f078cb4e9e91fa9d7c7ecdd6d06e17fb835f93",
+    "htmlUrl": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32810809315"
+  },
+  "persistence": {
+    "commitSha": "93ee1e9fbec9c56fbf5bf8aaedb20a0f27c7038f",
+    "parentCommitSha": "310a149bd30278fea86374b4a64816d0dbcfa33e",
+    "sourceCommitSha": "d2f078cb4e9e91fa9d7c7ecdd6d06e17fb835f93",
+    "safeInterveningCommitSha": "310a149bd30278fea86374b4a64816d0dbcfa33e",
+    "treeSha": "fa0b339e6ef6b9d6ed025e3f006301c01051d140",
+    "committedAt": "2026-08-25T04:56:44Z",
+    "authorName": "github-actions[bot]",
+    "message": "Persist audited sequence 18 identity-transition evidence 32810809315",
+    "htmlUrl": "https://github.com/FIGUEBARCELONA/ready-like-freddy/commit/93ee1e9fbec9c56fbf5bf8aaedb20a0f27c7038f",
+    "changedFileCount": 5,
+    "files": [
+      {
+        "path": "data/execution/runs/32810809315/SEQUENCE18_IDENTITY_TRANSITION_SHA256SUMS.txt",
+        "status": "added",
+        "blobSha": "e0f1067c211be786ae6d448cccef0f7481179a39",
+        "additions": 188,
+        "deletions": 0,
+        "changes": 188
+      },
+      {
+        "path": "data/execution/runs/32810809315/identity-transition-frontier.json",
+        "status": "added",
+        "blobSha": "345c3e0b41732060111fe393421e5d685e0ab7d2",
+        "additions": 715,
+        "deletions": 0,
+        "changes": 715
+      },
+      {
+        "path": "data/execution/runs/32810809315/identity-transition-observations.ndjson",
+        "status": "added",
+        "blobSha": "3be6b725c75f05e9a4a0e126117eeda0982fb513",
+        "additions": 85,
+        "deletions": 0,
+        "changes": 85
+      },
+      {
+        "path": "data/execution/runs/32810809315/sequence18-identity-transition-archive-report.json",
+        "status": "added",
+        "blobSha": "40c498e24f9448ab705569a6d084ec0563d92269",
+        "additions": 1368,
+        "deletions": 0,
+        "changes": 1368
+      },
+      {
+        "path": "data/execution/sequence18-identity-transition-archive-report.json",
+        "status": "added",
+        "blobSha": "40c498e24f9448ab705569a6d084ec0563d92269",
+        "additions": 1368,
+        "deletions": 0,
+        "changes": 1368
+      }
+    ],
+    "interveningCommit": {
+      "commitSha": "310a149bd30278fea86374b4a64816d0dbcfa33e",
+      "parentCommitSha": "d2f078cb4e9e91fa9d7c7ecdd6d06e17fb835f93",
+      "treeSha": "e7fdadb357453a4a521f1909ce01871af039f7f0",
+      "committedAt": "2026-08-25T04:56:04Z",
+      "authorName": "github-actions[bot]",
+      "message": "Index RLF validation run 32810809257",
+      "changedFileCount": 1,
+      "changedPath": "data/execution/live-validation.json",
+      "progressDeltaMutationCount": 0
+    }
+  },
+  "frontier": {
+    "frontierId": "RLF-SEQUENCE18-IDENTITY-TRANSITION-32810809315",
+    "frontierSha256": "403be442367d92d80aa184c8dd72161331dec108be21d29d7be438d543dfaab7",
+    "frontierFileSha256": "1dd11c6458f3d3c903af1e6281b75f184fecc8d95e3b5133ddffc1b522763693",
+    "selectedIdentitySha256": "af5c06fbcb2fdea5be542b5c93527bb20bda95d996682ad0a2e1ee8942eeb728",
+    "priorRunId": "32784949243",
+    "priorLedgerSha256": "0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7",
+    "priorDeltaCount": 11,
+    "workerCount": 50,
+    "activeLaneCount": 3,
+    "auditedIdleLaneCount": 47,
+    "selectedIdentityCount": 3,
+    "exactAliasUrlCount": 8,
+    "verifiedOfficialSiteMapTargetCount": 10,
+    "independentlyObservedOfficialProbeTargetCount": 10,
+    "transitionEnabledIdentityCount": 2,
+    "identityKeys": [
+      "HW2300|843",
+      "M1588|81B",
+      "M1588|84B"
+    ],
+    "ledgerMutationAllowed": false,
+    "archiveEvidencePolicy": {
+      "originalUrlMustBeOfficialFredPerryHttps": true,
+      "archiveCaptureAloneNeverEstablishesCodeAlias": true,
+      "exactCodeColourMediaUrlRequiredForExactMediaCandidate": true,
+      "samePageCrossCodeMediaAssociationRequiredForTransitionCandidate": true,
+      "transitionCandidateRequiresSeparateRecoveryGate": true
+    }
+  },
+  "result": {
+    "reportSha256": "dc23ea8a5f982b56ae19f71b44225ab7833d32548eef0f3dcb2bced0ad5f00e4",
+    "reportFileSha256": "1eb7c490d1e9fb0759cdb82b389ea80d53e1a2dc254e2851b55d413bf8a15dcb",
+    "observationsFileSha256": "3dc3863d6ee3569549fa86b0c8be891d190d9ea12d92b8d4ee40e3ed7e67fb90",
+    "attemptedProbeCount": 85,
+    "successfulResponseCount": 49,
+    "transportErrorCount": 0,
+    "responseStatusCounts": {
+      "200": 49,
+      "404": 7,
+      "503": 29
+    },
+    "observationRecordTypeCounts": [
+      {
+        "recordType": "COMMON_CRAWL_COLLECTION_INDEX_QUERY",
+        "count": 3
+      },
+      {
+        "recordType": "COMMON_CRAWL_EXACT_OFFICIAL_URL_QUERY",
+        "count": 36
+      },
+      {
+        "recordType": "CURRENT_EXACT_OFFICIAL_PRODUCT_PAGE_CAPTURE",
+        "count": 8
+      },
+      {
+        "recordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "count": 10
+      },
+      {
+        "recordType": "CURRENT_VERIFIED_OFFICIAL_SITE_MAP_CAPTURE",
+        "count": 10
+      },
+      {
+        "recordType": "WAYBACK_CDX_EXACT_OFFICIAL_URL_QUERY",
+        "count": 18
+      }
+    ],
+    "observationCountsByIdentity": [
+      {
+        "identityKey": "HW2300|843",
+        "count": 29
+      },
+      {
+        "identityKey": "M1588|81B",
+        "count": 28
+      },
+      {
+        "identityKey": "M1588|84B",
+        "count": 28
+      }
+    ],
+    "currentOfficialCaptureCount": 28,
+    "waybackIndexQueryCount": 18,
+    "waybackArchivedPageCaptureCount": 0,
+    "commonCrawlIndexQueryCount": 36,
+    "commonCrawlArchivedPageCaptureCount": 0,
+    "discoveredOfficialProductUrlCount": 18,
+    "discoveredOfficialProductUrls": [
+      {
+        "identityKey": "HW2300|843",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "263a53c6311b60e83d82cb3e533229ccd1782141c49e4a4b1aa0a79f5b7d630c",
+        "productUrl": "https://www.fredperry.com/ae-ar/twill-cap-hw2300-843.html",
+        "productCode": "HW2300",
+        "colourCode": "843",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "HW2300|843",
+        "sourceRecordType": "CURRENT_EXACT_OFFICIAL_PRODUCT_PAGE_CAPTURE",
+        "sourceRecordSha256": "74b499409843ada64d808af0fc0312e5f4a36b714c55c04ea8e4616472814e60",
+        "productUrl": "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+        "productCode": "HW2300",
+        "colourCode": "843",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "HW2300|843",
+        "sourceRecordType": "CURRENT_EXACT_OFFICIAL_PRODUCT_PAGE_CAPTURE",
+        "sourceRecordSha256": "8d99a124544472dcb78826cd626dd680fefcba7ea693e0cb50ffbf56abf54a62",
+        "productUrl": "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+        "productCode": "HW2300",
+        "colourCode": "843",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "HW2300|843",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "c1ec54fa35fc70699d2fb7c1384a34e5ace7c611b641530ab110880bf2d014b8",
+        "productUrl": "https://www.fredperry.com/sa-ar/accessories/twill-cap-hw2300-843.html",
+        "productCode": "HW2300",
+        "colourCode": "843",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "HW2300|843",
+        "sourceRecordType": "CURRENT_EXACT_OFFICIAL_PRODUCT_PAGE_CAPTURE",
+        "sourceRecordSha256": "b22105010e3bf523a11119c01ffefc244ae471be84ae1758a07e4a26ce5302e5",
+        "productUrl": "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+        "productCode": "HW2300",
+        "colourCode": "843",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "HW2300|843",
+        "sourceRecordType": "CURRENT_EXACT_OFFICIAL_PRODUCT_PAGE_CAPTURE",
+        "sourceRecordSha256": "a2696dab2393c41316d4e1d2bf1832b33bef9c0bc8772f385a1b3f42c3a004e1",
+        "productUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+        "productCode": "HW2300",
+        "colourCode": "843",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "M1588|81B",
+        "sourceRecordType": "CURRENT_EXACT_OFFICIAL_PRODUCT_PAGE_CAPTURE",
+        "sourceRecordSha256": "267fd8df4b96547c4523d5c1dca47025f77173bde2c0ee70fccafcfda58b50f8",
+        "productUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+        "productCode": "M1588",
+        "colourCode": "81B",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "M1588|81B",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "d61d8dd1514c43686cc71518570fbbf0e7b04f0312b16daca3241667a79fc1a6",
+        "productUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/twin-tipped-t-shirt-m1588v-81b.html",
+        "productCode": "M1588V",
+        "colourCode": "81B",
+        "relation": "ONE_TERMINAL_LETTER_CODE_VARIANT"
+      },
+      {
+        "identityKey": "M1588|81B",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "11800398f90fb142d327444d76953876658da239836114d3e5b2606fb2ea0783",
+        "productUrl": "https://www.fredperry.com/eu-es/camiseta-con-el-ribete-con-dos-franjas-m1588v-81b.html",
+        "productCode": "M1588V",
+        "colourCode": "81B",
+        "relation": "ONE_TERMINAL_LETTER_CODE_VARIANT"
+      },
+      {
+        "identityKey": "M1588|81B",
+        "sourceRecordType": "CURRENT_EXACT_OFFICIAL_PRODUCT_PAGE_CAPTURE",
+        "sourceRecordSha256": "ee23d7499021a05cf8e86642c6c69f25c20d8fa9a3144737c5b17a8abea2fdf3",
+        "productUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+        "productCode": "M1588",
+        "colourCode": "81B",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "M1588|81B",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "640684e98cc26c2f9136d57f1e63de25da26933f602c046330574fa3aaeea9d2",
+        "productUrl": "https://www.fredperry.com/eu-fr/homme/t-shirts/t-shirt-a-double-lisere-m1588-81b.html",
+        "productCode": "M1588",
+        "colourCode": "81B",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "M1588|81B",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "f8382ab4a2c348ebb37002d4daf33063c08fd7637b7d180b951b7b76ed4a45e6",
+        "productUrl": "https://www.fredperry.com/men/t-shirts/twin-tipped-t-shirt-m1588v-81b.html",
+        "productCode": "M1588V",
+        "colourCode": "81B",
+        "relation": "ONE_TERMINAL_LETTER_CODE_VARIANT"
+      },
+      {
+        "identityKey": "M1588|84B",
+        "sourceRecordType": "CURRENT_EXACT_OFFICIAL_PRODUCT_PAGE_CAPTURE",
+        "sourceRecordSha256": "c399463bf35b834906cec916b61671ee2c592066650472e115465245d71818ca",
+        "productUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+        "productCode": "M1588",
+        "colourCode": "84B",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "M1588|84B",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "d16599948e6ca3f10515c03bf626c727024a5a297c87999da72ea3fa7fe05e3a",
+        "productUrl": "https://www.fredperry.com/eu-es/camiseta-con-el-ribete-con-dos-franjas-m1588v-84b.html",
+        "productCode": "M1588V",
+        "colourCode": "84B",
+        "relation": "ONE_TERMINAL_LETTER_CODE_VARIANT"
+      },
+      {
+        "identityKey": "M1588|84B",
+        "sourceRecordType": "CURRENT_EXACT_OFFICIAL_PRODUCT_PAGE_CAPTURE",
+        "sourceRecordSha256": "aac90e5ab384b068e320fcd13a9f9a833b90ecfdfc8933c0e17c622fb4395e1d",
+        "productUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+        "productCode": "M1588",
+        "colourCode": "84B",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "M1588|84B",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "610bbfa01650d3ee78b1d2b62e83d52f897e0c98a84e33262a65e00b639ca7ea",
+        "productUrl": "https://www.fredperry.com/eu-fr/t-shirt-a-double-lisere-m1588-84b.html",
+        "productCode": "M1588",
+        "colourCode": "84B",
+        "relation": "EXACT_BASE_CODE"
+      },
+      {
+        "identityKey": "M1588|84B",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "ccbd2b184e9be404533c8337e68135bff8a7fd487078512d92ee669857a1a1e0",
+        "productUrl": "https://www.fredperry.com/eu-it/uomo/t-shirt-con-doppia-riga-m1588v-84b.html",
+        "productCode": "M1588V",
+        "colourCode": "84B",
+        "relation": "ONE_TERMINAL_LETTER_CODE_VARIANT"
+      },
+      {
+        "identityKey": "M1588|84B",
+        "sourceRecordType": "CURRENT_PUBLICLY_INDEXED_OFFICIAL_PROBE_PAGE_CAPTURE",
+        "sourceRecordSha256": "fb24444c3792232a10bfec11e55fe13fde43ef29831172381106938cd872b071",
+        "productUrl": "https://www.fredperry.com/men/twin-tipped-t-shirt-m1588v-84b.html",
+        "productCode": "M1588V",
+        "colourCode": "84B",
+        "relation": "ONE_TERMINAL_LETTER_CODE_VARIANT"
+      }
+    ],
+    "exactMediaCandidateCount": 0,
+    "exactMediaCandidateIdentityKeys": [],
+    "transitionBridgeCandidateCount": 0,
+    "transitionBridgeCandidateIdentityKeys": [],
+    "rejectedIdentityMediaCount": 103,
+    "rejectedIdentityMediaCountsByIdentity": [
+      {
+        "identityKey": "HW2300|843",
+        "count": 5
+      },
+      {
+        "identityKey": "M1588|81B",
+        "count": 42
+      },
+      {
+        "identityKey": "M1588|84B",
+        "count": 56
+      }
+    ],
+    "rejectedIdentityMediaReasonOccurrences": [
+      {
+        "reason": "ADJACENT_CODE_PAGE_AND_MEDIA_DO_NOT_ESTABLISH_BASE_CODE_ALIAS",
+        "count": 16
+      },
+      {
+        "reason": "MEDIA_COLOUR_CODE_MISMATCH",
+        "count": 87
+      },
+      {
+        "reason": "SOURCE_PAGE_EXACT_SKU_STATEMENT_NOT_OBSERVED",
+        "count": 13
+      }
+    ],
+    "automaticAliasPromotionPerformed": false,
+    "sameColourOrProductNameAloneAccepted": false,
+    "retriesRetained": true,
+    "unresolvedIdentityKeys": [
+      "HW2300|843",
+      "M1588|81B",
+      "M1588|84B"
+    ],
+    "nextAction": "NO_STRICT_IDENTITY_TRANSITION_OR_ARCHIVE_MEDIA_FOUND_RETRIES_RETAINED",
+    "ledgerMutationCount": 0,
+    "factoryVerifiedCount": 0,
+    "globalCanonicalProductCount": 0
+  },
+  "ledger": {
+    "latestRunId": "32784949243",
+    "deltaCount": 11,
+    "completedIdentityCount": 1357,
+    "productUrlCaptureCount": 2155,
+    "retryIdentityCount": 3,
+    "retryIdentityKeys": [
+      "HW2300|843",
+      "M1588|81B",
+      "M1588|84B"
+    ],
+    "officialProductImageReferenceCount": 11708,
+    "materialEvidenceCount": 1748,
+    "manufacturingClaimCount": 64,
+    "factoryVerifiedCount": 0,
+    "globalCanonicalProductCount": 0,
+    "canonicalRunnerLedgerSha256": "0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7",
+    "progressDeltaDirectoryTreeSha": "e4cd05a9f494e69839253770da18c292a60ce19c",
+    "latestProgressDeltaBlobSha": "7c2276e2cadf025032c1ee63a7981011b051f5b4"
+  },
+  "verification": {
+    "passed": true,
+    "allJobsSucceeded": true,
+    "jobCount": 52,
+    "identityWorkerJobCount": 50,
+    "jobInventorySha256": "cbf801d163b3e0bfcb175df94d0b96a1c1ae6103cdfb369b1a7799e678fdcf30",
+    "allArtifactsPresent": true,
+    "artifactCount": 52,
+    "identityWorkerArtifactCount": 50,
+    "allArtifactDigestsValid": true,
+    "allArtifactSizesValid": true,
+    "expiredArtifactCount": 0,
+    "totalArtifactSizeInBytes": 727046,
+    "artifactInventorySha256": "4d03e84f8c7830fd473225ad65394f7c6c595c00eec3985bb7b8fc7c62e66016",
+    "frontierArtifact": {
+      "id": 9549717826,
+      "name": "rlf-sequence18-identity-transition-frontier",
+      "sizeInBytes": 2577,
+      "digest": "sha256:0589414e9d4b98416f3a0721d51499e015b8df0fb3ff8483a390022e2cbf0a8c",
+      "expiresAt": "2026-09-24T04:55:38Z"
+    },
+    "resultArtifact": {
+      "id": 9549739862,
+      "name": "rlf-sequence18-identity-transition-results-32810809315",
+      "sizeInBytes": 389762,
+      "digest": "sha256:f4a8d369996cbbce68dca237c09131f51a99ba81b5247d82707ad850b525f327",
+      "expiresAt": "2026-09-24T04:56:42Z"
+    },
+    "finalArtifactFileCount": 189,
+    "evidenceManifestEntryCount": 188,
+    "allEvidenceManifestEntriesValid": true,
+    "evidenceFileChecks": {
+      "frontier": {
+        "repositoryPath": "data/execution/runs/32810809315/identity-transition-frontier.json",
+        "sourcePath": "execution/identity-transition-frontier/identity-transition-frontier.json",
+        "fileSha256": "1dd11c6458f3d3c903af1e6281b75f184fecc8d95e3b5133ddffc1b522763693",
+        "blobSha": "345c3e0b41732060111fe393421e5d685e0ab7d2",
+        "match": true
+      },
+      "report": {
+        "repositoryPath": "data/execution/runs/32810809315/sequence18-identity-transition-archive-report.json",
+        "sourcePath": "execution/sequence18-identity-consolidated/sequence18-identity-transition-archive-report.json",
+        "fileSha256": "1eb7c490d1e9fb0759cdb82b389ea80d53e1a2dc254e2851b55d413bf8a15dcb",
+        "blobSha": "40c498e24f9448ab705569a6d084ec0563d92269",
+        "match": true
+      },
+      "observations": {
+        "repositoryPath": "data/execution/runs/32810809315/identity-transition-observations.ndjson",
+        "sourcePath": "execution/sequence18-identity-consolidated/identity-transition-observations.ndjson",
+        "fileSha256": "3dc3863d6ee3569549fa86b0c8be891d190d9ea12d92b8d4ee40e3ed7e67fb90",
+        "blobSha": "3be6b725c75f05e9a4a0e126117eeda0982fb513",
+        "match": true
+      },
+      "manifest": {
+        "repositoryPath": "data/execution/runs/32810809315/SEQUENCE18_IDENTITY_TRANSITION_SHA256SUMS.txt",
+        "sourcePath": "execution/SEQUENCE18_IDENTITY_TRANSITION_SHA256SUMS.txt",
+        "fileSha256": "d8392dc71596af41d31ffe2234dad22311de51fd54e020b7c567be5db80df5b8",
+        "blobSha": "e0f1067c211be786ae6d448cccef0f7481179a39",
+        "match": true
+      }
+    },
+    "reportCopiesByteIdentical": true,
+    "observationLogicalHashCount": 85,
+    "workerSummaryCount": 50,
+    "activeLaneCount": 3,
+    "auditedIdleLaneCount": 47,
+    "canonicalLedgerUnchanged": true,
+    "progressDeltaDirectoryTreeUnchanged": true,
+    "persistenceProgressDeltaMutationCount": 0,
+    "independentFactoryGateChanged": false,
+    "globalCanonicalGateChanged": false
+  },
+  "jobs": {
+    "inventorySha256": "cbf801d163b3e0bfcb175df94d0b96a1c1ae6103cdfb369b1a7799e678fdcf30",
+    "inventory": [
+      {
+        "id": 97689791923,
+        "name": "Consolidate strict identity-transition evidence",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:24Z",
+        "completedAt": "2026-08-25T04:56:47Z"
+      },
+      {
+        "id": 97689670895,
+        "name": "Identity gate F01",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:56:14Z"
+      },
+      {
+        "id": 97689670897,
+        "name": "Identity gate F02",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:54Z",
+        "completedAt": "2026-08-25T04:56:22Z"
+      },
+      {
+        "id": 97689670903,
+        "name": "Identity gate F03",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:44Z",
+        "completedAt": "2026-08-25T04:56:07Z"
+      },
+      {
+        "id": 97689670995,
+        "name": "Identity gate F04",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:03Z",
+        "completedAt": "2026-08-25T04:56:11Z"
+      },
+      {
+        "id": 97689670926,
+        "name": "Identity gate F05",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:54Z",
+        "completedAt": "2026-08-25T04:56:03Z"
+      },
+      {
+        "id": 97689670944,
+        "name": "Identity gate F06",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:01Z",
+        "completedAt": "2026-08-25T04:56:14Z"
+      },
+      {
+        "id": 97689670901,
+        "name": "Identity gate F07",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689670934,
+        "name": "Identity gate F08",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:53Z",
+        "completedAt": "2026-08-25T04:56:01Z"
+      },
+      {
+        "id": 97689670970,
+        "name": "Identity gate F09",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:53Z",
+        "completedAt": "2026-08-25T04:56:00Z"
+      },
+      {
+        "id": 97689670977,
+        "name": "Identity gate F10",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:52Z",
+        "completedAt": "2026-08-25T04:55:58Z"
+      },
+      {
+        "id": 97689670920,
+        "name": "Identity gate F11",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689671001,
+        "name": "Identity gate F12",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:07Z",
+        "completedAt": "2026-08-25T04:56:13Z"
+      },
+      {
+        "id": 97689670918,
+        "name": "Identity gate F13",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689670949,
+        "name": "Identity gate F14",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:51Z"
+      },
+      {
+        "id": 97689670968,
+        "name": "Identity gate F15",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:54Z",
+        "completedAt": "2026-08-25T04:56:03Z"
+      },
+      {
+        "id": 97689670927,
+        "name": "Identity gate F16",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689670910,
+        "name": "Identity gate F17",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:49Z"
+      },
+      {
+        "id": 97689670965,
+        "name": "Identity gate F18",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:05Z",
+        "completedAt": "2026-08-25T04:56:12Z"
+      },
+      {
+        "id": 97689670954,
+        "name": "Identity gate F19",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:53Z",
+        "completedAt": "2026-08-25T04:56:00Z"
+      },
+      {
+        "id": 97689670989,
+        "name": "Identity gate F20",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:04Z",
+        "completedAt": "2026-08-25T04:56:17Z"
+      },
+      {
+        "id": 97689670991,
+        "name": "Identity gate F21",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:51Z",
+        "completedAt": "2026-08-25T04:56:00Z"
+      },
+      {
+        "id": 97689670996,
+        "name": "Identity gate F22",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:04Z",
+        "completedAt": "2026-08-25T04:56:11Z"
+      },
+      {
+        "id": 97689671010,
+        "name": "Identity gate F23",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689670942,
+        "name": "Identity gate F24",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689671037,
+        "name": "Identity gate F25",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:01Z",
+        "completedAt": "2026-08-25T04:56:10Z"
+      },
+      {
+        "id": 97689671052,
+        "name": "Identity gate F26",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:00Z",
+        "completedAt": "2026-08-25T04:56:08Z"
+      },
+      {
+        "id": 97689670986,
+        "name": "Identity gate F27",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:51Z"
+      },
+      {
+        "id": 97689671011,
+        "name": "Identity gate F28",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:02Z",
+        "completedAt": "2026-08-25T04:56:08Z"
+      },
+      {
+        "id": 97689671008,
+        "name": "Identity gate F29",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:54Z",
+        "completedAt": "2026-08-25T04:56:05Z"
+      },
+      {
+        "id": 97689670941,
+        "name": "Identity gate F30",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:51Z"
+      },
+      {
+        "id": 97689671050,
+        "name": "Identity gate F31",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:54Z",
+        "completedAt": "2026-08-25T04:56:03Z"
+      },
+      {
+        "id": 97689670988,
+        "name": "Identity gate F32",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689670964,
+        "name": "Identity gate F33",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689671022,
+        "name": "Identity gate F34",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:01Z",
+        "completedAt": "2026-08-25T04:56:07Z"
+      },
+      {
+        "id": 97689671055,
+        "name": "Identity gate F35",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:53Z",
+        "completedAt": "2026-08-25T04:56:01Z"
+      },
+      {
+        "id": 97689671051,
+        "name": "Identity gate F36",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:57Z"
+      },
+      {
+        "id": 97689671081,
+        "name": "Identity gate F37",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:54Z",
+        "completedAt": "2026-08-25T04:56:03Z"
+      },
+      {
+        "id": 97689671040,
+        "name": "Identity gate F38",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:49Z"
+      },
+      {
+        "id": 97689671067,
+        "name": "Identity gate F39",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:01Z",
+        "completedAt": "2026-08-25T04:56:08Z"
+      },
+      {
+        "id": 97689671056,
+        "name": "Identity gate F40",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:52Z",
+        "completedAt": "2026-08-25T04:55:59Z"
+      },
+      {
+        "id": 97689671150,
+        "name": "Identity gate F41",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:59Z",
+        "completedAt": "2026-08-25T04:56:08Z"
+      },
+      {
+        "id": 97689671058,
+        "name": "Identity gate F42",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:53Z",
+        "completedAt": "2026-08-25T04:56:03Z"
+      },
+      {
+        "id": 97689671147,
+        "name": "Identity gate F43",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:08Z",
+        "completedAt": "2026-08-25T04:56:15Z"
+      },
+      {
+        "id": 97689671071,
+        "name": "Identity gate F44",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:05Z",
+        "completedAt": "2026-08-25T04:56:10Z"
+      },
+      {
+        "id": 97689671095,
+        "name": "Identity gate F45",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689671092,
+        "name": "Identity gate F46",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:43Z",
+        "completedAt": "2026-08-25T04:55:52Z"
+      },
+      {
+        "id": 97689671184,
+        "name": "Identity gate F47",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:54Z",
+        "completedAt": "2026-08-25T04:56:05Z"
+      },
+      {
+        "id": 97689671134,
+        "name": "Identity gate F48",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:07Z",
+        "completedAt": "2026-08-25T04:56:16Z"
+      },
+      {
+        "id": 97689671195,
+        "name": "Identity gate F49",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:07Z",
+        "completedAt": "2026-08-25T04:56:16Z"
+      },
+      {
+        "id": 97689671165,
+        "name": "Identity gate F50",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:56:06Z",
+        "completedAt": "2026-08-25T04:56:14Z"
+      },
+      {
+        "id": 97689645048,
+        "name": "Prepare strict identity-transition frontier",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-08-25T04:55:34Z",
+        "completedAt": "2026-08-25T04:55:40Z"
+      }
+    ]
+  },
+  "artifacts": {
+    "inventorySha256": "4d03e84f8c7830fd473225ad65394f7c6c595c00eec3985bb7b8fc7c62e66016",
+    "inventory": [
+      {
+        "id": 9549717826,
+        "name": "rlf-sequence18-identity-transition-frontier",
+        "sizeInBytes": 2577,
+        "digest": "sha256:0589414e9d4b98416f3a0721d51499e015b8df0fb3ff8483a390022e2cbf0a8c",
+        "createdAt": "2026-08-25T04:55:38Z",
+        "expiresAt": "2026-09-24T04:55:38Z",
+        "expired": false
+      },
+      {
+        "id": 9549739862,
+        "name": "rlf-sequence18-identity-transition-results-32810809315",
+        "sizeInBytes": 389762,
+        "digest": "sha256:f4a8d369996cbbce68dca237c09131f51a99ba81b5247d82707ad850b525f327",
+        "createdAt": "2026-08-25T04:56:43Z",
+        "expiresAt": "2026-09-24T04:56:42Z",
+        "expired": false
+      },
+      {
+        "id": 9549729324,
+        "name": "rlf-sequence18-identity-worker-F01",
+        "sizeInBytes": 100149,
+        "digest": "sha256:c186002e7355679891f81cbd63c8b131ebdf9b61282a6c266e13c9214f79fbb9",
+        "createdAt": "2026-08-25T04:56:12Z",
+        "expiresAt": "2026-09-24T04:56:12Z",
+        "expired": false
+      },
+      {
+        "id": 9549731280,
+        "name": "rlf-sequence18-identity-worker-F02",
+        "sizeInBytes": 100544,
+        "digest": "sha256:b08f1420225a495b2b8580dac8388b93197cb9bb0be045a39681d38b997a8db7",
+        "createdAt": "2026-08-25T04:56:18Z",
+        "expiresAt": "2026-09-24T04:56:17Z",
+        "expired": false
+      },
+      {
+        "id": 9549726484,
+        "name": "rlf-sequence18-identity-worker-F03",
+        "sizeInBytes": 99542,
+        "digest": "sha256:f738b3ea7f07f6ec8953f433f66c0834b9c1c8be724bb891385ab6c095ccd09a",
+        "createdAt": "2026-08-25T04:56:04Z",
+        "expiresAt": "2026-09-24T04:56:03Z",
+        "expired": false
+      },
+      {
+        "id": 9549727873,
+        "name": "rlf-sequence18-identity-worker-F04",
+        "sizeInBytes": 735,
+        "digest": "sha256:dfd0a348c55be7204328be289b9c920ff2093683f68a629c75ad419c4cc09cbd",
+        "createdAt": "2026-08-25T04:56:08Z",
+        "expiresAt": "2026-09-24T04:56:07Z",
+        "expired": false
+      },
+      {
+        "id": 9549725126,
+        "name": "rlf-sequence18-identity-worker-F05",
+        "sizeInBytes": 734,
+        "digest": "sha256:1ab71fb7433632f2c9119e8f638cb270f63c8d5eb6e8b3955be9b4c26639af9a",
+        "createdAt": "2026-08-25T04:56:00Z",
+        "expiresAt": "2026-09-24T04:55:59Z",
+        "expired": false
+      },
+      {
+        "id": 9549728840,
+        "name": "rlf-sequence18-identity-worker-F06",
+        "sizeInBytes": 734,
+        "digest": "sha256:77f23934bb70599b053c14cf709eae1d9625c904bdd8fe4aa42f4065103254b4",
+        "createdAt": "2026-08-25T04:56:11Z",
+        "expiresAt": "2026-09-24T04:56:10Z",
+        "expired": false
+      },
+      {
+        "id": 9549721372,
+        "name": "rlf-sequence18-identity-worker-F07",
+        "sizeInBytes": 733,
+        "digest": "sha256:5477d123858cb967e8bbe2eb26493532ad687503ad2a00caeaf9f6811d6731a3",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549724766,
+        "name": "rlf-sequence18-identity-worker-F08",
+        "sizeInBytes": 733,
+        "digest": "sha256:c9774bba4376b0e0f57260faf58b3d192ec78910c8c5286c046d338226a2eca0",
+        "createdAt": "2026-08-25T04:55:59Z",
+        "expiresAt": "2026-09-24T04:55:58Z",
+        "expired": false
+      },
+      {
+        "id": 9549724707,
+        "name": "rlf-sequence18-identity-worker-F09",
+        "sizeInBytes": 734,
+        "digest": "sha256:1fcf4f77bb2afa9fd0483ad5140bed4568c0766575acba0265c2c2ebd5bce6f4",
+        "createdAt": "2026-08-25T04:55:58Z",
+        "expiresAt": "2026-09-24T04:55:58Z",
+        "expired": false
+      },
+      {
+        "id": 9549723914,
+        "name": "rlf-sequence18-identity-worker-F10",
+        "sizeInBytes": 733,
+        "digest": "sha256:7ba90afa1339f03248675835947f994c62b1661efce878774d6e8c088ccfd4de",
+        "createdAt": "2026-08-25T04:55:56Z",
+        "expiresAt": "2026-09-24T04:55:56Z",
+        "expired": false
+      },
+      {
+        "id": 9549721413,
+        "name": "rlf-sequence18-identity-worker-F11",
+        "sizeInBytes": 732,
+        "digest": "sha256:fb0446853a1d01d6fa851e27b7defd2673dfbd293f3e07e52a3d821ddb5d10be",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549728757,
+        "name": "rlf-sequence18-identity-worker-F12",
+        "sizeInBytes": 733,
+        "digest": "sha256:2693bd8c3ffa7131c95668db7a2a5067aa4c281c94026df580409e40e654cf83",
+        "createdAt": "2026-08-25T04:56:11Z",
+        "expiresAt": "2026-09-24T04:56:10Z",
+        "expired": false
+      },
+      {
+        "id": 9549721361,
+        "name": "rlf-sequence18-identity-worker-F13",
+        "sizeInBytes": 733,
+        "digest": "sha256:43271b67a1dfba0d0afa7b3731229dfd150038c0fd5b0b37a3088afceaf34d4c",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549721219,
+        "name": "rlf-sequence18-identity-worker-F14",
+        "sizeInBytes": 733,
+        "digest": "sha256:93954b09ccd8432baa704f7a7f6b40f5fea42c4b20e1fe5fd12cdca4fd794ad3",
+        "createdAt": "2026-08-25T04:55:48Z",
+        "expiresAt": "2026-09-24T04:55:47Z",
+        "expired": false
+      },
+      {
+        "id": 9549725084,
+        "name": "rlf-sequence18-identity-worker-F15",
+        "sizeInBytes": 731,
+        "digest": "sha256:607b0949bd08020cac3146514452cff4c55ab0e7b5ad0f878fdc1e6543d4b62c",
+        "createdAt": "2026-08-25T04:56:00Z",
+        "expiresAt": "2026-09-24T04:55:59Z",
+        "expired": false
+      },
+      {
+        "id": 9549721373,
+        "name": "rlf-sequence18-identity-worker-F16",
+        "sizeInBytes": 734,
+        "digest": "sha256:68e86cf9b023ba585316b27383a967b84fadb650e5e58c67dbac408630ed2e3f",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549720972,
+        "name": "rlf-sequence18-identity-worker-F17",
+        "sizeInBytes": 734,
+        "digest": "sha256:9be218fbe16737d668cc19d1c2bb62730e55af3b5c6afe646f5309a20a89d716",
+        "createdAt": "2026-08-25T04:55:48Z",
+        "expiresAt": "2026-09-24T04:55:47Z",
+        "expired": false
+      },
+      {
+        "id": 9549728381,
+        "name": "rlf-sequence18-identity-worker-F18",
+        "sizeInBytes": 733,
+        "digest": "sha256:43396b3a1b43a08d8421146d4f951d7b5584a27e8b9dc2b0e1330d51a01a522b",
+        "createdAt": "2026-08-25T04:56:10Z",
+        "expiresAt": "2026-09-24T04:56:09Z",
+        "expired": false
+      },
+      {
+        "id": 9549724189,
+        "name": "rlf-sequence18-identity-worker-F19",
+        "sizeInBytes": 734,
+        "digest": "sha256:7a1261cf523cce81ec12324ee2c098a1f4d4f50c0e37907fbb04f46ed278e883",
+        "createdAt": "2026-08-25T04:55:57Z",
+        "expiresAt": "2026-09-24T04:55:56Z",
+        "expired": false
+      },
+      {
+        "id": 9549729960,
+        "name": "rlf-sequence18-identity-worker-F20",
+        "sizeInBytes": 734,
+        "digest": "sha256:b11bc677716e8e83520f0fe65328a824488b1bff4743236813b91c7892923b95",
+        "createdAt": "2026-08-25T04:56:14Z",
+        "expiresAt": "2026-09-24T04:56:13Z",
+        "expired": false
+      },
+      {
+        "id": 9549724154,
+        "name": "rlf-sequence18-identity-worker-F21",
+        "sizeInBytes": 734,
+        "digest": "sha256:6836c18c8715d633f1d8a17be91833094a5fd413abece1df2050afb4d7469883",
+        "createdAt": "2026-08-25T04:55:57Z",
+        "expiresAt": "2026-09-24T04:55:56Z",
+        "expired": false
+      },
+      {
+        "id": 9549727746,
+        "name": "rlf-sequence18-identity-worker-F22",
+        "sizeInBytes": 734,
+        "digest": "sha256:02dc7dfd9954c128ed7a5d3cd8ddd0d95fcf69d066610c4472a8eb90dd72c5a7",
+        "createdAt": "2026-08-25T04:56:08Z",
+        "expiresAt": "2026-09-24T04:56:07Z",
+        "expired": false
+      },
+      {
+        "id": 9549721369,
+        "name": "rlf-sequence18-identity-worker-F23",
+        "sizeInBytes": 734,
+        "digest": "sha256:ce9d8ce5ed9e94b77b0c5146ed7b9cd922f28598ae79c6cae16ed7ccd56d0920",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549721332,
+        "name": "rlf-sequence18-identity-worker-F24",
+        "sizeInBytes": 734,
+        "digest": "sha256:3e96f43ea1eaaa951bc8bc496ebc0e63cf68fba36c39fcde082a948b02f4eeb0",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549727626,
+        "name": "rlf-sequence18-identity-worker-F25",
+        "sizeInBytes": 733,
+        "digest": "sha256:c99ee4813bee5a035389b21c06aca958b0c0daa51f7c50215b667c72ae07512b",
+        "createdAt": "2026-08-25T04:56:07Z",
+        "expiresAt": "2026-09-24T04:56:07Z",
+        "expired": false
+      },
+      {
+        "id": 9549727284,
+        "name": "rlf-sequence18-identity-worker-F26",
+        "sizeInBytes": 734,
+        "digest": "sha256:7c6c1ec6f0c54f9e7c77c29fc2f01afb8f23b1ed160230bb9d39310d68d7ffb9",
+        "createdAt": "2026-08-25T04:56:06Z",
+        "expiresAt": "2026-09-24T04:56:06Z",
+        "expired": false
+      },
+      {
+        "id": 9549721343,
+        "name": "rlf-sequence18-identity-worker-F27",
+        "sizeInBytes": 731,
+        "digest": "sha256:17d1667e49ef4cb7670079ad5eaf708e8163fb6940f6659f5bbaa8fa42b5d760",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549727075,
+        "name": "rlf-sequence18-identity-worker-F28",
+        "sizeInBytes": 735,
+        "digest": "sha256:39b01075a96715b66ccc2cb8fe7f50b5f0c6df4ccce21121264ec2568c74bc68",
+        "createdAt": "2026-08-25T04:56:06Z",
+        "expiresAt": "2026-09-24T04:56:05Z",
+        "expired": false
+      },
+      {
+        "id": 9549726164,
+        "name": "rlf-sequence18-identity-worker-F29",
+        "sizeInBytes": 733,
+        "digest": "sha256:70f715bf91006359a9be35f99a0501fd3bb7547495be5a117401d4c0c5ebb96b",
+        "createdAt": "2026-08-25T04:56:03Z",
+        "expiresAt": "2026-09-24T04:56:02Z",
+        "expired": false
+      },
+      {
+        "id": 9549720865,
+        "name": "rlf-sequence18-identity-worker-F30",
+        "sizeInBytes": 732,
+        "digest": "sha256:057af2228afe8a96e1ce31aba4015b1650c586f2ac8a7a4a70cf8637e2a43886",
+        "createdAt": "2026-08-25T04:55:47Z",
+        "expiresAt": "2026-09-24T04:55:47Z",
+        "expired": false
+      },
+      {
+        "id": 9549725176,
+        "name": "rlf-sequence18-identity-worker-F31",
+        "sizeInBytes": 734,
+        "digest": "sha256:dc64e6e1b5ee566e9e1b197f71cd8b5ac6065da905ecaa698bec44aa47715069",
+        "createdAt": "2026-08-25T04:56:00Z",
+        "expiresAt": "2026-09-24T04:55:59Z",
+        "expired": false
+      },
+      {
+        "id": 9549721301,
+        "name": "rlf-sequence18-identity-worker-F32",
+        "sizeInBytes": 734,
+        "digest": "sha256:b39ea61b97c5f43919110bb0ce697ea68fd8c1e807f925fa67641dfebff67775",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549721602,
+        "name": "rlf-sequence18-identity-worker-F33",
+        "sizeInBytes": 734,
+        "digest": "sha256:ee4693625c32a1442ff118710836e16459aaba863e7ce52b0cf48b1b46d27148",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:49Z",
+        "expired": false
+      },
+      {
+        "id": 9549726987,
+        "name": "rlf-sequence18-identity-worker-F34",
+        "sizeInBytes": 733,
+        "digest": "sha256:ef030a3da902d38400725d857af589de39667e0a58873488a944ab29a3981207",
+        "createdAt": "2026-08-25T04:56:06Z",
+        "expiresAt": "2026-09-24T04:56:05Z",
+        "expired": false
+      },
+      {
+        "id": 9549725185,
+        "name": "rlf-sequence18-identity-worker-F35",
+        "sizeInBytes": 734,
+        "digest": "sha256:2fc324b669460623d268ba702bd5f9b086fd364d3cd251ea0e81e3612c20a6a2",
+        "createdAt": "2026-08-25T04:56:00Z",
+        "expiresAt": "2026-09-24T04:55:59Z",
+        "expired": false
+      },
+      {
+        "id": 9549723035,
+        "name": "rlf-sequence18-identity-worker-F36",
+        "sizeInBytes": 733,
+        "digest": "sha256:fafd727912267566462b2b0d8330d74deb838e1d532cc38e194f44547aa9b4f9",
+        "createdAt": "2026-08-25T04:55:54Z",
+        "expiresAt": "2026-09-24T04:55:53Z",
+        "expired": false
+      },
+      {
+        "id": 9549725166,
+        "name": "rlf-sequence18-identity-worker-F37",
+        "sizeInBytes": 732,
+        "digest": "sha256:f06a7cc497f7314a850a34bec001f22448ea67bf23892cec47cb7ab417428c18",
+        "createdAt": "2026-08-25T04:56:00Z",
+        "expiresAt": "2026-09-24T04:55:59Z",
+        "expired": false
+      },
+      {
+        "id": 9549720920,
+        "name": "rlf-sequence18-identity-worker-F38",
+        "sizeInBytes": 735,
+        "digest": "sha256:d5fa460bb0c54ad11f7ac36c7efefc65e272de0313365f7ab03c0e0075dee26d",
+        "createdAt": "2026-08-25T04:55:48Z",
+        "expiresAt": "2026-09-24T04:55:47Z",
+        "expired": false
+      },
+      {
+        "id": 9549727252,
+        "name": "rlf-sequence18-identity-worker-F39",
+        "sizeInBytes": 733,
+        "digest": "sha256:7214cec6b7be8f9d319dbeaa6ee4c1cffebb6685e1643da1dc8e9f342deffb9b",
+        "createdAt": "2026-08-25T04:56:06Z",
+        "expiresAt": "2026-09-24T04:56:06Z",
+        "expired": false
+      },
+      {
+        "id": 9549724242,
+        "name": "rlf-sequence18-identity-worker-F40",
+        "sizeInBytes": 735,
+        "digest": "sha256:aacb786b4bc7a1c9693c021179ae3203e42da9161bd72a7e5ca409770539dff6",
+        "createdAt": "2026-08-25T04:55:57Z",
+        "expiresAt": "2026-09-24T04:55:56Z",
+        "expired": false
+      },
+      {
+        "id": 9549726826,
+        "name": "rlf-sequence18-identity-worker-F41",
+        "sizeInBytes": 733,
+        "digest": "sha256:7aea1bd896748491459a62a4fbf4fc639b2a80cf2f43e9b62bc29d2def4a2a88",
+        "createdAt": "2026-08-25T04:56:05Z",
+        "expiresAt": "2026-09-24T04:56:04Z",
+        "expired": false
+      },
+      {
+        "id": 9549725566,
+        "name": "rlf-sequence18-identity-worker-F42",
+        "sizeInBytes": 734,
+        "digest": "sha256:c2b95f22ae1dc59004173db0d14a4c23fd22db60730d0c536a74ceeff4eb7bec",
+        "createdAt": "2026-08-25T04:56:01Z",
+        "expiresAt": "2026-09-24T04:56:01Z",
+        "expired": false
+      },
+      {
+        "id": 9549729389,
+        "name": "rlf-sequence18-identity-worker-F43",
+        "sizeInBytes": 734,
+        "digest": "sha256:e93a3abf60fd7cf46100b9b15757b4eae3262bee6efac88e2a571a05ef6d9441",
+        "createdAt": "2026-08-25T04:56:13Z",
+        "expiresAt": "2026-09-24T04:56:12Z",
+        "expired": false
+      },
+      {
+        "id": 9549727896,
+        "name": "rlf-sequence18-identity-worker-F44",
+        "sizeInBytes": 734,
+        "digest": "sha256:cd378aeea5ec44a4c8357819c79bb9ebab54703d435542959d0ab86be21b7b25",
+        "createdAt": "2026-08-25T04:56:08Z",
+        "expiresAt": "2026-09-24T04:56:08Z",
+        "expired": false
+      },
+      {
+        "id": 9549721393,
+        "name": "rlf-sequence18-identity-worker-F45",
+        "sizeInBytes": 732,
+        "digest": "sha256:69754f7a0fba402f17bb39b80039ea24b60c5736a3b6d86bc683dd576ade1aa7",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549721378,
+        "name": "rlf-sequence18-identity-worker-F46",
+        "sizeInBytes": 734,
+        "digest": "sha256:a00ebae761da56d7b013dd42954bb0b925971e07ac9f92447fdc95a7dbb8b0b2",
+        "createdAt": "2026-08-25T04:55:49Z",
+        "expiresAt": "2026-09-24T04:55:48Z",
+        "expired": false
+      },
+      {
+        "id": 9549725817,
+        "name": "rlf-sequence18-identity-worker-F47",
+        "sizeInBytes": 732,
+        "digest": "sha256:694fa8e0a2d98828b51ad1ff0a37ab3478dba5c5f2f5d1f879ad6460f1b67bf0",
+        "createdAt": "2026-08-25T04:56:02Z",
+        "expiresAt": "2026-09-24T04:56:01Z",
+        "expired": false
+      },
+      {
+        "id": 9549729550,
+        "name": "rlf-sequence18-identity-worker-F48",
+        "sizeInBytes": 733,
+        "digest": "sha256:771207cbe5575c2aafb1228d0a7e40ab7bb2fa9f6d1d615c3c499fd7748fe04a",
+        "createdAt": "2026-08-25T04:56:13Z",
+        "expiresAt": "2026-09-24T04:56:12Z",
+        "expired": false
+      },
+      {
+        "id": 9549729365,
+        "name": "rlf-sequence18-identity-worker-F49",
+        "sizeInBytes": 734,
+        "digest": "sha256:8e5c007f4bf008d065f0e56a50f9bf3c5494ef3e90f500af1bb78cb05560049d",
+        "createdAt": "2026-08-25T04:56:13Z",
+        "expiresAt": "2026-09-24T04:56:12Z",
+        "expired": false
+      },
+      {
+        "id": 9549728966,
+        "name": "rlf-sequence18-identity-worker-F50",
+        "sizeInBytes": 734,
+        "digest": "sha256:2ce1f581ff7b9902d9aa2e247ae7119ade46f9b147bd3daeeec69de7fe29ea48",
+        "createdAt": "2026-08-25T04:56:11Z",
+        "expiresAt": "2026-09-24T04:56:10Z",
+        "expired": false
+      }
+    ]
+  },
+  "evidence": {
+    "reportPath": "data/execution/runs/32810809315/sequence18-identity-transition-archive-report.json",
+    "topLevelReportPath": "data/execution/sequence18-identity-transition-archive-report.json",
+    "observationsPath": "data/execution/runs/32810809315/identity-transition-observations.ndjson",
+    "frontierPath": "data/execution/runs/32810809315/identity-transition-frontier.json",
+    "sha256ManifestPath": "data/execution/runs/32810809315/SEQUENCE18_IDENTITY_TRANSITION_SHA256SUMS.txt"
+  },
+  "passed": true
+}
+
