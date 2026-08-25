@@ -1,0 +1,896 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-25T14:41:38.209Z",
+  "sourceCommitSha": "6b5ea0b840fc8d1cadb9f5154351966d4b437eae",
+  "targetSequence": 17,
+  "phaseId": "OFFICIAL_MEDIA_ARCHAEOLOGY_01",
+  "targetIdentities": [
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843"
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B"
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B"
+    }
+  ],
+  "sourceRunIds": [
+    "32746322369",
+    "32748405808",
+    "32754804084",
+    "32758087459",
+    "32777623316",
+    "32780333417",
+    "32781308211",
+    "32783967794"
+  ],
+  "runInventory": [
+    {
+      "runId": "32746322369",
+      "fileCount": 10
+    },
+    {
+      "runId": "32748405808",
+      "fileCount": 10
+    },
+    {
+      "runId": "32754804084",
+      "fileCount": 10
+    },
+    {
+      "runId": "32758087459",
+      "fileCount": 10
+    },
+    {
+      "runId": "32777623316",
+      "fileCount": 10
+    },
+    {
+      "runId": "32780333417",
+      "fileCount": 10
+    },
+    {
+      "runId": "32781308211",
+      "fileCount": 10
+    },
+    {
+      "runId": "32783967794",
+      "fileCount": 10
+    }
+  ],
+  "corpus": {
+    "textFileCount": 80,
+    "totalBytes": 81584159,
+    "duplicatePathCount": 0,
+    "duplicateContentGroups": 1
+  },
+  "assignmentCount": 50,
+  "nonemptyLaneCount": 50,
+  "minimumFilesPerLane": 1,
+  "maximumFilesPerLane": 2,
+  "assignedFileCount": 80,
+  "uniqueAssignedFileCount": 80,
+  "missingFiles": [],
+  "overlappingAssignments": [],
+  "assignments": [
+    {
+      "slot": "F01",
+      "files": [
+        {
+          "corpusPath": "32746322369/DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sizeBytes": 21851,
+          "sha256": "a16164b7e45411dc29aa36ad31fe126158096ce4fe8532ea95bb693b7c1edc93"
+        },
+        {
+          "corpusPath": "32780333417/DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sizeBytes": 21851,
+          "sha256": "543011c2b733417a4207f4feb5c071ce6eb525e6f231fc11d266f234d2c1c77b"
+        }
+      ]
+    },
+    {
+      "slot": "F02",
+      "files": [
+        {
+          "corpusPath": "32746322369/consolidated/canonical-duplicate-groups.json",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "consolidated/canonical-duplicate-groups.json",
+          "sizeBytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        {
+          "corpusPath": "32780333417/consolidated/canonical-duplicate-groups.json",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "consolidated/canonical-duplicate-groups.json",
+          "sizeBytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        }
+      ]
+    },
+    {
+      "slot": "F03",
+      "files": [
+        {
+          "corpusPath": "32746322369/consolidated/duplicate-product-urls.json",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "consolidated/duplicate-product-urls.json",
+          "sizeBytes": 61946,
+          "sha256": "0641a09f11fe394c660885d412939c9f9cb0cca0199d542ecb2633b0ad229e39"
+        },
+        {
+          "corpusPath": "32780333417/consolidated/duplicate-product-urls.json",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "consolidated/duplicate-product-urls.json",
+          "sizeBytes": 454475,
+          "sha256": "16ab55273201b59feb71df9e8f4945f149897ec857d7be68841fef9f659bda6f"
+        }
+      ]
+    },
+    {
+      "slot": "F04",
+      "files": [
+        {
+          "corpusPath": "32746322369/consolidated/manifest.json",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "consolidated/manifest.json",
+          "sizeBytes": 56821,
+          "sha256": "fe1e0ebd6c0d1c9878cff482df8e5d8cddaceb14742e0de5f446291f8e9bb581"
+        },
+        {
+          "corpusPath": "32780333417/consolidated/manifest.json",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "consolidated/manifest.json",
+          "sizeBytes": 57191,
+          "sha256": "7cb627dfad24977cf15d2ca9ae19a9daafb885033a07cc335a14162ec49b256d"
+        }
+      ]
+    },
+    {
+      "slot": "F05",
+      "files": [
+        {
+          "corpusPath": "32746322369/consolidated/product-candidates.ndjson",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "consolidated/product-candidates.ndjson",
+          "sizeBytes": 2415413,
+          "sha256": "4674ae253fe13caccdf7b1bcb783a5b247146a9e5b29565742acb953b4b70fdd"
+        },
+        {
+          "corpusPath": "32780333417/consolidated/product-candidates.ndjson",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "consolidated/product-candidates.ndjson",
+          "sizeBytes": 791046,
+          "sha256": "9559d09d73996860d4ac02f7cfa72a36102e9ec583534751dd4e672f5f4cd66e"
+        }
+      ]
+    },
+    {
+      "slot": "F06",
+      "files": [
+        {
+          "corpusPath": "32746322369/consolidated/product-frontier.json",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "consolidated/product-frontier.json",
+          "sizeBytes": 367124,
+          "sha256": "5686c89f01f40fc676424215313c745c9ab90e32f9f9939d1bf1016b3a99541c"
+        },
+        {
+          "corpusPath": "32780333417/consolidated/product-frontier.json",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "consolidated/product-frontier.json",
+          "sizeBytes": 13083,
+          "sha256": "d24637d3b19301ff4ef35fbd08e8ea2ecff74e2a652c545bf682fc62ceb17d94"
+        }
+      ]
+    },
+    {
+      "slot": "F07",
+      "files": [
+        {
+          "corpusPath": "32746322369/consolidated/product-identities.ndjson",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "consolidated/product-identities.ndjson",
+          "sizeBytes": 1258755,
+          "sha256": "f3a435a2d757e8459a25f2e310e4c7a88890821af42adea76a75b4f20c6cb24f"
+        },
+        {
+          "corpusPath": "32780333417/consolidated/product-identities.ndjson",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "consolidated/product-identities.ndjson",
+          "sizeBytes": 366941,
+          "sha256": "019cd14798f91465c2d08b4d6d2928ef9572e017a58aed8e8f2cde3df1f8b1ea"
+        }
+      ]
+    },
+    {
+      "slot": "F08",
+      "files": [
+        {
+          "corpusPath": "32746322369/consolidated/product-identity-aliases.json",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "consolidated/product-identity-aliases.json",
+          "sizeBytes": 206914,
+          "sha256": "8e579f61b2473a591daa4d3f27e332c15d4627391303ae727dc827c69e3b45cd"
+        },
+        {
+          "corpusPath": "32780333417/consolidated/product-identity-aliases.json",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "consolidated/product-identity-aliases.json",
+          "sizeBytes": 69489,
+          "sha256": "396dd17fbd7b131531ec1d26ce01effa3aa3ec447b574c17c0754bb6fd7aca6c"
+        }
+      ]
+    },
+    {
+      "slot": "F09",
+      "files": [
+        {
+          "corpusPath": "32746322369/consolidated/product-link-candidates.ndjson",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "consolidated/product-link-candidates.ndjson",
+          "sizeBytes": 2256342,
+          "sha256": "16f309c13ca6ddf9f1d322dd689f5c1221e1bebe68e0a77098ea8bbec2eec661"
+        },
+        {
+          "corpusPath": "32780333417/consolidated/product-link-candidates.ndjson",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "consolidated/product-link-candidates.ndjson",
+          "sizeBytes": 1046470,
+          "sha256": "8e9571801c0410d1f27253a4f84e43145ceff467436c711d5894b704f28b6695"
+        }
+      ]
+    },
+    {
+      "slot": "F10",
+      "files": [
+        {
+          "corpusPath": "32746322369/consolidated/records.ndjson",
+          "sourceRunId": "32746322369",
+          "relativeArtifactPath": "consolidated/records.ndjson",
+          "sizeBytes": 1182896,
+          "sha256": "90c2589ff54273b259389149e6df447fec2f44271175c76013e83213096f989f"
+        },
+        {
+          "corpusPath": "32780333417/consolidated/records.ndjson",
+          "sourceRunId": "32780333417",
+          "relativeArtifactPath": "consolidated/records.ndjson",
+          "sizeBytes": 1634375,
+          "sha256": "d3fa686de3f235deeb7a72f474f244b66249847f4d91649ac7159757312b4e96"
+        }
+      ]
+    },
+    {
+      "slot": "F11",
+      "files": [
+        {
+          "corpusPath": "32748405808/DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sizeBytes": 21851,
+          "sha256": "e8a0fc0aa23da55e4850cb3bb14d7336adf0e4e198608d9274588089e82706fd"
+        },
+        {
+          "corpusPath": "32781308211/DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sizeBytes": 21851,
+          "sha256": "112058070349ac8e835daa79f32bd4071d039cc88c12f78d9c81b8ba52e5343a"
+        }
+      ]
+    },
+    {
+      "slot": "F12",
+      "files": [
+        {
+          "corpusPath": "32748405808/consolidated/canonical-duplicate-groups.json",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "consolidated/canonical-duplicate-groups.json",
+          "sizeBytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        {
+          "corpusPath": "32781308211/consolidated/canonical-duplicate-groups.json",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "consolidated/canonical-duplicate-groups.json",
+          "sizeBytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        }
+      ]
+    },
+    {
+      "slot": "F13",
+      "files": [
+        {
+          "corpusPath": "32748405808/consolidated/duplicate-product-urls.json",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "consolidated/duplicate-product-urls.json",
+          "sizeBytes": 483462,
+          "sha256": "22a3e2db8f956b0479cb4212600f0dd2649c637fa5f1260c4c7aeb52143a0cd6"
+        },
+        {
+          "corpusPath": "32781308211/consolidated/duplicate-product-urls.json",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "consolidated/duplicate-product-urls.json",
+          "sizeBytes": 522975,
+          "sha256": "87128aa9489307306ac2f79a015841367d4475973bdb096e60cc298092f00844"
+        }
+      ]
+    },
+    {
+      "slot": "F14",
+      "files": [
+        {
+          "corpusPath": "32748405808/consolidated/manifest.json",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "consolidated/manifest.json",
+          "sizeBytes": 56916,
+          "sha256": "37c05de635bb5fbacf1972c4d9423d9dcf709e6db838a7b15ccffe30ab55df24"
+        },
+        {
+          "corpusPath": "32781308211/consolidated/manifest.json",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "consolidated/manifest.json",
+          "sizeBytes": 57442,
+          "sha256": "ef9b3795301495d3c9e6810cf2b7964f4efaf9c538b236f53aa76d1ae69e4398"
+        }
+      ]
+    },
+    {
+      "slot": "F15",
+      "files": [
+        {
+          "corpusPath": "32748405808/consolidated/product-candidates.ndjson",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "consolidated/product-candidates.ndjson",
+          "sizeBytes": 6811521,
+          "sha256": "2d1b70a96f0adf65addc1014df7fa474c9439db689929c3ea18fcd08cf1940c8"
+        },
+        {
+          "corpusPath": "32781308211/consolidated/product-candidates.ndjson",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "consolidated/product-candidates.ndjson",
+          "sizeBytes": 337875,
+          "sha256": "a2c6808013375687f441e62e71ac9a503fe632adae9009e23cfdf7c6fc1e8246"
+        }
+      ]
+    },
+    {
+      "slot": "F16",
+      "files": [
+        {
+          "corpusPath": "32748405808/consolidated/product-frontier.json",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "consolidated/product-frontier.json",
+          "sizeBytes": 285365,
+          "sha256": "584ae542a4ef30d9fd9bb65a3ed181399b0c3d2ae6ddc96727e11f3714ffad38"
+        },
+        {
+          "corpusPath": "32781308211/consolidated/product-frontier.json",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "consolidated/product-frontier.json",
+          "sizeBytes": 12480,
+          "sha256": "7084e72348d030f724c3462100f32e481a6ea23234418cd901e09f525c666372"
+        }
+      ]
+    },
+    {
+      "slot": "F17",
+      "files": [
+        {
+          "corpusPath": "32748405808/consolidated/product-identities.ndjson",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "consolidated/product-identities.ndjson",
+          "sizeBytes": 2190571,
+          "sha256": "5b53f619835936e6e798852319a2f18d987de7c1ae2584483e124e836d1a2313"
+        },
+        {
+          "corpusPath": "32781308211/consolidated/product-identities.ndjson",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "consolidated/product-identities.ndjson",
+          "sizeBytes": 197380,
+          "sha256": "b7a0a9013732b6836204ca80e44527161bda82fa4537293328cce3435b2bf58d"
+        }
+      ]
+    },
+    {
+      "slot": "F18",
+      "files": [
+        {
+          "corpusPath": "32748405808/consolidated/product-identity-aliases.json",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "consolidated/product-identity-aliases.json",
+          "sizeBytes": 541922,
+          "sha256": "023114cbc376c102926d612253dd1e7f2a2d499319d931bf6d4ded017157ab20"
+        },
+        {
+          "corpusPath": "32781308211/consolidated/product-identity-aliases.json",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "consolidated/product-identity-aliases.json",
+          "sizeBytes": 26143,
+          "sha256": "bc7088196f447902f5e4bafe1302272a3f73b2d99ea7c74e300386965f764b43"
+        }
+      ]
+    },
+    {
+      "slot": "F19",
+      "files": [
+        {
+          "corpusPath": "32748405808/consolidated/product-link-candidates.ndjson",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "consolidated/product-link-candidates.ndjson",
+          "sizeBytes": 6609211,
+          "sha256": "d7fef4e599de11aafaed32fe457a09eec5c768694a726b18888fe2222110bb14"
+        },
+        {
+          "corpusPath": "32781308211/consolidated/product-link-candidates.ndjson",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "consolidated/product-link-candidates.ndjson",
+          "sizeBytes": 684807,
+          "sha256": "572aeea6238240e859bf3fa00862d1e3375c58658ca16d776677af1790f59203"
+        }
+      ]
+    },
+    {
+      "slot": "F20",
+      "files": [
+        {
+          "corpusPath": "32748405808/consolidated/records.ndjson",
+          "sourceRunId": "32748405808",
+          "relativeArtifactPath": "consolidated/records.ndjson",
+          "sizeBytes": 3488772,
+          "sha256": "fa9139ec9cf0ef5b623bdbdc53e22b86cd279bfc859173bdf894cd909b247e68"
+        },
+        {
+          "corpusPath": "32781308211/consolidated/records.ndjson",
+          "sourceRunId": "32781308211",
+          "relativeArtifactPath": "consolidated/records.ndjson",
+          "sizeBytes": 1583292,
+          "sha256": "ebe5b1c6d6679f299eba19615699cb582f4edd740fac72146b3808fda57d4072"
+        }
+      ]
+    },
+    {
+      "slot": "F21",
+      "files": [
+        {
+          "corpusPath": "32754804084/DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sizeBytes": 21851,
+          "sha256": "2ed4b398bb85a9986bf93c5cba3258acabd28d889c113f46fc01964409b2e68a"
+        },
+        {
+          "corpusPath": "32783967794/DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sizeBytes": 21851,
+          "sha256": "8e2ba826983e2b354a87efd911ff5b7f14f73e5f7e68f78d664c7d0dfb945f35"
+        }
+      ]
+    },
+    {
+      "slot": "F22",
+      "files": [
+        {
+          "corpusPath": "32754804084/consolidated/canonical-duplicate-groups.json",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "consolidated/canonical-duplicate-groups.json",
+          "sizeBytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        {
+          "corpusPath": "32783967794/consolidated/canonical-duplicate-groups.json",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "consolidated/canonical-duplicate-groups.json",
+          "sizeBytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        }
+      ]
+    },
+    {
+      "slot": "F23",
+      "files": [
+        {
+          "corpusPath": "32754804084/consolidated/duplicate-product-urls.json",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "consolidated/duplicate-product-urls.json",
+          "sizeBytes": 470260,
+          "sha256": "a267d62ccff4b2de2abdaae9373ad2967ea0d99685ec3b280e3563246de5ef79"
+        },
+        {
+          "corpusPath": "32783967794/consolidated/duplicate-product-urls.json",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "consolidated/duplicate-product-urls.json",
+          "sizeBytes": 142457,
+          "sha256": "a1e666a51eb3a05272a7f0887821b755e77f49902a5cc7c366edbb06a5ac5d0d"
+        }
+      ]
+    },
+    {
+      "slot": "F24",
+      "files": [
+        {
+          "corpusPath": "32754804084/consolidated/manifest.json",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "consolidated/manifest.json",
+          "sizeBytes": 56906,
+          "sha256": "c0f35d87d7663d7955ffb13018bfb826f4fade64043ebe32b325565b712fbbb7"
+        },
+        {
+          "corpusPath": "32783967794/consolidated/manifest.json",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "consolidated/manifest.json",
+          "sizeBytes": 57372,
+          "sha256": "e3d43d7ea79d17bacfdf18bb38cd50d64e975658c80c10854b56b53f1e201499"
+        }
+      ]
+    },
+    {
+      "slot": "F25",
+      "files": [
+        {
+          "corpusPath": "32754804084/consolidated/product-candidates.ndjson",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "consolidated/product-candidates.ndjson",
+          "sizeBytes": 5588426,
+          "sha256": "79bf0681fcc9ac55f1259713c78654b6ffa92e6facc171615b4252d29383bb58"
+        },
+        {
+          "corpusPath": "32783967794/consolidated/product-candidates.ndjson",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "consolidated/product-candidates.ndjson",
+          "sizeBytes": 584180,
+          "sha256": "3435897fc7f820fed1793cbc313b0d16e0234bf28c4acf28234f9f88f36d2078"
+        }
+      ]
+    },
+    {
+      "slot": "F26",
+      "files": [
+        {
+          "corpusPath": "32754804084/consolidated/product-frontier.json",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "consolidated/product-frontier.json",
+          "sizeBytes": 147382,
+          "sha256": "6dd11f19918a0981ef47b1191f6399ee16ee46310db4c4a6678b23a123eefee1"
+        },
+        {
+          "corpusPath": "32783967794/consolidated/product-frontier.json",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "consolidated/product-frontier.json",
+          "sizeBytes": 4897,
+          "sha256": "ec51826ee0f4a96db9638ca2a03df8c83a14c036d6e33c44d6a2fe369af8717e"
+        }
+      ]
+    },
+    {
+      "slot": "F27",
+      "files": [
+        {
+          "corpusPath": "32754804084/consolidated/product-identities.ndjson",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "consolidated/product-identities.ndjson",
+          "sizeBytes": 1884680,
+          "sha256": "5bc84298deaef3bcaa0e3f941d004c1172f2c3634ba887b4f189d6da2d8cf2a3"
+        },
+        {
+          "corpusPath": "32783967794/consolidated/product-identities.ndjson",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "consolidated/product-identities.ndjson",
+          "sizeBytes": 274371,
+          "sha256": "9d5b54c3b8be257c3aa0bdcc371cfd489b7c627b0a2507991c24a8593c21008b"
+        }
+      ]
+    },
+    {
+      "slot": "F28",
+      "files": [
+        {
+          "corpusPath": "32754804084/consolidated/product-identity-aliases.json",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "consolidated/product-identity-aliases.json",
+          "sizeBytes": 445324,
+          "sha256": "8326121ba4eaf1d9dbf60f5fd32b4f0a94a528ff0d53441b4aeb2a9c85da00d3"
+        },
+        {
+          "corpusPath": "32783967794/consolidated/product-identity-aliases.json",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "consolidated/product-identity-aliases.json",
+          "sizeBytes": 50457,
+          "sha256": "176ce9550875b2005ee80744f78c2c4f37aa2dd01f2d7ea920c369bfe656ef15"
+        }
+      ]
+    },
+    {
+      "slot": "F29",
+      "files": [
+        {
+          "corpusPath": "32754804084/consolidated/product-link-candidates.ndjson",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "consolidated/product-link-candidates.ndjson",
+          "sizeBytes": 5469338,
+          "sha256": "2142a2bfbfc43767d29a4df1426ddef8ca0e5a4efa0dfeb4a87b30985d8f873b"
+        },
+        {
+          "corpusPath": "32783967794/consolidated/product-link-candidates.ndjson",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "consolidated/product-link-candidates.ndjson",
+          "sizeBytes": 632238,
+          "sha256": "b4ea49aca2f1ca57079e7aba5cfd0c4f6b6ffc82486a5da6f421cba5f9cb798f"
+        }
+      ]
+    },
+    {
+      "slot": "F30",
+      "files": [
+        {
+          "corpusPath": "32754804084/consolidated/records.ndjson",
+          "sourceRunId": "32754804084",
+          "relativeArtifactPath": "consolidated/records.ndjson",
+          "sizeBytes": 3410331,
+          "sha256": "d7d13f4122db3d6e465e9e80951b5651d58cf4667c528fd053e218354a8debd5"
+        },
+        {
+          "corpusPath": "32783967794/consolidated/records.ndjson",
+          "sourceRunId": "32783967794",
+          "relativeArtifactPath": "consolidated/records.ndjson",
+          "sizeBytes": 638774,
+          "sha256": "689711e1f02c59f11bc7fefd02ffa6e6188903642278c44e45a6b11531c2f823"
+        }
+      ]
+    },
+    {
+      "slot": "F31",
+      "files": [
+        {
+          "corpusPath": "32758087459/DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sizeBytes": 21851,
+          "sha256": "0dd9f340492e8424c0580411beab36e7096fdc831763c8ef53455277c49e7f69"
+        }
+      ]
+    },
+    {
+      "slot": "F32",
+      "files": [
+        {
+          "corpusPath": "32758087459/consolidated/canonical-duplicate-groups.json",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "consolidated/canonical-duplicate-groups.json",
+          "sizeBytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        }
+      ]
+    },
+    {
+      "slot": "F33",
+      "files": [
+        {
+          "corpusPath": "32758087459/consolidated/duplicate-product-urls.json",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "consolidated/duplicate-product-urls.json",
+          "sizeBytes": 458577,
+          "sha256": "e753a5f9dad70519748fc82e1d1097d9be5b37334abbbf21e3cf9fec19ffe8d3"
+        }
+      ]
+    },
+    {
+      "slot": "F34",
+      "files": [
+        {
+          "corpusPath": "32758087459/consolidated/manifest.json",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "consolidated/manifest.json",
+          "sizeBytes": 56799,
+          "sha256": "65f9d70ab53893e5cf0077b8687ef8972a2752a6c7a9f74f0860fd0771358413"
+        }
+      ]
+    },
+    {
+      "slot": "F35",
+      "files": [
+        {
+          "corpusPath": "32758087459/consolidated/product-candidates.ndjson",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "consolidated/product-candidates.ndjson",
+          "sizeBytes": 4494096,
+          "sha256": "45cd5eff078d9df120214899a2b5f9febaa115af111bd3907a561437530668c3"
+        }
+      ]
+    },
+    {
+      "slot": "F36",
+      "files": [
+        {
+          "corpusPath": "32758087459/consolidated/product-frontier.json",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "consolidated/product-frontier.json",
+          "sizeBytes": 521460,
+          "sha256": "d2b83b2b1f180b645b3227c265ae7c3455b41f565013e7d28d4cfd75c9c092e4"
+        }
+      ]
+    },
+    {
+      "slot": "F37",
+      "files": [
+        {
+          "corpusPath": "32758087459/consolidated/product-identities.ndjson",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "consolidated/product-identities.ndjson",
+          "sizeBytes": 2009725,
+          "sha256": "9c8d1081ce328d9c9747a7a626d4ecbbf69f33c69e31cf73852a46be0faf919a"
+        }
+      ]
+    },
+    {
+      "slot": "F38",
+      "files": [
+        {
+          "corpusPath": "32758087459/consolidated/product-identity-aliases.json",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "consolidated/product-identity-aliases.json",
+          "sizeBytes": 377853,
+          "sha256": "08ef53643e9915958f5ec564c8ecea9a8d8e30acb2325ba1ff80b83ab72f2685"
+        }
+      ]
+    },
+    {
+      "slot": "F39",
+      "files": [
+        {
+          "corpusPath": "32758087459/consolidated/product-link-candidates.ndjson",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "consolidated/product-link-candidates.ndjson",
+          "sizeBytes": 4454319,
+          "sha256": "e1dc8d340e754b1bbec127762723e864f9c2292e58145916f2f40ff6a772a845"
+        }
+      ]
+    },
+    {
+      "slot": "F40",
+      "files": [
+        {
+          "corpusPath": "32758087459/consolidated/records.ndjson",
+          "sourceRunId": "32758087459",
+          "relativeArtifactPath": "consolidated/records.ndjson",
+          "sizeBytes": 2562086,
+          "sha256": "95ceeb5693b900678ba80f6c588deec5f09902cfa22fbc92a3b6ff7c437548da"
+        }
+      ]
+    },
+    {
+      "slot": "F41",
+      "files": [
+        {
+          "corpusPath": "32777623316/DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "DISCOVERY_EVIDENCE_SHA256SUMS.txt",
+          "sizeBytes": 21851,
+          "sha256": "bd6ae86aa6e53d50f7e29d2d076819b4461b56aa1dc1537383c6aab8b005b883"
+        }
+      ]
+    },
+    {
+      "slot": "F42",
+      "files": [
+        {
+          "corpusPath": "32777623316/consolidated/canonical-duplicate-groups.json",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "consolidated/canonical-duplicate-groups.json",
+          "sizeBytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        }
+      ]
+    },
+    {
+      "slot": "F43",
+      "files": [
+        {
+          "corpusPath": "32777623316/consolidated/duplicate-product-urls.json",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "consolidated/duplicate-product-urls.json",
+          "sizeBytes": 391319,
+          "sha256": "66cabc2a1ac1eb88164887fcee9b2891c159aab3f4affef0fa492274409e6076"
+        }
+      ]
+    },
+    {
+      "slot": "F44",
+      "files": [
+        {
+          "corpusPath": "32777623316/consolidated/manifest.json",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "consolidated/manifest.json",
+          "sizeBytes": 56910,
+          "sha256": "33472c9ce87734cf3339fc375eb3de9a5b6b2c3de940a0606ea19e52f3cff10f"
+        }
+      ]
+    },
+    {
+      "slot": "F45",
+      "files": [
+        {
+          "corpusPath": "32777623316/consolidated/product-candidates.ndjson",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "consolidated/product-candidates.ndjson",
+          "sizeBytes": 2941884,
+          "sha256": "b7b1de8f5854d14851a49137baa9b783ea95f9e4602667ab010adf8c64de576a"
+        }
+      ]
+    },
+    {
+      "slot": "F46",
+      "files": [
+        {
+          "corpusPath": "32777623316/consolidated/product-frontier.json",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "consolidated/product-frontier.json",
+          "sizeBytes": 292657,
+          "sha256": "1852c57b346f6f5f1e1f10b6a4f4a8e7cb9841b14e15c313425eae8eff3d832e"
+        }
+      ]
+    },
+    {
+      "slot": "F47",
+      "files": [
+        {
+          "corpusPath": "32777623316/consolidated/product-identities.ndjson",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "consolidated/product-identities.ndjson",
+          "sizeBytes": 1475741,
+          "sha256": "d6a249e7dfe006af5b0fa0dbd464c74a9be5b36718616dd962faa086c918e84c"
+        }
+      ]
+    },
+    {
+      "slot": "F48",
+      "files": [
+        {
+          "corpusPath": "32777623316/consolidated/product-identity-aliases.json",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "consolidated/product-identity-aliases.json",
+          "sizeBytes": 266134,
+          "sha256": "d0ec65901ad82f9ed59059fd3436cc814567f89940f6361c8f9da191e11e9917"
+        }
+      ]
+    },
+    {
+      "slot": "F49",
+      "files": [
+        {
+          "corpusPath": "32777623316/consolidated/product-link-candidates.ndjson",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "consolidated/product-link-candidates.ndjson",
+          "sizeBytes": 2973567,
+          "sha256": "88c92b0ad10cb36c63081b35799ead3cccc4706d288d49a57383d7ad4f25c976"
+        }
+      ]
+    },
+    {
+      "slot": "F50",
+      "files": [
+        {
+          "corpusPath": "32777623316/consolidated/records.ndjson",
+          "sourceRunId": "32777623316",
+          "relativeArtifactPath": "consolidated/records.ndjson",
+          "sizeBytes": 2089392,
+          "sha256": "8c50774bd2c70b10ecd537df8ad8986bfaba0667f72532918b2e28d6a03e3524"
+        }
+      ]
+    }
+  ],
+  "planSha256": "d9e30f2ff37d662064521e3dea2812892c5bfd4301020c16eb63405f3423e3b3",
+  "passed": true
+}
