@@ -13,9 +13,9 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '36'
-  TARGET_RUN_ID: '32861233493'
-  TARGET_SHA: '497b78ec1694fb7c3833da999c072d48fd7388b8'
+  SNAPSHOT_REVISION: '37'
+  TARGET_RUN_ID: '32862115918'
+  TARGET_SHA: '886c7cda029663c960902095e23ff0311359e577'
 
 jobs:
   snapshot:
@@ -25,7 +25,7 @@ jobs:
         with:
           ref: feature/rlf-execution-backend-20260823
           fetch-depth: 0
-      - name: Capture and certify paginated sequence 17 dashboard
+      - name: Capture and certify paginated sequence 18 dashboard
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -43,36 +43,34 @@ jobs:
             --slurpfile jobs /tmp/jobs.json \
             --slurpfile artifacts /tmp/artifacts.json \
             '{
-              schemaVersion:19,
+              schemaVersion:20,
               capturedAt:$capturedAt,
               targetRunId:$targetRunId,
               targetSha:$targetSha,
               run:($run[0] | {id,run_number,run_attempt,status,conclusion,head_sha,event,created_at,updated_at,html_url}),
               counts:{
                 totalJobs:($jobs[0]|length),
-                prepareTotal:([$jobs[0][]|select(.name=="Prepare immutable 50-shard media plan")]|length),
-                prepareSuccess:([$jobs[0][]|select(.name=="Prepare immutable 50-shard media plan" and .conclusion=="success")]|length),
-                mediaTotal:([$jobs[0][]|select(.name|test("^Media F[0-9]{2}$"))]|length),
-                mediaSuccess:([$jobs[0][]|select((.name|test("^Media F[0-9]{2}$")) and .conclusion=="success")]|length),
-                mediaFailed:([$jobs[0][]|select((.name|test("^Media F[0-9]{2}$")) and (.conclusion!=null and .conclusion!="success"))]|length),
-                mediaActive:([$jobs[0][]|select((.name|test("^Media F[0-9]{2}$")) and .status!="completed")]|length),
-                consolidateTotal:([$jobs[0][]|select(.name=="Consolidate sequence 17 media archaeology")]|length),
-                consolidateSuccess:([$jobs[0][]|select(.name=="Consolidate sequence 17 media archaeology" and .conclusion=="success")]|length),
-                mediaWorkerArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence17-media-worker-F[0-9]{2}$"))]|length),
-                planArtifacts:([$artifacts[0][]|select(.name=="rlf-sequence17-media-plan")]|length),
-                consolidatedArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence17-media-archaeology-"))]|length),
+                prepareTotal:([$jobs[0][]|select(.name=="Prepare immutable 50-probe live plan")]|length),
+                prepareSuccess:([$jobs[0][]|select(.name=="Prepare immutable 50-probe live plan" and .conclusion=="success")]|length),
+                liveTotal:([$jobs[0][]|select(.name|test("^Live FF[0-9]{2}$"))]|length),
+                liveSuccess:([$jobs[0][]|select((.name|test("^Live FF[0-9]{2}$")) and .conclusion=="success")]|length),
+                liveFailed:([$jobs[0][]|select((.name|test("^Live FF[0-9]{2}$")) and (.conclusion!=null and .conclusion!="success"))]|length),
+                liveActive:([$jobs[0][]|select((.name|test("^Live FF[0-9]{2}$")) and .status!="completed")]|length),
+                consolidateTotal:([$jobs[0][]|select(.name=="Consolidate sequence 18 live official probes")]|length),
+                consolidateSuccess:([$jobs[0][]|select(.name=="Consolidate sequence 18 live official probes" and .conclusion=="success")]|length),
+                liveWorkerArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence18-live-worker-F[0-9]{2}$"))]|length),
+                planArtifacts:([$artifacts[0][]|select(.name=="rlf-sequence18-live-plan")]|length),
+                consolidatedArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence18-live-media-"))]|length),
                 totalArtifacts:($artifacts[0]|length)
               },
               jobs:$jobs[0],
               artifacts:$artifacts[0]
             } | .passed = (
               .run.status=="completed" and .run.conclusion=="success" and .run.head_sha==$targetSha and
-              .counts.totalJobs==52 and
-              .counts.prepareTotal==1 and .counts.prepareSuccess==1 and
-              .counts.mediaTotal==50 and .counts.mediaSuccess==50 and .counts.mediaFailed==0 and .counts.mediaActive==0 and
+              .counts.totalJobs==52 and .counts.prepareTotal==1 and .counts.prepareSuccess==1 and
+              .counts.liveTotal==50 and .counts.liveSuccess==50 and .counts.liveFailed==0 and .counts.liveActive==0 and
               .counts.consolidateTotal==1 and .counts.consolidateSuccess==1 and
-              .counts.mediaWorkerArtifacts==50 and .counts.planArtifacts==1 and
-              .counts.consolidatedArtifacts==1 and .counts.totalArtifacts==52
+              .counts.liveWorkerArtifacts==50 and .counts.planArtifacts==1 and .counts.consolidatedArtifacts==1 and .counts.totalArtifacts==52
             )' > data/execution/workflow-runs-snapshot.json
           cat data/execution/workflow-runs-snapshot.json
           jq -e '.passed == true' data/execution/workflow-runs-snapshot.json >/dev/null
@@ -84,7 +82,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Certify sequence 17 fifty-lane media archaeology dashboard'
+          git commit -m 'Certify sequence 18 fifty-lane live probe dashboard'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
