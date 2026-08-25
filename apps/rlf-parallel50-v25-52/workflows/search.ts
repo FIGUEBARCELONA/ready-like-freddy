@@ -89,12 +89,12 @@ export function overpassQuery(input:DiscoverInput,maxRows=36){
     'nwr["shop"="clothes"]["second_hand"~"^(yes|only)$"]["website"](area.country);','nwr["shop"="clothes"]["second_hand"~"^(yes|only)$"]["contact:website"](area.country);',
   ]:variant===1?[
     'nwr["shop"="charity"]["website"](area.country);','nwr["shop"="charity"]["contact:website"](area.country);',
-    'nwr["shop"="clothes"]["name"~"vintage|second|retro|pre.?loved|thrift",i]["website"](area.country);','nwr["shop"="clothes"]["name"~"vintage|second|retro|pre.?loved|thrift",i]["contact:website"](area.country);',
+    'nwr["shop"="charity"]["url"](area.country);','nwr["shop"="charity"]["contact:url"](area.country);',
   ]:[
     'nwr["shop"~"^(clothes|second_hand|charity|variety_store)$"]["second_hand"~"^(yes|only)$"]["website"](area.country);','nwr["shop"~"^(clothes|second_hand|charity|variety_store)$"]["second_hand"~"^(yes|only)$"]["contact:website"](area.country);',
     'nwr["shop"="second_hand"]["url"](area.country);','nwr["shop"="second_hand"]["contact:url"](area.country);',
   ];
-  return `[out:json][timeout:18];area["ISO3166-1"="${code}"]["admin_level"="2"]->.country;(${clauses.join('')});out tags ${rows};`;
+  return `[out:json][timeout:14];area["ISO3166-1"="${code}"]["admin_level"="2"]->.country;(${clauses.join('')});out tags ${rows};`;
 }
 export function primaryCorpus(_input:DiscoverInput){return OVERPASS_PROVIDER;}
 export function primaryEndpoint(input:DiscoverInput){return OVERPASS_ENDPOINTS[input.lane.index%OVERPASS_ENDPOINTS.length];}
@@ -104,7 +104,8 @@ export function shouldRetryOverpass(attempt:ProviderAttempt){return attempt.stat
 async function fetchOverpass(endpoint:string,input:DiscoverInput,limit:number){
   const started=Date.now();const query=overpassQuery(input,Math.max(limit*3,24));
   try{
-    const response=await fetch(endpoint,{method:'POST',body:query,redirect:'follow',signal:AbortSignal.timeout(22000),headers:{accept:'application/json','content-type':'text/plain;charset=UTF-8','accept-encoding':'gzip, deflate','user-agent':'RLF-Research/1.0 (+https://readylikefreddy.shop)'}});
+    const bodyData=new URLSearchParams({data:query}).toString();
+    const response=await fetch(endpoint,{method:'POST',body:bodyData,redirect:'follow',signal:AbortSignal.timeout(18000),headers:{accept:'application/json','content-type':'application/x-www-form-urlencoded;charset=UTF-8','accept-encoding':'gzip, deflate','user-agent':'RLF-Research/1.0 (+https://readylikefreddy.shop)'}});
     const body=await response.text();const results=response.ok?overpassResults(body,limit):[];
     const challenge=response.status===429||response.status===504||/rate limit|too many requests|slots available|runtime error|gateway timeout/i.test(body);
     const name=`${OVERPASS_PROVIDER}:${new URL(endpoint).hostname}`;
@@ -127,9 +128,9 @@ export function commonCrawlExactUrl(raw:string,limit=5){
   return `https://index.commoncrawl.org/${COMMON_CRAWL_INDEX}-index?${params.toString()}`;
 }
 export async function providerSmoke(){
-  const input:DiscoverInput={cycle:19,maxCandidates:8,lane:{slot:'SMOKE',countryCode:'DE',country:'Germany',language:'de-DE,de;q=.9,en;q=.7',tld:'de',localSecondhand:'second hand kleidung',index:0}};
-  const first=await fetchOverpass(OVERPASS_ENDPOINTS[0],input,12);
-  const second=shouldRetryOverpass(first.attempt)?await fetchOverpass(OVERPASS_ENDPOINTS[1],input,12):null;
+  const input:DiscoverInput={cycle:18,maxCandidates:6,lane:{slot:'SMOKE',countryCode:'DE',country:'Germany',language:'de-DE,de;q=.9,en;q=.7',tld:'de',localSecondhand:'second hand kleidung',index:0}};
+  const first=await fetchOverpass(OVERPASS_ENDPOINTS[0],input,10);
+  const second=shouldRetryOverpass(first.attempt)?await fetchOverpass(OVERPASS_ENDPOINTS[1],input,10):null;
   const responses=[first,...(second?[second]:[])];
   const attempts=responses.map(row=>({provider:row.attempt.name,status:row.attempt.status,bodyLength:row.attempt.bodyLength,contentType:row.attempt.contentType,responseHash:row.attempt.responseHash,challenge:row.attempt.challenge,error:row.attempt.error,durationMs:row.attempt.durationMs,parsedLinks:row.results.length}));
   const ready=attempts.some(row=>row.status===200&&!row.challenge&&!row.error&&row.parsedLinks>0);
