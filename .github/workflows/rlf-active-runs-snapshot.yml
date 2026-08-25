@@ -13,9 +13,9 @@ permissions:
   contents: write
 
 env:
-  SNAPSHOT_REVISION: '33'
-  TARGET_RUN_ID: '32783967794'
-  TARGET_SHA: '607e6838597f64bea50f08b9915a5ae9cf995c2b'
+  SNAPSHOT_REVISION: '34'
+  TARGET_RUN_ID: '32784949243'
+  TARGET_SHA: '2dd77901661cf282f4771e2d2b666986397de8cd'
 
 jobs:
   snapshot:
@@ -24,7 +24,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/rlf-execution-backend-20260823
-      - name: Capture and certify paginated sequence 15 dashboard
+          fetch-depth: 0
+      - name: Capture and certify paginated sequence 16 dashboard
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -47,36 +48,36 @@ jobs:
             --slurpfile jobs /tmp/jobs.json \
             --slurpfile artifacts /tmp/artifacts.json \
             '{
-              schemaVersion:17,
+              schemaVersion:18,
               capturedAt:$capturedAt,
               targetRunId:$targetRunId,
               targetSha:$targetSha,
               run:($run[0] | {id,run_number,run_attempt,status,conclusion,head_sha,event,created_at,updated_at,html_url}),
               counts:{
                 totalJobs:($jobs[0]|length),
-                discoveryTotal:([$jobs[0][]|select(.name|test("^Discovery F[0-9]{2}$"))]|length),
-                discoverySuccess:([$jobs[0][]|select((.name|test("^Discovery F[0-9]{2}$")) and .conclusion=="success")]|length),
-                discoveryFailed:([$jobs[0][]|select((.name|test("^Discovery F[0-9]{2}$")) and (.conclusion!=null and .conclusion!="success"))]|length),
-                discoveryActive:([$jobs[0][]|select((.name|test("^Discovery F[0-9]{2}$")) and .status!="completed")]|length),
+                prepareTotal:([$jobs[0][]|select(.name=="Prepare six-retry immutable frontier")]|length),
+                prepareSuccess:([$jobs[0][]|select(.name=="Prepare six-retry immutable frontier" and .conclusion=="success")]|length),
                 productTotal:([$jobs[0][]|select(.name|test("^Product F[0-9]{2}$"))]|length),
                 productSuccess:([$jobs[0][]|select((.name|test("^Product F[0-9]{2}$")) and .conclusion=="success")]|length),
                 productFailed:([$jobs[0][]|select((.name|test("^Product F[0-9]{2}$")) and (.conclusion!=null and .conclusion!="success"))]|length),
                 productActive:([$jobs[0][]|select((.name|test("^Product F[0-9]{2}$")) and .status!="completed")]|length),
-                discoveryWorkerArtifacts:([$artifacts[0][]|select(.name|test("^rlf-discovery-worker-F[0-9]{2}$"))]|length),
-                productWorkerArtifacts:([$artifacts[0][]|select(.name|test("^rlf-product-worker-F[0-9]{2}$"))]|length),
-                consolidatedDiscoveryArtifacts:([$artifacts[0][]|select(.name|test("^rlf-kb-official-discovery-"))]|length),
-                consolidatedProductArtifacts:([$artifacts[0][]|select(.name|test("^rlf-kb-product-pages-"))]|length),
+                consolidateTotal:([$jobs[0][]|select(.name=="Consolidate, audit and persist sequence 16")]|length),
+                consolidateSuccess:([$jobs[0][]|select(.name=="Consolidate, audit and persist sequence 16" and .conclusion=="success")]|length),
+                productWorkerArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence16-product-worker-F[0-9]{2}$"))]|length),
+                frontierArtifacts:([$artifacts[0][]|select(.name=="rlf-sequence16-retry-frontier")]|length),
+                consolidatedProductArtifacts:([$artifacts[0][]|select(.name|test("^rlf-sequence16-retry-results-"))]|length),
                 totalArtifacts:($artifacts[0]|length)
               },
               jobs:$jobs[0],
               artifacts:$artifacts[0]
             } | .passed = (
               .run.status=="completed" and .run.conclusion=="success" and .run.head_sha==$targetSha and
-              .counts.discoveryTotal==50 and .counts.discoverySuccess==50 and .counts.discoveryFailed==0 and .counts.discoveryActive==0 and
+              .counts.totalJobs==52 and
+              .counts.prepareTotal==1 and .counts.prepareSuccess==1 and
               .counts.productTotal==50 and .counts.productSuccess==50 and .counts.productFailed==0 and .counts.productActive==0 and
-              .counts.discoveryWorkerArtifacts==50 and .counts.productWorkerArtifacts==50 and
-              .counts.consolidatedDiscoveryArtifacts==1 and .counts.consolidatedProductArtifacts==1 and
-              .counts.totalArtifacts==104
+              .counts.consolidateTotal==1 and .counts.consolidateSuccess==1 and
+              .counts.productWorkerArtifacts==50 and .counts.frontierArtifacts==1 and
+              .counts.consolidatedProductArtifacts==1 and .counts.totalArtifacts==52
             )' > data/execution/workflow-runs-snapshot.json
           cat data/execution/workflow-runs-snapshot.json
           jq -e '.passed == true' data/execution/workflow-runs-snapshot.json >/dev/null
@@ -88,7 +89,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/execution/workflow-runs-snapshot.json
-          git commit -m 'Certify final sequence 15 dashboard'
+          git commit -m 'Certify sequence 16 retry recovery dashboard'
           for attempt in 1 2 3 4 5; do
             git fetch origin "$branch"
             if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
