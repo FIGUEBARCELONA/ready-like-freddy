@@ -28,7 +28,7 @@ jobs:
           node-version: '22'
       - name: Enable pinned pnpm
         run: corepack enable
-      - name: Execute complete sequence 17 validation
+      - name: Execute complete sequence 18 validation
         id: validate
         continue-on-error: true
         shell: bash
@@ -44,103 +44,53 @@ jobs:
 
           const identity=await loadProgressLedger();
           const sourcePages=await loadSourcePageLedger();
-          const preflight=JSON.parse(await readFile('data/execution/sequence17-media-archaeology-preflight.json','utf8'));
-          const manifest=JSON.parse(await readFile('data/execution/sequence17-media-archaeology-manifest.json','utf8'));
-          const evidence=JSON.parse(await readFile('data/execution/sequence17-media-evidence.json','utf8'));
+          const preflight=JSON.parse(await readFile('data/execution/sequence18-live-media-preflight.json','utf8'));
+          const manifest=JSON.parse(await readFile('data/execution/sequence18-live-media-manifest.json','utf8'));
+          const evidence=JSON.parse(await readFile('data/execution/sequence18-live-media-evidence.json','utf8'));
           const dashboard=JSON.parse(await readFile('data/execution/workflow-runs-snapshot.json','utf8'));
-          const snapshot=JSON.parse(await readFile('data/execution/sequence17-ledger-snapshot.json','utf8'));
+          const snapshot=JSON.parse(await readFile('data/execution/sequence18-ledger-snapshot.json','utf8'));
           const countJson=async dir=>(await readdir(dir)).filter(name=>name.endsWith('.json')).length;
           const expectedRetries=['HW2300|843','M1588|81B','M1588|84B'];
           const actual={
-            identity:{
-              completedIdentityCount:identity.completed.identityCount,
-              productUrlCaptureCount:identity.completed.productUrlCaptureCount,
-              officialProductImageReferenceCount:identity.counters.officialProductImageReferenceCount,
-              materialEvidenceCount:identity.counters.materialEvidenceCount,
-              manufacturingClaimCount:identity.counters.manufacturingClaimCount,
-              descriptionMissingIdentityCount:identity.metadataGaps.descriptionMissingIdentityCount,
-              priceMissingIdentityCount:identity.metadataGaps.priceMissingIdentityCount,
-              materialMissingIdentityCount:identity.metadataGaps.materialMissingIdentityCount,
-              retryIdentityKeys:identity.retry.identities.map(item=>item.identityKey).sort(),
-              deltaCount:identity.deltaCount,
-              latestRunId:String(identity.latestRunId),
-              factoryVerifiedCount:identity.counters.factoryVerifiedCount,
-              globalCanonicalProductCount:identity.counters.globalCanonicalProductCount,
-              ledgerSha256:identity.ledgerSha256,
-            },
-            sourcePages:{
-              deltaCount:sourcePages.deltaCount,
-              attemptedObservationCount:sourcePages.attemptedObservationCount,
-              uniqueAttemptedSourcePageCount:sourcePages.uniqueAttemptedSourcePageCount,
-              ledgerSha256:sourcePages.ledgerSha256,
-            },
-            canonicalJson:{
-              identityDeltas:await countJson('data/execution/progress-deltas'),
-              sourcePageDeltas:await countJson('data/execution/source-page-deltas'),
-              sourcePageAudits:await countJson('data/execution/source-page-delta-audits'),
-            },
+            identity:{completedIdentityCount:identity.completed.identityCount,productUrlCaptureCount:identity.completed.productUrlCaptureCount,officialProductImageReferenceCount:identity.counters.officialProductImageReferenceCount,materialEvidenceCount:identity.counters.materialEvidenceCount,manufacturingClaimCount:identity.counters.manufacturingClaimCount,descriptionMissingIdentityCount:identity.metadataGaps.descriptionMissingIdentityCount,priceMissingIdentityCount:identity.metadataGaps.priceMissingIdentityCount,materialMissingIdentityCount:identity.metadataGaps.materialMissingIdentityCount,retryIdentityKeys:identity.retry.identities.map(item=>item.identityKey).sort(),deltaCount:identity.deltaCount,latestRunId:String(identity.latestRunId),factoryVerifiedCount:identity.counters.factoryVerifiedCount,globalCanonicalProductCount:identity.counters.globalCanonicalProductCount,ledgerSha256:identity.ledgerSha256},
+            sourcePages:{deltaCount:sourcePages.deltaCount,attemptedObservationCount:sourcePages.attemptedObservationCount,uniqueAttemptedSourcePageCount:sourcePages.uniqueAttemptedSourcePageCount,ledgerSha256:sourcePages.ledgerSha256},
+            canonicalJson:{identityDeltas:await countJson('data/execution/progress-deltas'),sourcePageDeltas:await countJson('data/execution/source-page-deltas'),sourcePageAudits:await countJson('data/execution/source-page-delta-audits')},
           };
           const expected={
-            identity:{
-              completedIdentityCount:1357,productUrlCaptureCount:2155,
-              officialProductImageReferenceCount:11708,materialEvidenceCount:1748,
-              manufacturingClaimCount:64,descriptionMissingIdentityCount:826,
-              priceMissingIdentityCount:770,materialMissingIdentityCount:86,
-              retryIdentityKeys:expectedRetries,deltaCount:11,latestRunId:'32784949243',
-              factoryVerifiedCount:0,globalCanonicalProductCount:0,
-              ledgerSha256:'0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7',
-            },
-            sourcePages:{
-              deltaCount:8,attemptedObservationCount:1524,uniqueAttemptedSourcePageCount:1239,
-              ledgerSha256:'19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3',
-            },
+            identity:{completedIdentityCount:1357,productUrlCaptureCount:2155,officialProductImageReferenceCount:11708,materialEvidenceCount:1748,manufacturingClaimCount:64,descriptionMissingIdentityCount:826,priceMissingIdentityCount:770,materialMissingIdentityCount:86,retryIdentityKeys:expectedRetries,deltaCount:11,latestRunId:'32784949243',factoryVerifiedCount:0,globalCanonicalProductCount:0,ledgerSha256:'0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7'},
+            sourcePages:{deltaCount:8,attemptedObservationCount:1524,uniqueAttemptedSourcePageCount:1239,ledgerSha256:'19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3'},
             canonicalJson:{identityDeltas:11,sourcePageDeltas:8,sourcePageAudits:4},
           };
           const mismatches=[];
-          const compare=(prefix,a,e)=>{for(const [key,value] of Object.entries(e)) if(JSON.stringify(a[key])!==JSON.stringify(value)) mismatches.push([`${prefix}.${key}`,a[key],value]);};
-          compare('identity',actual.identity,expected.identity);
-          compare('sourcePages',actual.sourcePages,expected.sourcePages);
-          compare('canonicalJson',actual.canonicalJson,expected.canonicalJson);
+          const compare=(prefix,a,e)=>{for(const [key,value] of Object.entries(e))if(JSON.stringify(a[key])!==JSON.stringify(value))mismatches.push([`${prefix}.${key}`,a[key],value]);};
+          compare('identity',actual.identity,expected.identity);compare('sourcePages',actual.sourcePages,expected.sourcePages);compare('canonicalJson',actual.canonicalJson,expected.canonicalJson);
 
-          if(!preflight.passed || preflight.targetSequence!==17 || preflight.planSha256!=='d9e30f2ff37d662064521e3dea2812892c5bfd4301020c16eb63405f3423e3b3') mismatches.push(['sequence17.preflight',preflight,'passed exact plan']);
-          const preflightExpected={textFileCount:80,totalBytes:81584159,assignmentCount:50,nonemptyLaneCount:50,minimumFilesPerLane:1,maximumFilesPerLane:2,assignedFileCount:80,uniqueAssignedFileCount:80};
-          compare('sequence17.preflightCorpus',{
-            textFileCount:preflight.corpus.textFileCount,totalBytes:preflight.corpus.totalBytes,
-            assignmentCount:preflight.assignmentCount,nonemptyLaneCount:preflight.nonemptyLaneCount,
-            minimumFilesPerLane:preflight.minimumFilesPerLane,maximumFilesPerLane:preflight.maximumFilesPerLane,
-            assignedFileCount:preflight.assignedFileCount,uniqueAssignedFileCount:preflight.uniqueAssignedFileCount,
-          },preflightExpected);
-          if(preflight.missingFiles.length || preflight.overlappingAssignments.length || preflight.corpus.duplicatePathCount!==0) mismatches.push(['sequence17.preflightPartition',preflight,'zero missing overlap duplicate paths']);
-          const assigned=preflight.assignments.flatMap(item=>item.files.map(file=>file.corpusPath));
-          if(assigned.length!==80 || new Set(assigned).size!==80 || preflight.assignments.length!==50 || preflight.assignments.some(item=>item.files.length<1||item.files.length>2)) mismatches.push(['sequence17.assignmentCoverage',[assigned.length,new Set(assigned).size,preflight.assignments.length],[80,80,50]]);
+          if(!preflight.passed||preflight.targetSequence!==18||preflight.planSha256!=='83213579b078493e719a9159c97ac12651f605ba09130bb380b5d3a399dabd3f')mismatches.push(['sequence18.preflight',preflight,'passed exact plan']);
+          compare('sequence18.preflightCounts',{probeCount:preflight.probeCount,uniqueProbeUrlCount:preflight.uniqueProbeUrlCount,assignmentCount:preflight.assignmentCount,nonemptyLaneCount:preflight.nonemptyLaneCount,knownOfficialPageProbeCount:preflight.knownOfficialPageProbeCount,officialSearchProbeCount:preflight.officialSearchProbeCount},{probeCount:50,uniqueProbeUrlCount:50,assignmentCount:50,nonemptyLaneCount:50,knownOfficialPageProbeCount:8,officialSearchProbeCount:42});
+          if(preflight.duplicateProbeUrls.length||preflight.invalidHosts.length||preflight.assignments.length!==50||new Set(preflight.assignments.map(item=>item.probeUrl)).size!==50)mismatches.push(['sequence18.preflightPartition',preflight,'50 unique official URLs']);
 
-          if(!manifest.passed || manifest.runId!=='32861233493' || manifest.sourceCommitSha!=='497b78ec1694fb7c3833da999c072d48fd7388b8' || manifest.planSha256!==preflight.planSha256 || manifest.manifestSha256!=='b18f5d822114ec663beff2492117af224eb40fb99f1e1a13ae5f708302ef2230') mismatches.push(['sequence17.manifestIdentity',manifest,'passed exact run/commit/hash']);
-          if(manifest.workerCount!==50 || manifest.orchestrationStatus!=='FIFTY_OF_FIFTY_EXCLUSIVE_MEDIA_SHARDS_CONSOLIDATED' || manifest.status!=='IMMUTABLE_OFFICIAL_CORPUS_EXHAUSTED_NO_EXACT_MEDIA') mismatches.push(['sequence17.manifestGate',[manifest.workerCount,manifest.orchestrationStatus,manifest.status],[50,'FIFTY_OF_FIFTY_EXCLUSIVE_MEDIA_SHARDS_CONSOLIDATED','IMMUTABLE_OFFICIAL_CORPUS_EXHAUSTED_NO_EXACT_MEDIA']]);
-          compare('sequence17.corpus',manifest.corpus,{expectedFileCount:80,assignedFileCount:80,scannedFileCount:80,uniqueScannedFileCount:80,overlappingAssignments:[],missingFiles:[],unexpectedFiles:[]});
-          compare('sequence17.totals',manifest.totals,{rawEvidenceCount:95,deduplicatedEvidenceCount:43,officialMediaUrlCount:0,officialPageUrlCount:8,textOccurrenceEvidenceCount:35,identitiesWithOfficialMedia:0});
-          if(manifest.identityResults.length!==3 || manifest.identityResults.some(item=>item.officialMediaUrls.length!==0) || JSON.stringify(manifest.identityResults.map(item=>item.identityKey).sort())!==JSON.stringify(expectedRetries)) mismatches.push(['sequence17.identityResults',manifest.identityResults,'three retries, zero official media']);
-          if(String(evidence.runId)!=='32861233493' || evidence.planSha256!==preflight.planSha256 || evidence.evidence.length!==43) mismatches.push(['sequence17.evidence',[evidence.runId,evidence.planSha256,evidence.evidence.length],['32861233493',preflight.planSha256,43]]);
-          const illegalMedia=evidence.evidence.filter(item=>item.evidenceType==='OFFICIAL_EXACT_CODE_COLOUR_MEDIA_URL');
-          if(illegalMedia.length) mismatches.push(['sequence17.unexpectedMedia',illegalMedia,[]]);
+          if(!manifest.passed||manifest.runId!=='32862115918'||manifest.sourceCommitSha!=='886c7cda029663c960902095e23ff0311359e577'||manifest.planSha256!==preflight.planSha256||manifest.manifestSha256!=='a08bd163e69c125ec924f778edce86424245dbeacd78ff4d1243b96fc5544365')mismatches.push(['sequence18.manifestIdentity',manifest,'passed exact run/commit/hash']);
+          if(manifest.workerCount!==50||manifest.orchestrationStatus!=='FIFTY_OF_FIFTY_EXCLUSIVE_LIVE_PROBES_CONSOLIDATED'||manifest.status!=='LIVE_OFFICIAL_PROBES_EXHAUSTED_NO_VERIFIED_MEDIA')mismatches.push(['sequence18.manifestGate',[manifest.workerCount,manifest.orchestrationStatus,manifest.status],[50,'FIFTY_OF_FIFTY_EXCLUSIVE_LIVE_PROBES_CONSOLIDATED','LIVE_OFFICIAL_PROBES_EXHAUSTED_NO_VERIFIED_MEDIA']]);
+          compare('sequence18.totals',manifest.totals,{probeCount:50,uniqueProbeUrlCount:50,httpOkCount:0,httpErrorCount:50,exactTextOccurrenceProbeCount:29,observedCandidateMediaCount:0,verifiedMediaRawCount:0,verifiedMediaCount:0,identitiesWithVerifiedMedia:0});
+          if(manifest.identityResults.length!==3||manifest.identityResults.some(item=>item.verifiedMedia.length))mismatches.push(['sequence18.identityResults',manifest.identityResults,'three identities, zero verified media']);
 
-          const expectedDashboard={totalJobs:52,prepareTotal:1,prepareSuccess:1,mediaTotal:50,mediaSuccess:50,mediaFailed:0,mediaActive:0,consolidateTotal:1,consolidateSuccess:1,mediaWorkerArtifacts:50,planArtifacts:1,consolidatedArtifacts:1,totalArtifacts:52};
-          if(!dashboard.passed || dashboard.run.status!=='completed' || dashboard.run.conclusion!=='success' || dashboard.run.head_sha!=='497b78ec1694fb7c3833da999c072d48fd7388b8') mismatches.push(['sequence17.dashboardRun',dashboard.run,'completed success exact head']);
-          compare('sequence17.dashboard',dashboard.counts,expectedDashboard);
-          const consolidatedArtifact=dashboard.artifacts.find(item=>item.name==='rlf-sequence17-media-archaeology-32861233493');
-          if(!consolidatedArtifact || consolidatedArtifact.digest!=='sha256:9d89a69a18d1119dd8936a99bdba88099ef83f391e82bdc96448962642a9c749') mismatches.push(['sequence17.consolidatedArtifact',consolidatedArtifact,'exact digest']);
-          if(!snapshot.passed || snapshot.identity.ledgerSha256!==expected.identity.ledgerSha256 || snapshot.sourcePages.ledgerSha256!==expected.sourcePages.ledgerSha256 || snapshot.sequence17.manifestSha256!==manifest.manifestSha256) mismatches.push(['sequence17.snapshot',snapshot,'passed exact no-mutation checkpoint']);
+          const statusCounts=evidence.records.reduce((map,item)=>{const key=String(item.response?.status??'null');map[key]=(map[key]??0)+1;return map;},{});
+          const contentTypeCounts=evidence.records.reduce((map,item)=>{const key=String(item.response?.contentType??'null');map[key]=(map[key]??0)+1;return map;},{});
+          if(String(evidence.runId)!=='32862115918'||evidence.planSha256!==preflight.planSha256||evidence.records.length!==50||evidence.verifiedMedia.length!==0)mismatches.push(['sequence18.evidence',[evidence.runId,evidence.planSha256,evidence.records.length,evidence.verifiedMedia.length],['32862115918',preflight.planSha256,50,0]]);
+          if(JSON.stringify(statusCounts)!==JSON.stringify({'403':50}))mismatches.push(['sequence18.statusCounts',statusCounts,{'403':50}]);
+          if(JSON.stringify(contentTypeCounts)!==JSON.stringify({'text/html; charset=UTF-8':50}))mismatches.push(['sequence18.contentTypeCounts',contentTypeCounts,{'text/html; charset=UTF-8':50}]);
+          if(evidence.records.some(item=>item.observedCandidateMediaCount!==0||item.verifiedMediaCount!==0||item.response?.error!==null))mismatches.push(['sequence18.transportRecords',evidence.records,'50 deterministic WAF responses, zero candidates/media']);
 
-          const completed=new Set(identity.completed.identityKeys);
-          for(const key of expectedRetries) if(completed.has(key)) mismatches.push([`sequence17.falseResolution.${key}`,true,false]);
-          const checkpoint={
-            schemaVersion:11,sourceRunId:'32861233493',generatedAt:new Date().toISOString(),
-            expected,actual,
-            sequence17:{planSha256:preflight.planSha256,manifestSha256:manifest.manifestSha256,status:manifest.status,corpus:manifest.corpus,totals:manifest.totals,identityResults:manifest.identityResults,dashboardCounts:dashboard.counts,consolidatedArtifactDigest:consolidatedArtifact?.digest??null},
-            mismatches,passed:mismatches.length===0,
-          };
-          await writeFile('/tmp/rlf-ledger-checkpoint.json',`${JSON.stringify(checkpoint,null,2)}\n`);
-          console.log(JSON.stringify(checkpoint,null,2));
-          if(mismatches.length) throw new Error(`Sequence 17 validation mismatch: ${JSON.stringify(mismatches)}`);
+          const expectedDashboard={totalJobs:52,prepareTotal:1,prepareSuccess:1,liveTotal:50,liveSuccess:50,liveFailed:0,liveActive:0,consolidateTotal:1,consolidateSuccess:1,liveWorkerArtifacts:50,planArtifacts:1,consolidatedArtifacts:1,totalArtifacts:52};
+          if(!dashboard.passed||dashboard.run.status!=='completed'||dashboard.run.conclusion!=='success'||dashboard.run.head_sha!=='886c7cda029663c960902095e23ff0311359e577')mismatches.push(['sequence18.dashboardRun',dashboard.run,'completed success exact head']);
+          compare('sequence18.dashboard',dashboard.counts,expectedDashboard);
+          const consolidatedArtifact=dashboard.artifacts.find(item=>item.name==='rlf-sequence18-live-media-32862115918');
+          if(!consolidatedArtifact||consolidatedArtifact.digest!=='sha256:b4e0381e0d78e477edc059d987752c975710387040470843f60500f702d34044')mismatches.push(['sequence18.consolidatedArtifact',consolidatedArtifact,'exact digest']);
+          if(!snapshot.passed||snapshot.identity.ledgerSha256!==expected.identity.ledgerSha256||snapshot.sourcePages.ledgerSha256!==expected.sourcePages.ledgerSha256||snapshot.sequence18.status!=='DIRECT_OFFICIAL_TRANSPORT_BLOCKED_BY_WAF_NO_MEDIA_DECISION')mismatches.push(['sequence18.snapshot',snapshot,'passed exact WAF-blocked no-mutation checkpoint']);
+          const completed=new Set(identity.completed.identityKeys);for(const key of expectedRetries)if(completed.has(key))mismatches.push([`sequence18.falseResolution.${key}`,true,false]);
+
+          const checkpoint={schemaVersion:12,sourceRunId:'32862115918',generatedAt:new Date().toISOString(),expected,actual,sequence18:{planSha256:preflight.planSha256,manifestSha256:manifest.manifestSha256,status:'DIRECT_OFFICIAL_TRANSPORT_BLOCKED_BY_WAF_NO_MEDIA_DECISION',sourceManifestStatus:manifest.status,totals:manifest.totals,responseStatusCounts:statusCounts,responseContentTypeCounts:contentTypeCounts,dashboardCounts:dashboard.counts,consolidatedArtifactDigest:consolidatedArtifact?.digest??null},mismatches,passed:mismatches.length===0};
+          await writeFile('/tmp/rlf-ledger-checkpoint.json',`${JSON.stringify(checkpoint,null,2)}\n`);console.log(JSON.stringify(checkpoint,null,2));if(mismatches.length)throw new Error(`Sequence 18 validation mismatch: ${JSON.stringify(mismatches)}`);
           NODE
             pnpm check
             pnpm build
@@ -153,29 +103,14 @@ jobs:
         run: |
           set -euo pipefail
           node <<'NODE'
-          const fs=require('node:fs'); const crypto=require('node:crypto');
-          const log=fs.existsSync('/tmp/rlf-validation.log')?fs.readFileSync('/tmp/rlf-validation.log'):Buffer.from('missing validation log');
-          const checkpoint=fs.existsSync('/tmp/rlf-ledger-checkpoint.json')?JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json','utf8')):null;
-          const proof={schemaVersion:11,recordedAt:new Date().toISOString(),sourceCommitSha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT||'1'),validationOutcome:process.env.VALIDATION_OUTCOME,nodeVersion:process.version,logSha256:crypto.createHash('sha256').update(log).digest('hex'),ledgerCheckpoint:checkpoint,requiredChecks:['pnpm_install_frozen_lockfile','execution_script_syntax','canonical_json_11_identity_8_source_page_4_persisted_audits','exact_sequence17_no_mutation_ledgers','fifty_of_fifty_media_workers','eighty_exclusive_corpus_files','sequence17_immutable_corpus_exhausted','zero_exact_official_media_urls','eight_official_product_page_urls','three_retries_remain_open','factory_verified_zero','global_canonical_products_zero','typescript_no_emit','production_build']};
-          fs.writeFileSync('data/execution/validation-proof.json',`${JSON.stringify(proof,null,2)}\n`);
+          const fs=require('node:fs');const crypto=require('node:crypto');const log=fs.existsSync('/tmp/rlf-validation.log')?fs.readFileSync('/tmp/rlf-validation.log'):Buffer.from('missing validation log');const checkpoint=fs.existsSync('/tmp/rlf-ledger-checkpoint.json')?JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json','utf8')):null;const proof={schemaVersion:12,recordedAt:new Date().toISOString(),sourceCommitSha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT||'1'),validationOutcome:process.env.VALIDATION_OUTCOME,nodeVersion:process.version,logSha256:crypto.createHash('sha256').update(log).digest('hex'),ledgerCheckpoint:checkpoint,requiredChecks:['pnpm_install_frozen_lockfile','execution_script_syntax','canonical_json_11_identity_8_source_page_4_persisted_audits','exact_sequence18_no_mutation_ledgers','fifty_of_fifty_live_workers','fifty_unique_official_probe_urls','fifty_http_403_waf_responses','zero_observed_candidate_media','zero_verified_media','transport_blocked_not_evidence_absent','three_retries_remain_open','factory_verified_zero','global_canonical_products_zero','typescript_no_emit','production_build']};fs.writeFileSync('data/execution/validation-proof.json',`${JSON.stringify(proof,null,2)}\n`);
           NODE
       - name: Publish proof
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          branch='feature/rlf-execution-backend-20260823'
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/execution/validation-proof.json
-          git commit -m "Persist RLF sequence 17 validation proof ${GITHUB_RUN_ID}"
-          for attempt in 1 2 3 4 5; do
-            git fetch origin "$branch"
-            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
-            git rebase --abort 2>/dev/null || true
-            sleep $((attempt * 3))
-          done
-          exit 1
+          branch='feature/rlf-execution-backend-20260823';git config user.name 'github-actions[bot]';git config user.email '41898282+github-actions[bot]@users.noreply.github.com';git add data/execution/validation-proof.json;git commit -m "Persist RLF sequence 18 validation proof ${GITHUB_RUN_ID}";for attempt in 1 2 3 4 5;do git fetch origin "$branch";if git rebase "origin/$branch"&&git push origin "HEAD:$branch";then exit 0;fi;git rebase --abort 2>/dev/null||true;sleep $((attempt*3));done;exit 1
       - name: Enforce validation success
         if: steps.validate.outcome != 'success'
         run: exit 1
