@@ -7,9 +7,9 @@ import {assess} from './assessment';
 
 export async function discoverLaneCycle(input:DiscoverInput):Promise<LaneCycleResult> {
   'use step';
-  if(input.cycle===20){
+  if(input.cycle===20||input.cycle===21){
     const target=CYCLE20_TARGETS[input.lane.index];
-    if(!target)throw new Error(`CYCLE20_TARGET_MISSING_${input.lane.index}`);
+    if(!target)throw new Error(`TARGETED_CYCLE_TARGET_MISSING_${input.cycle}_${input.lane.index}`);
     return verifyTargetedLane({...input,target});
   }
   const searchedAt=new Date().toISOString();
