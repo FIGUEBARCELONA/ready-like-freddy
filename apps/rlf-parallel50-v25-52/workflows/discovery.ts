@@ -1,6 +1,6 @@
 import type {DiscoverInput,LaneCycleResult,Candidate,ProviderAttempt} from './types';
 import {NEGATIVE} from './policy';
-import {alternateCommerceQuery,domainOf,primaryCommerceQuery,searchAll,shouldRunAlternateSearch,type SearchItem} from './search';
+import {alternateCommerceQuery,domainOf,primaryCommerceQuery,primaryCorpus,searchFallback,searchPrimary,shouldRunFallbackSearch,type SearchItem} from './search';
 import {evidence,fetchBundle} from './evidence';
 import {assess} from './assessment';
 
@@ -9,18 +9,18 @@ export async function discoverLaneCycle(input:DiscoverInput):Promise<LaneCycleRe
   const searchedAt=new Date().toISOString();
   const primaryTemplate=primaryCommerceQuery(input);
   const discoveryQuery=`${primaryTemplate.query} ${NEGATIVE}`;
-  const primary=await searchAll(discoveryQuery,input);
+  const primary=await searchPrimary(discoveryQuery,input);
   const attempts:ProviderAttempt[]=[...primary.attempts];
   const merged:SearchItem[]=[];const seenUrls=new Set<string>();
   const merge=(items:SearchItem[])=>{for(const item of items){if(seenUrls.has(item.url))continue;seenUrls.add(item.url);merged.push(item);}};
   merge(primary.results);
-  let query=discoveryQuery;
-  if(shouldRunAlternateSearch(primary.results.length)) {
+  let query=`${primaryCorpus(input).toUpperCase()}:${discoveryQuery}`;
+  if(shouldRunFallbackSearch(primary.results.length)) {
     const alternateTemplate=alternateCommerceQuery(input);
-    const alternateQuery=`${alternateTemplate.query} ${NEGATIVE}`;
-    const alternate=await searchAll(alternateQuery,input);
-    attempts.push(...alternate.attempts);merge(alternate.results);
-    query+=` || ALTERNATE:${alternateQuery}`;
+    const fallbackQuery=`${alternateTemplate.query} ${NEGATIVE}`;
+    const fallback=await searchFallback(fallbackQuery,input);
+    attempts.push(...fallback.attempts);merge(fallback.results);
+    query+=` || BING_FALLBACK:${fallbackQuery}`;
   }
   const errors:string[]=[];const candidates:Candidate[]=[];const domains=new Set<string>();
   for(const result of merged) {
@@ -35,6 +35,6 @@ export async function discoverLaneCycle(input:DiscoverInput):Promise<LaneCycleRe
     if(bundle.target.status&&bundle.target.status>=400&&(!bundle.home||!bundle.home.status||bundle.home.status>=400)) errors.push(`${domain}:HTTP_${bundle.target.status}`);
     candidates.push(assess(input,query,primaryTemplate.index,-1,result,bundle));
   }
-  if(!merged.length) errors.push('NO_ELIGIBLE_DIRECT_COMMERCE_RESULTS');
+  if(!merged.length) errors.push('NO_ELIGIBLE_MULTI_CORPUS_RESULTS');
   return {slot:input.lane.slot,cycle:input.cycle,countryCode:input.lane.countryCode,country:input.lane.country,query,queryTemplate:primaryTemplate.index,identityQueryTemplate:-1,searchedAt,searchStatus:attempts.find(attempt=>attempt.status===200)?.status??attempts[0]?.status??null,candidates,errors,searchAttempts:attempts};
 }
