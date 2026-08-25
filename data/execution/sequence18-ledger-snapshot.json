@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-25T14:55:07.234Z",
+  "sourceCommitSha": "ff5a12969d90b3fe55972d93e9027b72cc01e81c",
+  "sourceRunId": "32862115918",
+  "identity": {
+    "completedIdentityCount": 1357,
+    "productUrlCaptureCount": 2155,
+    "officialProductImageReferenceCount": 11708,
+    "materialEvidenceCount": 1748,
+    "manufacturingClaimCount": 64,
+    "descriptionMissingIdentityCount": 826,
+    "priceMissingIdentityCount": 770,
+    "materialMissingIdentityCount": 86,
+    "retryIdentityCount": 3,
+    "retryIdentityKeys": [
+      "HW2300|843",
+      "M1588|81B",
+      "M1588|84B"
+    ],
+    "deltaCount": 11,
+    "latestRunId": "32784949243",
+    "factoryVerifiedCount": 0,
+    "globalCanonicalProductCount": 0,
+    "ledgerSha256": "0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7"
+  },
+  "sourcePages": {
+    "deltaCount": 8,
+    "attemptedObservationCount": 1524,
+    "uniqueAttemptedSourcePageCount": 1239,
+    "ledgerSha256": "19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3"
+  },
+  "sequence18": {
+    "planSha256": "83213579b078493e719a9159c97ac12651f605ba09130bb380b5d3a399dabd3f",
+    "preflightPassed": true,
+    "probeCount": 50,
+    "uniqueProbeUrlCount": 50,
+    "knownOfficialPageProbeCount": 8,
+    "officialSearchProbeCount": 42,
+    "manifestSha256": "a08bd163e69c125ec924f778edce86424245dbeacd78ff4d1243b96fc5544365",
+    "manifestPassed": true,
+    "status": "DIRECT_OFFICIAL_TRANSPORT_BLOCKED_BY_WAF_NO_MEDIA_DECISION",
+    "sourceManifestStatus": "LIVE_OFFICIAL_PROBES_EXHAUSTED_NO_VERIFIED_MEDIA",
+    "workerCount": 50,
+    "orchestrationStatus": "FIFTY_OF_FIFTY_EXCLUSIVE_LIVE_PROBES_CONSOLIDATED",
+    "totals": {
+      "probeCount": 50,
+      "uniqueProbeUrlCount": 50,
+      "httpOkCount": 0,
+      "httpErrorCount": 50,
+      "exactTextOccurrenceProbeCount": 29,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaRawCount": 0,
+      "verifiedMediaCount": 0,
+      "identitiesWithVerifiedMedia": 0
+    },
+    "responseStatusCounts": {
+      "403": 50
+    },
+    "responseContentTypeCounts": {
+      "text/html; charset=UTF-8": 50
+    },
+    "evidenceRecordCount": 50,
+    "verifiedMediaCount": 0,
+    "dashboardPassed": true,
+    "dashboardCounts": {
+      "totalJobs": 52,
+      "prepareTotal": 1,
+      "prepareSuccess": 1,
+      "liveTotal": 50,
+      "liveSuccess": 50,
+      "liveFailed": 0,
+      "liveActive": 0,
+      "consolidateTotal": 1,
+      "consolidateSuccess": 1,
+      "liveWorkerArtifacts": 50,
+      "planArtifacts": 1,
+      "consolidatedArtifacts": 1,
+      "totalArtifacts": 52
+    }
+  },
+  "passed": true
+}
