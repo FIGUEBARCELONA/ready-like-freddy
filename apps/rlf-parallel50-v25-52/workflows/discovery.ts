@@ -1,10 +1,17 @@
 import type {DiscoverInput,LaneCycleResult,Candidate,ProviderAttempt} from './types';
+import {CYCLE20_TARGETS} from '@/lib/cycle20-targets';
 import {domainOf,overpassVariant,primaryCorpus,searchPrimary,searchSecondary,shouldRetryOverpass,type SearchItem} from './search';
+import {verifyTargetedLane} from './targeted';
 import {evidence,fetchBundle} from './evidence';
 import {assess} from './assessment';
 
 export async function discoverLaneCycle(input:DiscoverInput):Promise<LaneCycleResult> {
   'use step';
+  if(input.cycle===20){
+    const target=CYCLE20_TARGETS[input.lane.index];
+    if(!target)throw new Error(`CYCLE20_TARGET_MISSING_${input.lane.index}`);
+    return verifyTargetedLane({...input,target});
+  }
   const searchedAt=new Date().toISOString();
   const primary=await searchPrimary(input);
   const attempts:ProviderAttempt[]=[...primary.attempts];
