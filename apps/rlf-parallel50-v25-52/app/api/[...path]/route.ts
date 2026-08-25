@@ -1,4 +1,5 @@
 import {getRun} from 'workflow/api';
+import {parallel50Campaign,parallel50Sweep} from '@/workflows/campaign';
 import {providerSmoke} from '@/workflows/search';
 import type {CampaignResult} from '@/workflows/types';
 import {REPLACEMENT_POLICY} from '@/lib/replacement-engine';
@@ -10,11 +11,12 @@ export const preferredRegion='fra1';
 const MONITOR_RUN_ID='wrun_01M0Q8981CTB61S3DJJ06JZ2FW';
 const LATEST_SWEEP_RUN_ID='wrun_01M0VNXGKMTSAG484467ET9PQY';
 const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{'cache-control':'no-store'}});
+void parallel50Sweep;void parallel50Campaign;
 async function runState(id:string,includeOutput=false){if(!id)return{status:'not_started',active:0,output:null as CampaignResult|null,error:null as string|null};try{const run=await getRun(id);const status=await run.status;const output=status==='completed'&&includeOutput?await run.returnValue as CampaignResult:null;return{status,active:['running','pending'].includes(status)?50:0,output,error:null as string|null};}catch(error){return{status:'unavailable',active:0,output:null,error:error instanceof Error?error.message:'run error'};}}
 
 export async function GET(request:Request,{params}:{params:Promise<{path:string[]}>}){
   const parts=(await params).path??[];const path=parts.join('/');void request;
-  const base={version:'25.55.51',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_OSM_OVERPASS_BBOX_TILES_V22R2',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0}};
+  const base={version:'25.55.52',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_OSM_OVERPASS_BBOX_TILES_V22R2',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0}};
   if(path==='health')return json({ok:true,...base,executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'CLOSED',oneShotSweep:'CLOSED',replacementEngineVersion:REPLACEMENT_POLICY.version,replacementSourcePool:REPLACEMENT_POLICY.sourcePool,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0,checkedAt:new Date().toISOString()});
   if(path==='provider/smoke')return json({ok:true,...base,smoke:await providerSmoke()});
   if(path==='replacement/policy')return json({ok:true,policy:REPLACEMENT_POLICY,activationState:'FAIL_CLOSED_EMPTY_ACCEPTED_4K'});
