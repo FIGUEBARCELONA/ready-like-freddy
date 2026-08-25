@@ -1,6 +1,8 @@
 import {getRun} from 'workflow/api';
 import {parallel50Campaign,parallel50Sweep} from '@/workflows/campaign';
 import {providerSmoke} from '@/workflows/search';
+import {targetedSmoke} from '@/workflows/targeted';
+import {CYCLE20_TARGETS} from '@/lib/cycle20-targets';
 import type {CampaignResult} from '@/workflows/types';
 import {REPLACEMENT_POLICY} from '@/lib/replacement-engine';
 import {CANONICAL_REGISTRY_COVERAGE,KNOWN_IDENTITY_QUARANTINE_DOMAINS} from '@/lib/known-suppliers';
@@ -16,9 +18,10 @@ async function runState(id:string,includeOutput=false){if(!id)return{status:'not
 
 export async function GET(request:Request,{params}:{params:Promise<{path:string[]}>}){
   const parts=(await params).path??[];const path=parts.join('/');void request;
-  const base={version:'25.55.52',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_OSM_OVERPASS_BBOX_TILES_V22R2',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0}};
-  if(path==='health')return json({ok:true,...base,executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'CLOSED',oneShotSweep:'CLOSED',replacementEngineVersion:REPLACEMENT_POLICY.version,replacementSourcePool:REPLACEMENT_POLICY.sourcePool,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0,checkedAt:new Date().toISOString()});
+  const base={version:'25.55.53',workflowVersion:'4.8.4_PINNED',searchProfile:'EU27_TARGETED_DIRECT_BRAND_VERIFICATION_V23',delta:'0051',dedupRegistry:CANONICAL_REGISTRY_COVERAGE,identityQuarantineCount:KNOWN_IDENTITY_QUARANTINE_DOMAINS.size,dependencyAudit:{moderate:0,high:0,critical:0,total:0}};
+  if(path==='health')return json({ok:true,...base,executionBackend:'VERCEL_WORKFLOW',queue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',parallelism:50,currentMonitorRunId:MONITOR_RUN_ID,latestSweepRunId:LATEST_SWEEP_RUN_ID,sweepBootstrap:'CLOSED',oneShotSweep:'CLOSED',targetedQueueSize:CYCLE20_TARGETS.length,replacementEngineVersion:REPLACEMENT_POLICY.version,replacementSourcePool:REPLACEMENT_POLICY.sourcePool,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0,checkedAt:new Date().toISOString()});
   if(path==='provider/smoke')return json({ok:true,...base,smoke:await providerSmoke()});
+  if(path==='targeted/smoke')return json({ok:true,...base,smoke:await targetedSmoke(CYCLE20_TARGETS[0],'en-IE,en;q=.9')});
   if(path==='replacement/policy')return json({ok:true,policy:REPLACEMENT_POLICY,activationState:'FAIL_CLOSED_EMPTY_ACCEPTED_4K'});
   if(path==='sweep-bootstrap'||path==='bootstrap')return json({ok:false,code:'BOOTSTRAP_CLOSED'},410);
   if(path==='status'){
@@ -26,7 +29,7 @@ export async function GET(request:Request,{params}:{params:Promise<{path:string[
     const activeWorkers=Math.max(monitor.active,sweep.active);
     const activeRunId=sweep.active?LATEST_SWEEP_RUN_ID:monitor.active?MONITOR_RUN_ID:null;
     const activeRunStatus=sweep.active?sweep.status:monitor.active?monitor.status:'idle';
-    return json({ok:true,generatedAt:new Date().toISOString(),deployment:{...base,executionBackend:'CONNECTED',scheduler:'VERCEL_WORKFLOW',durableQueue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',activeWorkers,activeLanes:activeWorkers,currentRunId:activeRunId,currentRunStatus:activeRunStatus,monitorRunId:MONITOR_RUN_ID,monitorRunStatus:monitor.status,latestSweepRunId:LATEST_SWEEP_RUN_ID,latestSweepStatus:sweep.status,sweepBootstrap:'CLOSED',oneShotSweep:'CLOSED',replacementEngineVersion:REPLACEMENT_POLICY.version,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0},sweep:{summary:sweep.output?{...sweep.output,candidates:undefined}:null},funnel:{qualifiedSuppliers:154,readyToMerge:12,projectedQualified:166,remainingTo10000:9834,acceptedPool:0,liveSelection:0,reserves:0}});
+    return json({ok:true,generatedAt:new Date().toISOString(),deployment:{...base,executionBackend:'CONNECTED',scheduler:'VERCEL_WORKFLOW',durableQueue:'VERCEL_QUEUES_MANAGED',persistence:'WORKFLOW_EVENT_LOG',activeWorkers,activeLanes:activeWorkers,currentRunId:activeRunId,currentRunStatus:activeRunStatus,monitorRunId:MONITOR_RUN_ID,monitorRunStatus:monitor.status,latestSweepRunId:LATEST_SWEEP_RUN_ID,latestSweepStatus:sweep.status,sweepBootstrap:'CLOSED',oneShotSweep:'CLOSED',targetedQueueSize:CYCLE20_TARGETS.length,replacementEngineVersion:REPLACEMENT_POLICY.version,qaAcceptedNewSuppliers:0,simulatedWorkersStarted:0},sweep:{summary:sweep.output?{...sweep.output,candidates:undefined}:null},funnel:{qualifiedSuppliers:154,readyToMerge:12,projectedQualified:166,remainingTo10000:9834,acceptedPool:0,liveSelection:0,reserves:0}});
   }
   if(parts[0]==='run'&&parts[1]){const state=await runState(parts[1],true);return json({ok:state.status!=='unavailable',runId:parts[1],status:state.status,activeWorkers:state.active,activeLanes:state.active,executionSemantics:['running','pending'].includes(state.status)?'DURABLE_RUNNING_OR_SCHEDULED':'TERMINAL',summary:state.output?{...state.output,candidates:undefined}:null,result:state.output,error:state.error},state.status==='unavailable'?404:200);}
   if(path==='results/latest'){
