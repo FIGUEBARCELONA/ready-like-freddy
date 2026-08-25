@@ -1,16 +1,16 @@
 {
-  "schemaVersion": 9,
-  "recordedAt": "2026-08-25T14:38:10.594Z",
-  "sourceCommitSha": "9b65672ad4ad0d30d0e81827cebdceb19e8e759a",
-  "runId": "32860711079",
+  "schemaVersion": 10,
+  "recordedAt": "2026-08-25T14:39:46.290Z",
+  "sourceCommitSha": "5096d5f60e8acab062141f4c7291d95296426ae2",
+  "runId": "32860832297",
   "runAttempt": 1,
-  "validationOutcome": "failure",
+  "validationOutcome": "success",
   "nodeVersion": "v22.23.2",
-  "logSha256": "fc5ab1a99fbedba9501c16e638c47ddf4991ee5c72f4f927435bee6410c3208e",
+  "logSha256": "fe1872b8dffb9163c04ac4970a498528aef26a69ea41346212d008f06c1eb6bc",
   "ledgerCheckpoint": {
-    "schemaVersion": 9,
+    "schemaVersion": 10,
     "sourceRunId": "32784949243",
-    "generatedAt": "2026-08-25T14:38:10.545Z",
+    "generatedAt": "2026-08-25T14:39:38.086Z",
     "expected": {
       "identity": {
         "completedIdentityCount": 1357,
@@ -37,6 +37,11 @@
         "attemptedObservationCount": 1524,
         "uniqueAttemptedSourcePageCount": 1239,
         "ledgerSha256": "19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3"
+      },
+      "canonicalJson": {
+        "identityDeltas": 11,
+        "sourcePageDeltas": 8,
+        "sourcePageAudits": 4
       }
     },
     "actual": {
@@ -65,6 +70,11 @@
         "attemptedObservationCount": 1524,
         "uniqueAttemptedSourcePageCount": 1239,
         "ledgerSha256": "19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3"
+      },
+      "canonicalJson": {
+        "identityDeltas": 11,
+        "sourcePageDeltas": 8,
+        "sourcePageAudits": 4
       }
     },
     "sequence16": {
@@ -125,19 +135,13 @@
       },
       "ledgerAuditPassed": true
     },
-    "mismatches": [
-      [
-        "canonicalJson.sourcePageAuditCount",
-        4,
-        8
-      ]
-    ],
-    "passed": false
+    "mismatches": [],
+    "passed": true
   },
   "requiredChecks": [
     "pnpm_install_frozen_lockfile",
     "execution_script_syntax",
-    "canonical_json_eleven_identity_deltas_eight_source_page_deltas",
+    "canonical_json_11_identity_8_source_page_4_persisted_audits",
     "exact_sequence16_ledgers",
     "fifty_of_fifty_product_workers",
     "sequence16_six_retry_frontier",
