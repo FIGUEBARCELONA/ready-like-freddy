@@ -13,7 +13,7 @@ function compile(file){
 function evaluate(file,requireFn){
   const module={exports:{}};
   const wrapper=`(function(exports,require,module,__filename,__dirname){${compile(file)}\n})`;
-  const context={console,URL,Set,Map,RegExp,String,Object,Array,Boolean,Number,Math,Date,AbortSignal,fetch};
+  const context={console,URL,URLSearchParams,Set,Map,RegExp,String,Object,Array,Boolean,Number,Math,Date,AbortSignal,fetch,decodeURIComponent,encodeURIComponent};
   const fn=vm.runInNewContext(wrapper,context);
   fn(module.exports,requireFn,module,file,path.dirname(file));
   return module.exports;
@@ -30,18 +30,34 @@ const search=evaluate(searchFile,(id)=>{
   throw new Error(`Unexpected search import: ${id}`);
 });
 
-const input={cycle:16,maxCandidates:8,lane:{slot:'F06',countryCode:'CZ',country:'Czechia',language:'cs-CZ,cs;q=.9,en;q=.7',tld:'cz',localSecondhand:'použité oblečení',index:5}};
-const primary=search.primaryCommerceQuery(input);
-const alternate=search.alternateCommerceQuery(input);
+const baseLane={slot:'F06',countryCode:'CZ',country:'Czechia',language:'cs-CZ,cs;q=.9,en;q=.7',tld:'cz',localSecondhand:'použité oblečení',index:5};
+const commonInput={cycle:17,maxCandidates:8,lane:baseLane};
+const ddgInput={cycle:17,maxCandidates:8,lane:{...baseLane,slot:'F33',index:32}};
+const primary=search.primaryCommerceQuery(commonInput);
+const alternate=search.alternateCommerceQuery(commonInput);
+const ccUrl=search.commonCrawlUrl(commonInput,48);
+const unwrapped=search.unwrapDuckDuckGo('//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.cz%2Fproducts%2Ffred-perry-polo%3Futm_source%3Dddg');
+
 const fixtures=[
-  [search.shouldRunAlternateSearch(0),true,'empty primary search triggers one alternate'],
-  [search.shouldRunAlternateSearch(1),false,'one primary result suppresses alternate'],
+  [search.COMMON_CRAWL_INDEX,'CC-MAIN-2026-30','Common Crawl collection is pinned'],
+  [search.primaryCorpus(commonInput),'commoncrawl-cdx','first EU-27 lane uses Common Crawl'],
+  [search.primaryCorpus(ddgInput),'duckduckgo-html','duplicate-country lane uses DuckDuckGo'],
+  [search.shouldRunFallbackSearch(0),true,'empty primary corpus triggers one Bing fallback'],
+  [search.shouldRunFallbackSearch(1),false,'one primary result suppresses Bing fallback'],
+  [ccUrl.includes('index.commoncrawl.org/CC-MAIN-2026-30-index'),true,'Common Crawl endpoint is pinned'],
+  [decodeURIComponent(ccUrl).includes('*.cz'),true,'Common Crawl query keeps ccTLD boundary'],
+  [decodeURIComponent(ccUrl).includes('matchType=domain'),true,'Common Crawl query uses domain match'],
+  [decodeURIComponent(ccUrl).includes('status:200'),true,'Common Crawl query filters HTTP 200'],
+  [decodeURIComponent(ccUrl).includes('mime:text/html'),true,'Common Crawl query filters HTML'],
+  [decodeURIComponent(ccUrl).includes('fred[^/?#]{0,12}perry'),true,'Common Crawl query filters Fred Perry URL forms'],
+  [decodeURIComponent(ccUrl).includes('limit=48'),true,'Common Crawl query is bounded'],
+  [unwrapped,'https://example.cz/products/fred-perry-polo','DuckDuckGo redirect is unwrapped and tracking removed'],
   [primary.query.includes('Fred Perry'),true,'primary keeps brand constraint'],
   [primary.query.includes('.cz')||primary.query.includes('Czechia'),true,'primary keeps country constraint'],
-  [alternate.query.includes('Fred Perry'),true,'alternate keeps brand constraint'],
-  [alternate.query.includes('Czechia'),true,'alternate keeps country constraint'],
+  [alternate.query.includes('Fred Perry'),true,'fallback keeps brand constraint'],
+  [alternate.query.includes('Czechia'),true,'fallback keeps country constraint'],
   [Number.isInteger(primary.index)&&primary.index>=0&&primary.index<8,true,'primary template index bounded'],
-  [Number.isInteger(alternate.index)&&alternate.index>=0&&alternate.index<8,true,'alternate template index bounded'],
+  [Number.isInteger(alternate.index)&&alternate.index>=0&&alternate.index<8,true,'fallback template index bounded'],
   [search.eligibleSearchDomain('new-vintage-store.cz'),true,'new professional candidate remains eligible'],
   [search.eligibleSearchDomain('96casual.de'),false,'known supplier excluded before fetch'],
   [search.eligibleSearchDomain('toms-paderborn.de'),false,'known rejection excluded before fetch'],
