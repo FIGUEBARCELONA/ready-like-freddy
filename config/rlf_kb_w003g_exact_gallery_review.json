@@ -1,0 +1,52 @@
+{
+  "version": "W003G_V1",
+  "canonical_date": "2026-08-26",
+  "policy": "APPEND_ONLY_FAIL_CLOSED",
+  "collector": {
+    "run_id": 32981057995,
+    "artifact_digest": "sha256:dcc71f6156505952aff7ec740cd5f774cbd13d97a50c40398d2af094b364e7ee",
+    "targets": 8,
+    "pages_http_200": 6,
+    "asset_attempts": 242,
+    "unique_images_reviewed": 36
+  },
+  "review": {
+    "retained_images": 29,
+    "rejected_images": 7,
+    "new_exact_role_promotions": 3,
+    "role_reinforcements": 1,
+    "partial_macro_records": 3
+  },
+  "promoted_roles": [
+    "M3600::U98/MACRO_BRAND_LABEL_FRONT",
+    "M3600::U98/MACRO_STYLE_SIZE_COLOUR_CODE",
+    "M3600::350/MACRO_BRAND_LABEL_FRONT"
+  ],
+  "reinforced_roles": [
+    "M3600::350/MACRO_STYLE_SIZE_COLOUR_CODE"
+  ],
+  "exact_full_codes": [
+    "M3600/U98/1950/418",
+    "M3600/350/1950/396",
+    "M3600/350/1950/419",
+    "M3600/350/1950/421"
+  ],
+  "partial_or_three_component_codes": [
+    "M3600/T50/1950"
+  ],
+  "component_4_direct_size_hypothesis": "REJECTED",
+  "positive_component_4_semantics": "OPEN",
+  "production_instance_candidates": 4,
+  "forensic_tasks_open_or_partial": 52,
+  "priority_colourways_without_any_code": [
+    "M3600::04C",
+    "M3600::85B",
+    "M3600::87B",
+    "M3600::T60"
+  ],
+  "exact_winzen_site_supported": false,
+  "exact_l7255_81a_shilla_link": false,
+  "automatic_split": false,
+  "automatic_merge": false,
+  "automatic_canonical_promotion": false
+}
