@@ -1,0 +1,49 @@
+name: RLF KB W003C OSH Tier One recovery
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - automation/fred-perry-product-map-20260826
+    paths:
+      - tools/fetch_fred_perry_osh_tier1.py
+      - .github/workflows/rlf-kb-w003c-osh-tier1.yml
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout temporary branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/fred-perry-product-map-20260826
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Recover Fred Perry Tier One facilities
+        run: python tools/fetch_fred_perry_osh_tier1.py
+
+      - name: Package auditable output
+        run: |
+          zip -r RLF_KB_W003C_OSH_TIER1_V1.zip osh-fred-perry-tier1
+          sha256sum RLF_KB_W003C_OSH_TIER1_V1.zip > RLF_KB_W003C_OSH_TIER1_V1.zip.sha256
+
+      - name: Upload W003C OSH package
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF_KB_W003C_OSH_TIER1_V1
+          path: |
+            RLF_KB_W003C_OSH_TIER1_V1.zip
+            RLF_KB_W003C_OSH_TIER1_V1.zip.sha256
+          retention-days: 7
+          if-no-files-found: error
