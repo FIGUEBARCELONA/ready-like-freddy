@@ -41,3 +41,5 @@ jobs:
           path: RLF_KB_W003H_MERCARI_EXACT_LABELS_V1.zip
           if-no-files-found: error
           retention-days: 7
+
+# Trigger revision: 2026-08-26T15:07Z
