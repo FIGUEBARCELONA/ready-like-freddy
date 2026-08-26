@@ -1,0 +1,92 @@
+{
+  "version": "1.0",
+  "canonical_date": "2026-08-26",
+  "policy": "APPEND_ONLY_FAIL_CLOSED",
+  "automatic_promotion": false,
+  "principal_census_unit": "production_variant",
+  "lane_scope": {
+    "key": "STYLE_CODE::COLOUR_CODE",
+    "cross_lane_overlap": "PROHIBITED",
+    "candidate_id_reconciliation": "SCOPE_KEY_FIRST_FAIL_CLOSED"
+  },
+  "execution_tiers": {
+    "tier_1_fast_track": {
+      "candidate_count": 8,
+      "entry_condition": "FOUR_REVIEWED_GENERIC_IMAGE_ROLES_COMPLETE",
+      "skip": [
+        "REPEAT_GENERIC_IMAGE_ACQUISITION"
+      ],
+      "targets": [
+        "MACRO_BRAND_LABEL_FRONT",
+        "MACRO_BRAND_LABEL_BACK_OR_STITCHING",
+        "MACRO_CARE_LABEL_FRONT",
+        "MACRO_CARE_LABEL_REVERSE",
+        "MACRO_STYLE_SIZE_COLOUR_CODE",
+        "MACRO_FACTORY_OR_CONSTRUCTION",
+        "EXACT_FACTORY_OR_MANUFACTURER",
+        "LABEL_SYSTEM",
+        "BOUNDED_PRODUCTION_PERIOD"
+      ]
+    },
+    "tier_2_standard": {
+      "candidate_count": 42,
+      "targets_in_order": [
+        "MISSING_GENERIC_DETAIL",
+        "FORENSIC_MACROS",
+        "MATERIAL_COMPOSITION",
+        "COUNTRY_OF_MANUFACTURE",
+        "PRODUCTION_DATING",
+        "EXACT_FACTORY_OR_MANUFACTURER",
+        "LABEL_SYSTEM"
+      ]
+    }
+  },
+  "deduplication": {
+    "composite_key": [
+      "candidate_id",
+      "canonical_url",
+      "binary_sha256",
+      "image_role",
+      "normalized_assertion"
+    ],
+    "negative_memory_required": true,
+    "retry_only_when": [
+      "SOURCE_CONTENT_CHANGED",
+      "ACCESS_METHOD_CHANGED",
+      "ACCEPTANCE_TARGET_CHANGED"
+    ]
+  },
+  "chronology": {
+    "product_quarter_semantics": "COMMERCIAL_CHRONOLOGY_ONLY",
+    "new_in_semantics": "COMMERCIAL_CHRONOLOGY_ONLY",
+    "seller_season_semantics": "EVIDENCE_INSTANCE_OBSERVATION",
+    "repeated_style_colour": "OPEN_PRODUCTION_PERIOD_SPLIT_REVIEW",
+    "automatic_manufacturing_date_inference": false
+  },
+  "promotion_gate": {
+    "automatic": false,
+    "requires_controlled_review": true,
+    "identity_dimensions": [
+      "COMMERCIAL_VARIANT",
+      "FACTORY_OR_MANUFACTURER",
+      "COUNTRY",
+      "MATERIAL_OR_COMPOSITION",
+      "LABEL_OR_CONSTRUCTION_SYSTEM",
+      "BOUNDED_PRODUCTION_PERIOD"
+    ]
+  },
+  "w003a_checkpoint": {
+    "fast_track_candidates": 8,
+    "commercial_colour_supported": 8,
+    "material_supported": 8,
+    "official_product_quarter_supported": 8,
+    "country_of_manufacture_supported": 8,
+    "manufacturing_month_supported": 3,
+    "production_period_split_reviews": 2,
+    "candidate_id_reconciliations": 1,
+    "open_fast_track_tasks": 56,
+    "exact_factory_supported": 0,
+    "forensic_macro_sets_complete": 0,
+    "canonical_production_variants_promoted": 0
+  }
+}
