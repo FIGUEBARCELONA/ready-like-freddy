@@ -6,6 +6,7 @@ on:
       - automation/fred-perry-product-map-20260826
     paths:
       - tools/fred_perry_product_map.py
+      - tools/fred_perry_product_map_strict.py
       - tools/fred_perry_product_map_single.py
       - tools/combine_fred_perry_product_maps.py
       - .github/workflows/fred-perry-product-map.yml
