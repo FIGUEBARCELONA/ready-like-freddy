@@ -1,0 +1,61 @@
+{
+  "version": "W003F_V1",
+  "canonical_date": "2026-08-26",
+  "policy": "APPEND_ONLY_FAIL_CLOSED",
+  "format_observed": [
+    "STYLE",
+    "COLOUR",
+    "MIDDLE_TOKEN",
+    "FINAL_TOKEN"
+  ],
+  "supported_semantics": {
+    "component_1": "STYLE_MODEL_CODE",
+    "component_2": "COLOUR_CODE",
+    "component_3": "UNRESOLVED",
+    "component_4": "UNRESOLVED"
+  },
+  "negative_findings": [
+    {
+      "token": "1950",
+      "ruled_out": ["GARMENT_SIZE", "COLOUR_CODE"],
+      "basis": "Observed across multiple colours and tag sizes M/L/XL"
+    },
+    {
+      "token": "419",
+      "ruled_out": ["GARMENT_SIZE"],
+      "basis": "Identical M3600/350/1950/419 recorded with tag sizes L and XL"
+    },
+    {
+      "token": "409",
+      "ruled_out": ["UNIQUE_COLOUR_IDENTIFIER"],
+      "basis": "Observed with S07/1950 and S31/01885 model-level labels"
+    }
+  ],
+  "controlled_comparison_codes": [
+    "M3600/U98/1950/418",
+    "M3600/350/1950/419",
+    "M3600/350/1950/396",
+    "M3600/Q46/1950/435",
+    "M3600/J74/1950/387",
+    "M3600/U93/1950",
+    "M3600/S07/1950/409",
+    "M3600/S31/01885/409",
+    "M3600/E36/01885/395"
+  ],
+  "commercial_variants_with_multiple_full_codes": [
+    "M3600::350"
+  ],
+  "distinct_full_code_action": "CREATE_UNPROMOTED_PRODUCTION_INSTANCE_CANDIDATE",
+  "automatic_split": false,
+  "automatic_merge": false,
+  "component_3_positive_semantics": "OPEN",
+  "component_4_positive_semantics": "OPEN",
+  "separate_identifier_namespaces": [
+    "PHYSICAL_FULL_CODE",
+    "GTIN_EAN",
+    "OFFICIAL_COMMERCIAL_SKU",
+    "JAPAN_HINBAN2",
+    "SELLER_MANAGEMENT_NUMBER"
+  ],
+  "automatic_canonical_promotion": false
+}
