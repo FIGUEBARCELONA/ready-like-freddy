@@ -7,6 +7,7 @@ on:
     paths:
       - tools/fred_perry_product_map.py
       - tools/fred_perry_product_map_strict.py
+      - tools/fred_perry_product_map_strict_v2.py
       - tools/fred_perry_product_map_single.py
       - tools/combine_fred_perry_product_maps.py
       - tools/normalize_verified_product_sources.py
