@@ -1,5 +1,5 @@
 {
-  "version": "W003D_V1",
+  "version": "W003D_V1_1",
   "canonical_date": "2026-08-26",
   "policy": "APPEND_ONLY_FAIL_CLOSED",
   "winzen": {
@@ -13,7 +13,8 @@
     "registered_office_is_factory": false,
     "regenagri_certificate": "CU-1075663",
     "fast_track_m3600_legal_entity_supported": 7,
-    "street_level_zhongshan_facility_status": "OPEN",
+    "zhongshan_facility_site_status": "OPEN",
+    "complete_street_address_status": "OPEN",
     "exact_item_factory_status": "OPEN"
   },
   "shilla_glovis_vietnam": {
@@ -24,7 +25,8 @@
     "facility_locality": "Cho Moi Quarter, Go Cong Ward, Vietnam",
     "principal_activity": "Manufacture of suitcases, bags and similar products",
     "l7255_style_legal_entity_status": "LEGAL_ENTITY_SUPPORTED",
-    "l7255_style_street_facility_status": "STREET_LEVEL_FACILITY_SUPPORTED",
+    "l7255_style_facility_status": "FACILITY_SITE_SUPPORTED",
+    "complete_street_address_status": "OPEN",
     "l7255_81a_exact_item_factory_status": "OPEN",
     "exact_colour_link_required": true
   },
