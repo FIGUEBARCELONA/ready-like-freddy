@@ -1,0 +1,74 @@
+{
+  "version": "W003C_V1",
+  "canonical_date": "2026-08-26",
+  "policy": "APPEND_ONLY_FAIL_CLOSED",
+  "scope": {
+    "tier_1_fast_track": 8,
+    "tier_2_standard": 42,
+    "lane_key": "style_code::colour_code",
+    "cross_lane_overlap": "PROHIBITED"
+  },
+  "factory_attribution_levels": [
+    "COUNTRY_SUPPORTED",
+    "FACTORY_CLUSTER_SUPPORTED",
+    "LEGAL_ENTITY_SUPPORTED",
+    "STREET_LEVEL_FACILITY_SUPPORTED",
+    "EXACT_ITEM_FACTORY_SUPPORTED"
+  ],
+  "winzen_bridge": {
+    "factory_cluster_id": "WINZEN_ZHONGSHAN",
+    "factory_name": "Winzen",
+    "country": "CN",
+    "locality_scope": "Zhongshan area",
+    "valid_from_year": 2015,
+    "eligible_models": ["M3600", "G3600", "M6000"],
+    "minimum_required_evidence": [
+      "EXACT_STYLE_CODE",
+      "COUNTRY_CHINA_SUPPORTED",
+      "BOUNDED_PERIOD_2015_OR_LATER"
+    ],
+    "maximum_automatic_attribution_level": "FACTORY_CLUSTER_SUPPORTED",
+    "exact_legal_entity_status": "OPEN",
+    "street_level_facility_status": "OPEN",
+    "exact_item_factory_status": "OPEN"
+  },
+  "gtin_policy": {
+    "identity_scope": "STYLE_COLOUR_SIZE",
+    "creates_production_variant": false,
+    "supported_uses": [
+      "SKU_DEDUPLICATION",
+      "STYLE_CONFIRMATION",
+      "COLOUR_CONFIRMATION",
+      "SIZE_CONFIRMATION",
+      "CROSS_SOURCE_LINKING"
+    ],
+    "unsupported_uses": [
+      "FACTORY_INFERENCE",
+      "COUNTRY_INFERENCE",
+      "MATERIAL_INFERENCE",
+      "PRODUCTION_DATE_INFERENCE",
+      "LABEL_SYSTEM_INFERENCE"
+    ]
+  },
+  "trade_record_policy": {
+    "shipment_date_is_production_date": false,
+    "redacted_shipper_resolves_factory": false,
+    "may_support": [
+      "STYLE",
+      "MATERIAL_CLASS",
+      "EXPORT_COUNTRY",
+      "SHIPMENT_CHRONOLOGY"
+    ]
+  },
+  "open_supply_hub": {
+    "fred_perry_contributor_id": 1092,
+    "api_authorization_failure_status": "AUTH_REQUIRED",
+    "authorization_failure_means_empty_list": false
+  },
+  "promotion": {
+    "automatic": false,
+    "factory_cluster_alone_is_sufficient": false,
+    "gtin_alone_is_sufficient": false,
+    "trade_record_alone_is_sufficient": false
+  }
+}
