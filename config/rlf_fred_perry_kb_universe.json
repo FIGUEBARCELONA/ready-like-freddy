@@ -1,0 +1,50 @@
+{
+  "schema": "RLF_FRED_PERRY_KB_UNIVERSE_CONFIG_V1",
+  "canonical_date": "2026-08-26",
+  "coverage": {
+    "year_from": 1940,
+    "date_to": "2026-08-31",
+    "brand": "Fred Perry",
+    "geography": "worldwide",
+    "factories": "all_historical_and_current_evidenced_facilities",
+    "categories": "all_product_categories"
+  },
+  "planning": {
+    "initial_expected_minimum": 10000,
+    "initial_expected_maximum": 15000,
+    "expanded_capacity": 20000,
+    "hard_cap": null,
+    "census_unit": "production_variant",
+    "images_per_production_variant_minimum": 9,
+    "images_per_production_variant_target": 10,
+    "image_capacity_at_20000_minimum": 180000,
+    "image_capacity_at_20000_target": 200000
+  },
+  "identity_levels": [
+    "model_family",
+    "commercial_variant",
+    "production_variant",
+    "evidence_instance"
+  ],
+  "kb_inclusion_ignores": [
+    "current_stock",
+    "current_sale_status",
+    "price",
+    "discount",
+    "commercial_margin",
+    "preloved_pool_eligibility",
+    "supplier_geography"
+  ],
+  "prohibitions": [
+    "fabricated_products",
+    "fabricated_fields",
+    "fabricated_factories",
+    "fabricated_dates",
+    "generated_evidence_images",
+    "placeholder_evidence",
+    "counting_sizes_as_unique_products",
+    "counting_urls_as_unique_products",
+    "using_listing_date_as_manufacture_date"
+  ],
+  "policy": "APPEND_ONLY_FAIL_CLOSED"
+}
