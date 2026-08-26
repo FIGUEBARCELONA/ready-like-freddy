@@ -12,7 +12,7 @@ A legal entity may be linked to a factory cluster when the following chain is co
 3. the legal entity's product scope is compatible with the observed product;
 4. no contradictory entity with the same name remains unresolved.
 
-This supports `LEGAL_ENTITY_SUPPORTED` for the industrial cluster. It does not automatically support the street-level production facility or the exact item-to-factory link.
+This supports `LEGAL_ENTITY_SUPPORTED` for the industrial cluster. It does not automatically support the exact production site, a complete postal address or the exact item-to-factory link.
 
 ## 2. Winzen
 
@@ -32,7 +32,7 @@ For the seven fast-track M3600 candidates, the maximum supported level becomes:
 
 with entity `WINZEN_INTERNATIONAL_LIMITED_2870887` and factory cluster `WINZEN_ZHONGSHAN`.
 
-The Hong Kong address is a registered/corporate office and must not be represented as the Zhongshan production building. The exact Zhongshan street address and exact item-to-plant bridge remain open.
+The Hong Kong address is a registered/corporate office and must not be represented as the Zhongshan production building. The exact Zhongshan site/address and exact item-to-plant bridge remain open.
 
 ## 3. Shilla Glovis Vietnam and L7255
 
@@ -49,8 +49,10 @@ The company's own location page identifies the Shilla Glovis International Vietn
 This supports:
 
 - `LEGAL_ENTITY_SUPPORTED` at style level `L7255`;
-- `STREET_LEVEL_FACILITY_SUPPORTED` at style level `L7255`;
+- `FACILITY_SITE_SUPPORTED` at style level `L7255`;
 - Vietnam as production country for the exact `L7255-81A` commercial candidate.
+
+`FACILITY_SITE_SUPPORTED` means that the named operating site/locality is supported. It does not imply a complete street-number postal address.
 
 It does **not** support `EXACT_ITEM_FACTORY_SUPPORTED` for colour `81A` until a trade record, production document, label or physical evidence explicitly connects `81A`, GTIN `5063460129686`, or the observed evidence instance to that facility.
 
@@ -97,4 +99,4 @@ Visual similarity alone is insufficient.
 
 ## 7. Promotion rule
 
-`LEGAL_ENTITY_SUPPORTED`, `STREET_LEVEL_FACILITY_SUPPORTED` at model/style level, GTIN evidence and model-level labels enrich the candidate but do not alone promote a canonical production variant.
+`LEGAL_ENTITY_SUPPORTED`, `FACILITY_SITE_SUPPORTED` at model/style level, GTIN evidence and model-level labels enrich the candidate but do not alone promote a canonical production variant.
