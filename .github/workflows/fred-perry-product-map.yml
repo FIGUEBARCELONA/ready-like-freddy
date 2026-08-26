@@ -12,6 +12,10 @@ on:
       - .github/workflows/fred-perry-product-map.yml
   workflow_dispatch:
 
+concurrency:
+  group: fred-perry-product-map-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -88,12 +92,12 @@ jobs:
           path: collected
           merge-multiple: true
 
-      - name: Consolidate and globally deduplicate
+      - name: Consolidate active products and globally deduplicate
         run: |
           rm -rf final
           python tools/combine_fred_perry_product_maps.py collected final
 
-      - name: Create final checksums and ZIP
+      - name: Create final ZIP and checksum
         run: |
           cd final
           find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
@@ -101,10 +105,10 @@ jobs:
           zip -qr fred-perry-product-map-20260826.zip final
           sha256sum fred-perry-product-map-20260826.zip > fred-perry-product-map-20260826.zip.sha256
 
-      - name: Upload consolidated product map
+      - name: Upload strict consolidated product map
         uses: actions/upload-artifact@v4
         with:
-          name: fred-perry-product-map-20260826-parallel25
+          name: fred-perry-product-map-20260826-strict-active
           path: |
             final/
             fred-perry-product-map-20260826.zip
