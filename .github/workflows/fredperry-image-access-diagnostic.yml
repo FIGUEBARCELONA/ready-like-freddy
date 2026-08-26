@@ -1,0 +1,31 @@
+name: Fred Perry image access diagnostic
+
+on:
+  push:
+    branches:
+      - automation/fred-perry-product-map-20260826
+    paths:
+      - 'tools/test_fredperry_image_access.py'
+      - '.github/workflows/fredperry-image-access-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests curl_cffi
+      - run: python tools/test_fredperry_image_access.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fredperry-image-access-diagnostic
+          path: fp-image-access-diagnostic
+          if-no-files-found: error
+          retention-days: 7
