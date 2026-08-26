@@ -15,7 +15,7 @@ permissions:
 jobs:
   crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 54
     steps:
       - name: Checkout temporary branch
         uses: actions/checkout@v4
