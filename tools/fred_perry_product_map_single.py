@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Run the Fred Perry URL mapper for exactly one configured retailer."""
+"""Run the strict Fred Perry URL mapper for exactly one configured retailer."""
 from __future__ import annotations
 
 import argparse
 import sys
 
-import fred_perry_product_map as mapper
+import fred_perry_product_map_strict as mapper
 
 
 def main() -> int:
@@ -19,7 +19,7 @@ def main() -> int:
     if len(selected) != 1:
         raise SystemExit(f"Unknown or duplicate site rank: {args.site_rank}")
 
-    mapper.SITES = selected
+    mapper.set_sites(selected)
     sys.argv = [
         "fred_perry_product_map.py",
         "--output-dir", args.output_dir,
