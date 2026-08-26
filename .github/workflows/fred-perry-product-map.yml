@@ -9,6 +9,8 @@ on:
       - tools/fred_perry_product_map_strict.py
       - tools/fred_perry_product_map_single.py
       - tools/combine_fred_perry_product_maps.py
+      - tools/normalize_verified_product_sources.py
+      - data/fred_perry_product_url_seeds/**
       - .github/workflows/fred-perry-product-map.yml
   workflow_dispatch:
 
@@ -91,6 +93,9 @@ jobs:
           pattern: fred-perry-map-site-*
           path: collected
           merge-multiple: true
+
+      - name: Normalize verified direct sources
+        run: python tools/normalize_verified_product_sources.py collected
 
       - name: Consolidate active products and globally deduplicate
         run: |
