@@ -1,0 +1,58 @@
+{
+  "version": "W003D_V1",
+  "canonical_date": "2026-08-26",
+  "policy": "APPEND_ONLY_FAIL_CLOSED",
+  "winzen": {
+    "factory_cluster_id": "WINZEN_ZHONGSHAN",
+    "legal_entity_id": "WINZEN_INTERNATIONAL_LIMITED_2870887",
+    "legal_name_en": "WINZEN INTERNATIONAL LIMITED",
+    "legal_name_zh": "永生針織有限公司",
+    "hong_kong_company_number": "2870887",
+    "business_registration_number": "71143376",
+    "registered_office": "Flat D, 9/F, Phase 5, Hong Kong Spinners Industrial Building, 760 Cheung Sha Wan Road, Kowloon, Hong Kong",
+    "registered_office_is_factory": false,
+    "regenagri_certificate": "CU-1075663",
+    "fast_track_m3600_legal_entity_supported": 7,
+    "street_level_zhongshan_facility_status": "OPEN",
+    "exact_item_factory_status": "OPEN"
+  },
+  "shilla_glovis_vietnam": {
+    "legal_entity_id": "SHILLA_GLOVIS_VIETNAM_1201560444",
+    "legal_name_en": "SHILLA GLOVIS VIETNAM COMPANY LIMITED",
+    "legal_name_vi": "CÔNG TY TNHH SHILLA GLOVIS VIỆT NAM",
+    "tax_registration_number": "1201560444",
+    "facility_locality": "Cho Moi Quarter, Go Cong Ward, Vietnam",
+    "principal_activity": "Manufacture of suitcases, bags and similar products",
+    "l7255_style_legal_entity_status": "LEGAL_ENTITY_SUPPORTED",
+    "l7255_style_street_facility_status": "STREET_LEVEL_FACILITY_SUPPORTED",
+    "l7255_81a_exact_item_factory_status": "OPEN",
+    "exact_colour_link_required": true
+  },
+  "l7255_81a": {
+    "gtin_ean13": "5063460129686",
+    "country_of_origin": "Vietnam",
+    "factory_inference_from_gtin": false
+  },
+  "model_label_references": [
+    {
+      "code": "M3600/S31/01885/409",
+      "scope": "MODEL_LEVEL_ONLY"
+    },
+    {
+      "code": "M3600/E36/01885/395",
+      "scope": "MODEL_LEVEL_ONLY"
+    },
+    {
+      "code": "M3600/S07/1950/409",
+      "scope": "MODEL_LEVEL_ONLY"
+    }
+  ],
+  "physical_image_promotion": {
+    "exact_style_colour_visible": true,
+    "exact_gtin_link": true,
+    "immutable_single_item_gallery": true,
+    "primary_document_link": true,
+    "visual_similarity_alone": false
+  },
+  "automatic_canonical_promotion": false
+}
