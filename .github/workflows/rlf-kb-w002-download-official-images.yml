@@ -1,0 +1,43 @@
+name: RLF KB W002 download official images
+
+on:
+  push:
+    branches:
+      - automation/fred-perry-product-map-20260826
+    paths:
+      - 'tools/rlf_kb_w002_download_official_images.py'
+      - 'data/kb/w001/RLF_KB_W001_TOP50_SEEDS.csv'
+      - '.github/workflows/rlf-kb-w002-download-official-images.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check curl_cffi
+      - name: Download official W002 image set
+        run: |
+          python tools/rlf_kb_w002_download_official_images.py \
+            data/kb/w001/RLF_KB_W001_TOP50_SEEDS.csv \
+            RLF_KB_W002_OFFICIAL_IMAGE_BYTES_V2
+      - name: Package auditable image set
+        run: |
+          zip -r RLF_KB_W002_OFFICIAL_IMAGE_BYTES_V2.zip RLF_KB_W002_OFFICIAL_IMAGE_BYTES_V2
+          sha256sum RLF_KB_W002_OFFICIAL_IMAGE_BYTES_V2.zip > RLF_KB_W002_OFFICIAL_IMAGE_BYTES_V2.zip.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF_KB_W002_OFFICIAL_IMAGE_BYTES_V2
+          path: |
+            RLF_KB_W002_OFFICIAL_IMAGE_BYTES_V2.zip
+            RLF_KB_W002_OFFICIAL_IMAGE_BYTES_V2.zip.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
