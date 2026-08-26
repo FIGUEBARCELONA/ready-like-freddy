@@ -7,6 +7,7 @@ import urllib.parse
 import fred_perry_product_map_strict as strict
 
 SITES = strict.SITES
+_V1_STRICT_PRODUCT_PATH = strict.strict_product_path
 
 _CATEGORY_SEGMENTS = {
     "male", "female", "men", "mens", "women", "womens", "kids", "junior",
@@ -18,7 +19,7 @@ _RENDERED_SOURCES = {"rendered_jsonld", "rendered_brand_page"}
 
 
 def strict_product_path(url, site):
-    if not strict.strict_product_path(url, site):
+    if not _V1_STRICT_PRODUCT_PATH(url, site):
         return False
     path = urllib.parse.urlsplit(url).path.lower().rstrip("/")
     last = path.rsplit("/", 1)[-1]
