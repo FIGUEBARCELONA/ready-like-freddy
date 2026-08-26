@@ -1,0 +1,58 @@
+{
+  "version": "W003H_DISCOVERY_V1",
+  "canonical_date": "2026-08-26",
+  "policy": "APPEND_ONLY_FAIL_CLOSED",
+  "exact_physical_discoveries": [
+    {
+      "scope_key": "M3600::T60",
+      "source_url": "https://jp.mercari.com/item/m76909864831",
+      "item_id": "m76909864831",
+      "style_supported": true,
+      "colour_supported": true,
+      "tag_size": "L",
+      "declared_image_count": 12,
+      "gallery_bytes_reviewed": false,
+      "exact_full_code_supported": false,
+      "forensic_role_promotions": 0
+    }
+  ],
+  "collector": {
+    "workflow_run_id": 32984074923,
+    "workflow_name": "RLF KB W003H Mercari exact labels",
+    "run_status": "EXECUTOR_QUEUED",
+    "job_assigned": false,
+    "results_interpretable": false,
+    "empty_result_inference": false
+  },
+  "winzen_records": {
+    "zhongshan_factory_cluster": "SEPARATE",
+    "hong_kong_legal_entity": "SEPARATE",
+    "vietnam_entity_site": {
+      "name": "WINZEN KNITWEAR CO., LTD. (VIETNAM)",
+      "address": "No. 79 Le Duan Street, Ward 1, Quang Tri Town, Quang Tri Province, Vietnam",
+      "record_type": "INDUSTRIAL_NETWORK_REFERENCE",
+      "relationship_to_zhongshan": "UNPROVEN",
+      "relationship_to_fast_track_m3600": "UNPROVEN"
+    }
+  },
+  "l7255_shilla": {
+    "exact_commercial_chain": {
+      "scope_key": "L7255::81A",
+      "gtin": "5063460129686",
+      "country": "Vietnam"
+    },
+    "style_industrial_chain": {
+      "style_code": "L7255",
+      "description": "24.L7255.CLASSIC BARREL BAG",
+      "brand": "Fred Perry",
+      "material": "Polyester fabric",
+      "supplier": "SHILLA GLOVIS VIETNAM CO LTD",
+      "country": "Vietnam"
+    },
+    "exact_item_bridge_status": "OPEN",
+    "automatic_merge": false
+  },
+  "new_exact_macro_promotions": 0,
+  "new_exact_factory_promotions": 0,
+  "canonical_production_variants_promoted": 0
+}
