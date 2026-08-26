@@ -6,6 +6,8 @@ on:
       - automation/fred-perry-product-map-20260826
     paths:
       - tools/fred_perry_product_map.py
+      - tools/fred_perry_product_map_single.py
+      - tools/combine_fred_perry_product_maps.py
       - .github/workflows/fred-perry-product-map.yml
   workflow_dispatch:
 
@@ -13,9 +15,15 @@ permissions:
   contents: read
 
 jobs:
-  crawl:
+  crawl-site:
+    name: Crawl retailer ${{ matrix.site }}
     runs-on: ubuntu-latest
-    timeout-minutes: 54
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        site: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
     steps:
       - name: Checkout temporary branch
         uses: actions/checkout@v4
@@ -30,24 +38,76 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install requests beautifulsoup4 lxml selenium
 
-      - name: Crawl and validate Fred Perry product URLs
+      - name: Crawl one retailer
+        shell: bash
         env:
           PYTHONUNBUFFERED: '1'
         run: |
-          rm -rf artifact
-          python tools/fred_perry_product_map.py --output-dir artifact --workers 16 2>&1 | tee artifact-run.log
-          cp artifact-run.log artifact/
+          site=$(printf '%02d' '${{ matrix.site }}')
+          output="artifact/site_${site}"
+          mkdir -p "$output"
+          set +e
+          python tools/fred_perry_product_map_single.py \
+            --site-rank '${{ matrix.site }}' \
+            --output-dir "$output" \
+            --workers 12 2>&1 | tee "$output/artifact-run.log"
+          code=${PIPESTATUS[0]}
+          printf '%s\n' "$code" > "$output/crawler_exit_code.txt"
+          exit 0
 
-      - name: Create checksums
+      - name: Add per-site checksums
+        shell: bash
         run: |
-          cd artifact
+          site=$(printf '%02d' '${{ matrix.site }}')
+          cd "artifact/site_${site}"
           find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
 
-      - name: Upload auditable URL map
+      - name: Upload per-site auditable map
         uses: actions/upload-artifact@v4
         with:
-          name: fred-perry-product-map-20260826
+          name: fred-perry-map-site-${{ matrix.site }}
           path: artifact/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
+
+  consolidate:
+    name: Consolidate 25 retailer maps
+    needs: crawl-site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout temporary branch
+        uses: actions/checkout@v4
+
+      - name: Download all per-site maps
+        uses: actions/download-artifact@v4
+        with:
+          pattern: fred-perry-map-site-*
+          path: collected
+          merge-multiple: true
+
+      - name: Consolidate and globally deduplicate
+        run: |
+          rm -rf final
+          python tools/combine_fred_perry_product_maps.py collected final
+
+      - name: Create final checksums and ZIP
+        run: |
+          cd final
+          find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+          cd ..
+          zip -qr fred-perry-product-map-20260826.zip final
+          sha256sum fred-perry-product-map-20260826.zip > fred-perry-product-map-20260826.zip.sha256
+
+      - name: Upload consolidated product map
+        uses: actions/upload-artifact@v4
+        with:
+          name: fred-perry-product-map-20260826-parallel25
+          path: |
+            final/
+            fred-perry-product-map-20260826.zip
+            fred-perry-product-map-20260826.zip.sha256
           if-no-files-found: error
           retention-days: 7
           compression-level: 6
