@@ -1,0 +1,54 @@
+name: Fred Perry product URL map
+
+on:
+  push:
+    branches:
+      - automation/fred-perry-product-map-20260826
+    paths:
+      - tools/fred_perry_product_map.py
+      - .github/workflows/fred-perry-product-map.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - name: Checkout temporary branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install crawler dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install requests beautifulsoup4 lxml selenium
+
+      - name: Crawl and validate Fred Perry product URLs
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          rm -rf artifact
+          python tools/fred_perry_product_map.py --output-dir artifact --workers 16 2>&1 | tee artifact-run.log
+          cp artifact-run.log artifact/
+
+      - name: Create checksums
+        run: |
+          cd artifact
+          find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+
+      - name: Upload auditable URL map
+        uses: actions/upload-artifact@v4
+        with:
+          name: fred-perry-product-map-20260826
+          path: artifact/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
