@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+# Dedicated full-sitemap pass: no candidate cap and no fabricated URLs.
 import csv, hashlib, json, re, urllib.parse, xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,7 +25,6 @@ for u in locs:
                      'availability':'unknown','verification_status':'sitemap_product_pattern','http_status':r.status_code,
                      'source':'official_sitemap','source_url':URL,'sha256_url':hashlib.sha256(canonical.encode()).hexdigest(),
                      'captured_at_utc':datetime.now(timezone.utc).replace(microsecond=0).isoformat()})
-# exact dedupe
 rows=list({x['canonical_url']:x for x in rows}.values())
 rows.sort(key=lambda x:x['product_url'])
 fields=list(rows[0].keys()) if rows else []
