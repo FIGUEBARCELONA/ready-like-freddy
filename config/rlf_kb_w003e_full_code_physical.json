@@ -1,0 +1,48 @@
+{
+  "version": "W003E_V1",
+  "canonical_date": "2026-08-26",
+  "policy": "APPEND_ONLY_FAIL_CLOSED",
+  "observed_full_codes": [
+    {
+      "scope_key": "M3600::U98",
+      "observed_full_code": "M3600/U98/1950/418",
+      "status": "PRODUCTION_INSTANCE_CANDIDATE"
+    },
+    {
+      "scope_key": "M3600::350",
+      "observed_full_code": "M3600/350/1950/419",
+      "status": "PRODUCTION_INSTANCE_CANDIDATE"
+    },
+    {
+      "scope_key": "M3600::350",
+      "observed_full_code": "M3600/350/1950/396",
+      "status": "PRODUCTION_INSTANCE_CANDIDATE"
+    }
+  ],
+  "component_semantics": {
+    "1950": "UNRESOLVED",
+    "418": "UNRESOLVED",
+    "419": "UNRESOLVED",
+    "396": "UNRESOLVED"
+  },
+  "same_style_colour_multiple_codes": {
+    "opens_review_candidates": true,
+    "automatically_splits_production_variant": false
+  },
+  "textual_code_is_forensic_macro": false,
+  "physical_front_is_forensic_macro": false,
+  "transport_failure_statuses": [
+    "HTTP_401",
+    "HTTP_403",
+    "HTTP_404",
+    "EXPIRED_URL",
+    "INVALID_IMAGE_BYTES",
+    "MISSING_GALLERY"
+  ],
+  "factory_status": {
+    "winzen_zhongshan_exact_site": "OPEN",
+    "l7255_81a_shilla_exact_item_link": "OPEN"
+  },
+  "automatic_role_promotion": false,
+  "automatic_canonical_promotion": false
+}
