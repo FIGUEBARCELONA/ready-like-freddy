@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-import fred_perry_product_map_strict as mapper
+import fred_perry_product_map_strict_v2 as mapper
 
 
 def main() -> int:
