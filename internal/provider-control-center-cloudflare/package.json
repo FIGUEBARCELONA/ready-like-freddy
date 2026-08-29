@@ -1,0 +1,16 @@
+{
+  "name": "rlf-provider-control-center-cloudflare",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check src/worker.js && node --check src/dashboard.js",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "db:migrate:remote": "wrangler d1 migrations apply rlf-provider-census --remote"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
