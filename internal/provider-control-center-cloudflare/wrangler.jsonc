@@ -1,0 +1,43 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rlf-provider-control-center",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-08-29",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "vars": {
+    "ADMIN_EMAIL": "REPLACE_WITH_YOUR_EMAIL",
+    "SYSTEM_LABEL": "RLF Fase 1 · Cens proveïdors UE",
+    "TARGET_VERIFIED": "10000",
+    "MAX_LOGICAL_LANES": "50",
+    "FETCH_TIMEOUT_MS": "12000",
+    "USER_AGENT": "RLFProviderVerifier/1.0 (+private internal research; contact via operator)"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rlf-provider-census",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "queues": {
+    "producers": [
+      { "binding": "VERIFY_QUEUE", "queue": "rlf-provider-verification" }
+    ],
+    "consumers": [
+      {
+        "queue": "rlf-provider-verification",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 3,
+        "dead_letter_queue": "rlf-provider-verification-dlq",
+        "max_concurrency": 50,
+        "retry_delay": 120
+      }
+    ]
+  },
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  }
+}
