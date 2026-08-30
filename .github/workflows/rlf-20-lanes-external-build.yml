@@ -35,6 +35,24 @@ jobs:
           cp ci-src/lane-apparatus.test.mjs work/tests/lane-apparatus.test.mjs
           chmod +x work/scripts/lane-apparatus.mjs work/scripts/run-20-lanes.mjs
           test "$(wc -l < work/scripts/lib-lane-apparatus.mjs)" -eq 624
+          python3 <<'PY'
+          from pathlib import Path
+          home = Path('work/client/src/pages/Home.tsx')
+          text = home.read_text()
+          text = text.replace(
+              'import { AlertTriangle, CheckCircle2, CircleDot, Database, LockKeyhole, ShieldCheck, TimerReset } from "lucide-react";',
+              'import { AlertTriangle, CheckCircle2, CircleDot, Database, LockKeyhole, ShieldCheck, TimerReset } from "lucide-react";\nimport type { LucideIcon } from "lucide-react";'
+          )
+          text = text.replace(
+              '  const activeWork = (status.counters.leased || 0) + (status.counters.in_review || 0);\n\n  return (',
+              '''  const activeWork = (status.counters.leased || 0) + (status.counters.in_review || 0);\n  const statCards: Array<{ label: string; value: number; Icon: LucideIcon }> = [\n    { label: "Tasques", value: status.counters.total || 0, Icon: Database },\n    { label: "En cua", value: status.counters.queued || 0, Icon: CircleDot },\n    { label: "Reservades", value: status.counters.leased || 0, Icon: LockKeyhole },\n    { label: "En revisió", value: status.counters.in_review || 0, Icon: AlertTriangle },\n    { label: "Quarantena", value: status.counters.quarantine || 0, Icon: TimerReset },\n    { label: "Verificades", value: status.counters.verified || 0, Icon: CheckCircle2 },\n  ];\n\n  return ('''
+          )
+          old = '''        {[\n          ["Tasques", status.counters.total || 0, Database],\n          ["En cua", status.counters.queued || 0, CircleDot],\n          ["Reservades", status.counters.leased || 0, LockKeyhole],\n          ["En revisió", status.counters.in_review || 0, AlertTriangle],\n          ["Quarantena", status.counters.quarantine || 0, TimerReset],\n          ["Verificades", status.counters.verified || 0, CheckCircle2],\n        ].map(([label, value, Icon]) => ('''
+          new = '''        {statCards.map(({ label, value, Icon }) => ('''
+          if old not in text:
+              raise SystemExit('Home.tsx statistics block not found')
+          home.write_text(text.replace(old, new))
+          PY
           node <<'NODE'
           const fs = require('fs');
           const lanes = Array.from({ length: 20 }, (_, i) => ({
