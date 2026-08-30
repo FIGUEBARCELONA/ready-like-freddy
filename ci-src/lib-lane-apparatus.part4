@@ -1,0 +1,144 @@
+      state.last_event_id = events.at(-1).event_id;
+      state.integrity = this.integrity(state);
+      await atomicJson(this.stateFile, state);
+      for (const event of events) await this.appendEvent(event);
+      await this.publish(state, config);
+      return { reaped: events.length, summary: this.summary(state, config) };
+    });
+  }
+
+  recalculate(state, config) {
+    const counters = { total: 0, queued: 0, leased: 0, in_review: 0, quarantine: 0, blocked: 0, verified: 0, expired: 0 };
+    for (const lane of Object.values(state.lanes)) lane.active_lease_count = 0;
+    for (const task of Object.values(state.tasks)) {
+      counters.total++;
+      counters[task.status] = (counters[task.status] || 0) + 1;
+      if (task.status === 'leased') state.lanes[task.lane_id].active_lease_count++;
+    }
+    state.counters = counters;
+    state.invariants = this.checkInvariants(state, config);
+    if (!Object.values(state.invariants).every(Boolean)) throw new Error(`Apparatus invariant failure: ${JSON.stringify(state.invariants)}`);
+  }
+
+  checkInvariants(state, config) {
+    const tasks = Object.values(state.tasks);
+    const laneIds = Object.keys(state.lanes);
+    const membership = laneIds.flatMap((laneId) => state.lanes[laneId].task_ids.map((taskId) => `${laneId}:${taskId}`));
+    const memberTaskIds = membership.map((value) => value.split(':').slice(1).join(':'));
+    const domains = tasks.map((x) => canonicalDomain(x.domain)).filter(Boolean);
+    const networks = tasks.map((x) => x.network_seed).filter(Boolean);
+    const suppliers = tasks.flatMap((x) => x.member_supplier_ids || [x.supplier_id]).filter(Boolean);
+    return {
+      exactly_20_lanes: laneIds.length === config.lane_count && config.lane_count === 20,
+      task_membership_complete: memberTaskIds.length === tasks.length && new Set(memberTaskIds).size === tasks.length && tasks.every((task) => state.lanes[task.lane_id]?.task_ids.includes(task.task_id)),
+      no_task_overlap: new Set(tasks.map((x) => x.task_id)).size === tasks.length,
+      no_network_overlap: new Set(networks).size === networks.length,
+      no_domain_overlap: new Set(domains).size === domains.length,
+      no_supplier_overlap: new Set(suppliers).size === suppliers.length,
+      leases_belong_to_lane: tasks.filter((x) => x.lease).every((x) => x.status === 'leased' && Boolean(state.lanes[x.lane_id])),
+      verified_are_fail_closed: tasks.filter((x) => x.status === 'verified').every((x) => Boolean(x.verification?.decision_hash))
+    };
+  }
+
+  integrity(state) {
+    const clone = structuredClone(state);
+    delete clone.integrity;
+    return { algorithm: 'sha256', state_hash: sha(stableStringify(clone)), calculated_at: nowIso() };
+  }
+
+  summary(state, config) {
+    return {
+      apparatus_id: state.apparatus_id,
+      policy: state.policy,
+      wave_id: state.wave_id,
+      revision: state.revision,
+      updated_at: state.updated_at,
+      lane_count: state.lane_count,
+      counters: state.counters,
+      lanes: Object.values(state.lanes).map((lane) => {
+        const tasks = lane.task_ids.map((id) => state.tasks[id]);
+        return {
+          lane_id: lane.lane_id,
+          status: lane.status,
+          active_lease_count: lane.active_lease_count,
+          total: tasks.length,
+          queued: tasks.filter((x) => x.status === 'queued').length,
+          leased: tasks.filter((x) => x.status === 'leased').length,
+          in_review: tasks.filter((x) => x.status === 'in_review').length,
+          quarantine: tasks.filter((x) => x.status === 'quarantine').length,
+          blocked: tasks.filter((x) => x.status === 'blocked').length,
+          verified: tasks.filter((x) => x.status === 'verified').length,
+          next_task_id: tasks.filter((x) => ['queued', 'in_review', 'quarantine'].includes(x.status) && !this.isLeaseActive(x)).sort((a, b) => (a.position || 99999) - (b.position || 99999))[0]?.task_id || null
+        };
+      }),
+      invariants: state.invariants,
+      lease_seconds: config.lease_seconds,
+      state_hash: state.integrity?.state_hash || null
+    };
+  }
+
+  async status({ include_tasks = false } = {}) {
+    const config = await this.loadConfig();
+    const state = await this.loadState();
+    const summary = this.summary(state, config);
+    return include_tasks ? { ...summary, tasks: Object.values(state.tasks) } : summary;
+  }
+
+  async events({ limit = 100, task_id = null } = {}) {
+    if (!await exists(this.eventsFile)) return [];
+    const entries = parseNdjson(await readFile(this.eventsFile, 'utf8'));
+    return entries.filter((event) => !task_id || event.task_id === task_id).slice(-Math.max(1, Number(limit)));
+  }
+
+  async snapshot({ actor = 'system:snapshot' } = {}) {
+    return this.withLock(async () => {
+      const config = await this.loadConfig();
+      const state = await this.loadState();
+      await mkdir(this.snapshotsDir, { recursive: true });
+      const stamp = nowIso().replaceAll(':', '').replaceAll('-', '').replace('.000Z', 'Z');
+      const file = path.join(this.snapshotsDir, `${stamp}-r${state.revision}.json`);
+      await atomicJson(file, state);
+      const event = this.makeEvent({ type: 'snapshot_created', actor, state_revision: state.revision, details: { file: path.relative(this.root, file), state_hash: state.integrity.state_hash } });
+      await this.appendEvent(event);
+      return { file, state_hash: state.integrity.state_hash };
+    });
+  }
+
+  async publish(state = null, config = null) {
+    state ||= await this.loadState();
+    config ||= await this.loadConfig();
+    await mkdir(this.publicDir, { recursive: true });
+    const summary = this.summary(state, config);
+    const publicState = {
+      ...summary,
+      lanes: summary.lanes.map((lane) => ({
+        ...lane,
+        tasks: state.lanes[lane.lane_id].task_ids.map((id) => state.tasks[id]).map((task) => ({
+          task_id: task.task_id,
+          trading_name: task.trading_name,
+          candidate_country: task.candidate_country,
+          domain: task.domain,
+          status: task.status,
+          next_gate: task.next_gate,
+          position: task.position,
+          priority_score: task.priority_score,
+          preflight_flags: task.preflight_flags || [],
+          attempt_count: task.attempt_count,
+          lease_expires_at: task.lease?.expires_at || null
+        }))
+      }))
+    };
+    await atomicJson(path.join(this.publicDir, 'status.json'), publicState);
+    await mkdir(path.join(this.publicDir, 'lanes'), { recursive: true });
+    for (const lane of publicState.lanes) await atomicJson(path.join(this.publicDir, 'lanes', `${lane.lane_id}.json`), lane);
+    await atomicJson(path.join(this.publicDir, 'manifest.json'), {
+      apparatus_id: state.apparatus_id,
+      revision: state.revision,
+      generated_at: nowIso(),
+      state_hash: state.integrity.state_hash,
+      public_status_hash: sha(stableStringify(publicState))
+    });
+  }
+}
+
+export { DEFAULT_CONFIG, stableStringify, sha };

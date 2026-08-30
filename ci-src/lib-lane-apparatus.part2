@@ -1,0 +1,160 @@
+  }
+
+  async knownAssignments() {
+    if (!await exists(this.assignmentsFile)) return new Set();
+    return new Set(parseNdjson(await readFile(this.assignmentsFile, 'utf8')).map((x) => x.task_id));
+  }
+
+  async initialize({ waveFile = this.activeWaveFile, actor = 'system:bootstrap', force = false } = {}) {
+    return this.withLock(async () => {
+      const config = await this.ensureConfig();
+      const wave = await readJson(waveFile);
+      const tasks = this.validateWave(wave, config);
+      const previous = await exists(this.stateFile) ? await readJson(this.stateFile) : null;
+      if (previous && !force) throw new Error('Apparatus already initialized. Use sync instead of init, or --force explicitly.');
+      const createdAt = nowIso();
+      const taskMap = {};
+      const laneMap = {};
+      for (const lane of wave.lanes) {
+        laneMap[lane.lane_id] = { lane_id: lane.lane_id, status: 'ready', task_ids: [], active_lease_count: 0 };
+        for (const source of lane.tasks) {
+          const initialStatus = source.status === 'done' && source.current_decision === 'verified'
+            ? 'verified'
+            : ['queued', 'in_review', 'quarantine', 'blocked'].includes(source.status) ? source.status : 'queued';
+          const task = {
+            ...source,
+            lane_id: lane.lane_id,
+            status: initialStatus,
+            attempt_count: 0,
+            lease: null,
+            apparatus_revision: 1,
+            fingerprint: this.taskFingerprint(source),
+            last_event_id: null,
+            updated_at: createdAt
+          };
+          taskMap[task.task_id] = task;
+          laneMap[lane.lane_id].task_ids.push(task.task_id);
+        }
+      }
+      const state = {
+        schema_version: config.schema_version,
+        apparatus_id: config.apparatus_id,
+        policy: config.policy,
+        initialized_at: createdAt,
+        updated_at: createdAt,
+        revision: 1,
+        wave_id: wave.wave_id,
+        wave_sha256: sha(stableStringify(wave)),
+        lane_count: config.lane_count,
+        lanes: laneMap,
+        tasks: taskMap,
+        counters: {},
+        integrity: {}
+      };
+      this.recalculate(state, config);
+      const event = this.makeEvent({ type: 'apparatus_initialized', actor, state_revision: state.revision, details: { wave_id: wave.wave_id, tasks: tasks.length } });
+      state.last_event_id = event.event_id;
+      state.integrity = this.integrity(state);
+      await atomicJson(this.stateFile, state);
+      await this.appendEvent(event);
+      for (const task of Object.values(state.tasks)) {
+        await this.appendAssignment({ assignment_id: randomUUID(), assigned_at: createdAt, actor, wave_id: state.wave_id, task_id: task.task_id, supplier_id: task.supplier_id, lane_id: task.lane_id, network_seed: task.network_seed, domain: task.domain || null, fingerprint: task.fingerprint });
+      }
+      await this.publish(state, config);
+      return this.summary(state, config);
+    });
+  }
+
+  async sync({ waveFile = this.activeWaveFile, actor = 'system:sync' } = {}) {
+    return this.withLock(async () => {
+      const config = await this.ensureConfig();
+      const wave = await readJson(waveFile);
+      this.validateWave(wave, config);
+      if (!await exists(this.stateFile)) {
+        // Lock is already held; initialize inline.
+        const createdAt = nowIso();
+        const taskMap = {};
+        const laneMap = {};
+        for (const lane of wave.lanes) {
+          laneMap[lane.lane_id] = { lane_id: lane.lane_id, status: 'ready', task_ids: [], active_lease_count: 0 };
+          for (const source of lane.tasks) {
+            const task = { ...source, lane_id: lane.lane_id, status: source.status === 'in_review' ? 'in_review' : 'queued', attempt_count: 0, lease: null, apparatus_revision: 1, fingerprint: this.taskFingerprint(source), last_event_id: null, updated_at: createdAt };
+            taskMap[task.task_id] = task;
+            laneMap[lane.lane_id].task_ids.push(task.task_id);
+          }
+        }
+        const state = { schema_version: config.schema_version, apparatus_id: config.apparatus_id, policy: config.policy, initialized_at: createdAt, updated_at: createdAt, revision: 1, wave_id: wave.wave_id, wave_sha256: sha(stableStringify(wave)), lane_count: config.lane_count, lanes: laneMap, tasks: taskMap, counters: {}, integrity: {} };
+        this.recalculate(state, config);
+        const event = this.makeEvent({ type: 'apparatus_initialized', actor, state_revision: state.revision, details: { wave_id: wave.wave_id, tasks: Object.keys(taskMap).length } });
+        state.last_event_id = event.event_id;
+        state.integrity = this.integrity(state);
+        await atomicJson(this.stateFile, state);
+        await this.appendEvent(event);
+        for (const task of Object.values(state.tasks)) {
+          await this.appendAssignment({ assignment_id: randomUUID(), assigned_at: createdAt, actor, wave_id: state.wave_id, task_id: task.task_id, supplier_id: task.supplier_id, lane_id: task.lane_id, network_seed: task.network_seed, domain: task.domain || null, fingerprint: task.fingerprint });
+        }
+        await this.publish(state, config);
+        return this.summary(state, config);
+      }
+      const state = await readJson(this.stateFile);
+      const knownAssignmentIds = await this.knownAssignments();
+      const newlyAssigned = [];
+      const incomingById = new Map(wave.lanes.flatMap((lane) => lane.tasks.map((task) => [task.task_id, { ...task, lane_id: lane.lane_id }])));
+      const assignedDimensions = {
+        network: new Map(), domain: new Map(), supplier: new Map()
+      };
+      for (const task of Object.values(state.tasks)) {
+        if (task.network_seed) assignedDimensions.network.set(task.network_seed, task.task_id);
+        const domain = canonicalDomain(task.domain); if (domain) assignedDimensions.domain.set(domain, task.task_id);
+        for (const id of task.member_supplier_ids || [task.supplier_id]) assignedDimensions.supplier.set(id, task.task_id);
+      }
+      let added = 0; let refreshed = 0;
+      for (const [taskId, source] of incomingById) {
+        const existing = state.tasks[taskId];
+        if (existing) {
+          const protectedFields = { status: existing.status, attempt_count: existing.attempt_count, lease: existing.lease, lane_id: existing.lane_id, apparatus_revision: existing.apparatus_revision, last_event_id: existing.last_event_id, updated_at: existing.updated_at };
+          state.tasks[taskId] = { ...existing, ...source, ...protectedFields, fingerprint: this.taskFingerprint(source) };
+          refreshed++;
+          continue;
+        }
+        const collisions = [];
+        if (source.network_seed && assignedDimensions.network.has(source.network_seed)) collisions.push(`network:${source.network_seed}`);
+        const domain = canonicalDomain(source.domain);
+        if (domain && assignedDimensions.domain.has(domain)) collisions.push(`domain:${domain}`);
+        for (const id of source.member_supplier_ids || [source.supplier_id]) if (assignedDimensions.supplier.has(id)) collisions.push(`supplier:${id}`);
+        if (collisions.length) throw new Error(`Sync rejected overlap for ${taskId}: ${collisions.join(', ')}`);
+        const lane = state.lanes[source.lane_id];
+        if (!lane) throw new Error(`Unknown lane ${source.lane_id}`);
+        state.tasks[taskId] = { ...source, status: source.status === 'in_review' ? 'in_review' : 'queued', attempt_count: 0, lease: null, apparatus_revision: 1, fingerprint: this.taskFingerprint(source), last_event_id: null, updated_at: nowIso() };
+        lane.task_ids.push(taskId);
+        newlyAssigned.push(state.tasks[taskId]);
+        if (source.network_seed) assignedDimensions.network.set(source.network_seed, taskId);
+        if (domain) assignedDimensions.domain.set(domain, taskId);
+        for (const id of source.member_supplier_ids || [source.supplier_id]) assignedDimensions.supplier.set(id, taskId);
+        added++;
+      }
+      state.wave_id = wave.wave_id;
+      state.wave_sha256 = sha(stableStringify(wave));
+      state.revision++;
+      state.updated_at = nowIso();
+      this.recalculate(state, config);
+      const event = this.makeEvent({ type: 'apparatus_synced', actor, state_revision: state.revision, details: { wave_id: wave.wave_id, added, refreshed } });
+      state.last_event_id = event.event_id;
+      state.integrity = this.integrity(state);
+      await atomicJson(this.stateFile, state);
+      await this.appendEvent(event);
+      for (const task of Object.values(state.tasks)) {
+        if (!knownAssignmentIds.has(task.task_id) || newlyAssigned.some((x) => x.task_id === task.task_id)) {
+          await this.appendAssignment({ assignment_id: randomUUID(), assigned_at: nowIso(), actor, wave_id: state.wave_id, task_id: task.task_id, supplier_id: task.supplier_id, lane_id: task.lane_id, network_seed: task.network_seed, domain: task.domain || null, fingerprint: task.fingerprint });
+          knownAssignmentIds.add(task.task_id);
+        }
+      }
+      await this.publish(state, config);
+      return { ...this.summary(state, config), added, refreshed };
+    });
+  }
+
+  makeEvent({ type, actor, task = null, lane_id = null, from_status = null, to_status = null, state_revision = null, details = {} }) {
+    const base = { event_id: randomUUID(), event_type: type, occurred_at: nowIso(), actor, state_revision, task_id: task?.task_id || null, supplier_id: task?.supplier_id || null, lane_id: lane_id || task?.lane_id || null, from_status, to_status, details };
+    return { ...base, event_hash: sha(stableStringify(base)) };
+  }

@@ -1,0 +1,160 @@
+
+  isLeaseActive(task) { return Boolean(task.lease && Date.parse(task.lease.expires_at) > Date.now()); }
+  releaseExpiredInMemory(state, config, actor = 'system:lease-reaper') {
+    const events = [];
+    for (const task of Object.values(state.tasks)) {
+      if (task.status !== 'leased' || !task.lease || this.isLeaseActive(task)) continue;
+      const from = task.status;
+      task.status = task.attempt_count >= config.max_attempts ? 'quarantine' : (task.lease.return_status || 'queued');
+      task.lease = null;
+      task.updated_at = nowIso();
+      task.apparatus_revision++;
+      events.push(this.makeEvent({ type: 'lease_expired', actor, task, from_status: from, to_status: task.status, state_revision: state.revision + 1 }));
+    }
+    return events;
+  }
+
+  async claim({ lane_id, actor, task_id = null, lease_seconds = null } = {}) {
+    if (!lane_id || !actor) throw new Error('claim requires lane_id and actor');
+    return this.withLock(async () => {
+      const config = await this.loadConfig();
+      const state = await this.loadState();
+      const expiryEvents = this.releaseExpiredInMemory(state, config);
+      const lane = state.lanes[lane_id];
+      if (!lane) throw new Error(`Unknown lane: ${lane_id}`);
+      const candidates = lane.task_ids.map((id) => state.tasks[id]).filter((task) => ['queued', 'in_review', 'quarantine'].includes(task.status) && !this.isLeaseActive(task));
+      const task = task_id ? candidates.find((x) => x.task_id === task_id) : candidates.sort((a, b) => (a.position || 999999) - (b.position || 999999) || a.task_id.localeCompare(b.task_id))[0];
+      if (!task) throw new Error(task_id ? `Task ${task_id} is not claimable in ${lane_id}` : `No claimable task in ${lane_id}`);
+      if (task.lane_id !== lane_id) throw new Error(`Task ${task.task_id} belongs to ${task.lane_id}, not ${lane_id}`);
+      const from = task.status;
+      const seconds = Number(lease_seconds || config.lease_seconds);
+      const leaseId = randomUUID();
+      task.status = 'leased';
+      task.attempt_count = Number(task.attempt_count || 0) + 1;
+      task.lease = { lease_id: leaseId, actor, claimed_at: nowIso(), heartbeat_at: nowIso(), expires_at: new Date(Date.now() + seconds * 1000).toISOString(), return_status: from };
+      task.updated_at = nowIso();
+      task.apparatus_revision++;
+      state.revision++;
+      state.updated_at = nowIso();
+      const event = this.makeEvent({ type: 'task_claimed', actor, task, from_status: from, to_status: 'leased', state_revision: state.revision, details: { lease_id: leaseId, expires_at: task.lease.expires_at } });
+      task.last_event_id = event.event_id;
+      this.recalculate(state, config);
+      state.last_event_id = event.event_id;
+      state.integrity = this.integrity(state);
+      await atomicJson(this.stateFile, state);
+      for (const e of expiryEvents) await this.appendEvent(e);
+      await this.appendEvent(event);
+      await this.publish(state, config);
+      return { task: structuredClone(task), lease_id: leaseId, state_revision: state.revision };
+    });
+  }
+
+  async heartbeat({ task_id, lease_id, actor, lease_seconds = null } = {}) {
+    if (!task_id || !lease_id || !actor) throw new Error('heartbeat requires task_id, lease_id and actor');
+    return this.withLock(async () => {
+      const config = await this.loadConfig();
+      const state = await this.loadState();
+      const task = state.tasks[task_id];
+      this.assertLease(task, lease_id, actor);
+      const seconds = Number(lease_seconds || config.lease_seconds);
+      task.lease.heartbeat_at = nowIso();
+      task.lease.expires_at = new Date(Date.now() + seconds * 1000).toISOString();
+      task.updated_at = nowIso();
+      state.revision++;
+      state.updated_at = nowIso();
+      const event = this.makeEvent({ type: 'lease_heartbeat', actor, task, from_status: 'leased', to_status: 'leased', state_revision: state.revision, details: { lease_id, expires_at: task.lease.expires_at } });
+      task.last_event_id = event.event_id;
+      this.recalculate(state, config);
+      state.last_event_id = event.event_id;
+      state.integrity = this.integrity(state);
+      await atomicJson(this.stateFile, state);
+      await this.appendEvent(event);
+      await this.publish(state, config);
+      return { task_id, lease_id, expires_at: task.lease.expires_at };
+    });
+  }
+
+  assertLease(task, lease_id, actor) {
+    if (!task) throw new Error('Unknown task');
+    if (task.status !== 'leased' || !task.lease) throw new Error(`Task ${task.task_id} is not leased`);
+    if (task.lease.lease_id !== lease_id) throw new Error('Lease token mismatch');
+    if (task.lease.actor !== actor) throw new Error(`Lease belongs to ${task.lease.actor}`);
+    if (!this.isLeaseActive(task)) throw new Error('Lease has expired');
+  }
+
+  validateVerification(payload, config, task) {
+    const gateResults = payload.gate_results || {};
+    const missing = config.required_gates.filter((gate) => gateResults[gate]?.status !== 'passed');
+    if (missing.length) throw new Error(`verified rejected: missing passed gates: ${missing.join(', ')}`);
+    const evidenceIds = [...new Set(payload.evidence_ids || [])].filter(Boolean);
+    if (evidenceIds.length < 2) throw new Error('verified rejected: at least two independent evidence IDs are required');
+    if (!payload.primary_reviewer || !payload.second_reviewer) throw new Error('verified rejected: primary_reviewer and second_reviewer are required');
+    if (payload.primary_reviewer === payload.second_reviewer) throw new Error('verified rejected: second reviewer must be independent');
+    if (!payload.decision_reason || payload.decision_reason.length < 20) throw new Error('verified rejected: decision_reason must be explicit');
+    if ((task.preflight_flags || []).includes('marketplace_excluded')) throw new Error('verified rejected: marketplace exclusion flag present');
+    return { evidenceIds, gateResults };
+  }
+
+  async transition({ task_id, lease_id, actor, to_status, payload = {} } = {}) {
+    if (!task_id || !lease_id || !actor || !to_status) throw new Error('transition requires task_id, lease_id, actor and to_status');
+    return this.withLock(async () => {
+      const config = await this.loadConfig();
+      const state = await this.loadState();
+      const task = state.tasks[task_id];
+      this.assertLease(task, lease_id, actor);
+      const from = task.status;
+      if (!(config.allowed_transitions[from] || []).includes(to_status)) throw new Error(`Transition ${from} -> ${to_status} is not allowed`);
+      let verification = null;
+      if (to_status === 'verified') verification = this.validateVerification(payload, config, task);
+      const previousLease = task.lease;
+      task.status = to_status;
+      task.lease = null;
+      task.current_decision = to_status === 'verified' ? 'verified' : (to_status === 'blocked' ? 'blocked' : 'not_verified');
+      if (payload.next_gate !== undefined) task.next_gate = payload.next_gate;
+      if (payload.unmet_gates !== undefined) task.unmet_gates = payload.unmet_gates;
+      if (payload.evidence_count !== undefined) task.evidence_count = payload.evidence_count;
+      if (payload.notes) task.notes = payload.notes;
+      if (verification) {
+        task.verification = {
+          verified_at: nowIso(),
+          evidence_ids: verification.evidenceIds,
+          gate_results: verification.gateResults,
+          primary_reviewer: payload.primary_reviewer,
+          second_reviewer: payload.second_reviewer,
+          decision_reason: payload.decision_reason,
+          priority_signals: payload.priority_signals || {},
+          decision_hash: sha(stableStringify({ task_id, verification, primary_reviewer: payload.primary_reviewer, second_reviewer: payload.second_reviewer, decision_reason: payload.decision_reason }))
+        };
+      }
+      task.updated_at = nowIso();
+      task.apparatus_revision++;
+      state.revision++;
+      state.updated_at = nowIso();
+      const event = this.makeEvent({ type: 'task_transitioned', actor, task, from_status: from, to_status, state_revision: state.revision, details: { ...payload, lease_id: previousLease.lease_id } });
+      task.last_event_id = event.event_id;
+      this.recalculate(state, config);
+      state.last_event_id = event.event_id;
+      state.integrity = this.integrity(state);
+      await atomicJson(this.stateFile, state);
+      await this.appendEvent(event);
+      await this.publish(state, config);
+      return { task: structuredClone(task), state_revision: state.revision };
+    });
+  }
+
+  async release({ task_id, lease_id, actor, reason = 'manual_release' } = {}) {
+    const state = await this.loadState();
+    const task = state.tasks[task_id];
+    if (!task?.lease) throw new Error(`Task ${task_id} has no active lease`);
+    return this.transition({ task_id, lease_id, actor, to_status: task.lease.return_status || 'queued', payload: { notes: reason } });
+  }
+
+  async reap({ actor = 'system:lease-reaper' } = {}) {
+    return this.withLock(async () => {
+      const config = await this.loadConfig();
+      const state = await this.loadState();
+      const events = this.releaseExpiredInMemory(state, config, actor);
+      if (!events.length) return { reaped: 0, summary: this.summary(state, config) };
+      state.revision++;
+      state.updated_at = nowIso();
+      this.recalculate(state, config);

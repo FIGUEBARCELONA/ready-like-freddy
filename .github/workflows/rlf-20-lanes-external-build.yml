@@ -1,0 +1,117 @@
+name: RLF 20 Lanes Verified External Build
+
+on:
+  push:
+    branches:
+      - ci/rlf-20-lanes-build-fix-20260830
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout CI payload
+        uses: actions/checkout@v4
+
+      - name: Clone canonical application source
+        run: |
+          git clone --depth 1 "https://7f0548f6b28a1758d9bf7be630d36cb4.artifacts.cloudflare.net/git/prod/amXn7bnmjuTqkxQJkwaXdx.git" work
+          test -f work/package.json
+          test -f work/pnpm-lock.yaml
+
+      - name: Overlay fixed 20-lane apparatus
+        run: |
+          cp ci-src/package.json work/package.json
+          cp ci-src/Home.tsx work/client/src/pages/Home.tsx
+          cp ci-src/server-index.ts work/server/index.ts
+          mkdir -p work/scripts work/tests
+          cat ci-src/lib-lane-apparatus.part1 ci-src/lib-lane-apparatus.part2 ci-src/lib-lane-apparatus.part3 ci-src/lib-lane-apparatus.part4 > work/scripts/lib-lane-apparatus.mjs
+          cp ci-src/lane-apparatus.mjs work/scripts/lane-apparatus.mjs
+          cp ci-src/run-20-lanes.mjs work/scripts/run-20-lanes.mjs
+          cp ci-src/lane-apparatus.test.mjs work/tests/lane-apparatus.test.mjs
+          chmod +x work/scripts/lane-apparatus.mjs work/scripts/run-20-lanes.mjs
+          test "$(wc -l < work/scripts/lib-lane-apparatus.mjs)" -eq 624
+          sha256sum work/scripts/lib-lane-apparatus.mjs work/client/src/pages/Home.tsx work/server/index.ts
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: work/pnpm-lock.yaml
+
+      - name: Activate exact pnpm version
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.4.1 --activate
+          node --version
+          pnpm --version
+
+      - name: Install locked dependencies from external network
+        working-directory: work
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript verification
+        working-directory: work
+        run: pnpm check
+
+      - name: Apparatus concurrency and fail-closed tests
+        working-directory: work
+        run: pnpm tracker:test
+
+      - name: Full Vite and Express build
+        working-directory: work
+        run: pnpm build
+
+      - name: Production smoke test
+        working-directory: work
+        run: |
+          NODE_ENV=production PORT=4173 node dist/index.js > /tmp/rlf-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:4173/ >/tmp/rlf-index.html; then
+              break
+            fi
+            sleep 1
+          done
+          grep -q '<!doctype html>' /tmp/rlf-index.html
+          kill $server_pid
+          wait $server_pid || true
+          cat /tmp/rlf-server.log
+
+      - name: Create auditable build report and offline bundle
+        working-directory: work
+        run: |
+          mkdir -p external-build-result
+          {
+            echo 'RLF 20 LANES EXTERNAL BUILD: PASS'
+            echo "UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "NODE=$(node --version)"
+            echo "PNPM=$(pnpm --version)"
+            echo "COMMIT=${GITHUB_SHA}"
+            echo
+            echo 'DIST FILES:'
+            find dist -type f -printf '%P\t%s bytes\n' | sort
+            echo
+            echo 'SOURCE HASHES:'
+            sha256sum package.json pnpm-lock.yaml client/src/pages/Home.tsx server/index.ts scripts/lib-lane-apparatus.mjs scripts/lane-apparatus.mjs scripts/run-20-lanes.mjs tests/lane-apparatus.test.mjs
+          } | tee external-build-result/BUILD_REPORT.txt
+          sha256sum $(find dist -type f | sort) > external-build-result/DIST_SHA256SUMS.txt
+          tar --zstd -cf external-build-result/RLF_20_LANES_BUILD_OFFLINE_2026-08-30.tar.zst \
+            dist node_modules package.json pnpm-lock.yaml patches client server shared scripts tests tsconfig.json tsconfig.node.json vite.config.ts
+          sha256sum external-build-result/RLF_20_LANES_BUILD_OFFLINE_2026-08-30.tar.zst > external-build-result/OFFLINE_BUNDLE_SHA256.txt
+          du -sh external-build-result/*
+
+      - name: Upload compiled and offline artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-20-LANES-EXTERNAL-BUILD-PASS
+          path: work/external-build-result/
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0

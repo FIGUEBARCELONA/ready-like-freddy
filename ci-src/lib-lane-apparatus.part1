@@ -1,0 +1,160 @@
+import { createHash, randomUUID } from 'node:crypto';
+import { mkdir, readFile, writeFile, appendFile, rename, rm, stat } from 'node:fs/promises';
+import path from 'node:path';
+
+const DEFAULT_CONFIG = {
+  schema_version: '2.0.0',
+  apparatus_id: 'RLF-SUPPLIER-CENSUS-20-LANES',
+  lane_count: 20,
+  policy: 'APPEND_ONLY_FAIL_CLOSED',
+  lease_seconds: 1800,
+  heartbeat_seconds: 300,
+  max_attempts: 4,
+  required_gates: [
+    'legal_identity_and_eu_country',
+    'professional_secondhand_activity',
+    'legal_or_fiscal_traceability',
+    'direct_purchase_capability',
+    'professional_contactability',
+    'consumer_terms_and_compliance',
+    'technical_integrity',
+    'deduplication',
+    'second_review'
+  ],
+  priority_signals: [
+    'fred_perry_current_stock',
+    'fred_perry_historical_stock',
+    'similar_brands_catalogue'
+  ],
+  terminal_statuses: ['verified', 'blocked', 'expired'],
+  active_statuses: ['queued', 'leased', 'in_review', 'quarantine'],
+  allowed_transitions: {
+    queued: ['leased', 'blocked', 'quarantine'],
+    leased: ['queued', 'in_review', 'quarantine', 'blocked', 'verified'],
+    in_review: ['leased', 'queued', 'quarantine', 'blocked', 'verified'],
+    quarantine: ['leased', 'queued', 'blocked'],
+    blocked: [],
+    verified: [],
+    expired: []
+  }
+};
+
+function nowIso() { return new Date().toISOString(); }
+function sha(value) { return createHash('sha256').update(value).digest('hex'); }
+function stableStringify(value) {
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map((k) => `${JSON.stringify(k)}:${stableStringify(value[k])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+function parseNdjson(text) {
+  return text.split(/\r?\n/).filter(Boolean).map((line, index) => {
+    try { return JSON.parse(line); }
+    catch (error) { throw new Error(`Invalid NDJSON line ${index + 1}: ${error.message}`); }
+  });
+}
+function canonicalDomain(value) {
+  if (!value) return null;
+  try {
+    return new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`).hostname.toLowerCase().replace(/^www\./, '');
+  } catch { return null; }
+}
+async function exists(file) { try { await stat(file); return true; } catch { return false; } }
+async function readJson(file) { return JSON.parse(await readFile(file, 'utf8')); }
+async function atomicJson(file, value) {
+  await mkdir(path.dirname(file), { recursive: true });
+  const tmp = `${file}.${process.pid}.${randomUUID()}.tmp`;
+  await writeFile(tmp, JSON.stringify(value, null, 2) + '\n');
+  await rename(tmp, file);
+}
+
+export class LaneApparatus {
+  constructor(root, options = {}) {
+    this.root = path.resolve(root);
+    this.trackerDir = options.trackerDir || path.join(this.root, 'tracker');
+    this.dir = options.apparatusDir || path.join(this.trackerDir, 'apparatus');
+    this.configFile = options.configFile || path.join(this.dir, 'config.json');
+    this.stateFile = options.stateFile || path.join(this.dir, 'state.json');
+    this.eventsFile = options.eventsFile || path.join(this.dir, 'events.ndjson');
+    this.assignmentsFile = options.assignmentsFile || path.join(this.dir, 'assignments.ndjson');
+    this.lockDir = options.lockDir || path.join(this.dir, '.write-lock');
+    this.snapshotsDir = options.snapshotsDir || path.join(this.dir, 'snapshots');
+    this.activeWaveFile = options.activeWaveFile || path.join(this.trackerDir, 'active-wave.json');
+    this.publicDir = options.publicDir || path.join(this.root, 'client', 'public', 'tracker', 'apparatus');
+  }
+
+  async ensureConfig(overrides = {}) {
+    await mkdir(this.dir, { recursive: true });
+    const current = await exists(this.configFile) ? await readJson(this.configFile) : {};
+    const config = { ...DEFAULT_CONFIG, ...current, ...overrides };
+    if (config.lane_count !== 20) throw new Error('RLF invariant: the fixed apparatus must contain exactly 20 lanes');
+    await atomicJson(this.configFile, config);
+    return config;
+  }
+
+  async withLock(fn, { timeoutMs = 15000, staleMs = 120000 } = {}) {
+    const start = Date.now();
+    await mkdir(this.dir, { recursive: true });
+    while (true) {
+      try {
+        await mkdir(this.lockDir);
+        await writeFile(path.join(this.lockDir, 'owner.json'), JSON.stringify({ pid: process.pid, acquired_at: nowIso() }) + '\n');
+        break;
+      } catch (error) {
+        if (error.code !== 'EEXIST') throw error;
+        try {
+          const lockStat = await stat(this.lockDir);
+          if (Date.now() - lockStat.mtimeMs > staleMs) {
+            await rm(this.lockDir, { recursive: true, force: true });
+            continue;
+          }
+        } catch {}
+        if (Date.now() - start > timeoutMs) throw new Error('Timed out waiting for apparatus write lock');
+        await new Promise((resolve) => setTimeout(resolve, 40 + Math.floor(Math.random() * 80)));
+      }
+    }
+    try { return await fn(); }
+    finally { await rm(this.lockDir, { recursive: true, force: true }); }
+  }
+
+  async loadConfig() { return this.ensureConfig(); }
+  async loadState() {
+    if (!await exists(this.stateFile)) throw new Error('Apparatus is not initialized. Run lane-apparatus init.');
+    return readJson(this.stateFile);
+  }
+
+  taskFingerprint(task) {
+    return sha(stableStringify({
+      task_id: task.task_id,
+      supplier_id: task.supplier_id,
+      network_seed: task.network_seed,
+      domain: canonicalDomain(task.domain),
+      member_supplier_ids: [...(task.member_supplier_ids || [])].sort()
+    }));
+  }
+
+  validateWave(wave, config) {
+    if (!wave || !Array.isArray(wave.lanes)) throw new Error('Invalid active wave: lanes missing');
+    if (wave.lanes.length !== config.lane_count) throw new Error(`Invalid active wave: expected ${config.lane_count} lanes, got ${wave.lanes.length}`);
+    const all = wave.lanes.flatMap((lane) => lane.tasks.map((task) => ({ ...task, lane_id: lane.lane_id })));
+    const dimensions = [
+      ['task_id', all.map((x) => x.task_id).filter(Boolean)],
+      ['network_seed', all.map((x) => x.network_seed).filter(Boolean)],
+      ['domain', all.map((x) => canonicalDomain(x.domain)).filter(Boolean)],
+      ['supplier_id', all.flatMap((x) => x.member_supplier_ids || [x.supplier_id]).filter(Boolean)]
+    ];
+    for (const [name, values] of dimensions) {
+      if (new Set(values).size !== values.length) throw new Error(`Wave invariant failed: duplicate ${name}`);
+    }
+    return all;
+  }
+
+  async appendEvent(event) {
+    await mkdir(path.dirname(this.eventsFile), { recursive: true });
+    await appendFile(this.eventsFile, JSON.stringify(event) + '\n');
+  }
+
+  async appendAssignment(record) {
+    await mkdir(path.dirname(this.assignmentsFile), { recursive: true });
+    await appendFile(this.assignmentsFile, JSON.stringify(record) + '\n');
