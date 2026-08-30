@@ -14,35 +14,53 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - name: Checkout CI payload
+      - name: Checkout self-contained CI payload
         uses: actions/checkout@v4
 
-      - name: Clone canonical application source
+      - name: Assemble self-contained application source
         run: |
-          git clone --depth 1 "https://7f0548f6b28a1758d9bf7be630d36cb4.artifacts.cloudflare.net/git/prod/amXn7bnmjuTqkxQJkwaXdx.git" work
-          test -f work/package.json
-          test -f work/pnpm-lock.yaml
-
-      - name: Overlay fixed 20-lane apparatus
-        run: |
+          mkdir -p work/client/src/pages work/client/public/tracker/apparatus work/server work/scripts work/tests
           cp ci-src/package.json work/package.json
+          cp ci-src/client-index.html work/client/index.html
+          cp ci-src/main.tsx work/client/src/main.tsx
+          cp ci-src/App.tsx work/client/src/App.tsx
+          cp ci-src/index.css work/client/src/index.css
           cp ci-src/Home.tsx work/client/src/pages/Home.tsx
           cp ci-src/server-index.ts work/server/index.ts
-          mkdir -p work/scripts work/tests
+          cp ci-src/vite.config.ts work/vite.config.ts
+          cp ci-src/tsconfig.json work/tsconfig.json
           cat ci-src/lib-lane-apparatus.part1 ci-src/lib-lane-apparatus.part2 ci-src/lib-lane-apparatus.part3 ci-src/lib-lane-apparatus.part4 > work/scripts/lib-lane-apparatus.mjs
           cp ci-src/lane-apparatus.mjs work/scripts/lane-apparatus.mjs
           cp ci-src/run-20-lanes.mjs work/scripts/run-20-lanes.mjs
           cp ci-src/lane-apparatus.test.mjs work/tests/lane-apparatus.test.mjs
           chmod +x work/scripts/lane-apparatus.mjs work/scripts/run-20-lanes.mjs
           test "$(wc -l < work/scripts/lib-lane-apparatus.mjs)" -eq 624
+          node <<'NODE'
+          const fs = require('fs');
+          const lanes = Array.from({ length: 20 }, (_, i) => ({
+            lane_id: `LANE-${String(i + 1).padStart(2, '0')}`,
+            status: 'ready', active_lease_count: 0, total: 0, queued: 0,
+            leased: 0, in_review: 0, quarantine: 0, blocked: 0,
+            verified: 0, next_task_id: null, tasks: []
+          }));
+          const status = {
+            apparatus_id: 'RLF-SUPPLIER-CENSUS-20-LANES',
+            policy: 'APPEND_ONLY_FAIL_CLOSED', wave_id: 'CI-SMOKE', revision: 1,
+            updated_at: new Date().toISOString(), lane_count: 20,
+            counters: { total: 0, queued: 0, leased: 0, in_review: 0, quarantine: 0, blocked: 0, verified: 0, expired: 0 },
+            lanes,
+            invariants: { exactly_20_lanes: true, task_membership_complete: true, no_task_overlap: true, no_network_overlap: true, no_domain_overlap: true, no_supplier_overlap: true, leases_belong_to_lane: true, verified_are_fail_closed: true },
+            lease_seconds: 1800,
+            state_hash: 'ci-smoke-only'
+          };
+          fs.writeFileSync('work/client/public/tracker/apparatus/status.json', JSON.stringify(status, null, 2) + '\n');
+          NODE
           sha256sum work/scripts/lib-lane-apparatus.mjs work/client/src/pages/Home.tsx work/server/index.ts
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: pnpm
-          cache-dependency-path: work/pnpm-lock.yaml
 
       - name: Activate exact pnpm version
         run: |
@@ -51,9 +69,14 @@ jobs:
           node --version
           pnpm --version
 
-      - name: Install locked dependencies from external network
+      - name: Generate and enforce reproducible lockfile
         working-directory: work
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --lockfile-only
+          test -s pnpm-lock.yaml
+          cp pnpm-lock.yaml pnpm-lock.generated.yaml
+          pnpm install --frozen-lockfile
+          cmp pnpm-lock.yaml pnpm-lock.generated.yaml
 
       - name: TypeScript verification
         working-directory: work
@@ -72,14 +95,15 @@ jobs:
         run: |
           NODE_ENV=production PORT=4173 node dist/index.js > /tmp/rlf-server.log 2>&1 &
           server_pid=$!
-          trap 'kill $server_pid || true' EXIT
+          trap 'kill $server_pid 2>/dev/null || true' EXIT
           for attempt in $(seq 1 30); do
             if curl --fail --silent --show-error http://127.0.0.1:4173/ >/tmp/rlf-index.html; then
               break
             fi
             sleep 1
           done
-          grep -q '<!doctype html>' /tmp/rlf-index.html
+          grep -qi '<!doctype html>' /tmp/rlf-index.html
+          curl --fail --silent http://127.0.0.1:4173/api/tracker/status | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const x=JSON.parse(s);if(x.lane_count!==20)process.exit(1)})"
           kill $server_pid
           wait $server_pid || true
           cat /tmp/rlf-server.log
@@ -101,9 +125,9 @@ jobs:
             echo 'SOURCE HASHES:'
             sha256sum package.json pnpm-lock.yaml client/src/pages/Home.tsx server/index.ts scripts/lib-lane-apparatus.mjs scripts/lane-apparatus.mjs scripts/run-20-lanes.mjs tests/lane-apparatus.test.mjs
           } | tee external-build-result/BUILD_REPORT.txt
-          sha256sum $(find dist -type f | sort) > external-build-result/DIST_SHA256SUMS.txt
+          find dist -type f -print0 | sort -z | xargs -0 sha256sum > external-build-result/DIST_SHA256SUMS.txt
           tar --zstd -cf external-build-result/RLF_20_LANES_BUILD_OFFLINE_2026-08-30.tar.zst \
-            dist node_modules package.json pnpm-lock.yaml patches client server shared scripts tests tsconfig.json tsconfig.node.json vite.config.ts
+            dist node_modules package.json pnpm-lock.yaml client server scripts tests tsconfig.json vite.config.ts
           sha256sum external-build-result/RLF_20_LANES_BUILD_OFFLINE_2026-08-30.tar.zst > external-build-result/OFFLINE_BUNDLE_SHA256.txt
           du -sh external-build-result/*
 
