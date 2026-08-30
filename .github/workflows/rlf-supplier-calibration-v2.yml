@@ -1,4 +1,4 @@
-name: RLF Supplier Calibration V2 Preflight
+name: RLF Supplier Calibration V2 Extra 200
 on:
   push:
     branches: [ci/rlf-calibration-v2-20260830]
@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  preflight:
+  preflight-extra-200:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -14,18 +14,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run respectful homepage preflight
+      - name: Verify exact candidates 101-300 payload
+        run: |
+          test "$(sha256sum calibration/pool-v2-extra-200.json.gz.b64 | cut -d' ' -f1)" = "ae454c600ab11ebbe5aa7c5cf464b1a24b2acf0703d45b76b5a353b211bc4b6e"
+          node -e "const fs=require('fs'),z=require('zlib');const x=JSON.parse(z.gunzipSync(Buffer.from(fs.readFileSync('calibration/pool-v2-extra-200.json.gz.b64','utf8').trim(),'base64')));if(x.candidates.length!==200)process.exit(1);console.log('exact_candidates',x.candidates.length)"
+      - name: Run respectful external preflight for candidates 101-300
         env:
-          PREFLIGHT_LIMIT: '100'
+          PREFLIGHT_LIMIT: '200'
           PREFLIGHT_CONCURRENCY: '20'
           PREFLIGHT_TIMEOUT_MS: '12000'
           PREFLIGHT_MAX_BYTES: '1000000'
-        run: node calibration/preflight-web-v2.mjs calibration/pool-v2.json.gz.b64 calibration-results
-      - name: Upload calibrated evidence
+        run: node calibration/preflight-web-v2.mjs calibration/pool-v2-extra-200.json.gz.b64 calibration-results-extra-200
+      - name: Verify observed output count
+        run: node -e "const x=require('./calibration-results-extra-200/preflight-results.json');if(x.results.length!==200||x.summary.candidates!==200)process.exit(1);console.log(x.summary)"
+      - name: Upload real evidence for candidates 101-300
         uses: actions/upload-artifact@v4
         with:
-          name: RLF-SUPPLIER-CALIBRATION-V2-PREFLIGHT
-          path: calibration-results
+          name: RLF-SUPPLIER-CALIBRATION-V2-EXTRA-200
+          path: calibration-results-extra-200
           if-no-files-found: error
           retention-days: 30
           compression-level: 9
