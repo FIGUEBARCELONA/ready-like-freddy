@@ -1,0 +1,31 @@
+name: RLF Supplier Calibration V2 Preflight
+on:
+  push:
+    branches: [ci/rlf-calibration-v2-20260830]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run respectful homepage preflight
+        env:
+          PREFLIGHT_LIMIT: '100'
+          PREFLIGHT_CONCURRENCY: '20'
+          PREFLIGHT_TIMEOUT_MS: '12000'
+          PREFLIGHT_MAX_BYTES: '1000000'
+        run: node calibration/preflight-web-v2.mjs calibration/pool-v2.json.gz.b64 calibration-results
+      - name: Upload calibrated evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-SUPPLIER-CALIBRATION-V2-PREFLIGHT
+          path: calibration-results
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9
