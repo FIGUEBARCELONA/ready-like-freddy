@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "checkpoint": "057",
+  "checkpoint_id": "RLF-TERRITORIAL-DE-BERLIN-G23-INITIALISED-057-GEOMETRY-PASSED-DISCOVERY-NOT-STARTED",
+  "base_checkpoint_id": "RLF-TERRITORIAL-DE-BERLIN-G23-GEOMETRY-GATE-056-PASSED",
+  "zone_id": "DE_11000000_G23",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "phase_2_started": false,
+  "canonical_totals": {
+    "verified": 340,
+    "eligible": 71,
+    "hold": 269,
+    "remaining_to_10000": 9660
+  },
+  "geometry_gate": {
+    "state": "PASSED",
+    "source": "Eurostat GISCO LAU 2024",
+    "source_gisco_id": "DE_11000000",
+    "source_sha256": "ae07901e0a11cb7891d1a6d6a31cfd833e25672ca318908856b0e34a1acca594",
+    "berlin_feature_sha256": "364fe3b6ecc09bba5053769cb2a71fe99eebdcc3f526a7f850429e39769ef88b",
+    "g23_clipped_sha256": "6c13d2d5a5a426feab68ac3af54e06d9912ce5063ea025873260f9af84eb93df",
+    "workflow_run_id": 33548398019,
+    "workflow_head_sha": "7b0f62e4a75f451e8552f2d06119fbf2ec80e839",
+    "artifact_id": 9816425203,
+    "artifact_sha256": "57efdc69ae4cf03c2aa1f993a0020940d03d04b4dbd6df8811f0ee02e80d362b",
+    "point_in_polygon_enabled": true
+  },
+  "discovery_gate": {
+    "state": "READY_NOT_STARTED",
+    "raw_discovery_queue_open": 0,
+    "raw_discovery_records": 0,
+    "candidate_records": 0,
+    "open_pending": 0,
+    "candidate_set_frozen": false,
+    "exhaustion_counter": 0,
+    "exhaustion_required": 15
+  },
+  "mandatory_order": [
+    "Generate deterministic discovery vectors constrained to the accepted G23 polygon.",
+    "Retain source coordinates and evidence URL for every raw discovery.",
+    "Run point-in-polygon before identity creation.",
+    "Reject discoveries outside G23.",
+    "Run global identity, domain, address and network deduplication.",
+    "Only then open a pending candidate.",
+    "Resolve every pending candidate before freezing the candidate set.",
+    "Only after freeze may a fresh 15-vector exhaustion matrix start."
+  ],
+  "locks": {
+    "G31_locked": true,
+    "next_city_locked": true,
+    "next_country_locked": true,
+    "phase_2_locked": true
+  },
+  "invariants": {
+    "eligible_plus_hold_equals_verified": true,
+    "no_candidate_opened": true,
+    "no_pending_opened": true,
+    "exhaustion_not_started": true,
+    "no_count_delta": true
+  }
+}
