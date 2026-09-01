@@ -1,0 +1,75 @@
+name: RLF G23 official GISCO geometry capture
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/rlf-g23-gisco-geometry-capture.yml"
+      - "scripts/validate_gisco_g23.py"
+
+permissions:
+  contents: read
+
+jobs:
+  capture-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned geometry dependency
+        run: python -m pip install --disable-pip-version-check "shapely==2.0.6"
+
+      - name: Create output directory
+        run: mkdir -p evidence/g23_geometry
+
+      - name: Download authoritative GISCO LAU 2024 GeoJSON
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson"
+          OUT="evidence/g23_geometry/LAU_RG_01M_2024_4326.geojson"
+          curl --fail --show-error --location --retry 8 --retry-all-errors --retry-delay 5 --connect-timeout 30 --max-time 600 --header 'Accept: application/geo+json,application/json;q=0.9,*/*;q=0.1' --output "$OUT.part" "$URL"
+          test -s "$OUT.part"
+          mv "$OUT.part" "$OUT"
+          sha256sum "$OUT" | tee evidence/g23_geometry/SOURCE_SHA256.txt
+
+      - name: Validate Berlin feature and clip G23
+        run: python scripts/validate_gisco_g23.py evidence/g23_geometry/LAU_RG_01M_2024_4326.geojson evidence/g23_geometry
+
+      - name: Fail closed unless all required outputs exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s evidence/g23_geometry/LAU_RG_01M_2024_4326.geojson
+          test -s evidence/g23_geometry/DE_11000000_Berlin.normalized.geojson
+          test -s evidence/g23_geometry/DE_11000000_G23.clipped.normalized.geojson
+          test -s evidence/g23_geometry/G23_GEOMETRY_CAPTURE_MANIFEST.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('evidence/g23_geometry/G23_GEOMETRY_CAPTURE_MANIFEST.json').read_text(encoding='utf-8'))
+          assert data['gate_pass'] is True
+          assert data['source']['sha256']
+          assert data['berlin']['gisco_id'] == 'DE_11000000'
+          assert data['berlin']['valid'] is True
+          assert data['berlin']['normalized_sha256']
+          assert data['g23']['valid'] is True
+          assert data['g23']['empty'] is False
+          assert data['g23']['normalized_sha256']
+          PY
+
+      - name: Upload immutable audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rlf-g23-gisco-geometry-evidence
+          path: evidence/g23_geometry/
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9
