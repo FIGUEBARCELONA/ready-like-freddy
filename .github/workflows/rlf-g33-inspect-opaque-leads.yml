@@ -1,0 +1,40 @@
+name: RLF G33 inspect opaque directory leads
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/rlf-g33-inspect-opaque-leads.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch and extract identity signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          urls=(
+            'https://www.gelbeseiten.de/gsbiz/4b118ea8-07fc-4e1d-bd52-4f507c3e0d73'
+            'https://www.gelbeseiten.de/gsbiz/eb90d42e-f716-4cd6-a4ff-76f0d35c0cb5'
+            'https://www.beste-laeden.de/13057-berlin-falkenberg/'
+          )
+          n=0
+          for u in "${urls[@]}"; do
+            n=$((n+1)); echo "=== LEAD $n $u ==="
+            code=$(curl -L -sS --max-time 20 -A 'Mozilla/5.0 Chrome/151' -o /tmp/x -w '%{http_code}' "$u" || true)
+            echo "HTTP=$code FINAL=$(curl -L -sS --max-time 20 -o /dev/null -w '%{url_effective}' "$u" || true)"
+            python3 - <<'PY'
+          import re,html
+          s=open('/tmp/x',errors='ignore').read() if __import__('os').path.exists('/tmp/x') else ''
+          def clean(x): return re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>',' ',x))).strip()
+          m=re.search(r'<title[^>]*>(.*?)</title>',s,re.I|re.S); print('TITLE=',clean(m.group(1))[:500] if m else '')
+          text=clean(s)
+          keys=['Second','second','gebraucht','Vintage','Kleidung','Bekleidung','13055','13057','Falkenberg','Hohenschönhausen','Hausvaterweg','Konrad-Wolf','Floh','KiK','TAIFUN']
+          snippets=[]
+          for k in keys:
+            for mm in list(re.finditer(re.escape(k),text,re.I))[:2]:
+              snippets.append(text[max(0,mm.start()-180):min(len(text),mm.end()+260)])
+          for x in snippets[:12]: print('SNIP=',x)
+          PY
+          done
