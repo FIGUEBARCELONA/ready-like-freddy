@@ -1,0 +1,46 @@
+name: RLF Parallel50 G32 real trigger
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-parallel50-g32-trigger.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trigger-parallel50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger real Vercel Parallel50 runtime
+        id: trigger
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'POST /api/run'
+          code=$(curl -sS -o /tmp/body.json -w '%{http_code}' \
+            -X POST 'https://rlf-parallel50-runtime.vercel.app/api/run' \
+            -H 'content-type: application/json' \
+            --data '{}')
+          echo "HTTP=$code"
+          cat /tmp/body.json
+          echo
+          echo "http_code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+            exit 22
+          fi
+
+      - name: Poll runtime status
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 20); do
+            echo "--- poll $i ---"
+            curl -fsS 'https://rlf-parallel50-runtime.vercel.app/api/status' || true
+            echo
+            sleep 5
+          done
