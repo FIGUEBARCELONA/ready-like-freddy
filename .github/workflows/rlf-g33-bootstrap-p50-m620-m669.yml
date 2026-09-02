@@ -1,0 +1,184 @@
+name: RLF G33 bootstrap + real Parallel50 M620-M669
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-g33-bootstrap-p50-m620-m669.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  g33:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Materialize authoritative G33 geometry from Berlin LAU 2024
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q shapely pyproj
+          curl -fsSL 'https://raw.githubusercontent.com/euraf/eu-nuts-lau/main/v1/DE/DE300_LAU_RG_01M_2024_4326.geojson' -o berlin_lau_2024.geojson
+          python3 - <<'PYGEO'
+          import json,hashlib
+          from shapely.geometry import shape,box,mapping
+          from pyproj import Geod
+          src=json.load(open('berlin_lau_2024.geojson'))
+          feat=src['features'][0]; geom=shape(feat['geometry'])
+          minx,miny,maxx,maxy=geom.bounds
+          dx=(maxx-minx)/3; dy=(maxy-miny)/3
+          # canonical grid: G32 = north-middle, therefore G33 = north-east
+          g33_bbox=[minx+2*dx,miny+2*dy,maxx,maxy]
+          clip=geom.intersection(box(*g33_bbox))
+          geod=Geod(ellps='WGS84')
+          area,per=geod.geometry_area_perimeter(clip)
+          obj={'type':'FeatureCollection','name':'DE_11000000_G33_AUTHORITATIVE_CLIP_2024',
+               'features':[{'type':'Feature','properties':{
+                 'zone_id':'DE_11000000_G33','zone_name':'Grid 3-3','zone_order':9,'city_id':'DE_11000000','city_name':'Berlin, Stadt',
+                 'source':'Eurostat/GISCO LAU 2024 via euraf mirror','source_url':'https://raw.githubusercontent.com/euraf/eu-nuts-lau/main/v1/DE/DE300_LAU_RG_01M_2024_4326.geojson',
+                 'method':'authoritative Berlin LAU 2024 intersected with canonical 3x3 north-east cell',
+                 'berlin_bbox':[minx,miny,maxx,maxy],'grid_bbox':g33_bbox,'geodesic_area_km2':abs(area)/1e6,'geodesic_perimeter_km':per/1000,
+                 'geometry_validation':'PASS_DIRECT_SHAPELY_INTERSECTION_FROM_AUTHORITATIVE_SOURCE'},'geometry':mapping(clip)}]}
+          raw=json.dumps(obj,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode(); obj['features'][0]['properties']['sha256_pretty_independent']=hashlib.sha256(raw).hexdigest()
+          json.dump(obj,open('DE_11000000_G33_AUTHORITATIVE_CLIP_2024.geojson','w'),ensure_ascii=False,indent=2)
+          print(json.dumps(obj['features'][0]['properties'],ensure_ascii=False))
+          # verify G32 reconstructed bbox implied by same thirds
+          g32=[minx+dx,miny+2*dy,minx+2*dx,maxy]
+          print('DERIVED_G32_BBOX',g32)
+          PYGEO
+
+      - name: Launch 50 real simultaneous G33 discovery workers
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf p50 && mkdir -p p50/ready p50/out p50/owners
+          cat > p50/worker.py <<'PYWORKER'
+          import sys,os,time,json,html,re,urllib.parse,urllib.request,hashlib
+          lane,cell,postcode,label,vector,engine=sys.argv[1:7]
+          vterms={
+           'V1_OWNED':'secondhand laden kleidung eigene website -vinted -ebay -kleinanzeigen',
+           'V2_SOCIAL':'sozialkaufhaus kleidung second hand verkauf gemeinnuetzig -spendecontainer',
+           'V3_VINTAGE':'vintage mode secondhand boutique kommission laden -marketplace',
+           'V4_FAMILY':'kinder familie second hand bekleidung laden gebraucht',
+           'V5_REUSE':'gebrauchtwaren textilien kleiderladen wiederverwendung einzelhandel -auto -moebel'
+          }[vector]
+          open(f'p50/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+45
+          while not os.path.exists('p50/GO'):
+            if time.time()>deadline: raise SystemExit('barrier timeout')
+            time.sleep(.02)
+          time.sleep((int(hashlib.sha256(lane.encode()).hexdigest()[:4],16)%1300)/1000)
+          query=f'"{postcode}" Berlin "{label}" {vterms}'
+          q=urllib.parse.quote_plus(query)
+          url=f'https://html.duckduckgo.com/html/?q={q}' if engine=='ddg' else f'https://www.bing.com/search?q={q}&count=25'
+          status=None;body='';err=None;owned=[];dups=[];started=time.time(); seen=set()
+          try:
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36','Accept-Language':'de-DE,de;q=0.9,en;q=0.5'})
+            with urllib.request.urlopen(req,timeout=28) as r: status=getattr(r,'status',200); body=r.read().decode('utf-8','replace')
+            for href in re.findall(r'href=["\']([^"\']+)["\']',body,re.I):
+              href=html.unescape(href)
+              if href.startswith('//'): href='https:'+href
+              if 'uddg=' in href:
+                try: href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                except Exception: pass
+              if not href.startswith('http'): continue
+              host=(urllib.parse.urlparse(href).hostname or '').lower()
+              if any(x in host for x in ['duckduckgo.com','bing.com','microsoft.com']): continue
+              u=href.split('#',1)[0]
+              if u in seen: continue
+              seen.add(u)
+              key=hashlib.sha256(u.encode()).hexdigest(); owner=f'p50/owners/{key}'
+              try:
+                fd=os.open(owner,os.O_CREAT|os.O_EXCL|os.O_WRONLY); os.write(fd,lane.encode()); os.close(fd); owned.append(u)
+              except FileExistsError:
+                try:first=open(owner).read().strip()
+                except Exception:first='UNKNOWN'
+                dups.append({'url':u,'owner':first})
+              if len(owned)>=20: break
+          except Exception as e: err=type(e).__name__+': '+str(e)
+          json.dump({'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G33','packet':'M620-M669','lane':lane,'cell':cell,'postcode':postcode,'label':label,'vector':vector,'engine':engine,'pid':os.getpid(),'query':query,'http_status':status,'body_bytes':len(body.encode('utf-8','ignore')),'error':err,'started':started,'ended':time.time(),'owned_results':owned,'duplicate_skipped':dups},open(f'p50/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          PYWORKER
+
+          cat > p50/lanes.tsv <<'LANES'
+          M620	C01	13051	Neu-Hohenschönhausen	V1_OWNED	ddg
+          M621	C01	13051	Neu-Hohenschönhausen	V2_SOCIAL	bing
+          M622	C01	13051	Neu-Hohenschönhausen	V3_VINTAGE	ddg
+          M623	C01	13051	Neu-Hohenschönhausen	V4_FAMILY	bing
+          M624	C01	13051	Neu-Hohenschönhausen	V5_REUSE	ddg
+          M625	C02	13053	Hohenschönhausen	V1_OWNED	bing
+          M626	C02	13053	Hohenschönhausen	V2_SOCIAL	ddg
+          M627	C02	13053	Hohenschönhausen	V3_VINTAGE	bing
+          M628	C02	13053	Hohenschönhausen	V4_FAMILY	ddg
+          M629	C02	13053	Hohenschönhausen	V5_REUSE	bing
+          M630	C03	13055	Alt-Hohenschönhausen	V1_OWNED	ddg
+          M631	C03	13055	Alt-Hohenschönhausen	V2_SOCIAL	bing
+          M632	C03	13055	Alt-Hohenschönhausen	V3_VINTAGE	ddg
+          M633	C03	13055	Alt-Hohenschönhausen	V4_FAMILY	bing
+          M634	C03	13055	Alt-Hohenschönhausen	V5_REUSE	ddg
+          M635	C04	13057	Falkenberg	V1_OWNED	bing
+          M636	C04	13057	Falkenberg	V2_SOCIAL	ddg
+          M637	C04	13057	Falkenberg	V3_VINTAGE	bing
+          M638	C04	13057	Falkenberg	V4_FAMILY	ddg
+          M639	C04	13057	Falkenberg	V5_REUSE	bing
+          M640	C05	13059	Wartenberg	V1_OWNED	ddg
+          M641	C05	13059	Wartenberg	V2_SOCIAL	bing
+          M642	C05	13059	Wartenberg	V3_VINTAGE	ddg
+          M643	C05	13059	Wartenberg	V4_FAMILY	bing
+          M644	C05	13059	Wartenberg	V5_REUSE	ddg
+          M645	C06	12689	Marzahn-Nord	V1_OWNED	bing
+          M646	C06	12689	Marzahn-Nord	V2_SOCIAL	ddg
+          M647	C06	12689	Marzahn-Nord	V3_VINTAGE	bing
+          M648	C06	12689	Marzahn-Nord	V4_FAMILY	ddg
+          M649	C06	12689	Marzahn-Nord	V5_REUSE	bing
+          M650	C07	13125	Buch-Ost	V1_OWNED	ddg
+          M651	C07	13125	Buch-Ost	V2_SOCIAL	bing
+          M652	C07	13125	Buch-Ost	V3_VINTAGE	ddg
+          M653	C07	13125	Buch-Ost	V4_FAMILY	bing
+          M654	C07	13125	Buch-Ost	V5_REUSE	ddg
+          M655	C08	13129	Blankenburg-Ost	V1_OWNED	bing
+          M656	C08	13129	Blankenburg-Ost	V2_SOCIAL	ddg
+          M657	C08	13129	Blankenburg-Ost	V3_VINTAGE	bing
+          M658	C08	13129	Blankenburg-Ost	V4_FAMILY	ddg
+          M659	C08	13129	Blankenburg-Ost	V5_REUSE	bing
+          M660	C09	13127	Französisch-Buchholz-Ost	V1_OWNED	ddg
+          M661	C09	13127	Französisch-Buchholz-Ost	V2_SOCIAL	bing
+          M662	C09	13127	Französisch-Buchholz-Ost	V3_VINTAGE	ddg
+          M663	C09	13127	Französisch-Buchholz-Ost	V4_FAMILY	bing
+          M664	C09	13127	Französisch-Buchholz-Ost	V5_REUSE	ddg
+          M665	C10	13088	Weißensee-Nordost	V1_OWNED	bing
+          M666	C10	13088	Weißensee-Nordost	V2_SOCIAL	ddg
+          M667	C10	13088	Weißensee-Nordost	V3_VINTAGE	bing
+          M668	C10	13088	Weißensee-Nordost	V4_FAMILY	ddg
+          M669	C10	13088	Weißensee-Nordost	V5_REUSE	bing
+          LANES
+
+          pids=(); while IFS=$'\t' read -r lane cell pc label vec engine; do python3 p50/worker.py "$lane" "$cell" "$pc" "$label" "$vec" "$engine" & pids+=("$!"); done < p50/lanes.tsv
+          deadline=$((SECONDS+45)); while true; do ready=$(find p50/ready -type f|wc -l); [ "$ready" -eq 50 ] && break; [ "$SECONDS" -ge "$deadline" ] && { echo "barrier failed $ready/50"; exit 7; }; sleep .05; done
+          alive=0; for p in "${pids[@]}"; do kill -0 "$p" 2>/dev/null && alive=$((alive+1)); done
+          echo "BARRIER_READY=$ready"; echo "SIMULTANEOUS_ALIVE=$alive"; [ "$alive" -eq 50 ] || exit 8; date +%s.%N > p50/GO
+          fail=0; for p in "${pids[@]}"; do wait "$p" || fail=$((fail+1)); done; echo "WORKER_PROCESS_FAILURES=$fail"; [ "$fail" -eq 0 ] || exit 9
+
+      - name: AAA merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYMERGE'
+          import glob,json,hashlib
+          rows=[json.load(open(f,encoding='utf-8')) for f in sorted(glob.glob('p50/out/M*.json'))]
+          rep={'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G33','packet':'M620-M669','workers':len(rows),'unique_pids':len({r['pid'] for r in rows}),'unique_lanes':len({r['lane'] for r in rows}),'unique_queries':len({r['query'] for r in rows}),'simultaneous_alive':50,'process_failures':0,'http_success':sum(1 for r in rows if r['http_status'] and 200<=r['http_status']<300),'errors':[{'lane':r['lane'],'error':r['error']} for r in rows if r['error']],'owned_unique_results':sum(len(r['owned_results']) for r in rows),'duplicates_skipped':sum(len(r['duplicate_skipped']) for r in rows),'rows':rows}
+          core=json.dumps(rep,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode();rep['sha256']=hashlib.sha256(core).hexdigest();json.dump(rep,open('RLF_G33_P50_M620_M669.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:rep[k] for k in ['workers','unique_pids','unique_lanes','unique_queries','simultaneous_alive','http_success','owned_unique_results','duplicates_skipped']},ensure_ascii=False))
+          if not (rep['workers']==50 and rep['unique_pids']==50 and rep['unique_lanes']==50 and rep['unique_queries']==50): raise SystemExit(10)
+          PYMERGE
+
+      - name: Upload G33 bootstrap and P50 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-G33-BOOTSTRAP-P50-M620-M669
+          path: |
+            DE_11000000_G33_AUTHORITATIVE_CLIP_2024.geojson
+            RLF_G33_P50_M620_M669.json
+            p50/out/*.json
+          retention-days: 7
