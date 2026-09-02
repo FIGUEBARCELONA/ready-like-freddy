@@ -1,0 +1,90 @@
+name: RLF EU27 CP108 cursor materialization audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'state/rlf-eu27-cp108-cursor-materialization.json'
+      - '.github/workflows/rlf-eu27-cp108-cursor-materialization-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cursor-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate exact cursor and fail-closed invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, hashlib
+          p='state/rlf-eu27-cp108-cursor-materialization.json'
+          d=json.load(open(p,encoding='utf-8'))
+          assert d['checkpoint']=='CP108_EXACT_CURSOR_MATERIALIZATION_PARTIAL'
+          assert d['source_checkpoint']=='CP107_TERRITORIAL_PARALLEL27_STRICT_ORDER'
+          assert d['phase_2_kb']=='LOCKED' and d['canonical_delta']==0
+          c=d['canonical_counts_at_entry']
+          assert c['verified']==413 and c['eligible']==70 and c['hold']==343 and c['remaining']==9587
+          assert c['eligible']+c['hold']==c['verified'] and 10000-c['verified']==c['remaining']
+          assert d['source_contract']['no_capital_assumption'] is True
+          assert d['source_contract']['no_G11_assumption'] is True
+          assert d['source_contract']['missing_source_row_action']=='FAIL_CLOSED_NO_WRITE'
+          lanes=d['lanes']; assert len(lanes)==27
+          assert len({x['lane_id'] for x in lanes})==27
+          assert len({x['iso'] for x in lanes})==27
+          assert len({x['owner_lock'] for x in lanes})==27
+          assert all(x['owner_lock']==f"{x['lane_id']}:{x['iso']}" for x in lanes)
+          write=[x for x in lanes if x['write_permission']]
+          exact=[x for x in lanes if x['materialization']=='EXACT_CURRENT_CURSOR']
+          cityzone=[x for x in lanes if x['materialization']=='CITY_AND_ZONE_EXACT']
+          cityonly=[x for x in lanes if x['materialization']=='CITY_EXACT_ZONE_PENDING']
+          pending=[x for x in lanes if x['materialization']=='CURSOR_PENDING_FAIL_CLOSED']
+          assert len(write)==1 and write[0]['lane_id']=='L11'
+          assert len(exact)==1 and exact[0]['lane_id']=='L11'
+          assert len(cityzone)==1 and cityzone[0]['lane_id']=='L01'
+          assert len(cityonly)==9
+          assert len(pending)==16
+          s=d['materialization_summary']
+          derived={'lanes_total':len(lanes),'exact_current_write_cursor_materialized':len(exact),'city_and_initial_zone_materialized_prewrite_locked':len(cityzone),'city_only_materialized_zone_pending':len(cityonly),'cursor_pending_fail_closed':len(pending),'territorial_write_enabled':len(write)}
+          assert s==derived, (s,derived)
+          # Any write-enabled lane must have fully materialized cursor fields.
+          for x in write:
+              assert x['city_rank'] is not None and x['city_id'] and x['zone_order'] is not None and x['zone_id']
+          # Any missing zone is hard blocked from territorial writes.
+          for x in lanes:
+              if x['zone_id'] is None or x['zone_order'] is None:
+                  assert x['write_permission'] is False
+          # Initial lanes cannot silently assume G11; only source-proven values may exist.
+          at=next(x for x in lanes if x['lane_id']=='L01')
+          assert (at['city_id'],at['zone_order'],at['zone_id'])==('AT_90001',1,'AT_90001_G11') and at['write_permission'] is False
+          de=next(x for x in lanes if x['lane_id']=='L11')
+          assert (de['city_rank'],de['city_id'],de['zone_order'],de['zone_id'])==(2,'DE_02000000',1,'DE_02000000_G13')
+          assert de['pending']==38 and de['exhaustion']=='0/15'
+          assert set(de['later_zones_locked'])=={'DE_02000000_G23','DE_02000000_G31'}
+          report={
+            'checkpoint':d['checkpoint'],
+            'quality_gate':'PASS',
+            'lanes_total':27,
+            'cursor_partition':derived,
+            'only_write_enabled_lane':'L11:DE',
+            'missing_cursor_writes':0,
+            'capital_assumptions':'PROHIBITED',
+            'G11_assumptions':'PROHIBITED',
+            'canonical_delta':0,
+            'phase_2':'LOCKED',
+            'state_sha256':hashlib.sha256(open(p,'rb').read()).hexdigest()
+          }
+          open('RLF_EU27_CP108_CURSOR_MATERIALIZATION_AUDIT.json','w').write(json.dumps(report,indent=2,ensure_ascii=False))
+          print(json.dumps(report,indent=2,ensure_ascii=False))
+          PY
+      - name: Upload CP108 audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP108-CURSOR-MATERIALIZATION-AUDIT
+          path: RLF_EU27_CP108_CURSOR_MATERIALIZATION_AUDIT.json
+          retention-days: 30
