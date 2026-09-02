@@ -30,8 +30,8 @@
     "lanes_total": 27,
     "exact_current_write_cursor_materialized": 1,
     "city_and_initial_zone_materialized_prewrite_locked": 1,
-    "city_only_materialized_zone_pending": 8,
-    "cursor_pending_fail_closed": 17,
+    "city_only_materialized_zone_pending": 9,
+    "cursor_pending_fail_closed": 16,
     "territorial_write_enabled": 1
   },
   "lanes": [
