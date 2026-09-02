@@ -1,0 +1,158 @@
+name: RLF G32 Parallel50 real simultaneous processes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-g32-parallel50-processes.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Launch 50 independent OS workers behind one barrier
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf work && mkdir -p work/ready work/out
+          cat > work/worker.py <<'PY'
+          import sys, os, time, json, html, re, urllib.parse, urllib.request, hashlib
+          lane_id, area_id, area, vector_id = sys.argv[1:5]
+          ready=f'work/ready/{lane_id}'
+          open(ready,'w').write(str(os.getpid()))
+          deadline=time.time()+45
+          while not os.path.exists('work/GO'):
+            if time.time()>deadline:
+              raise SystemExit('barrier timeout')
+            time.sleep(0.02)
+          # deterministic sub-second spreading while every process remains alive concurrently
+          delay=(int(hashlib.sha256(lane_id.encode()).hexdigest()[:4],16)%700)/1000
+          time.sleep(delay)
+          qmap={
+            'V1_DIRECT_OWNED':'second hand laden {area} Berlin eigene website',
+            'V2_SOCIAL_CHARITY':'sozialkaufhaus kleidung {area} Berlin gemeinnützig',
+            'V3_VINTAGE_CONSIGNMENT':'vintage kommissionsladen mode {area} Berlin second hand',
+            'V4_FAMILY_CHILDREN':'kinder familien second hand bekleidung {area} Berlin',
+            'V5_LOCAL_DIRECTORIES':'secondhand shop gebrauchtwaren kleidung {area} Berlin branchenbuch',
+          }
+          q=qmap[vector_id].format(area=area)
+          url='https://html.duckduckgo.com/html/?q='+urllib.parse.quote(q)
+          started=time.time(); results=[]; error=None
+          try:
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36','Accept-Language':'de-DE,de;q=0.9,en;q=0.5'})
+            with urllib.request.urlopen(req,timeout=25) as r:
+              body=r.read().decode('utf-8','replace')
+            pairs=re.findall(r'class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>',body,re.I|re.S)
+            for href,title in pairs[:15]:
+              title=html.unescape(re.sub(r'\s+',' ',re.sub('<[^>]+>',' ',title))).strip()
+              href=html.unescape(href)
+              if 'uddg=' in href:
+                try: href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                except Exception: pass
+              results.append({'title':title,'url':href})
+          except Exception as e:
+            error=type(e).__name__+': '+str(e)
+          ended=time.time()
+          json.dump({
+            'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32','lane_id':lane_id,
+            'area_id':area_id,'area':area,'vector_id':vector_id,'pid':os.getpid(),
+            'barrier_release_epoch':float(open('work/GO').read()),'request_started_epoch':started,
+            'request_ended_epoch':ended,'query':q,'error':error,'results':results
+          },open(f'work/out/{lane_id}.json','w'),ensure_ascii=False,indent=2)
+          PY
+
+          python3 - <<'PY' > work/lanes.tsv
+          areas=[
+            ('A01_REINICKENDORF','Reinickendorf'),('A02_WITTENAU','Wittenau'),
+            ('A03_MAERKISCHES_VIERTEL','Märkisches Viertel'),('A04_WAIDMANNSLUST','Waidmannslust'),
+            ('A05_LUEBARS','Lübars'),('A06_HERMSDORF','Hermsdorf'),('A07_FROHNAU','Frohnau'),
+            ('A08_ROSENTHAL_NIEDERSCHOENHAUSEN','Rosenthal Niederschönhausen'),
+            ('A09_PANKOW_NORD','Pankow Nord'),('A10_BUCH_KAROW','Buch Karow')]
+          vectors=['V1_DIRECT_OWNED','V2_SOCIAL_CHARITY','V3_VINTAGE_CONSIGNMENT','V4_FAMILY_CHILDREN','V5_LOCAL_DIRECTORIES']
+          n=370
+          for aid,area in areas:
+            for v in vectors:
+              print(f'M{n}\t{aid}\t{area}\t{v}')
+              n+=1
+          PY
+
+          pids=()
+          while IFS=$'\t' read -r lane aid area vec; do
+            python3 work/worker.py "$lane" "$aid" "$area" "$vec" &
+            pids+=("$!")
+          done < work/lanes.tsv
+
+          deadline=$((SECONDS+45))
+          while true; do
+            ready=$(find work/ready -type f | wc -l)
+            [ "$ready" -eq 50 ] && break
+            [ "$SECONDS" -ge "$deadline" ] && { echo "barrier failed: $ready/50"; exit 7; }
+            sleep 0.05
+          done
+
+          alive=0
+          for p in "${pids[@]}"; do kill -0 "$p" 2>/dev/null && alive=$((alive+1)); done
+          echo "BARRIER_READY=50"
+          echo "SIMULTANEOUS_ALIVE_BEFORE_RELEASE=$alive"
+          [ "$alive" -eq 50 ] || exit 8
+          date +%s.%N > work/GO
+
+          fail=0
+          for p in "${pids[@]}"; do wait "$p" || fail=$((fail+1)); done
+          echo "WORKER_PROCESS_FAILURES=$fail"
+          [ "$fail" -eq 0 ] || exit 9
+
+      - name: AAA merge and concurrency proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import glob,json,hashlib,urllib.parse
+          files=sorted(glob.glob('work/out/M*.json'))
+          rows=[json.load(open(f,encoding='utf-8')) for f in files]
+          pids={r['pid'] for r in rows}; lanes={r['lane_id'] for r in rows}
+          release=min(r['barrier_release_epoch'] for r in rows) if rows else None
+          # Number of workers whose request interval overlaps at each request-start event.
+          events=[]
+          for r in rows:
+            events.append((r['request_started_epoch'],1)); events.append((r['request_ended_epoch'],-1))
+          events.sort(key=lambda x:(x[0],-x[1]))
+          active=peak=0
+          for _,d in events:
+            active+=d; peak=max(peak,active)
+          urls={}
+          for r in rows:
+            for x in r.get('results',[]):
+              u=x.get('url')
+              if u: urls.setdefault(u,[]).append({'lane':r['lane_id'],'title':x.get('title'),'query':r['query']})
+          report={
+            'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32',
+            'workers_expected':50,'worker_outputs':len(rows),'unique_pids':len(pids),'unique_lanes':len(lanes),
+            'barrier_ready':50,'simultaneous_alive_before_release':50,
+            'peak_overlapping_http_requests':peak,
+            'all_50_real_processes_verified':len(rows)==50 and len(pids)==50 and len(lanes)==50,
+            'worker_errors':[{'lane':r['lane_id'],'error':r['error']} for r in rows if r.get('error')],
+            'unique_urls':len(urls),'duplicate_url_observations':sum(max(0,len(v)-1) for v in urls.values()),
+            'url_evidence':urls,
+            'workers':[{k:r[k] for k in ['lane_id','area_id','area','vector_id','pid','barrier_release_epoch','request_started_epoch','request_ended_epoch','query','error']} for r in rows]
+          }
+          raw=json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+          report['sha256']=hashlib.sha256(raw).hexdigest()
+          json.dump(report,open('RLF_G32_PARALLEL50_SIMULTANEOUS_REAL.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:report[k] for k in ['workers_expected','worker_outputs','unique_pids','unique_lanes','barrier_ready','simultaneous_alive_before_release','peak_overlapping_http_requests','all_50_real_processes_verified','unique_urls','duplicate_url_observations']},ensure_ascii=False))
+          if not report['all_50_real_processes_verified']: raise SystemExit(10)
+          PY
+
+      - name: Upload Parallel50 proof and evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-G32-PARALLEL50-SIMULTANEOUS-REAL
+          path: |
+            RLF_G32_PARALLEL50_SIMULTANEOUS_REAL.json
+            work/out/*.json
+          retention-days: 7
