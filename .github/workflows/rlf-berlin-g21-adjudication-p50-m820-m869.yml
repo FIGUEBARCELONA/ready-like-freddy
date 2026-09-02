@@ -1,0 +1,217 @@
+name: RLF Berlin G21 adjudication Parallel50 M820-M869
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-berlin-g21-adjudication-p50-m820-m869.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Build exclusive work units and run 50 real workers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p p50/ready p50/out p50/work p50/claims
+          python3 -m pip install -q shapely
+          curl -fsSL 'https://raw.githubusercontent.com/euraf/eu-nuts-lau/main/v1/DE/DE300_LAU_RG_01M_2024_4326.geojson' -o berlin.geojson
+
+          python3 - <<'PYBUILD'
+          import hashlib,json,math,re,unicodedata,urllib.request
+          from shapely.geometry import Point,box,mapping,shape
+
+          geom=shape(json.load(open('berlin.geojson'))['features'][0]['geometry'])
+          minx,miny,maxx,maxy=geom.bounds
+          dx=(maxx-minx)/3;dy=(maxy-miny)/3
+          bbox=[minx,miny+dy,minx+dx,miny+2*dy]
+          clip=geom.intersection(box(*bbox))
+          q='''[out:json][timeout:80];(nwr[shop=second_hand]({s},{w},{n},{e});nwr[shop=clothes][second_hand]({s},{w},{n},{e});nwr[shop=clothes][clothes=second_hand]({s},{w},{n},{e}););out center tags;'''.format(s=bbox[1],w=bbox[0],n=bbox[3],e=bbox[2])
+          req=urllib.request.Request('https://overpass-api.de/api/interpreter',data=q.encode(),headers={'User-Agent':'RLF-census/1.0'})
+          with urllib.request.urlopen(req,timeout=95) as r:data=json.load(r)
+
+          raw=[]
+          for el in data.get('elements',[]):
+            lat=el.get('lat') or (el.get('center') or {}).get('lat');lon=el.get('lon') or (el.get('center') or {}).get('lon')
+            if lat is None or lon is None or not clip.covers(Point(lon,lat)):continue
+            raw.append({'type':el.get('type'),'id':el.get('id'),'lat':lat,'lon':lon,'tags':el.get('tags',{})})
+          def norm(s):
+            s=unicodedata.normalize('NFKD',(s or '').lower());s=''.join(c for c in s if not unicodedata.combining(c));return re.sub('[^a-z0-9]+','',s)
+          groups={}
+          for x in raw:
+            nm=x['tags'].get('name');key=norm(nm) if nm else f"unnamed:{x['type']}:{x['id']}";groups.setdefault(key,[]).append(x)
+          ordered=sorted(groups.items(),key=lambda kv:((kv[1][0]['tags'].get('name') or 'zzzz').lower(),kv[0]))
+
+          buckets=[[] for _ in range(21)]
+          for i,(key,records) in enumerate(ordered):
+            buckets[i%21].append({'key':key,'name':records[0]['tags'].get('name'),'records':records})
+          for i,b in enumerate(buckets):json.dump({'lane':f'M{820+i:03d}','kind':'identity','bucket':b},open(f'p50/work/M{820+i:03d}.json','w'),ensure_ascii=False,indent=2)
+
+          oxfam={
+            'lane':'M841','kind':'operator','canonical_identity_key':'oxfam-deutschland-shops-ggmbh',
+            'operator':'Oxfam Deutschland Shops gGmbH',
+            'urls':['https://shops.oxfam.de/shops/berlin-charlottenburg','https://shops.oxfam.de/shops/berlin-spandau','https://shops.oxfam.de/shops/berlin-wilmersdorf','https://shops.oxfam.de/impressum']
+          }
+          json.dump(oxfam,open('p50/work/M841.json','w'),ensure_ascii=False,indent=2)
+
+          cols,rows=7,4
+          sx=(bbox[2]-bbox[0])/cols;sy=(bbox[3]-bbox[1])/rows
+          for idx in range(28):
+            col=idx%cols;row=idx//cols
+            sb=[bbox[0]+col*sx,bbox[1]+row*sy,bbox[0]+(col+1)*sx,bbox[1]+(row+1)*sy]
+            task={'lane':f'M{842+idx:03d}','kind':'residual_microcell','cell_index':idx,'grid':[cols,rows],'bbox':sb,'parent_bbox':bbox}
+            json.dump(task,open(f'p50/work/M{842+idx:03d}.json','w'),indent=2)
+
+          manifest={'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G21_REPAIR','packet':'M820-M869','parent_bbox':bbox,'raw_records':len(raw),'identity_groups':len(ordered),'identity_owner_lanes':21,'operator_owner_lanes':1,'residual_microcells':28,'work_units':50,'known_keys':[k for k,_ in ordered]}
+          manifest['sha256']=hashlib.sha256(json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          json.dump(manifest,open('RLF_G21_M820_M869_WORK_MANIFEST.json','w'),indent=2)
+          json.dump({'type':'FeatureCollection','features':[{'type':'Feature','properties':{'zone':'DE_11000000_G21_REPAIR'},'geometry':mapping(clip)}]},open('BERLIN_G21_REPAIR_CLIP.geojson','w'))
+          print(json.dumps({k:manifest[k] for k in ['raw_records','identity_groups','identity_owner_lanes','operator_owner_lanes','residual_microcells','work_units','sha256']}))
+          PYBUILD
+
+          cat > p50/worker.py <<'PYWORKER'
+          import hashlib,html,json,os,re,sys,time,urllib.parse,urllib.request
+
+          lane=sys.argv[1];task=json.load(open(f'p50/work/{lane}.json'));open(f'p50/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+50
+          while not os.path.exists('p50/GO'):
+            if time.time()>deadline:raise SystemExit('barrier timeout')
+            time.sleep(.02)
+          time.sleep((int(hashlib.sha256(lane.encode()).hexdigest()[:4],16)%1400)/1000)
+
+          def clean_text(body,limit=9000):
+            body=re.sub(r'<script\b[^>]*>.*?</script>',' ',body,flags=re.I|re.S);body=re.sub(r'<style\b[^>]*>.*?</style>',' ',body,flags=re.I|re.S)
+            return html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',body)))[:limit]
+
+          def fetch(url):
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Chrome/151','Accept-Language':'de-DE,de;q=0.9,en;q=0.6'})
+              with urllib.request.urlopen(req,timeout=28) as r:
+                body=r.read(240000).decode('utf-8','replace');return {'url':url,'status':getattr(r,'status',200),'final_url':r.geturl(),'text':clean_text(body)}
+            except Exception as e:return {'url':url,'error':type(e).__name__+': '+str(e)}
+
+          def search(query,engine):
+            enc=urllib.parse.quote_plus(query);url=f'https://www.bing.com/search?q={enc}&count=25' if engine=='bing' else f'https://html.duckduckgo.com/html/?q={enc}'
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Chrome/151','Accept-Language':'de-DE,de;q=0.9'})
+              with urllib.request.urlopen(req,timeout=30) as r:body=r.read().decode('utf-8','replace');status=getattr(r,'status',200)
+              links=[];seen=set()
+              for href in re.findall(r'href=["\']([^"\']+)["\']',body,re.I):
+                href=html.unescape(href)
+                if href.startswith('//'):href='https:'+href
+                if 'uddg=' in href:
+                  try:href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                  except Exception:pass
+                if not href.startswith('http'):continue
+                host=(urllib.parse.urlparse(href).hostname or '').lower()
+                if any(x in host for x in ['bing.com','microsoft.com','duckduckgo.com']):continue
+                href=href.split('#',1)[0]
+                if href in seen:continue
+                seen.add(href);links.append(href)
+                if len(links)>=15:break
+              return {'query':query,'engine':engine,'status':status,'links':links}
+            except Exception as e:return {'query':query,'engine':engine,'error':type(e).__name__+': '+str(e),'links':[]}
+
+          def claim(url):
+            key=hashlib.sha256(url.encode()).hexdigest();path=f'p50/claims/{key}'
+            try:
+              fd=os.open(path,os.O_CREAT|os.O_EXCL|os.O_WRONLY);os.write(fd,lane.encode());os.close(fd);return {'url':url,'owner':lane,'accepted':True}
+            except FileExistsError:
+              owner=open(path).read();return {'url':url,'owner':owner,'accepted':False,'reason':'ATOMIC_GLOBAL_DUPLICATE'}
+
+          out={'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G21_REPAIR','packet':'M820-M869','lane':lane,'pid':os.getpid(),'kind':task['kind'],'task':task,'started_after_barrier':time.time()}
+          found=[];direct=[]
+          if task['kind']=='identity':
+            items=[]
+            for n,c in enumerate(task['bucket']):
+              name=c.get('name');queries=[]
+              if name:
+                queries=[search(f'"{name}" Berlin ("second hand" OR secondhand OR gebraucht OR vintage OR kleidung)', 'bing'),search(f'"{name}" Berlin secondhand Impressum', 'ddg')]
+              urls=[]
+              for rec in c.get('records',[]):
+                tags=rec.get('tags',{})
+                for field in ['website','contact:website','url']:
+                  if tags.get(field):urls.append(tags[field])
+              urls=list(dict.fromkeys(urls));pages=[fetch(u) for u in urls]
+              for q in queries:
+                for u in q.get('links',[]):found.append(claim(u))
+              for p in pages:
+                if p.get('final_url'):found.append(claim(p['final_url']))
+              items.append({'candidate':c,'queries':queries,'direct_pages':pages})
+            out['items']=items
+          elif task['kind']=='operator':
+            direct=[fetch(u) for u in task['urls']]
+            for p in direct:
+              found.append(claim(p.get('final_url') or p['url']))
+            out['direct_pages']=direct
+          else:
+            b=task['bbox'];s,w,n,e=b[1],b[0],b[3],b[2]
+            q='''[out:json][timeout:45];(nwr[second_hand=yes]({s},{w},{n},{e});nwr[shop=charity]({s},{w},{n},{e});nwr[social_facility=clothing_bank]({s},{w},{n},{e});nwr[shop=clothes][clothes=used]({s},{w},{n},{e}););out center tags;'''.format(s=s,w=w,n=n,e=e)
+            try:
+              req=urllib.request.Request('https://overpass-api.de/api/interpreter',data=q.encode(),headers={'User-Agent':'RLF-census/1.0'})
+              with urllib.request.urlopen(req,timeout=55) as r:data=json.load(r)
+              els=[]
+              cols,rows=task['grid'];pb=task['parent_bbox'];sx=(pb[2]-pb[0])/cols;sy=(pb[3]-pb[1])/rows
+              for el in data.get('elements',[]):
+                lat=el.get('lat') or (el.get('center') or {}).get('lat');lon=el.get('lon') or (el.get('center') or {}).get('lon')
+                if lat is None or lon is None:continue
+                col=min(cols-1,max(0,int((lon-pb[0])/sx)));row=min(rows-1,max(0,int((lat-pb[1])/sy)))
+                if row*cols+col==task['cell_index']:els.append(el)
+              out['complementary_osm']=els
+            except Exception as ex:out['complementary_osm_error']=type(ex).__name__+': '+str(ex);out['complementary_osm']=[]
+            center=((w+e)/2,(s+n)/2)
+            queries=[search(f'Berlin second hand kleidung shop near {center[1]:.5f} {center[0]:.5f}','bing'),search(f'Berlin sozialkaufhaus vintage mode near {center[1]:.5f} {center[0]:.5f}','ddg')]
+            for qq in queries:
+              for u in qq.get('links',[]):found.append(claim(u))
+            out['queries']=queries
+          out['url_claims']=found;out['finished']=time.time();json.dump(out,open(f'p50/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          PYWORKER
+
+          pids=()
+          for i in $(seq 820 869); do lane=$(printf 'M%03d' "$i"); python3 p50/worker.py "$lane" & pids+=("$!"); done
+          deadline=$((SECONDS+50))
+          while true; do ready=$(find p50/ready -type f | wc -l); [ "$ready" -eq 50 ] && break; [ "$SECONDS" -ge "$deadline" ] && exit 7; sleep .05; done
+          alive=0; for p in "${pids[@]}"; do kill -0 "$p" 2>/dev/null && alive=$((alive+1)); done
+          echo "BARRIER_READY=$ready"; echo "SIMULTANEOUS_ALIVE=$alive"; [ "$alive" -eq 50 ] || exit 8
+          date +%s.%N > p50/GO
+          fail=0; for p in "${pids[@]}"; do wait "$p" || fail=$((fail+1)); done
+          echo "WORKER_PROCESS_FAILURES=$fail"; [ "$fail" -eq 0 ] || exit 9
+
+      - name: AAA partition ownership and evidence audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYAUDIT'
+          import glob,hashlib,json
+          rows=[json.load(open(f)) for f in sorted(glob.glob('p50/out/M*.json'))]
+          manifest=json.load(open('RLF_G21_M820_M869_WORK_MANIFEST.json'))
+          identity=[];operator=[];cells=[];claims=[]
+          for row in rows:
+            if row['kind']=='identity':identity.extend(x['candidate']['key'] for x in row.get('items',[]))
+            elif row['kind']=='operator':operator.append(row['task']['canonical_identity_key'])
+            else:cells.append(row['task']['cell_index'])
+            claims.extend(row.get('url_claims',[]))
+          accepted=[x for x in claims if x.get('accepted')];dups=[x for x in claims if not x.get('accepted')]
+          report={'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G21_REPAIR','packet':'M820-M869','workers':len(rows),'unique_pids':len({r['pid'] for r in rows}),'unique_lanes':len({r['lane'] for r in rows}),'simultaneous_alive':50,'process_failures':0,'manifest_identity_groups':manifest['identity_groups'],'assigned_identity_groups':len(identity),'unique_assigned_identity_groups':len(set(identity)),'operator_owners':operator,'residual_cells':len(cells),'unique_residual_cells':len(set(cells)),'accepted_unique_urls':len(accepted),'atomic_duplicate_urls':len(dups),'identity_partition_complete':len(identity)==manifest['identity_groups']==len(set(identity)),'residual_partition_complete':len(cells)==28==len(set(cells)) and set(cells)==set(range(28)),'rows':rows}
+          report['sha256']=hashlib.sha256(json.dumps(report,sort_keys=True,separators=(',',':')).encode()).hexdigest();json.dump(report,open('RLF_BERLIN_G21_ADJUDICATION_M820_M869.json','w'),ensure_ascii=False,indent=2)
+          summary={k:report[k] for k in ['workers','unique_pids','unique_lanes','simultaneous_alive','process_failures','manifest_identity_groups','assigned_identity_groups','unique_assigned_identity_groups','operator_owners','residual_cells','unique_residual_cells','accepted_unique_urls','atomic_duplicate_urls','identity_partition_complete','residual_partition_complete','sha256']};print(json.dumps(summary))
+          assert report['workers']==report['unique_pids']==report['unique_lanes']==50
+          assert report['identity_partition_complete'] and report['residual_partition_complete']
+          PYAUDIT
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-BERLIN-G21-ADJUDICATION-P50-M820-M869
+          path: |
+            BERLIN_G21_REPAIR_CLIP.geojson
+            RLF_G21_M820_M869_WORK_MANIFEST.json
+            RLF_BERLIN_G21_ADJUDICATION_M820_M869.json
+            p50/out/*.json
+          retention-days: 7
