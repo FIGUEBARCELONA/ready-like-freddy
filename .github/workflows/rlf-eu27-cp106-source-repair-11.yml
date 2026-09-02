@@ -1,0 +1,140 @@
+name: RLF EU27 CP106 selective source repair 11
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp106-source-repair-11.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repair11:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate selective retry manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p repair/ready repair/out repair/raw repair/pids
+          python3 - <<'PY'
+          import json
+          d=json.load(open('state/rlf-eu27-cp106-source-repair-11.json'))
+          assert d['source_run_id']==33694131682
+          assert d['canonical_delta']==0
+          assert d['trigger']=='TECHNICAL_RETRY_SOURCE_FAILURE'
+          assert len(d['failed_lanes'])==11
+          assert len({x['lane_id'] for x in d['failed_lanes']})==11
+          assert len(d['forbidden_lanes'])==16
+          assert set(x['lane_id'] for x in d['failed_lanes']).isdisjoint(d['forbidden_lanes'])
+          print('selective-retry manifest PASS')
+          PY
+          cat > repair/worker.py <<'PY'
+          import sys,json,os,time,hashlib,urllib.request,urllib.parse
+          from urllib.parse import urlparse
+          lane_id=sys.argv[1]
+          seed=json.load(open('state/rlf-eu27-parallel27-activation-seed-cp105.json'))
+          repair=json.load(open('state/rlf-eu27-cp106-source-repair-11.json'))
+          allowed={x['lane_id']:x for x in repair['failed_lanes']}
+          if lane_id not in allowed: raise SystemExit('FORBIDDEN_SUCCESSFUL_LANE_RETRY')
+          lane=next(x for x in seed['lanes'] if x['lane_id']==lane_id)
+          spec=allowed[lane_id]
+          assert lane['iso']==spec['iso'] and lane['next_vector']==spec['vector']
+          iso=lane['iso']; vector=lane['next_vector']
+          open(f'repair/ready/{lane_id}','w').write(str(os.getpid()))
+          deadline=time.time()+30
+          while not os.path.exists('repair/START'):
+              if time.time()>deadline: raise SystemExit('barrier timeout')
+              time.sleep(.03)
+          if vector=='CLOTHES_YES': body='nwr["shop"="clothes"]["second_hand"="yes"](area.country);'
+          elif vector=='CLOTHES_ONLY': body='nwr["shop"="clothes"]["second_hand"="only"](area.country);'
+          elif vector=='OTHER_SECONDHAND': body='nwr["second_hand"~"yes|only"](area.country);'
+          else: raise SystemExit('unexpected repair vector')
+          query=f'''[out:json][timeout:40];area["ISO3166-1"="{iso}"][admin_level=2]->.country;{body}out center tags qt;'''
+          endpoints=repair['new_endpoint_order']
+          attempts=[]; payload=None; used=None; started=time.time()
+          for ep in endpoints:
+              try:
+                  req=urllib.request.Request(ep,data=urllib.parse.urlencode({'data':query}).encode(),headers={'User-Agent':'RLF-EU27-AAA/1.1','Content-Type':'application/x-www-form-urlencoded'})
+                  with urllib.request.urlopen(req,timeout=48) as r: raw=r.read(); status=getattr(r,'status',200)
+                  obj=json.loads(raw)
+                  if not isinstance(obj.get('elements'),list): raise ValueError('missing elements')
+                  payload=obj; used=ep; attempts.append({'endpoint':ep,'status':status,'ok':True}); break
+              except Exception as ex:
+                  attempts.append({'endpoint':ep,'ok':False,'error':type(ex).__name__+': '+str(ex)[:240]})
+                  time.sleep(.4)
+          elements=[] if payload is None else payload.get('elements',[])
+          rows=[]; seen=set()
+          for el in elements:
+              typ=str(el.get('type')); oid=str(el.get('id')); key=f'{typ}:{oid}'
+              if key in seen: continue
+              seen.add(key); tags=el.get('tags') or {}
+              if vector=='OTHER_SECONDHAND' and tags.get('shop') in ('second_hand','clothes'): continue
+              website=tags.get('website') or tags.get('contact:website'); domain=None
+              if website:
+                  try:
+                      u=website if '://' in website else 'https://'+website
+                      domain=(urlparse(u).hostname or '').lower().removeprefix('www.') or None
+                  except Exception: pass
+              lat=el.get('lat'); lon=el.get('lon')
+              if lat is None and isinstance(el.get('center'),dict): lat=el['center'].get('lat'); lon=el['center'].get('lon')
+              rows.append({'osm_key':key,'name':tags.get('name'),'website':website,'domain':domain,'lat':lat,'lon':lon,'tags':tags})
+          result={'schema':'RLF_EU27_CP106_SELECTIVE_REPAIR_RESULT_V1','source_run_id':repair['source_run_id'],'lane_id':lane_id,'iso':iso,'country':lane['country'],'owner_lock':lane['owner_lock'],'vector':vector,'technical_retry_trigger':repair['trigger'],'query_sha256':hashlib.sha256(query.encode()).hexdigest(),'endpoint_used':used,'attempts':attempts,'source_ok':payload is not None,'duration_seconds':round(time.time()-started,3),'candidate_count_raw':len(elements),'candidate_count_unique_after_lane_dedup':len(rows),'candidates':rows,'canonical_delta':0,'promotion_prohibited':True,'exhaustion_credit':0,'observed_at_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'pid':os.getpid()}
+          json.dump(result,open(f'repair/out/{lane_id}_{iso}.json','w'),ensure_ascii=False,indent=2)
+          if payload is not None: json.dump(payload,open(f'repair/raw/{lane_id}_{iso}.json','w'),ensure_ascii=False)
+          PY
+      - name: Execute only 11 failed lanes simultaneously
+        shell: bash
+        run: |
+          set -euo pipefail
+          lanes=(L03 L09 L10 L13 L17 L19 L20 L23 L24 L25 L26)
+          pids=()
+          for lane in "${lanes[@]}"; do python3 repair/worker.py "$lane" >"repair/${lane}.log" 2>&1 & pids+=("$!"); echo "$!" >"repair/pids/${lane}"; done
+          for _ in $(seq 1 500); do [ "$(find repair/ready -type f | wc -l)" -eq 11 ] && break; sleep .05; done
+          ready=$(find repair/ready -type f | wc -l); [ "$ready" -eq 11 ] || exit 1
+          alive=0; for pid in "${pids[@]}"; do kill -0 "$pid" 2>/dev/null && alive=$((alive+1)); done
+          echo "$alive" > repair/simultaneous_alive.txt; [ "$alive" -eq 11 ] || exit 1
+          touch repair/START
+          failures=0; for pid in "${pids[@]}"; do wait "$pid" || failures=$((failures+1)); done
+          echo "$failures" > repair/process_failures.txt; [ "$failures" -eq 0 ] || { cat repair/L*.log; exit 1; }
+      - name: Consolidate selective repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,glob,hashlib,collections
+          rows=[json.load(open(f)) for f in sorted(glob.glob('repair/out/L*_*.json'))]
+          assert len(rows)==11
+          assert len({r['lane_id'] for r in rows})==11
+          assert int(open('repair/simultaneous_alive.txt').read())==11
+          assert int(open('repair/process_failures.txt').read())==0
+          assert all(r['canonical_delta']==0 and r['promotion_prohibited'] and r['exhaustion_credit']==0 for r in rows)
+          ok=[r for r in rows if r['source_ok']]; fail=[r for r in rows if not r['source_ok']]
+          domains=collections.defaultdict(set); osm=collections.defaultdict(set)
+          for r in rows:
+              for c in r['candidates']:
+                  osm[c['osm_key']].add(r['lane_id'])
+                  if c.get('domain'): domains[c['domain']].add(r['lane_id'])
+          report={'schema':'RLF_EU27_CP106_SELECTIVE_REPAIR_AUDIT_V1','source_run_id':33694131682,'technical_retry_trigger':'TECHNICAL_RETRY_SOURCE_FAILURE','lanes_retried':11,'simultaneous_alive':11,'process_failures':0,'source_ok':len(ok),'source_failed':len(fail),'successful_lane_ids':[r['lane_id'] for r in ok],'failed_lane_ids':[r['lane_id'] for r in fail],'canonical_delta':0,'exhaustion_credit':0,'cross_lane_osm_collisions':{k:sorted(v) for k,v in osm.items() if len(v)>1},'cross_lane_domain_collisions':{k:sorted(v) for k,v in domains.items() if len(v)>1},'quality_gate':'PASS' if len(ok)==11 else 'PARTIAL_SOURCE_AVAILABILITY'}
+          report['sha256']=hashlib.sha256(json.dumps(report,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          json.dump(report,open('RLF_EU27_CP106_SELECTIVE_REPAIR_AUDIT.json','w'),indent=2)
+          json.dump(rows,open('RLF_EU27_CP106_SELECTIVE_REPAIR_RESULTS.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Upload repair evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP106-SOURCE-REPAIR-11
+          path: |
+            RLF_EU27_CP106_SELECTIVE_REPAIR_AUDIT.json
+            RLF_EU27_CP106_SELECTIVE_REPAIR_RESULTS.json
+            repair/out/*.json
+            repair/raw/*.json
+            repair/*.log
+            repair/simultaneous_alive.txt
+            repair/process_failures.txt
+          retention-days: 14
