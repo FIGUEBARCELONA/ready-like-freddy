@@ -20,9 +20,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo 'POST /api/run'
+          echo 'POST /api/sweep50'
           code=$(curl -sS -o /tmp/body.json -w '%{http_code}' \
-            -X POST 'https://rlf-parallel50-runtime.vercel.app/api/run' \
+            -X POST 'https://rlf-parallel50-runtime.vercel.app/api/sweep50' \
             -H 'content-type: application/json' \
             --data '{}')
           echo "HTTP=$code"
@@ -38,9 +38,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for i in $(seq 1 20); do
+          for i in $(seq 1 30); do
             echo "--- poll $i ---"
             curl -fsS 'https://rlf-parallel50-runtime.vercel.app/api/status' || true
             echo
-            sleep 5
+            sleep 4
           done
