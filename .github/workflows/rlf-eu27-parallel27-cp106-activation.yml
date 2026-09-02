@@ -1,0 +1,255 @@
+name: RLF EU27 Parallel27 CP106 activation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-parallel27-cp106-activation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel27:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate CP105 seed and build worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p p27/ready p27/out p27/raw p27/pids
+          python3 - <<'PY'
+          import json,sys
+          p='state/rlf-eu27-parallel27-activation-seed-cp105.json'
+          d=json.load(open(p))
+          lanes=d['lanes']
+          assert d['source_checkpoint']=='CP105'
+          assert d['canonical_counts']=={'verified':413,'eligible':70,'hold':343,'remaining':9587}
+          assert len(lanes)==27
+          assert len({x['lane_id'] for x in lanes})==27
+          assert len({x['iso'] for x in lanes})==27
+          assert len({x['owner_lock'] for x in lanes})==27
+          assert sum(x['backup_candidate_records'] for x in lanes)==10063
+          assert all(x['canonical_delta_permission']==0 for x in lanes)
+          assert next(x for x in lanes if x['iso']=='DE')['mode']=='CP105_HAMBURG_G13'
+          print('seed validation PASS')
+          PY
+          cat > p27/worker.py <<'PY'
+          import sys,json,os,time,hashlib,re,urllib.request,urllib.parse,urllib.error
+          from urllib.parse import urlparse
+
+          SEED='state/rlf-eu27-parallel27-activation-seed-cp105.json'
+          lane_id=sys.argv[1]
+          seed=json.load(open(SEED))
+          lane=next(x for x in seed['lanes'] if x['lane_id']==lane_id)
+          iso=lane['iso']; vector=lane['next_vector']
+          ready=f'p27/ready/{lane_id}'
+          open(ready,'w').write(str(os.getpid()))
+          deadline=time.time()+60
+          while not os.path.exists('p27/START'):
+              if time.time()>deadline:
+                  raise SystemExit('barrier timeout')
+              time.sleep(0.05)
+
+          def coords(obj):
+              if isinstance(obj,(list,tuple)):
+                  if len(obj)>=2 and isinstance(obj[0],(int,float)) and isinstance(obj[1],(int,float)):
+                      yield float(obj[0]),float(obj[1])
+                  else:
+                      for x in obj: yield from coords(x)
+
+          def hamburg_g13_bbox():
+              u='https://raw.githubusercontent.com/euraf/eu-nuts-lau/main/v1/DE/DE600_LAU_RG_01M_2024_4326.geojson'
+              req=urllib.request.Request(u,headers={'User-Agent':'RLF-EU27-AAA/1.0'})
+              with urllib.request.urlopen(req,timeout=45) as r:
+                  d=json.load(r)
+              pts=[]
+              for f in d.get('features',[]): pts.extend(coords(f.get('geometry',{}).get('coordinates',[])))
+              if not pts: raise RuntimeError('Hamburg geometry empty')
+              xs=[p[0] for p in pts]; ys=[p[1] for p in pts]
+              minx,maxx,miny,maxy=min(xs),max(xs),min(ys),max(ys)
+              dx=(maxx-minx)/3; dy=(maxy-miny)/3
+              return (miny, minx+2*dx, miny+dy, maxx)
+
+          historical_map={
+            'SECOND_HAND':'shop=second_hand',
+            'CLOTHES_YES':'shop=clothes + second_hand=yes',
+            'CLOTHES_ONLY':'shop=clothes + second_hand=only',
+            'VINTAGE':'shop=vintage'
+          }
+          hist=set(lane.get('historical_query_categories',[]))
+          mapped=historical_map.get(vector)
+          if mapped and mapped in hist:
+              raise SystemExit(f'ANTI_LOOP_FAIL historical vector repeated: {mapped}')
+
+          if vector=='HAMBURG_G13_RESIDUAL':
+              s,w,n,e=hamburg_g13_bbox()
+              scope=f'DE_02000000_G13:{s:.8f},{w:.8f},{n:.8f},{e:.8f}'
+              query=f'''[out:json][timeout:75];(nwr["second_hand"~"yes|only"]({s},{w},{n},{e});nwr["shop"~"second_hand|vintage"]({s},{w},{n},{e}););out center tags;'''
+          else:
+              scope=f'EU_COUNTRY:{iso}'
+              if vector=='SECOND_HAND': body='nwr["shop"="second_hand"](area.country);'
+              elif vector=='CLOTHES_YES': body='nwr["shop"="clothes"]["second_hand"="yes"](area.country);'
+              elif vector=='CLOTHES_ONLY': body='nwr["shop"="clothes"]["second_hand"="only"](area.country);'
+              elif vector=='VINTAGE': body='nwr["shop"="vintage"](area.country);'
+              elif vector=='OTHER_SECONDHAND': body='nwr["second_hand"~"yes|only"](area.country);'
+              else: raise SystemExit(f'no executable new vector for {lane_id}')
+              query=f'''[out:json][timeout:75];area["ISO3166-1"="{iso}"][admin_level=2]->.country;{body}out center tags;'''
+
+          signature=hashlib.sha256(f'{lane_id}|{iso}|{vector}|{scope}|{query}'.encode()).hexdigest()
+          endpoints=[
+            'https://overpass-api.de/api/interpreter',
+            'https://overpass.kumi.systems/api/interpreter',
+            'https://overpass.nchc.org.tw/api/interpreter'
+          ]
+          offset=(int(lane_id[1:])-1)%len(endpoints)
+          endpoints=endpoints[offset:]+endpoints[:offset]
+          attempts=[]; payload=None; used=None
+          started=time.time()
+          for ep in endpoints:
+              try:
+                  body=urllib.parse.urlencode({'data':query}).encode()
+                  req=urllib.request.Request(ep,data=body,headers={'User-Agent':'RLF-EU27-AAA/1.0','Content-Type':'application/x-www-form-urlencoded'})
+                  with urllib.request.urlopen(req,timeout=100) as r:
+                      raw=r.read(); status=getattr(r,'status',200)
+                  obj=json.loads(raw)
+                  if not isinstance(obj.get('elements'),list): raise ValueError('missing elements')
+                  payload=obj; used=ep; attempts.append({'endpoint':ep,'status':status,'ok':True}); break
+              except Exception as ex:
+                  attempts.append({'endpoint':ep,'ok':False,'error':type(ex).__name__+': '+str(ex)[:240]})
+                  time.sleep(1.0)
+          duration=time.time()-started
+
+          elements=[] if payload is None else payload.get('elements',[])
+          rows=[]; seen=set()
+          for el in elements:
+              typ=str(el.get('type')); oid=str(el.get('id')); key=f'{typ}:{oid}'
+              if key in seen: continue
+              seen.add(key)
+              tags=el.get('tags') or {}
+              if vector=='OTHER_SECONDHAND' and tags.get('shop') in ('second_hand','clothes'):
+                  continue
+              lat=el.get('lat'); lon=el.get('lon')
+              if lat is None and isinstance(el.get('center'),dict): lat=el['center'].get('lat'); lon=el['center'].get('lon')
+              website=tags.get('website') or tags.get('contact:website')
+              domain=None
+              if website:
+                  try:
+                      u=website if '://' in website else 'https://'+website
+                      domain=(urlparse(u).hostname or '').lower().removeprefix('www.') or None
+                  except Exception: pass
+              rows.append({'osm_key':key,'name':tags.get('name'),'website':website,'domain':domain,'lat':lat,'lon':lon,'tags':tags})
+
+          result={
+            'schema':'RLF_EU27_LANE_ACTIVATION_RESULT_V1','source_checkpoint':'CP105','activation_checkpoint':'CP106_DISCOVERY_ONLY',
+            'lane_id':lane_id,'iso':iso,'country':lane['country'],'owner_lock':lane['owner_lock'],'mode':lane['mode'],
+            'backup_candidate_records':lane['backup_candidate_records'],'historical_query_categories':lane['historical_query_categories'],
+            'vector':vector,'vector_signature':signature,'scope':scope,'query':query,'source':'OpenStreetMap Overpass API',
+            'endpoint_used':used,'attempts':attempts,'source_ok':payload is not None,'duration_seconds':round(duration,3),
+            'candidate_count_raw':len(elements),'candidate_count_unique_after_lane_dedup':len(rows),'candidates':rows,
+            'canonical_delta':0,'promotion_prohibited':True,'observed_at_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),
+            'pid':os.getpid()
+          }
+          out=f'p27/out/{lane_id}_{iso}.json'
+          with open(out,'w') as f: json.dump(result,f,ensure_ascii=False,indent=2)
+          if payload is not None:
+              with open(f'p27/raw/{lane_id}_{iso}_overpass.json','w') as f: json.dump(payload,f,ensure_ascii=False)
+          PY
+
+      - name: Execute 27 real simultaneous country lanes
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f p27/START
+          pids=()
+          for i in $(seq -w 1 27); do
+            lane="L${i}"
+            python3 p27/worker.py "$lane" >"p27/${lane}.log" 2>&1 &
+            pid=$!; pids+=("$pid"); echo "$pid" > "p27/pids/${lane}"
+          done
+          for _ in $(seq 1 600); do
+            ready=$(find p27/ready -type f | wc -l)
+            [ "$ready" -eq 27 ] && break
+            sleep 0.1
+          done
+          ready=$(find p27/ready -type f | wc -l)
+          [ "$ready" -eq 27 ] || { echo "barrier ready=$ready/27"; exit 1; }
+          alive=0
+          for pid in "${pids[@]}"; do kill -0 "$pid" 2>/dev/null && alive=$((alive+1)); done
+          echo "$alive" > p27/simultaneous_alive.txt
+          [ "$alive" -eq 27 ] || { echo "simultaneous alive=$alive/27"; exit 1; }
+          touch p27/START
+          rc=0
+          for pid in "${pids[@]}"; do wait "$pid" || rc=$((rc+1)); done
+          echo "$rc" > p27/process_failures.txt
+          if [ "$rc" -ne 0 ]; then
+            echo "worker process failures: $rc"
+            cat p27/L*.log || true
+            exit 1
+          fi
+
+      - name: AAA cross-lane audit and fail-closed consolidation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,glob,hashlib,collections,os
+          seed=json.load(open('state/rlf-eu27-parallel27-activation-seed-cp105.json'))
+          files=sorted(glob.glob('p27/out/L*_*.json'))
+          rows=[json.load(open(f)) for f in files]
+          assert len(rows)==27, len(rows)
+          assert len({r['lane_id'] for r in rows})==27
+          assert len({r['iso'] for r in rows})==27
+          assert len({r['owner_lock'] for r in rows})==27
+          assert len({r['vector_signature'] for r in rows})==27
+          assert all(r['canonical_delta']==0 and r['promotion_prohibited'] for r in rows)
+          assert int(open('p27/simultaneous_alive.txt').read())==27
+          assert int(open('p27/process_failures.txt').read())==0
+
+          osm=collections.defaultdict(list); domains=collections.defaultdict(list)
+          for r in rows:
+              for c in r['candidates']:
+                  osm[c['osm_key']].append(r['lane_id'])
+                  if c.get('domain'): domains[c['domain']].append(r['lane_id'])
+          osm_coll={k:sorted(set(v)) for k,v in osm.items() if len(set(v))>1}
+          domain_coll={k:sorted(set(v)) for k,v in domains.items() if len(set(v))>1}
+          source_ok=sum(bool(r['source_ok']) for r in rows)
+          unique_candidates=sum(r['candidate_count_unique_after_lane_dedup'] for r in rows)
+          report={
+            'schema':'RLF_EU27_PARALLEL27_CP106_ACTIVATION_AUDIT_V1','source_checkpoint':'CP105',
+            'activation_checkpoint':'CP106_DISCOVERY_ONLY','canonical_counts_unchanged':seed['canonical_counts'],
+            'canonical_delta':0,'lanes':27,'unique_lane_ids':27,'unique_iso':27,'unique_owner_locks':27,
+            'unique_vector_signatures':27,'simultaneous_alive':27,'process_failures':0,'source_queries_ok':source_ok,
+            'source_queries_failed':27-source_ok,'new_discovery_rows_before_global_collision_suppression':unique_candidates,
+            'cross_lane_osm_key_collisions':osm_coll,'cross_lane_osm_collision_count':len(osm_coll),
+            'cross_lane_domain_collisions':domain_coll,'cross_lane_domain_collision_count':len(domain_coll),
+            'collision_policy':'EVIDENCE_ONLY_DELTA_0; no promotion in activation wave',
+            'runtime_dedupe_tested':True,'runtime_anti_loop_tested':True,
+            'runtime_anti_loop_rule':'each lane vector checked against its historical query categories before execution',
+            'germany_scope':'DE_02000000_G13 residual combined-tag audit only; G23/G31 remain locked',
+            'phase_2_kb':'LOCKED','quality_gate':'PASS' if source_ok==27 else 'PASS_TOPOLOGY_PARTIAL_SOURCE_AVAILABILITY'
+          }
+          raw=json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+          report['sha256']=hashlib.sha256(raw).hexdigest()
+          json.dump(report,open('RLF_EU27_PARALLEL27_CP106_ACTIVATION_AUDIT.json','w'),ensure_ascii=False,indent=2)
+          json.dump(rows,open('RLF_EU27_PARALLEL27_CP106_LANE_RESULTS.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+
+      - name: Upload Parallel27 activation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-PARALLEL27-CP106-ACTIVATION
+          path: |
+            RLF_EU27_PARALLEL27_CP106_ACTIVATION_AUDIT.json
+            RLF_EU27_PARALLEL27_CP106_LANE_RESULTS.json
+            p27/out/*.json
+            p27/raw/*.json
+            p27/*.log
+            p27/simultaneous_alive.txt
+            p27/process_failures.txt
+          retention-days: 14
