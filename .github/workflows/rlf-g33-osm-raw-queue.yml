@@ -1,0 +1,71 @@
+name: RLF G33 authoritative OSM raw queue
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-g33-osm-raw-queue.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  osm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Build exact G33 polygon and fetch OSM candidate universe
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q shapely
+          curl -fsSL 'https://raw.githubusercontent.com/euraf/eu-nuts-lau/main/v1/DE/DE300_LAU_RG_01M_2024_4326.geojson' -o berlin.geojson
+          python3 - <<'PY'
+          import json
+          from shapely.geometry import shape,box,mapping
+          src=json.load(open('berlin.geojson')); g=shape(src['features'][0]['geometry']); minx,miny,maxx,maxy=g.bounds; dx=(maxx-minx)/3;dy=(maxy-miny)/3
+          clip=g.intersection(box(minx+2*dx,miny+2*dy,maxx,maxy))
+          json.dump({'type':'FeatureCollection','features':[{'type':'Feature','properties':{'zone_id':'DE_11000000_G33'},'geometry':mapping(clip)}]},open('g33.geojson','w'))
+          print(*clip.bounds)
+          PY
+          cat > query.overpass <<'Q'
+          [out:json][timeout:60];
+          (
+            nwr["shop"="second_hand"](52.56291683233339,13.536366254666689,52.58978213008393,13.584311174000002);
+            nwr["shop"="charity"](52.56291683233339,13.536366254666689,52.58978213008393,13.584311174000002);
+            nwr["shop"="clothes"]["second_hand"](52.56291683233339,13.536366254666689,52.58978213008393,13.584311174000002);
+            nwr["second_hand"~"yes|only"](52.56291683233339,13.536366254666689,52.58978213008393,13.584311174000002);
+            nwr["name"~"Second.?Hand|secondhand|Vintage|Sozialkaufhaus|Kleider|Trödel|Troedel",i](52.56291683233339,13.536366254666689,52.58978213008393,13.584311174000002);
+          );
+          out center tags;
+          Q
+          ok=0
+          for ep in 'https://overpass-api.de/api/interpreter' 'https://overpass.kumi.systems/api/interpreter'; do
+            if curl -fsS --max-time 80 --data-urlencode data@query.overpass "$ep" -o overpass.json; then ok=1; echo "OVERPASS_ENDPOINT=$ep"; break; fi
+          done
+          [ "$ok" -eq 1 ] || { echo 'OVERPASS_ALL_ENDPOINTS_FAILED'; exit 8; }
+          python3 - <<'PY'
+          import json,hashlib
+          from shapely.geometry import shape,Point
+          clip=shape(json.load(open('g33.geojson'))['features'][0]['geometry'])
+          d=json.load(open('overpass.json')); rows=[]
+          for e in d.get('elements',[]):
+            lon=e.get('lon',e.get('center',{}).get('lon')); lat=e.get('lat',e.get('center',{}).get('lat'))
+            if lon is None or lat is None or not clip.covers(Point(lon,lat)): continue
+            tags=e.get('tags',{}); rows.append({'osm_type':e.get('type'),'osm_id':e.get('id'),'lat':lat,'lon':lon,'tags':tags})
+          rows.sort(key=lambda x:(x['osm_type'],x['osm_id']))
+          obj={'schema_version':'1.0.0','zone_id':'DE_11000000_G33','source':'OpenStreetMap via Overpass','inside_authoritative_clip_only':True,'records':rows,'record_count':len(rows)}
+          raw=json.dumps(obj,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode();obj['sha256']=hashlib.sha256(raw).hexdigest()
+          json.dump(obj,open('G33_RAW_OSM_QUEUE.json','w'),ensure_ascii=False,indent=2)
+          print('G33_RAW_OSM_RECORDS',len(rows))
+          for r in rows: print(r['osm_type'],r['osm_id'],r['lat'],r['lon'],r['tags'])
+          PY
+      - name: Upload OSM queue
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-G33-RAW-OSM-QUEUE
+          path: |
+            g33.geojson
+            G33_RAW_OSM_QUEUE.json
+          retention-days: 7
