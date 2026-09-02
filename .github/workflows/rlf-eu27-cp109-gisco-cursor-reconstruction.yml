@@ -1,0 +1,199 @@
+name: RLF EU27 CP109 GISCO cursor reconstruction
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp109-gisco-cursor-reconstruction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconstruct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download official GISCO LAU 2024 sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p cp109
+          curl --fail --location --retry 4 --retry-delay 2 \
+            'https://gisco-services.ec.europa.eu/distribution/v2/lau/csv/LAU_RG_01M_2024_4326.csv' \
+            -o cp109/LAU_RG_01M_2024_4326.csv
+          curl --fail --location --retry 4 --retry-delay 2 \
+            'https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson' \
+            -o cp109/LAU_RG_01M_2024_4326.geojson
+          sha256sum cp109/LAU_RG_01M_2024_4326.csv cp109/LAU_RG_01M_2024_4326.geojson > cp109/SHA256SUMS.txt
+      - name: Reconstruct top LAU and first physical grid cell
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q shapely
+          python3 - <<'PY'
+          import csv,json,hashlib,math,re
+          from pathlib import Path
+          from shapely.geometry import shape, box
+
+          base=Path('cp109')
+          csv_path=base/'LAU_RG_01M_2024_4326.csv'
+          gj_path=base/'LAU_RG_01M_2024_4326.geojson'
+
+          raw=csv_path.read_text(encoding='utf-8-sig')
+          sample=raw[:5000]
+          dialect=csv.Sniffer().sniff(sample, delimiters=',;\t|')
+          rows=list(csv.DictReader(raw.splitlines(), dialect=dialect))
+          if not rows: raise SystemExit('EMPTY_GISCO_CSV')
+          headers=list(rows[0].keys())
+          print('HEADERS',headers)
+
+          def pick(cands):
+              norm={h.upper():h for h in headers}
+              for c in cands:
+                  if c.upper() in norm:return norm[c.upper()]
+              return None
+          c_country=pick(['CNTR_CODE','CNTR_ID','COUNTRY','COUNTRY_CODE'])
+          c_id=pick(['LAU_ID','GISCO_ID'])
+          c_name=pick(['LAU_NAME','NAME_LATN','NAME'])
+          pop_candidates=[h for h in headers if 'POP' in h.upper() and not any(x in h.upper() for x in ['DENS','CHANGE'])]
+          if not (c_country and c_id and c_name and pop_candidates):
+              raise SystemExit(f'FIELD_DISCOVERY_FAIL country={c_country} id={c_id} name={c_name} pop={pop_candidates}')
+
+          def num(v):
+              if v is None:return None
+              s=str(v).strip().replace(' ','').replace('\u00a0','')
+              if not s:return None
+              # population fields are integers; tolerate decimal representation
+              s=s.replace(',','.') if s.count(',')==1 and s.count('.')==0 else s
+              try:
+                  x=float(s)
+                  return x if math.isfinite(x) and x>=0 else None
+              except:return None
+
+          # Select the population column that best reproduces source-backed control values.
+          controls_pop={
+            ('DE','DE_11000000'):3782202,
+            ('AT','AT_90001'):2005760,
+            ('BE','BE_11002'):544759,
+            ('BG','BG_SOF46'):1286965,
+            ('HR','HR_01333'):767131,
+            ('DK','DK_101'):659350,
+            ('EE','EE_0784'):457572,
+            ('FI','FI_091'):674500,
+            ('SK','SK_529460'):112473,
+            ('SI','SI_061'):298227,
+          }
+          # Build lookup first.
+          lookup={(r.get(c_country),r.get(c_id)):r for r in rows}
+          scores=[]
+          for pc in pop_candidates:
+              exact=0; comparable=0; abs_err=0
+              details=[]
+              for key,want in controls_pop.items():
+                  r=lookup.get(key)
+                  got=num(r.get(pc)) if r else None
+                  if got is not None:
+                      comparable+=1; abs_err+=abs(got-want)
+                      if int(round(got))==want: exact+=1
+                  details.append([key[0],key[1],got,want])
+              scores.append({'column':pc,'exact_controls':exact,'comparable_controls':comparable,'absolute_error':abs_err,'details':details})
+          scores.sort(key=lambda x:(-x['exact_controls'],-x['comparable_controls'],x['absolute_error']))
+          pop_col=scores[0]['column']
+          if scores[0]['exact_controls'] < 8:
+              raise SystemExit('POPULATION_COLUMN_FAILS_CANONICAL_CONTROLS '+json.dumps(scores[:5]))
+
+          # Source namespaces. Spain uses INE for ranking but its known rank1 ID is used only for geometry.
+          eu_source=['DE','AT','BE','BG','HR','DK','SK','SI','EE','FI','EL','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SE','CZ','CY']
+          out=[]
+          for cc in eu_source:
+              cr=[]
+              for r in rows:
+                  if r.get(c_country)!=cc: continue
+                  p=num(r.get(pop_col))
+                  if p is None or p<=0: continue
+                  cr.append((p,r.get(c_id),r.get(c_name)))
+              cr.sort(key=lambda x:(-x[0],str(x[2]),str(x[1])))
+              if not cr: raise SystemExit('NO_POSITIVE_POP_ROWS_'+cc)
+              p,lid,name=cr[0]
+              out.append({'source_country_code':cc,'city_rank':1,'city_id':lid,'city_name':name,'population':int(round(p))})
+
+          gj=json.load(open(gj_path,encoding='utf-8'))
+          feats=gj.get('features',[])
+          def prop(f,*names):
+              pr=f.get('properties') or {}
+              for n in names:
+                  if n in pr:return pr[n]
+              up={str(k).upper():v for k,v in pr.items()}
+              for n in names:
+                  if n.upper() in up:return up[n.upper()]
+              return None
+          geom_by_id={prop(f,'LAU_ID','GISCO_ID'):f for f in feats}
+
+          # Add known Spanish rank1 from canonical INE-backed materialization for geometry only.
+          out.append({'source_country_code':'ES','city_rank':1,'city_id':'ES_28079','city_name':'Madrid','population':None,'ranking_source':'INE_CANONICAL_MATERIALIZED'})
+
+          for rec in out:
+              f=geom_by_id.get(rec['city_id'])
+              if not f: raise SystemExit('MISSING_GEOMETRY_'+str(rec['city_id']))
+              g=shape(f['geometry'])
+              minx,miny,maxx,maxy=g.bounds
+              dx=(maxx-minx)/3; dy=(maxy-miny)/3
+              cells=[]
+              for rr in range(1,4):
+                  for cc in range(1,4):
+                      b=box(minx+(cc-1)*dx,miny+(rr-1)*dy,minx+cc*dx,miny+rr*dy)
+                      inter=g.intersection(b)
+                      if not inter.is_empty and inter.area>1e-15:
+                          cells.append({'zone_order':len(cells)+1,'zone_id':f"{rec['city_id']}_G{rr}{cc}",'zone_name':f'Grid {rr}-{cc}','area_deg2':inter.area})
+              if not cells: raise SystemExit('NO_GRID_CELLS_'+rec['city_id'])
+              rec['zones_total_reconstructed']=len(cells)
+              rec['first_zone']=cells[0]
+              rec['all_zone_ids']=[x['zone_id'] for x in cells]
+
+          bycc={x['source_country_code']:x for x in out}
+          expected={
+            'DE':('DE_11000000',9), 'AT':('AT_90001',9), 'BE':('BE_11002',8),
+            'BG':('BG_SOF46',9), 'HR':('HR_01333',8), 'DK':('DK_101',9),
+            'EE':('EE_0784',7), 'FI':('FI_091',9), 'SK':('SK_529460',8),
+            'SI':('SI_061',8), 'ES':('ES_28079',9)
+          }
+          control=[]
+          for cc,(cid,zcount) in expected.items():
+              r=bycc[cc]
+              ok=r['city_id']==cid and r['zones_total_reconstructed']==zcount
+              control.append({'country':cc,'expected_city_id':cid,'got_city_id':r['city_id'],'expected_zones':zcount,'got_zones':r['zones_total_reconstructed'],'pass':ok})
+          if not all(x['pass'] for x in control):
+              raise SystemExit('RECONSTRUCTION_CONTROL_FAIL '+json.dumps(control,ensure_ascii=False))
+
+          report={
+            'schema':'RLF_EU27_CP109_GISCO_CURSOR_RECONSTRUCTION_V1',
+            'quality_gate':'PASS',
+            'canonical_delta':0,
+            'source_urls':[
+              'https://gisco-services.ec.europa.eu/distribution/v2/lau/csv/LAU_RG_01M_2024_4326.csv',
+              'https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson'
+            ],
+            'csv_headers':headers,
+            'population_column_selected':pop_col,
+            'population_column_scores':scores,
+            'controls':control,
+            'records':out,
+            'france':'EXCLUDED_FROM_THIS_RECONSTRUCTION_INSEE_SPECIAL_SOURCE_REQUIRED',
+            'spain':'RANK1_INHERITED_FROM_CANONICAL_INE_MATERIALIZATION_GEOMETRY_RECONSTRUCTED_FROM_GISCO',
+            'promotion_allowed':False
+          }
+          report['sha256']=hashlib.sha256(json.dumps(report,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()
+          json.dump(report,open(base/'RLF_EU27_CP109_GISCO_CURSOR_RECONSTRUCTION.json','w'),indent=2,ensure_ascii=False)
+          print(json.dumps({'quality_gate':'PASS','pop_col':pop_col,'records':[{k:r[k] for k in ['source_country_code','city_id','city_name','population','zones_total_reconstructed','first_zone']} for r in out]},indent=2,ensure_ascii=False))
+          PY
+      - name: Upload CP109 reconstruction evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP109-GISCO-CURSOR-RECONSTRUCTION
+          path: |
+            cp109/RLF_EU27_CP109_GISCO_CURSOR_RECONSTRUCTION.json
+            cp109/SHA256SUMS.txt
+          retention-days: 30
