@@ -1,0 +1,154 @@
+name: RLF Hamburg G13 adjudication Parallel50 M870-M919
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-hamburg-g13-adjudication-p50-m870-m919.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Build Hamburg G13 identity partition and run 50 real workers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p p50/ready p50/out p50/work p50/claims
+          python3 -m pip install -q shapely
+          curl -fsSL 'https://raw.githubusercontent.com/euraf/eu-nuts-lau/main/v1/DE/DE600_LAU_RG_01M_2024_4326.geojson' -o hamburg.geojson
+
+          python3 - <<'PYBUILD'
+          import hashlib,json,re,time,unicodedata,urllib.request
+          from shapely.geometry import Point,box,mapping,shape
+          geom=shape(json.load(open('hamburg.geojson'))['features'][0]['geometry']);minx,miny,maxx,maxy=geom.bounds
+          dx=(maxx-minx)/3;dy=(maxy-miny)/3;bbox=[minx+2*dx,miny,maxx,miny+dy];clip=geom.intersection(box(*bbox))
+          query='''[out:json][timeout:80];(nwr[shop=second_hand]({s},{w},{n},{e});nwr[shop=clothes][second_hand]({s},{w},{n},{e});nwr[shop=clothes][clothes=second_hand]({s},{w},{n},{e}););out center tags;'''.format(s=bbox[1],w=bbox[0],n=bbox[3],e=bbox[2])
+          data=None;errors=[]
+          for endpoint in ['https://overpass.kumi.systems/api/interpreter','https://overpass-api.de/api/interpreter','https://overpass.private.coffee/api/interpreter']:
+            for attempt in range(2):
+              try:
+                req=urllib.request.Request(endpoint,data=query.encode(),headers={'User-Agent':'RLF-census/1.0'})
+                with urllib.request.urlopen(req,timeout=110) as response:data=json.load(response)
+                break
+              except Exception as exc:
+                errors.append({'endpoint':endpoint,'attempt':attempt+1,'error':type(exc).__name__+': '+str(exc)});time.sleep(2+attempt)
+            if data is not None:break
+          if data is None:raise SystemExit('OVERPASS_PREFLIGHT_FAILED '+json.dumps(errors))
+          raw=[]
+          for element in data.get('elements',[]):
+            lat=element.get('lat') or (element.get('center') or {}).get('lat');lon=element.get('lon') or (element.get('center') or {}).get('lon')
+            if lat is None or lon is None or not clip.covers(Point(lon,lat)):continue
+            raw.append({'type':element.get('type'),'id':element.get('id'),'lat':lat,'lon':lon,'tags':element.get('tags',{})})
+          def norm(value):
+            value=unicodedata.normalize('NFKD',(value or '').lower());value=''.join(c for c in value if not unicodedata.combining(c));return re.sub('[^a-z0-9]+','',value)
+          groups={}
+          for record in raw:
+            name=record['tags'].get('name');key=norm(name) if name else f"unnamed:{record['type']}:{record['id']}";groups.setdefault(key,[]).append(record)
+          ordered=sorted(groups.items(),key=lambda item:((item[1][0]['tags'].get('name') or 'zzzz').lower(),item[0]))
+          buckets=[[] for _ in range(50)]
+          for index,(key,records) in enumerate(ordered):buckets[index%50].append({'key':key,'name':records[0]['tags'].get('name'),'records':records})
+          for index,bucket in enumerate(buckets):json.dump({'lane':f'M{870+index:03d}','kind':'identity_owner','bucket':bucket},open(f'p50/work/M{870+index:03d}.json','w'),ensure_ascii=False,indent=2)
+          manifest={'phase':'FASE_1_CENS_PROVEIDORS_UE','city_id':'DE_02000000','zone':'DE_02000000_G13','packet':'M870-M919','raw_records':len(raw),'identity_groups':len(ordered),'work_units':50,'nonempty_work_units':sum(bool(bucket) for bucket in buckets),'bbox':bbox,'group_keys':[key for key,_ in ordered]}
+          manifest['sha256']=hashlib.sha256(json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()).hexdigest();json.dump(manifest,open('RLF_HAMBURG_G13_M870_M919_WORK_MANIFEST.json','w'),ensure_ascii=False,indent=2)
+          json.dump({'type':'FeatureCollection','features':[{'type':'Feature','properties':{'zone':'DE_02000000_G13'},'geometry':mapping(clip)}]},open('HAMBURG_G13_CLIP.geojson','w'))
+          print(json.dumps({k:manifest[k] for k in ['raw_records','identity_groups','work_units','nonempty_work_units','sha256']}))
+          PYBUILD
+
+          cat > p50/worker.py <<'PYWORKER'
+          import hashlib,html,json,os,re,sys,time,urllib.parse,urllib.request
+          lane=sys.argv[1];task=json.load(open(f'p50/work/{lane}.json'));open(f'p50/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+50
+          while not os.path.exists('p50/GO'):
+            if time.time()>deadline:raise SystemExit('barrier timeout')
+            time.sleep(.02)
+          time.sleep((int(hashlib.sha256(lane.encode()).hexdigest()[:4],16)%1400)/1000)
+          def text(body,limit=9000):
+            body=re.sub(r'<script\b[^>]*>.*?</script>',' ',body,flags=re.I|re.S);body=re.sub(r'<style\b[^>]*>.*?</style>',' ',body,flags=re.I|re.S);return html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',body)))[:limit]
+          def fetch(url):
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Chrome/151','Accept-Language':'de-DE,de;q=0.9,en;q=0.6'})
+              with urllib.request.urlopen(req,timeout=28) as response:return {'url':url,'status':getattr(response,'status',200),'final_url':response.geturl(),'text':text(response.read(240000).decode('utf-8','replace'))}
+            except Exception as exc:return {'url':url,'error':type(exc).__name__+': '+str(exc)}
+          def search(query,engine):
+            encoded=urllib.parse.quote_plus(query);url=f'https://www.bing.com/search?q={encoded}&count=25' if engine=='bing' else f'https://html.duckduckgo.com/html/?q={encoded}'
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Chrome/151','Accept-Language':'de-DE,de;q=0.9'})
+              with urllib.request.urlopen(req,timeout=30) as response:body=response.read().decode('utf-8','replace');status=getattr(response,'status',200)
+              links=[];seen=set()
+              for href in re.findall(r'href=["\']([^"\']+)["\']',body,re.I):
+                href=html.unescape(href)
+                if href.startswith('//'):href='https:'+href
+                if 'uddg=' in href:
+                  try:href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                  except Exception:pass
+                if not href.startswith('http'):continue
+                host=(urllib.parse.urlparse(href).hostname or '').lower()
+                if any(value in host for value in ['bing.com','microsoft.com','duckduckgo.com']):continue
+                href=href.split('#',1)[0]
+                if href in seen:continue
+                seen.add(href);links.append(href)
+                if len(links)>=15:break
+              return {'query':query,'engine':engine,'status':status,'links':links}
+            except Exception as exc:return {'query':query,'engine':engine,'error':type(exc).__name__+': '+str(exc),'links':[]}
+          def claim(url):
+            key=hashlib.sha256(url.encode()).hexdigest();path=f'p50/claims/{key}'
+            try:
+              descriptor=os.open(path,os.O_CREAT|os.O_EXCL|os.O_WRONLY);os.write(descriptor,lane.encode());os.close(descriptor);return {'url':url,'owner':lane,'accepted':True}
+            except FileExistsError:return {'url':url,'owner':open(path).read(),'accepted':False,'reason':'ATOMIC_GLOBAL_DUPLICATE'}
+          items=[];claims=[]
+          for candidate_index,candidate in enumerate(task['bucket']):
+            name=candidate.get('name');queries=[]
+            if name:
+              queries=[search(f'"{name}" Hamburg ("second hand" OR secondhand OR gebraucht OR vintage OR kleidung)','bing'),search(f'"{name}" Hamburg secondhand Impressum','ddg')]
+            else:
+              record=candidate['records'][0];queries=[search(f'Hamburg second hand shop near {record["lat"]} {record["lon"]}','bing')]
+            urls=[]
+            for record in candidate.get('records',[]):
+              for field in ['website','contact:website','url']:
+                if record.get('tags',{}).get(field):urls.append(record['tags'][field])
+            pages=[fetch(url) for url in dict.fromkeys(urls)]
+            for query_result in queries:
+              for url in query_result.get('links',[]):claims.append(claim(url))
+            for page in pages:
+              if page.get('final_url'):claims.append(claim(page['final_url']))
+            items.append({'candidate':candidate,'queries':queries,'direct_pages':pages})
+          result={'phase':'FASE_1_CENS_PROVEIDORS_UE','city_id':'DE_02000000','zone':'DE_02000000_G13','packet':'M870-M919','lane':lane,'pid':os.getpid(),'kind':'identity_owner','items':items,'url_claims':claims,'finished':time.time()};json.dump(result,open(f'p50/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          PYWORKER
+
+          pids=()
+          for number in $(seq 870 919); do lane=$(printf 'M%03d' "$number"); python3 p50/worker.py "$lane" & pids+=("$!"); done
+          deadline=$((SECONDS+50));while true;do ready=$(find p50/ready -type f|wc -l);[ "$ready" -eq 50 ]&&break;[ "$SECONDS" -ge "$deadline" ]&&exit 7;sleep .05;done
+          alive=0;for pid in "${pids[@]}";do kill -0 "$pid" 2>/dev/null&&alive=$((alive+1));done;echo "BARRIER_READY=$ready";echo "SIMULTANEOUS_ALIVE=$alive";[ "$alive" -eq 50 ]||exit 8
+          date +%s.%N > p50/GO;failures=0;for pid in "${pids[@]}";do wait "$pid"||failures=$((failures+1));done;echo "WORKER_PROCESS_FAILURES=$failures";[ "$failures" -eq 0 ]||exit 9
+
+      - name: AAA partition and ownership audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYAUDIT'
+          import glob,hashlib,json
+          rows=[json.load(open(path)) for path in sorted(glob.glob('p50/out/M*.json'))];manifest=json.load(open('RLF_HAMBURG_G13_M870_M919_WORK_MANIFEST.json'))
+          keys=[];claims=[]
+          for row in rows:
+            keys.extend(item['candidate']['key'] for item in row['items']);claims.extend(row.get('url_claims',[]))
+          report={'phase':'FASE_1_CENS_PROVEIDORS_UE','city_id':'DE_02000000','zone':'DE_02000000_G13','packet':'M870-M919','workers':len(rows),'unique_pids':len({row['pid'] for row in rows}),'unique_lanes':len({row['lane'] for row in rows}),'simultaneous_alive':50,'process_failures':0,'manifest_identity_groups':manifest['identity_groups'],'assigned_identity_groups':len(keys),'unique_assigned_identity_groups':len(set(keys)),'accepted_unique_urls':sum(1 for claim in claims if claim.get('accepted')),'atomic_duplicate_urls':sum(1 for claim in claims if not claim.get('accepted')),'partition_complete':len(keys)==manifest['identity_groups']==len(set(keys)),'rows':rows}
+          report['sha256']=hashlib.sha256(json.dumps(report,sort_keys=True,separators=(',',':')).encode()).hexdigest();json.dump(report,open('RLF_HAMBURG_G13_ADJUDICATION_M870_M919.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:report[k] for k in ['workers','unique_pids','unique_lanes','simultaneous_alive','process_failures','manifest_identity_groups','assigned_identity_groups','unique_assigned_identity_groups','accepted_unique_urls','atomic_duplicate_urls','partition_complete','sha256']}));assert report['workers']==report['unique_pids']==report['unique_lanes']==50 and report['partition_complete']
+          PYAUDIT
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-HAMBURG-G13-ADJUDICATION-P50-M870-M919
+          path: |
+            HAMBURG_G13_CLIP.geojson
+            RLF_HAMBURG_G13_M870_M919_WORK_MANIFEST.json
+            RLF_HAMBURG_G13_ADJUDICATION_M870_M919.json
+            p50/out/*.json
+          retention-days: 7
