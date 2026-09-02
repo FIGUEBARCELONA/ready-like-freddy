@@ -1,0 +1,132 @@
+name: RLF G33 real Parallel50 M670-M719 post-refreeze exhaustion
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/rlf-g33-p50-m670-m719-exhaustion.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Launch 50 exclusive-source workers
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf p50 && mkdir -p p50/ready p50/out p50/owners
+          cat > p50/worker.py <<'PY'
+          import sys,os,time,json,html,re,urllib.parse,urllib.request,hashlib
+          lane,domain,engine=sys.argv[1:4]
+          open(f'p50/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+45
+          while not os.path.exists('p50/GO'):
+            if time.time()>deadline: raise SystemExit('barrier timeout')
+            time.sleep(.02)
+          time.sleep((int(hashlib.sha256(lane.encode()).hexdigest()[:4],16)%1400)/1000)
+          query=f'site:{domain} ("Berlin Falkenberg" OR "Berlin Wartenberg" OR "13057 Berlin" OR "13059 Berlin") (secondhand OR "second hand" OR vintage OR sozialkaufhaus OR kleidung OR kleiderladen OR gebraucht) -auto -immobilien'
+          q=urllib.parse.quote_plus(query); url=f'https://html.duckduckgo.com/html/?q={q}' if engine=='ddg' else f'https://www.bing.com/search?q={q}&count=25'
+          status=None;body='';err=None;owned=[];dups=[];seen=set()
+          try:
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36','Accept-Language':'de-DE,de;q=0.9,en;q=0.5'})
+            with urllib.request.urlopen(req,timeout=28) as r:status=getattr(r,'status',200);body=r.read().decode('utf-8','replace')
+            for href in re.findall(r'href=["\']([^"\']+)["\']',body,re.I):
+              href=html.unescape(href)
+              if href.startswith('//'):href='https:'+href
+              if 'uddg=' in href:
+                try:href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                except Exception:pass
+              if not href.startswith('http'):continue
+              host=(urllib.parse.urlparse(href).hostname or '').lower(); d=domain.lower()
+              if not (host==d or host.endswith('.'+d)):continue
+              u=href.split('#',1)[0]
+              if u in seen:continue
+              seen.add(u);key=hashlib.sha256(u.encode()).hexdigest();owner=f'p50/owners/{key}'
+              try:
+                fd=os.open(owner,os.O_CREAT|os.O_EXCL|os.O_WRONLY);os.write(fd,lane.encode());os.close(fd);owned.append(u)
+              except FileExistsError:
+                try:first=open(owner).read().strip()
+                except:first='UNKNOWN'
+                dups.append({'url':u,'owner':first})
+              if len(owned)>=20:break
+          except Exception as e:err=type(e).__name__+': '+str(e)
+          json.dump({'zone':'DE_11000000_G33','packet':'M670-M719','lane':lane,'source_domain':domain,'engine':engine,'pid':os.getpid(),'query':query,'http_status':status,'body_bytes':len(body.encode('utf-8','ignore')),'error':err,'owned_results':owned,'duplicate_skipped':dups},open(f'p50/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          PY
+          cat > p50/lanes.tsv <<'LANES'
+          M670	berlin.de	ddg
+          M671	berliner-woche.de	bing
+          M672	morgenpost.de	ddg
+          M673	tagesspiegel.de	bing
+          M674	bz-berlin.de	ddg
+          M675	berliner-kurier.de	bing
+          M676	rbb24.de	ddg
+          M677	visitberlin.de	bing
+          M678	tip-berlin.de	ddg
+          M679	qiez.de	bing
+          M680	mitvergnuegen.com	ddg
+          M681	berlinmitkind.de	bing
+          M682	rausgegangen.de	ddg
+          M683	meinestadt.de	bing
+          M684	dasoertliche.de	ddg
+          M685	dastelefonbuch.de	bing
+          M686	11880.com	ddg
+          M687	cylex.de	bing
+          M688	gelbeseiten.de	ddg
+          M689	golocal.de	bing
+          M690	finde-offen.de	ddg
+          M691	firmania.de	bing
+          M692	ortsdienst.de	ddg
+          M693	stadtbranchenbuch.com	bing
+          M694	mapcarta.com	ddg
+          M695	caritas-berlin.de	bing
+          M696	berliner-stadtmission.de	ddg
+          M697	drk-berlin.de	bing
+          M698	awo-berlin.de	ddg
+          M699	johanniter.de	bing
+          M700	malteser-berlin.de	ddg
+          M701	berliner-tafel.de	bing
+          M702	unionhilfswerk.de	ddg
+          M703	albatrosggmbh.de	bing
+          M704	pinel.de	ddg
+          M705	sozdia.de	bing
+          M706	face-familienzentrum.de	ddg
+          M707	humanistisch.de	bing
+          M708	stadtteilzentren.de	ddg
+          M709	tierschutz-berlin.de	bing
+          M710	resales.de	ddg
+          M711	humana-second-hand.de	bing
+          M712	nochmall.de	ddg
+          M713	picknweight.de	bing
+          M714	flohkids.de	ddg
+          M715	socialladen.de	bing
+          M716	fairkauf-berlin.de	ddg
+          M717	findus-berlin.de	bing
+          M718	vintageberlin.de	ddg
+          M719	kleinanzeigen.de	bing
+          LANES
+          pids=(); while IFS=$'\t' read -r lane domain engine; do python3 p50/worker.py "$lane" "$domain" "$engine" & pids+=("$!"); done < p50/lanes.tsv
+          deadline=$((SECONDS+45));while true;do ready=$(find p50/ready -type f|wc -l);[ "$ready" -eq 50 ]&&break;[ "$SECONDS" -ge "$deadline" ]&&exit 7;sleep .05;done
+          alive=0;for p in "${pids[@]}";do kill -0 "$p" 2>/dev/null&&alive=$((alive+1));done;echo "BARRIER_READY=$ready";echo "SIMULTANEOUS_ALIVE=$alive";[ "$alive" -eq 50 ]||exit 8;date +%s.%N>p50/GO
+          fail=0;for p in "${pids[@]}";do wait "$p"||fail=$((fail+1));done;echo "WORKER_PROCESS_FAILURES=$fail";[ "$fail" -eq 0 ]||exit 9
+      - name: AAA merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import glob,json,hashlib
+          rows=[json.load(open(f,encoding='utf-8')) for f in sorted(glob.glob('p50/out/M*.json'))]
+          rep={'zone':'DE_11000000_G33','packet':'M670-M719','workers':len(rows),'unique_pids':len({r['pid'] for r in rows}),'unique_lanes':len({r['lane'] for r in rows}),'unique_domains':len({r['source_domain'] for r in rows}),'unique_queries':len({r['query'] for r in rows}),'simultaneous_alive':50,'http_success':sum(1 for r in rows if r['http_status'] and 200<=r['http_status']<300),'error_lanes':[{'lane':r['lane'],'domain':r['source_domain'],'error':r['error']} for r in rows if r['error']],'owned_unique_results':sum(len(r['owned_results']) for r in rows),'duplicates_skipped':sum(len(r['duplicate_skipped']) for r in rows),'rows':rows}
+          rep['sha256']=hashlib.sha256(json.dumps(rep,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest();json.dump(rep,open('RLF_G33_P50_M670_M719.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:rep[k] for k in ['workers','unique_pids','unique_lanes','unique_domains','unique_queries','simultaneous_alive','http_success','owned_unique_results','duplicates_skipped']},ensure_ascii=False))
+          if not(rep['workers']==rep['unique_pids']==rep['unique_lanes']==rep['unique_domains']==rep['unique_queries']==50):raise SystemExit(10)
+          PY
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-G33-P50-M670-M719-EXHAUSTION
+          path: |
+            RLF_G33_P50_M670_M719.json
+            p50/out/*.json
+          retention-days: 7
