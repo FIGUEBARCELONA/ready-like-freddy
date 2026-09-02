@@ -1,0 +1,127 @@
+name: RLF EU27 CP110 France INSEE cursor reconstruction
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp110-france-insee-cursor-reconstruction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconstruct-france:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download current France municipal population resource
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p cp110
+          curl --fail --location --retry 4 --retry-delay 2 \
+            'https://www.data.gouv.fr/api/1/datasets/r/be303501-5c46-48a1-87b4-3d198423ff49' \
+            -o cp110/france_population_2026.xlsx
+          sha256sum cp110/france_population_2026.xlsx > cp110/SHA256SUMS.txt
+      - name: Inspect INSEE-backed table and reconstruct Paris aggregate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pandas openpyxl xlrd
+          python3 - <<'PY'
+          import pandas as pd, json, re, hashlib
+          from pathlib import Path
+          p=Path('cp110/france_population_2026.xlsx')
+          book=pd.ExcelFile(p)
+          frames=[]
+          for s in book.sheet_names:
+              df=pd.read_excel(p,sheet_name=s,dtype=str)
+              if len(df):
+                  df.columns=[str(c).strip().lower() for c in df.columns]
+                  if {'codgeo','libgeo','p23_pop'}.issubset(df.columns):
+                      frames.append(df)
+          if not frames: raise SystemExit('REQUIRED_COLUMNS_NOT_FOUND')
+          df=pd.concat(frames,ignore_index=True)
+          df['p23_num']=pd.to_numeric(df['p23_pop'],errors='coerce')
+          df=df[df['p23_num'].notna() & (df['p23_num']>0)].copy()
+          cols=[c for c in ['reg','dep','cv','codgeo','libgeo','p23_pop'] if c in df.columns]
+          top_rows=df.sort_values(['p23_num','libgeo'],ascending=[False,True]).head(30)[cols].to_dict('records')
+          special=df[df['libgeo'].str.contains(r'Paris|Lyon|Marseille',case=False,na=False)][cols].copy()
+          special_rows=special.to_dict('records')
+
+          # Canonical project methodology: Paris/Lyon/Marseille are city aggregates whose
+          # municipal arrondissement rows are retained as zones. Detect arrondissement-like rows
+          # from official names/codes, never by fixed counts alone.
+          def rows_for_city(city):
+              x=special[special['libgeo'].str.contains(city,case=False,na=False)].copy()
+              return x
+          aggs={}
+          for city in ['Paris','Lyon','Marseille']:
+              x=rows_for_city(city)
+              # Prefer explicit arrondissement rows if present. Exclude any exact city aggregate row
+              # from the sum to prevent double counting.
+              mask=x['libgeo'].str.contains(r'arrondissement',case=False,na=False)
+              arr=x[mask].copy()
+              if len(arr)==0:
+                  # If naming differs, preserve evidence without inventing aggregation.
+                  aggs[city]={'status':'NO_EXPLICIT_ARRONDISSEMENT_ROWS','rows':x[cols].to_dict('records')}
+              else:
+                  aggs[city]={
+                    'status':'AGGREGATED_EXPLICIT_ARRONDISSEMENT_ROWS',
+                    'population':int(pd.to_numeric(arr['p23_pop'],errors='coerce').fillna(0).sum()),
+                    'zone_count':int(len(arr)),
+                    'rows':arr[cols].sort_values('codgeo').to_dict('records')
+                  }
+          if aggs['Paris'].get('status')!='AGGREGATED_EXPLICIT_ARRONDISSEMENT_ROWS':
+              raise SystemExit('PARIS_ARRONDISSEMENTS_NOT_EXPLICIT_FAIL_CLOSED')
+
+          # Candidate rank1 compares custom aggregates against ordinary municipality rows,
+          # while excluding arrondissement rows as standalone cities.
+          arr_codes=set()
+          for v in aggs.values():
+              for r in v.get('rows',[]): arr_codes.add(str(r.get('codgeo')))
+          ordinary=df[~df['codgeo'].astype(str).isin(arr_codes)].copy()
+          candidates=[{'city_name':r['libgeo'],'city_id':r['codgeo'],'population':int(r['p23_num']),'kind':'COMMUNE'}
+                      for _,r in ordinary.sort_values('p23_num',ascending=False).head(20).iterrows()]
+          for city,v in aggs.items():
+              if 'population' in v:
+                  candidates.append({'city_name':city,'city_id':f'FR_{city.upper()}_AGG','population':v['population'],'kind':'ARRONDISSEMENT_AGGREGATE'})
+          candidates.sort(key=lambda r:(-r['population'],r['city_name']))
+          rank1=candidates[0]
+          if rank1['city_name']!='Paris' or rank1['kind']!='ARRONDISSEMENT_AGGREGATE':
+              raise SystemExit('FRANCE_RANK1_NOT_PARIS_FAIL_CLOSED '+json.dumps(rank1,ensure_ascii=False))
+          paris_rows=aggs['Paris']['rows']
+          # Source-backed first zone is the first canonical arrondissement row after numeric code order;
+          # do not yet assign the project's final zone_id until cross-checked against territorial registry.
+          first_src=sorted(paris_rows,key=lambda r:str(r.get('codgeo')))[0]
+          report={
+            'schema':'RLF_EU27_CP110_FRANCE_INSEE_CURSOR_RECONSTRUCTION_V1',
+            'quality_gate':'PASS_PARTIAL_ZONE_ID_PENDING_CANONICAL_REGISTRY_CROSSCHECK',
+            'canonical_delta':0,
+            'resource':'https://www.data.gouv.fr/api/1/datasets/r/be303501-5c46-48a1-87b4-3d198423ff49',
+            'population_field':'p23_pop',
+            'sheet_names':book.sheet_names,
+            'columns':list(df.columns),
+            'rank1':rank1,
+            'paris_aggregate':aggs['Paris'],
+            'paris_first_source_arrondissement':first_src,
+            'lyon_aggregate':aggs['Lyon'],
+            'marseille_aggregate':aggs['Marseille'],
+            'top_source_rows':top_rows,
+            'zone_id_final':'PENDING_CANONICAL_TERRITORIAL_REGISTRY_CROSSCHECK',
+            'promotion_allowed':False
+          }
+          report['sha256']=hashlib.sha256(json.dumps(report,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()
+          json.dump(report,open('cp110/RLF_EU27_CP110_FRANCE_INSEE_CURSOR_RECONSTRUCTION.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({'quality_gate':report['quality_gate'],'rank1':rank1,'paris_population':aggs['Paris']['population'],'paris_zone_count':aggs['Paris']['zone_count'],'first_source_arrondissement':first_src},ensure_ascii=False,indent=2))
+          PY
+      - name: Upload CP110 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP110-FRANCE-INSEE-CURSOR-RECONSTRUCTION
+          path: |
+            cp110/RLF_EU27_CP110_FRANCE_INSEE_CURSOR_RECONSTRUCTION.json
+            cp110/SHA256SUMS.txt
+          retention-days: 30
