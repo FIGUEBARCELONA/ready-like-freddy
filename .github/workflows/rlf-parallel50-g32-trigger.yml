@@ -14,24 +14,34 @@ jobs:
   trigger-parallel50:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - name: Trigger real Vercel Parallel50 runtime
+      - name: Check Vercel auth availability
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${VERCEL_TOKEN:-}" ]; then
+            echo 'VERCEL_TOKEN_PRESENT=false'
+            exit 9
+          fi
+          echo 'VERCEL_TOKEN_PRESENT=true'
+
+      - name: Trigger authenticated Vercel Parallel50 runtime
         id: trigger
         shell: bash
         run: |
           set -euo pipefail
-          echo 'POST /api/sweep50'
+          echo 'POST /api/sweep50 authenticated'
           code=$(curl -sS -o /tmp/body.json -w '%{http_code}' \
             -X POST 'https://rlf-parallel50-runtime.vercel.app/api/sweep50' \
             -H 'content-type: application/json' \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
             --data '{}')
           echo "HTTP=$code"
           cat /tmp/body.json
           echo
-          echo "http_code=$code" >> "$GITHUB_OUTPUT"
-          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
-            exit 22
-          fi
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then exit 22; fi
 
       - name: Poll runtime status
         if: success()
