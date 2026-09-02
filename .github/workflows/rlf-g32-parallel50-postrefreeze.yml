@@ -1,0 +1,147 @@
+name: RLF G32 post-refreeze Parallel50 M470-M519
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-g32-parallel50-postrefreeze.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Launch 50 non-overlapping workers with atomic URL ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf p50 && mkdir -p p50/ready p50/out p50/owners
+          cat > p50/worker.py <<'PY'
+          import sys,os,time,json,re,html,urllib.parse,urllib.request,hashlib
+          lane,area_id,area,vector_id,query_tpl=sys.argv[1:6]
+          open(f'p50/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+45
+          while not os.path.exists('p50/GO'):
+            if time.time()>deadline: raise SystemExit('barrier timeout')
+            time.sleep(.02)
+          q=query_tpl.replace('{area}',area)
+          url='https://html.duckduckgo.com/html/?q='+urllib.parse.quote(q)
+          started=time.time(); err=None; owned=[]; duplicate_skipped=[]
+          try:
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36','Accept-Language':'de-DE,de;q=0.9,en;q=0.5'})
+            with urllib.request.urlopen(req,timeout=25) as r: body=r.read().decode('utf-8','replace')
+            pairs=re.findall(r'class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>',body,re.I|re.S)
+            for href,title in pairs[:15]:
+              href=html.unescape(href)
+              if 'uddg=' in href:
+                try: href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                except Exception: pass
+              title=html.unescape(re.sub(r'\s+',' ',re.sub('<[^>]+>',' ',title))).strip()
+              key=hashlib.sha256(href.encode()).hexdigest()
+              lock=f'p50/owners/{key}'
+              try:
+                os.mkdir(lock)
+                open(lock+'/owner','w').write(lane)
+                owned.append({'title':title,'url':href})
+              except FileExistsError:
+                try: owner=open(lock+'/owner').read().strip()
+                except Exception: owner='UNKNOWN'
+                duplicate_skipped.append({'url':href,'owner':owner})
+          except Exception as e: err=type(e).__name__+': '+str(e)
+          json.dump({'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32','lane':lane,'area_id':area_id,'area':area,'vector_id':vector_id,'query':q,'pid':os.getpid(),'started':started,'ended':time.time(),'error':err,'owned_results':owned,'duplicate_skipped':duplicate_skipped},open(f'p50/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          PY
+
+          cat > p50/lanes.tsv <<'EOF'
+          M470	A01_REINICKENDORF	Reinickendorf	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M471	A01_REINICKENDORF	Reinickendorf	V2_VINTAGE	vintage mode {area} Berlin shop
+          M472	A01_REINICKENDORF	Reinickendorf	V3_CHILDREN	kindersecondhand {area} Berlin
+          M473	A01_REINICKENDORF	Reinickendorf	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M474	A01_REINICKENDORF	Reinickendorf	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          M475	A02_WITTENAU	Wittenau	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M476	A02_WITTENAU	Wittenau	V2_VINTAGE	vintage mode {area} Berlin shop
+          M477	A02_WITTENAU	Wittenau	V3_CHILDREN	kindersecondhand {area} Berlin
+          M478	A02_WITTENAU	Wittenau	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M479	A02_WITTENAU	Wittenau	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          M480	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M481	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	V2_VINTAGE	vintage mode {area} Berlin shop
+          M482	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	V3_CHILDREN	kindersecondhand {area} Berlin
+          M483	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M484	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          M485	A04_WAIDMANNSLUST	Waidmannslust	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M486	A04_WAIDMANNSLUST	Waidmannslust	V2_VINTAGE	vintage mode {area} Berlin shop
+          M487	A04_WAIDMANNSLUST	Waidmannslust	V3_CHILDREN	kindersecondhand {area} Berlin
+          M488	A04_WAIDMANNSLUST	Waidmannslust	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M489	A04_WAIDMANNSLUST	Waidmannslust	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          M490	A05_LUEBARS	Lübars	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M491	A05_LUEBARS	Lübars	V2_VINTAGE	vintage mode {area} Berlin shop
+          M492	A05_LUEBARS	Lübars	V3_CHILDREN	kindersecondhand {area} Berlin
+          M493	A05_LUEBARS	Lübars	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M494	A05_LUEBARS	Lübars	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          M495	A06_HERMSDORF	Hermsdorf	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M496	A06_HERMSDORF	Hermsdorf	V2_VINTAGE	vintage mode {area} Berlin shop
+          M497	A06_HERMSDORF	Hermsdorf	V3_CHILDREN	kindersecondhand {area} Berlin
+          M498	A06_HERMSDORF	Hermsdorf	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M499	A06_HERMSDORF	Hermsdorf	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          M500	A07_FROHNAU	Frohnau	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M501	A07_FROHNAU	Frohnau	V2_VINTAGE	vintage mode {area} Berlin shop
+          M502	A07_FROHNAU	Frohnau	V3_CHILDREN	kindersecondhand {area} Berlin
+          M503	A07_FROHNAU	Frohnau	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M504	A07_FROHNAU	Frohnau	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          M505	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M506	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	V2_VINTAGE	vintage mode {area} Berlin shop
+          M507	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	V3_CHILDREN	kindersecondhand {area} Berlin
+          M508	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M509	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          M510	A09_PANKOW_NORD	Pankow Nord	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M511	A09_PANKOW_NORD	Pankow Nord	V2_VINTAGE	vintage mode {area} Berlin shop
+          M512	A09_PANKOW_NORD	Pankow Nord	V3_CHILDREN	kindersecondhand {area} Berlin
+          M513	A09_PANKOW_NORD	Pankow Nord	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M514	A09_PANKOW_NORD	Pankow Nord	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          M515	A10_BUCH_KAROW	Buch Karow	V1_SECONDHAND_APPAREL	second hand kleidung {area} Berlin laden
+          M516	A10_BUCH_KAROW	Buch Karow	V2_VINTAGE	vintage mode {area} Berlin shop
+          M517	A10_BUCH_KAROW	Buch Karow	V3_CHILDREN	kindersecondhand {area} Berlin
+          M518	A10_BUCH_KAROW	Buch Karow	V4_SOCIAL_RETAIL	sozialkaufhaus kleidung {area} Berlin verkauf
+          M519	A10_BUCH_KAROW	Buch Karow	V5_CONSIGNMENT	kommissionsladen mode {area} Berlin
+          EOF
+
+          pids=()
+          while IFS=$'\t' read -r lane aid area vid q; do
+            python3 p50/worker.py "$lane" "$aid" "$area" "$vid" "$q" & pids+=("$!")
+          done < p50/lanes.tsv
+          deadline=$((SECONDS+45))
+          while [ "$(find p50/ready -type f | wc -l)" -lt 50 ]; do
+            [ "$SECONDS" -ge "$deadline" ] && exit 7
+            sleep .05
+          done
+          alive=0; for p in "${pids[@]}"; do kill -0 "$p" 2>/dev/null && alive=$((alive+1)); done
+          echo "BARRIER_READY=50"; echo "SIMULTANEOUS_ALIVE=$alive"; [ "$alive" -eq 50 ] || exit 8
+          date +%s.%N > p50/GO
+          fail=0; for p in "${pids[@]}"; do wait "$p" || fail=$((fail+1)); done
+          echo "WORKER_FAILURES=$fail"; [ "$fail" -eq 0 ] || exit 9
+
+      - name: Merge ownership and QA structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import glob,json,hashlib
+          rows=[json.load(open(f,encoding='utf-8')) for f in sorted(glob.glob('p50/out/M*.json'))]
+          lanes={r['lane'] for r in rows}; pids={r['pid'] for r in rows}; queries={r['query'] for r in rows}
+          owned=sum(len(r['owned_results']) for r in rows); dup=sum(len(r['duplicate_skipped']) for r in rows)
+          report={'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32','packet':'M470-M519','outputs':len(rows),'unique_lanes':len(lanes),'unique_pids':len(pids),'unique_queries':len(queries),'all_50_real_unique':len(rows)==50 and len(lanes)==50 and len(pids)==50 and len(queries)==50,'worker_errors':sum(1 for r in rows if r.get('error')),'owned_unique_results':owned,'duplicate_results_skipped_by_atomic_ownership':dup,'rows':rows}
+          raw=json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode(); report['sha256']=hashlib.sha256(raw).hexdigest()
+          json.dump(report,open('RLF_G32_P50_M470_M519_POSTREFREEZE.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:report[k] for k in ['outputs','unique_lanes','unique_pids','unique_queries','all_50_real_unique','worker_errors','owned_unique_results','duplicate_results_skipped_by_atomic_ownership']}))
+          if not report['all_50_real_unique']: raise SystemExit(10)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-G32-P50-M470-M519-POSTREFREEZE
+          path: |
+            RLF_G32_P50_M470_M519_POSTREFREEZE.json
+            p50/out/*.json
+          retention-days: 7
