@@ -1,0 +1,142 @@
+name: RLF Hamburg G13 Parallel50 M720-M769 v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-hamburg-g13-p50-m720-m769-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Build authoritative G13 queue and launch 50 real workers
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf p50 && mkdir -p p50/ready p50/out p50/buckets
+          python3 -m pip install -q shapely
+          curl -fsSL 'https://raw.githubusercontent.com/euraf/eu-nuts-lau/main/v1/DE/DE600_LAU_RG_01M_2024_4326.geojson' -o hamburg.geojson
+          python3 - <<'PYQUEUE'
+          import json,re,hashlib,urllib.parse,urllib.request,unicodedata
+          from shapely.geometry import shape,box,Point,mapping
+          src=json.load(open('hamburg.geojson')); feat=src['features'][0]; geom=shape(feat['geometry'])
+          minx,miny,maxx,maxy=geom.bounds; dx=(maxx-minx)/3; dy=(maxy-miny)/3
+          bbox=[minx+2*dx,miny,maxx,miny+dy]; clip=geom.intersection(box(*bbox))
+          q='''[out:json][timeout:60];(nwr[shop=second_hand]({s},{w},{n},{e});nwr[shop=clothes][second_hand]({s},{w},{n},{e});nwr[shop=clothes][clothes=second_hand]({s},{w},{n},{e}););out center tags;'''.format(s=bbox[1],w=bbox[0],n=bbox[3],e=bbox[2])
+          req=urllib.request.Request('https://overpass-api.de/api/interpreter',data=q.encode(),headers={'User-Agent':'RLF-census/1.0'})
+          with urllib.request.urlopen(req,timeout=75) as r: data=json.load(r)
+          raw=[]
+          for el in data.get('elements',[]):
+            lat=el.get('lat') or (el.get('center') or {}).get('lat'); lon=el.get('lon') or (el.get('center') or {}).get('lon')
+            if lat is None or lon is None or not clip.covers(Point(lon,lat)): continue
+            raw.append({'type':el.get('type'),'id':el.get('id'),'lat':lat,'lon':lon,'tags':el.get('tags',{})})
+          def norm(s):
+            s=unicodedata.normalize('NFKD',(s or '').lower()); s=''.join(c for c in s if not unicodedata.combining(c)); return re.sub('[^a-z0-9]+','',s)
+          groups={}
+          for x in raw:
+            name=x['tags'].get('name'); key=norm(name) if name else f"unnamed:{x['type']}:{x['id']}"
+            groups.setdefault(key,[]).append(x)
+          ordered=sorted(groups.items(),key=lambda kv:((kv[1][0]['tags'].get('name') or 'zzzz').lower(),kv[0]))
+          buckets=[[] for _ in range(49)]
+          for i,(k,v) in enumerate(ordered):
+            names=sorted({x['tags'].get('name') for x in v if x['tags'].get('name')}); websites=sorted({x['tags'].get('website') for x in v if x['tags'].get('website')}); operators=sorted({x['tags'].get('operator') for x in v if x['tags'].get('operator')})
+            buckets[i%49].append({'key':k,'name':names[0] if names else None,'websites':websites,'operators':operators,'records':v})
+          for i,b in enumerate(buckets): json.dump(b,open(f'p50/buckets/{i:02d}.json','w'),ensure_ascii=False,indent=2)
+          queue={'city_id':'DE_02000000','zone':'DE_02000000_G13','grid_bbox':bbox,'raw_records':len(raw),'identity_groups':len(ordered),'bucket_count':49,'nonempty_buckets':sum(bool(b) for b in buckets),'groups':[{'key':k,'name':v[0]['tags'].get('name'),'records':len(v)} for k,v in ordered]}
+          queue['sha256']=hashlib.sha256(json.dumps(queue,sort_keys=True,separators=(',',':')).encode()).hexdigest(); json.dump(queue,open('HAMBURG_G13_LIVE_OSM_QUEUE.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:queue[k] for k in ['raw_records','identity_groups','bucket_count','nonempty_buckets','sha256']}))
+          PYQUEUE
+
+          cat > p50/worker.py <<'PYWORKER'
+          import sys,os,time,json,html,re,urllib.parse,urllib.request,hashlib
+          lane,idx=sys.argv[1:3]; open(f'p50/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+45
+          while not os.path.exists('p50/GO'):
+            if time.time()>deadline: raise SystemExit('barrier timeout')
+            time.sleep(.02)
+          time.sleep((int(hashlib.sha256(lane.encode()).hexdigest()[:4],16)%1300)/1000)
+          results=[]; errors=[]
+          def search(query,engine):
+            q=urllib.parse.quote_plus(query); url=(f'https://html.duckduckgo.com/html/?q={q}' if engine=='ddg' else f'https://www.bing.com/search?q={q}&count=20')
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Chrome/151','Accept-Language':'de-DE,de;q=0.9'})
+              with urllib.request.urlopen(req,timeout=30) as r: body=r.read().decode('utf-8','replace'); status=getattr(r,'status',200)
+              hrefs=re.findall(r'href=["\']([^"\']+)["\']',body,re.I); links=[]; seen=set()
+              for href in hrefs:
+                href=html.unescape(href)
+                if href.startswith('//'): href='https:'+href
+                if 'uddg=' in href:
+                  try: href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                  except: pass
+                if not href.startswith('http'): continue
+                host=(urllib.parse.urlparse(href).hostname or '').lower()
+                if any(x in host for x in ['duckduckgo.com','bing.com','microsoft.com']): continue
+                href=href.split('#',1)[0]
+                if href in seen: continue
+                seen.add(href); links.append(href)
+                if len(links)>=12: break
+              return {'query':query,'engine':engine,'status':status,'links':links}
+            except Exception as e: return {'query':query,'engine':engine,'error':type(e).__name__+': '+str(e),'links':[]}
+          if idx=='49':
+            results.append(search('Hamburg 2026 Neueröffnung second hand vintage sozialkaufhaus kleidung Harburg Wilhelmsburg Hamburg-Mitte','bing'))
+          else:
+            bucket=json.load(open(f'p50/buckets/{int(idx):02d}.json'))
+            for j,g in enumerate(bucket):
+              name=g.get('name')
+              if name: query=f'"{name}" Hamburg ("second hand" OR secondhand OR vintage OR gebraucht OR kleidung OR mode)'
+              else:
+                r=g['records'][0]; query=f'Hamburg second hand shop near {r["lat"]} {r["lon"]}'
+              engine='ddg' if (int(idx)+j)%2==0 else 'bing'; s=search(query,engine); direct=[]
+              for w in g.get('websites',[]):
+                try:
+                  req=urllib.request.Request(w,headers={'User-Agent':'Mozilla/5.0 Chrome/151','Accept-Language':'de-DE,de;q=0.9'})
+                  with urllib.request.urlopen(req,timeout=20) as rr:
+                    b=rr.read(180000).decode('utf-8','replace'); direct.append({'url':w,'status':getattr(rr,'status',200),'text':html.unescape(re.sub(r'\s+',' ',re.sub('<[^>]+>',' ',b)))[:5000]})
+                except Exception as e: direct.append({'url':w,'error':type(e).__name__+': '+str(e)})
+              results.append({'candidate':g,'search':s,'direct':direct})
+          json.dump({'phase':'FASE_1_CENS_PROVEIDORS_UE','city_id':'DE_02000000','zone':'DE_02000000_G13','packet':'M720-M769','lane':lane,'bucket_index':idx,'pid':os.getpid(),'results':results,'ended':time.time()},open(f'p50/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          PYWORKER
+
+          pids=()
+          for i in $(seq 0 49); do lane=$(printf 'M%03d' $((720+i))); python3 p50/worker.py "$lane" "$i" & pids+=("$!"); done
+          deadline=$((SECONDS+45))
+          while true; do ready=$(find p50/ready -type f|wc -l); [ "$ready" -eq 50 ] && break; [ "$SECONDS" -ge "$deadline" ] && exit 7; sleep .05; done
+          alive=0; for p in "${pids[@]}"; do kill -0 "$p" 2>/dev/null && alive=$((alive+1)); done
+          echo "BARRIER_READY=$ready"; echo "SIMULTANEOUS_ALIVE=$alive"; [ "$alive" -eq 50 ] || exit 8
+          date +%s.%N > p50/GO
+          fail=0; for p in "${pids[@]}"; do wait "$p" || fail=$((fail+1)); done
+          echo "WORKER_PROCESS_FAILURES=$fail"; [ "$fail" -eq 0 ] || exit 9
+
+      - name: AAA merge and partition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYMERGE'
+          import glob,json,hashlib
+          rows=[json.load(open(f,encoding='utf-8')) for f in sorted(glob.glob('p50/out/M*.json'))]; queue=json.load(open('HAMBURG_G13_LIVE_OSM_QUEUE.json'))
+          owned=[]
+          for r in rows:
+            if r['bucket_index']!='49':
+              for x in r['results']:
+                c=x.get('candidate') or {}; owned.extend([g.get('key') for g in [c] if g.get('key')])
+          report={'city_id':'DE_02000000','zone':'DE_02000000_G13','packet':'M720-M769','workers':len(rows),'unique_pids':len({r['pid'] for r in rows}),'unique_lanes':len({r['lane'] for r in rows}),'simultaneous_alive':50,'process_failures':0,'queue_identity_groups':queue['identity_groups'],'assigned_identity_groups':len(owned),'unique_assigned_identity_groups':len(set(owned)),'partition_complete':len(owned)==queue['identity_groups'] and len(set(owned))==queue['identity_groups'],'rows':rows}
+          report['sha256']=hashlib.sha256(json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest(); json.dump(report,open('RLF_HAMBURG_G13_P50_M720_M769_V2.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:report[k] for k in ['workers','unique_pids','unique_lanes','simultaneous_alive','queue_identity_groups','assigned_identity_groups','unique_assigned_identity_groups','partition_complete']}))
+          if not (report['workers']==50 and report['unique_pids']==50 and report['unique_lanes']==50 and report['partition_complete']): raise SystemExit(10)
+          PYMERGE
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-HAMBURG-G13-P50-M720-M769-V2
+          path: |
+            HAMBURG_G13_LIVE_OSM_QUEUE.json
+            RLF_HAMBURG_G13_P50_M720_M769_V2.json
+            p50/out/*.json
+          retention-days: 7
