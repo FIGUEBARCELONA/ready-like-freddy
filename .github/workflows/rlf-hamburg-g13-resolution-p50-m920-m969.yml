@@ -1,0 +1,196 @@
+name: RLF Hamburg G13 resolution Parallel50 M920-M969
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-hamburg-g13-resolution-p50-m920-m969.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Build immutable one-identity-per-worker manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p p50/ready p50/out p50/work p50/claims p50/pages
+          python3 - <<'PYBUILD'
+          import hashlib,json
+          candidates=json.loads(r'''[{"name":"2nd Fit Kiloshop","key":"2ndfitkiloshop","osm_type":"node","osm_id":2619992606,"lat":53.5601656,"lon":9.9632939,"street":"Schulterblatt","housenumber":"25","postcode":"20357","website":null,"lane":"M920"},{"name":"2nd Second Hand","key":"2ndsecondhand","osm_type":"node","osm_id":12104527498,"lat":53.5828715,"lon":10.0105557,"street":"Mühlenkamp","housenumber":"44","postcode":"22303","website":null,"lane":"M921"},{"name":"Ankauf-Verkauf","key":"ankaufverkauf","osm_type":"node","osm_id":11403863681,"lat":53.46186,"lon":9.9839546,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M922"},{"name":"Bilderträume","key":"bildertraume","osm_type":"node","osm_id":3809164051,"lat":53.5731981,"lon":9.9498187,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M923"},{"name":"Die Schleuse","key":"dieschleuse","osm_type":"node","osm_id":1053609654,"lat":53.5688106,"lon":9.9499399,"street":"Eimsbütteler Straße","housenumber":"129","postcode":"22769","website":"https://www.dieschleuse.com","lane":"M924"},{"name":"DRK Kilo-Shop Altona","key":"drkkiloshopaltona","osm_type":"node","osm_id":10944463404,"lat":53.5514154,"lon":9.9371262,"street":"Neue Große Bergstraße","housenumber":"4-6","postcode":"22767","website":"https://www.drk-hamburg.de/angebote/alltagshilfen/kilo-shop.html","lane":"M925"},{"name":"Däumling No 3","key":"daumlingno3","osm_type":"node","osm_id":7837581869,"lat":53.5608699,"lon":9.8200963,"street":"Elbchaussee","housenumber":"537","postcode":"22587","website":null,"lane":"M926"},{"name":"Fifty fifty second hand","key":"fiftyfiftysecondhand","osm_type":"node","osm_id":7836458795,"lat":53.5592886,"lon":9.811526,"street":"Blankeneser Bahnhofstraße","housenumber":"7","postcode":"22587","website":"https://fiftyfiftysecondhand.com/","lane":"M927"},{"name":"First Class Designer Second Hand","key":"firstclassdesignersecondhand","osm_type":"node","osm_id":7845757444,"lat":53.559449,"lon":9.884205,"street":"Waitzstraße","housenumber":"17","postcode":"22607","website":"https://www.waitzstrasse17.de/","lane":"M928"},{"name":"Flohkids","key":"flohkids","osm_type":"node","osm_id":11163017778,"lat":53.5763508,"lon":9.8200612,"street":null,"housenumber":null,"postcode":null,"website":"https://hamburg-west.flohkids.de/seiten/hamburg-west","lane":"M929"},{"name":"Gold&Silber Atelier","key":"goldsilberatelier","osm_type":"node","osm_id":3659401140,"lat":53.549637,"lon":10.0016078,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M930"},{"name":"Großes Erbstück","key":"groeserbstuck","osm_type":"node","osm_id":4973391120,"lat":53.5828338,"lon":10.0119692,"street":null,"housenumber":null,"postcode":null,"website":"http://grosses-erbstueck.de","lane":"M931"},{"name":"Gödeke","key":"godeke","osm_type":"node","osm_id":8911974802,"lat":53.5631251,"lon":9.8113975,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M932"},{"name":"Harry's Antik- & Trödelmarkt","key":"harrysantiktrodelmarkt","osm_type":"node","osm_id":11165519367,"lat":53.5790777,"lon":10.0187396,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M933"},{"name":"Hip Cats","key":"hipcats","osm_type":"node","osm_id":1845213275,"lat":53.5527217,"lon":9.9630463,"street":"Hein-Hoyer-Straße","housenumber":"56","postcode":"20359","website":"http://hip-cats.de/","lane":"M934"},{"name":"Jungs & Deerns","key":"jungsdeerns","osm_type":"node","osm_id":7836396923,"lat":53.5582377,"lon":9.8099038,"street":"Blankeneser Hauptstraße","housenumber":"151","postcode":"22587","website":null,"lane":"M935"},{"name":"Kilo Laden","key":"kiloladen","osm_type":"node","osm_id":3386527867,"lat":53.5523975,"lon":10.0051313,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M936"},{"name":"Kinderkram","key":"kinderkram","osm_type":"node","osm_id":11883871215,"lat":53.5635119,"lon":10.0329538,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M937"},{"name":"Kleiderkammer","key":"kleiderkammer","osm_type":"node","osm_id":880538763,"lat":53.5421858,"lon":10.1273938,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M938"},{"name":"Kleidermarkt Wilhelmsburg","key":"kleidermarktwilhelmsburg","osm_type":"node","osm_id":10873251645,"lat":53.514293,"lon":9.984853,"street":"Am Veringhof","housenumber":"17","postcode":"21107","website":"https://www.kleiderkammer-wilhelmsburg.de","lane":"M939"},{"name":"Kleiderrausch","key":"kleiderrausch","osm_type":"node","osm_id":9025877142,"lat":53.5507469,"lon":9.9246822,"street":null,"housenumber":null,"postcode":null,"website":"http://www.kleiderrausch.de/","lane":"M940"},{"name":"Knallbonbon","key":"knallbonbon","osm_type":"node","osm_id":3888959937,"lat":53.5691431,"lon":10.0543966,"street":"Wandsbeker Chaussee","housenumber":"259","postcode":"22089","website":null,"lane":"M941"},{"name":"Kreuz & quer","key":"kreuzquer","osm_type":"node","osm_id":5762361782,"lat":53.4627842,"lon":9.9820609,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M942"},{"name":"Kukulino","key":"kukulino","osm_type":"node","osm_id":11165397294,"lat":53.5782123,"lon":10.0296489,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M943"},{"name":"Lieblingsstück","key":"lieblingsstuck","osm_type":"node","osm_id":6535314548,"lat":53.5616032,"lon":9.8198732,"street":"Dockenhudener Straße","housenumber":"1","postcode":"22587","website":null,"lane":"M944"},{"name":"Lütte & Plünn","key":"lutteplunn","osm_type":"node","osm_id":4029683841,"lat":53.5801007,"lon":10.0613262,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M945"},{"name":"Mango","key":"mango","osm_type":"way","osm_id":982084047,"lat":53.5515345,"lon":10.000275,"street":"Spitalerstraße","housenumber":"22-26","postcode":"20095","website":null,"lane":"M946"},{"name":"Mano a Mano","key":"manoamano","osm_type":"node","osm_id":4791414722,"lat":53.5536499,"lon":9.93198,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M947"},{"name":"Nachhaltique","key":"nachhaltique","osm_type":"node","osm_id":11499939808,"lat":53.580213,"lon":9.9481663,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M948"},{"name":"Otten von Emmerich","key":"ottenvonemmerich","osm_type":"way","osm_id":900567900,"lat":53.552475,"lon":9.9896324,"street":null,"housenumber":null,"postcode":null,"website":"https://www.oveshop.de/","lane":"M949"},{"name":"PICKnWEIGHT","key":"picknweight","osm_type":"node","osm_id":4192584292,"lat":53.5581297,"lon":9.9631343,"street":"Beim Grünen Jäger","housenumber":"16","postcode":"20359","website":"https://picknweight.de/pages/hamburg","lane":"M950"},{"name":"RELUV","key":"reluv","osm_type":"node","osm_id":4449707590,"lat":53.5532838,"lon":9.9291104,"street":"Bahrenfelder Straße","housenumber":"133","postcode":null,"website":null,"lane":"M951"},{"name":"Rock Shop","key":"rockshop","osm_type":"node","osm_id":3029716493,"lat":53.545701,"lon":9.9676369,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M952"},{"name":"Schn€ppchen","key":"schnppchen","osm_type":"node","osm_id":5039123959,"lat":53.568428,"lon":10.0492264,"street":"Wandsbeker Chaussee","housenumber":"189","postcode":"22089","website":"http://www.schneppchen-hamburg.de","lane":"M953"},{"name":"Second Schanze","key":"secondschanze","osm_type":"node","osm_id":9036284810,"lat":53.56864,"lon":9.9644013,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M954"},{"name":"Secondella","key":"secondella","osm_type":"node","osm_id":1983556531,"lat":53.5525709,"lon":9.9866292,"street":null,"housenumber":null,"postcode":null,"website":"https://www.secondella.de/","lane":"M955"},{"name":"Secondhand Gestöber","key":"secondhandgestober","osm_type":"node","osm_id":1432465796,"lat":53.5765147,"lon":9.9428819,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M956"},{"name":"Stilbruch","key":"stilbruch","osm_type":"way","osm_id":24950570,"lat":53.5655744,"lon":9.924694,"street":"Ruhrstraße","housenumber":"51","postcode":"22761","website":"http://www.stilbruch.de","lane":"M957"},{"name":"Stöberkiste","key":"stoberkiste","osm_type":"node","osm_id":3809132614,"lat":53.5728843,"lon":9.9504102,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M958"},{"name":"Telecard Hamburg","key":"telecardhamburg","osm_type":"node","osm_id":3670889373,"lat":53.5501866,"lon":10.0018669,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M959"},{"name":"Thrift Thieves","key":"thriftthieves","osm_type":"node","osm_id":5341006410,"lat":53.5650987,"lon":9.958975,"street":"Schulterblatt","housenumber":"133","postcode":"20357","website":null,"lane":"M960"},{"name":"TIMODE","key":"timode","osm_type":"node","osm_id":3282483457,"lat":53.5486481,"lon":10.0916007,"street":"Washingtonallee","housenumber":"65","postcode":"22111","website":null,"lane":"M961"},{"name":"UNNAMED_node_11367083296","key":"unnamed:node:11367083296","osm_type":"node","osm_id":11367083296,"lat":53.5489616,"lon":9.9597368,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M962"},{"name":"UNNAMED_node_11476053454","key":"unnamed:node:11476053454","osm_type":"node","osm_id":11476053454,"lat":53.574231,"lon":9.9600131,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M963"},{"name":"UNNAMED_node_3206749003","key":"unnamed:node:3206749003","osm_type":"node","osm_id":3206749003,"lat":53.568137,"lon":10.0925971,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M964"},{"name":"Veltins","key":"veltins","osm_type":"node","osm_id":9988238503,"lat":53.5582739,"lon":9.9715465,"street":null,"housenumber":null,"postcode":null,"website":null,"lane":"M965"},{"name":"Vintage & Rags","key":"vintagerags","osm_type":"node","osm_id":2058305236,"lat":53.5530194,"lon":10.003504,"street":"Kurze Mühren","housenumber":"6","postcode":"20095","website":"https://www.vintage-rags.de/","lane":"M966"},{"name":"Vintage Kaufhaus Hamburg","key":"vintagekaufhaushamburg","osm_type":"node","osm_id":11891404969,"lat":53.5588205,"lon":9.961191,"street":null,"housenumber":null,"postcode":"22767","website":null,"lane":"M967"},{"name":"Vintage Revivals","key":"vintagerevivals","osm_type":"node","osm_id":4415574698,"lat":53.5603242,"lon":9.9635773,"street":null,"housenumber":null,"postcode":null,"website":"https://www.vintagerevivals.de/de/","lane":"M968"},{"name":"Zwergenaufstand","key":"zwergenaufstand","osm_type":"node","osm_id":6671338329,"lat":53.5765657,"lon":9.9428005,"street":"Lappenbergsallee","housenumber":"29","postcode":"20257","website":"https://www.second-hand-zwergenaufstand.de/","lane":"M969"}]''')
+          assert len(candidates)==50
+          assert len({row['lane'] for row in candidates})==50
+          assert len({row['key'] for row in candidates})==50
+          assert [row['lane'] for row in candidates]==[f'M{number:03d}' for number in range(920,970)]
+          for row in candidates:
+              json.dump(row,open(f"p50/work/{row['lane']}.json",'w'),ensure_ascii=False,indent=2)
+          manifest={
+            'phase':'FASE_1_CENS_PROVEIDORS_UE',
+            'city_id':'DE_02000000',
+            'zone':'DE_02000000_G13',
+            'packet':'M920-M969',
+            'policy':'ONE_UNRESOLVED_IDENTITY_PER_REAL_WORKER_NO_OVERLAP',
+            'source_checkpoint':'CP104',
+            'work_units':50,
+            'nonempty_work_units':50,
+            'candidate_keys':[row['key'] for row in candidates],
+            'assignments':candidates,
+          }
+          manifest['sha256']=hashlib.sha256(json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          json.dump(manifest,open('RLF_HAMBURG_G13_M920_M969_WORK_MANIFEST.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({'work_units':50,'unique_lanes':50,'unique_candidate_keys':50,'sha256':manifest['sha256']}))
+          PYBUILD
+
+      - name: Execute 50 real simultaneous evidence workers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYWORKER'
+          from pathlib import Path
+          Path('p50/worker.py').write_text(r'''import hashlib,html,json,os,re,sys,time,urllib.parse,urllib.request
+          lane=sys.argv[1]
+          candidate=json.load(open(f'p50/work/{lane}.json'))
+          open(f'p50/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+60
+          while not os.path.exists('p50/GO'):
+              if time.time()>deadline: raise SystemExit('barrier timeout')
+              time.sleep(.02)
+          time.sleep((int(hashlib.sha256(lane.encode()).hexdigest()[:4],16)%1200)/1000)
+          
+          def clean(body,limit=18000):
+              body=re.sub(r'<script\b[^>]*>.*?</script>',' ',body,flags=re.I|re.S)
+              body=re.sub(r'<style\b[^>]*>.*?</style>',' ',body,flags=re.I|re.S)
+              return html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',body)))[:limit]
+          
+          def fetch(url):
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Chrome/151','Accept-Language':'de-DE,de;q=0.9,en;q=0.6'})
+                  with urllib.request.urlopen(req,timeout=30) as response:
+                      body=response.read(320000).decode('utf-8','replace')
+                      return {'url':url,'status':getattr(response,'status',200),'final_url':response.geturl(),'text':clean(body)}
+              except Exception as exc:
+                  return {'url':url,'error':type(exc).__name__+': '+str(exc)}
+          
+          def search(query,engine):
+              encoded=urllib.parse.quote_plus(query)
+              url=f'https://www.bing.com/search?q={encoded}&count=20' if engine=='bing' else f'https://html.duckduckgo.com/html/?q={encoded}'
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Chrome/151','Accept-Language':'de-DE,de;q=0.9,en;q=0.6'})
+                  with urllib.request.urlopen(req,timeout=30) as response:
+                      body=response.read().decode('utf-8','replace');status=getattr(response,'status',200)
+                  links=[];seen=set()
+                  for href in re.findall(r'href=["\']([^"\']+)["\']',body,re.I):
+                      href=html.unescape(href)
+                      if href.startswith('//'): href='https:'+href
+                      if 'uddg=' in href:
+                          try: href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                          except Exception: pass
+                      if not href.startswith('http'): continue
+                      host=(urllib.parse.urlparse(href).hostname or '').lower()
+                      if any(value in host for value in ['bing.com','microsoft.com','duckduckgo.com']): continue
+                      href=href.split('#',1)[0]
+                      if href in seen: continue
+                      seen.add(href);links.append(href)
+                      if len(links)>=12: break
+                  return {'query':query,'engine':engine,'status':status,'links':links}
+              except Exception as exc:
+                  return {'query':query,'engine':engine,'error':type(exc).__name__+': '+str(exc),'links':[]}
+          
+          def claim(url):
+              normalized=url.split('#',1)[0]
+              key=hashlib.sha256(normalized.encode()).hexdigest();path=f'p50/claims/{key}'
+              try:
+                  descriptor=os.open(path,os.O_CREAT|os.O_EXCL|os.O_WRONLY);os.write(descriptor,lane.encode());os.close(descriptor)
+                  return {'url':normalized,'owner':lane,'accepted':True}
+              except FileExistsError:
+                  return {'url':normalized,'owner':open(path).read(),'accepted':False,'reason':'ATOMIC_GLOBAL_DUPLICATE'}
+          
+          name=candidate['name']
+          location=' '.join(str(value) for value in [candidate.get('street'),candidate.get('housenumber'),candidate.get('postcode'),'Hamburg'] if value)
+          if name.startswith('UNNAMED_'):
+              activity_query=f'Hamburg Second Hand Kleidung {candidate["lat"]} {candidate["lon"]}'
+              identity_query=f'Gewerbe Secondhand Hamburg {candidate["lat"]} {candidate["lon"]} Impressum'
+          else:
+              activity_query=f'"{name}" "{location}" (Secondhand OR "Second Hand" OR Vintage OR gebraucht) Kleidung'
+              identity_query=f'"{name}" Hamburg (Impressum OR Inhaber OR GmbH OR e.V. OR HRB OR HRA)'
+          queries=[search(activity_query,'bing'),search(identity_query,'ddg')]
+          candidate_urls=[]
+          if candidate.get('website'): candidate_urls.append(candidate['website'])
+          for query in queries:
+              candidate_urls.extend(query.get('links',[]))
+          claims=[];pages=[]
+          for url in dict.fromkeys(candidate_urls):
+              ownership=claim(url);claims.append(ownership)
+              if ownership['accepted'] and len(pages)<8: pages.append(fetch(url))
+          joined=' '.join(page.get('text','') for page in pages).lower()
+          signals={
+            'secondhand_terms':sorted({term for term in ['secondhand','second hand','gebraucht','vintage','kommissionsware'] if term in joined}),
+            'apparel_terms':sorted({term for term in ['kleidung','mode','fashion','bekleidung','textilien','jacken','hosen','shirts'] if term in joined}),
+            'legal_terms':sorted({term for term in ['impressum','gmbh','e.v.','inhaber','hrb','hra','ust-id'] if term in joined}),
+            'checkout_terms':sorted({term for term in ['warenkorb','in den warenkorb','cart','checkout','versand'] if term in joined}),
+          }
+          result={
+            'phase':'FASE_1_CENS_PROVEIDORS_UE','city_id':'DE_02000000','zone':'DE_02000000_G13','packet':'M920-M969',
+            'lane':lane,'pid':os.getpid(),'candidate':candidate,'queries':queries,'url_claims':claims,'owned_pages':pages,
+            'signals':signals,'finished':time.time()
+          }
+          result['sha256']=hashlib.sha256(json.dumps(result,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          json.dump(result,open(f'p50/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          ''')
+          PYWORKER
+
+          pids=()
+          for number in $(seq 920 969); do lane=$(printf 'M%03d' "$number"); python3 p50/worker.py "$lane" & pids+=("$!"); done
+          deadline=$((SECONDS+60))
+          while true; do ready=$(find p50/ready -type f | wc -l); [ "$ready" -eq 50 ] && break; [ "$SECONDS" -ge "$deadline" ] && exit 7; sleep .05; done
+          alive=0
+          for pid in "${pids[@]}"; do kill -0 "$pid" 2>/dev/null && alive=$((alive+1)); done
+          echo "BARRIER_READY=$ready"; echo "SIMULTANEOUS_ALIVE=$alive"; [ "$alive" -eq 50 ] || exit 8
+          date +%s.%N > p50/GO
+          failures=0
+          for pid in "${pids[@]}"; do wait "$pid" || failures=$((failures+1)); done
+          echo "WORKER_PROCESS_FAILURES=$failures"; [ "$failures" -eq 0 ] || exit 9
+
+      - name: AAA partition ownership and evidence audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYAUDIT'
+          import glob,hashlib,json
+          rows=[json.load(open(path)) for path in sorted(glob.glob('p50/out/M*.json'))]
+          manifest=json.load(open('RLF_HAMBURG_G13_M920_M969_WORK_MANIFEST.json'))
+          keys=[row['candidate']['key'] for row in rows]
+          claims=[claim for row in rows for claim in row.get('url_claims',[])]
+          report={
+            'phase':'FASE_1_CENS_PROVEIDORS_UE','city_id':'DE_02000000','zone':'DE_02000000_G13','packet':'M920-M969',
+            'workers':len(rows),'unique_pids':len({row['pid'] for row in rows}),'unique_lanes':len({row['lane'] for row in rows}),
+            'simultaneous_alive':50,'process_failures':0,'manifest_work_units':manifest['work_units'],
+            'assigned_candidate_keys':len(keys),'unique_assigned_candidate_keys':len(set(keys)),
+            'accepted_unique_urls':sum(1 for claim in claims if claim.get('accepted')),
+            'atomic_duplicate_urls':sum(1 for claim in claims if not claim.get('accepted')),
+            'lanes_with_activity_results':sum(any(q.get('links') for q in row['queries'][:1]) for row in rows),
+            'lanes_with_identity_results':sum(any(q.get('links') for q in row['queries'][1:]) for row in rows),
+            'lanes_with_owned_pages':sum(bool(row.get('owned_pages')) for row in rows),
+            'partition_complete':len(rows)==len(keys)==len(set(keys))==50,
+            'rows':rows,
+          }
+          report['sha256']=hashlib.sha256(json.dumps(report,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          json.dump(report,open('RLF_HAMBURG_G13_RESOLUTION_M920_M969.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({key:report[key] for key in ['workers','unique_pids','unique_lanes','simultaneous_alive','process_failures','assigned_candidate_keys','unique_assigned_candidate_keys','accepted_unique_urls','atomic_duplicate_urls','lanes_with_activity_results','lanes_with_identity_results','lanes_with_owned_pages','partition_complete','sha256']}))
+          assert report['workers']==report['unique_pids']==report['unique_lanes']==50 and report['partition_complete']
+          PYAUDIT
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-HAMBURG-G13-RESOLUTION-P50-M920-M969
+          path: |
+            RLF_HAMBURG_G13_M920_M969_WORK_MANIFEST.json
+            RLF_HAMBURG_G13_RESOLUTION_M920_M969.json
+            p50/out/*.json
+          retention-days: 7
