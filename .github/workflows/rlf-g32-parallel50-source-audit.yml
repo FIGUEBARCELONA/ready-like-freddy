@@ -1,0 +1,138 @@
+name: RLF G32 Parallel50 exclusive source audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-g32-parallel50-source-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Launch 50 exclusive-domain source workers simultaneously
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf audit && mkdir -p audit/ready audit/out
+          cat > audit/targets.tsv <<'EOF'
+          M420	fairkauf-berlin.de	https://www.fairkauf-berlin.de/
+          M421	fairkaufhaus.de	https://www.fairkaufhaus.de/
+          M422	helpberlin.de	https://helpberlin.de/spendenannahme/
+          M423	socialladen.de	https://socialladen.de/scond-hand-berlin/
+          M424	agens-berlin.de	https://www.agens-berlin.de/weitere-angebote/kleiderkammer/
+          M425	suppe.franziskaner.de	https://suppe.franziskaner.de/kleiderkammer/
+          M426	berlin-nord.flohkids.de	https://berlin-nord.flohkids.de/seiten/berlin-nord
+          M427	chiara-berlin.de	http://www.chiara-berlin.de/
+          M428	et-cetera-berlin.de	http://www.et-cetera-berlin.de/info.php
+          M429	gewandhaus-secondhand.de	https://gewandhaus-secondhand.de/kommissionsware/
+          M430	wundervoll-secondhand.de	https://wundervoll-secondhand.de/an-und-verkauf-kommission/
+          M431	veistberlin.com	https://www.veistberlin.com/projects/kommissionsverkauf
+          M432	in-rotation.com	https://www.in-rotation.com/de/pages/selltrade
+          M433	lastdecades.de	https://lastdecades.de/
+          M434	klamotteberlin.de	https://www.klamotteberlin.de/
+          M435	zweimalgut.de	https://www.zweimalgut.de/
+          M436	sammensecondhand.de	https://sammensecondhand.de/kinder-second-hand/
+          M437	rondo-frohnau.de	https://www.rondo-frohnau.de/
+          M438	ortsteile-berlin.de	https://www.ortsteile-berlin.de/anbieter/herrmann-moden
+          M439	berlin.stadtbranchenbuch.com	https://berlin.stadtbranchenbuch.com/6334564.html
+          M440	berlin.branchen-info.net	https://berlin.branchen-info.net/fp_2378556.php
+          M441	onlinestreet.de	https://onlinestreet.de/poi/QU5kNWJITjlKUyt6YTUzWWY0UDFGQT09
+          M442	seekty.com	https://seekty.com/berlin/branchen/wiki-wittenauer-kinder-second-hand/
+          M443	ekg-frohnau.de	https://www.ekg-frohnau.de/gemeindeleben-wir-sind-fur-sie-da/johannesgarten
+          M444	tildi.com	https://tildi.com/
+          M445	comme.de	https://www.comme.de/
+          M446	sylviap-mode-design.de	http://www.sylviap-mode-design.de/Kommissionsware-fuer-Boutiquen/
+          M447	soziale-unternehmen-berlin.de	https://www.soziale-unternehmen-berlin.de/category/einzelhandel/secondhand-kleidung/
+          M448	berlinmitkind.de	https://berlinmitkind.de/stadtleben/top-10/soziale-secondhand-laeden/
+          M449	qiez.de	https://www.qiez.de/secondhand-kinderkleidung-berlin-tipp/
+          M450	top10berlin.de	https://www.top10berlin.de/de/cat/shopping-271/second-hand-shops-861
+          M451	visitberlin.de	https://www.visitberlin.de/de/blog/11-tolle-second-hand-laeden-berlin
+          M452	tip-berlin.de	https://www.tip-berlin.de/lifestyle/shopping/second-hand-laeden/
+          M453	yoys.de	https://www.yoys.de/adresse/gesch%C3%A4ft-f%C3%BCr-second-hand-kleidung/Berlin-Pankow-Wilhelmsruh
+          M454	11880.com	https://www.11880.com/branchenbuch/berlin/131901927B101728988/sozialkaufhaus.html
+          M455	dasoertliche.de	https://www.dasoertliche.de/Themen/Secondhandshops/Berlin-Reinickendorf.html
+          M456	dastelefonbuch.de	https://www.dastelefonbuch.de/Suche/Secondhand/Berlin
+          M457	gelbeseiten.de	https://www.gelbeseiten.de/branchen/second%20hand/berlin%20bezirk%20pankow
+          M458	web2.cylex.de	https://web2.cylex.de/branchen/geschaeft-fuer-second-hand-kleidung/Berlin/?dst=Reinickendorf
+          M459	lokaleauskunft.de	https://www.lokaleauskunft.de/D_39291_L%C3%BCbars/0/4990_Second+Hand+Shops.htm
+          M460	wegweiser-aktuell.de	https://www.wegweiser-aktuell.de/berlin/13_reinickendorf_143_an-und-verkauf-gebrauchtwaren-secondhand.htm
+          M461	firmania.de	https://firmania.de/berlin/charlotte-macht-gl%C3%BCcklich-5334769
+          M462	localitybiz.de	https://localitybiz.de/26269181/sachensucher-kindersecondhand-berlin
+          M463	finderr.de	https://www.finderr.de/sachensucher-secondhand.de-second-hand-bekleidungsgeschaeft-geschaeft-fuer-babybekleidung-kinderbekleidungsgeschaeft-modegeschaef-berlin-kindersecondhand-101145733
+          M464	finde-offen.de	https://finde-offen.de/berlin%28waidmannslust%29/gesch%C3%A4ft-f%C3%BCr-second-hand-kleidung
+          M465	oeffnungszeiten-firmen.de	https://www.oeffnungszeiten-firmen.de/arbeitszeit-zeitplan/Kleidung-Berlin-Waidmannslust-Sachensucher-Secondhandshop/639132
+          M466	oeffnungszeitenbuch.de	https://www.oeffnungszeitenbuch.de/filiale/Berlin-Veist%2520-%2520Designer%2520Second%2520Hand%2520und%2520Vintage%2520Kommissionsladen-4367353J.html
+          M467	pankow-weissensee-prenzlauerberg.berlin	https://www.pankow-weissensee-prenzlauerberg.berlin/en/shopping-kategorie/second-hand
+          M468	berlin.city-map.de	https://berlin.city-map.de/01010000/secondhandshops
+          M469	karow-guide.de	https://www.karow-guide.de/modestrecke/
+          EOF
+
+          cat > audit/worker.py <<'PY'
+          import sys,os,time,json,re,html,urllib.request,urllib.parse,hashlib
+          lane,domain,url=sys.argv[1:4]
+          open(f'audit/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+45
+          while not os.path.exists('audit/GO'):
+            if time.time()>deadline: raise SystemExit('barrier timeout')
+            time.sleep(.02)
+          started=time.time(); status=None; final=url; text=''; err=None
+          try:
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36','Accept-Language':'de-DE,de;q=0.9,en;q=0.5'})
+            with urllib.request.urlopen(req,timeout=30) as r:
+              status=getattr(r,'status',200); final=r.geturl(); raw=r.read(300000).decode('utf-8','replace')
+            raw=re.sub(r'<script\b[^>]*>.*?</script>',' ',raw,flags=re.I|re.S)
+            raw=re.sub(r'<style\b[^>]*>.*?</style>',' ',raw,flags=re.I|re.S)
+            text=html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',raw))).strip()[:60000]
+          except Exception as e: err=type(e).__name__+': '+str(e)
+          low=text.lower()
+          signals={k:(k in low) for k in ['second hand','secondhand','vintage','kleidung','bekleidung','kommission','ankauf','verkauf','öffnungszeiten','impressum','inhaber','geschäft','laden']}
+          zips=sorted(set(re.findall(r'\b(?:13(?:40[3-9]|41[0-9]|42[0-9]|43[0-9]|45[0-9]|46[0-9]|47[0-9]|48[0-9]|49[0-9]|15[0-9]|16[0-9]|17[0-9]|18[0-9]|19[0-9]|2[0-9]{2}))\b',text)))[:30]
+          out={'lane':lane,'domain':domain,'url':url,'pid':os.getpid(),'status':status,'final_url':final,'started':started,'ended':time.time(),'error':err,'signals':signals,'postal_codes':zips,'text_excerpt':text[:12000]}
+          json.dump(out,open(f'audit/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          PY
+
+          pids=()
+          while IFS=$'\t' read -r lane domain url; do
+            python3 audit/worker.py "$lane" "$domain" "$url" & pids+=("$!")
+          done < audit/targets.tsv
+          deadline=$((SECONDS+45))
+          while [ "$(find audit/ready -type f | wc -l)" -lt 50 ]; do
+            [ "$SECONDS" -ge "$deadline" ] && exit 7
+            sleep .05
+          done
+          alive=0; for p in "${pids[@]}"; do kill -0 "$p" 2>/dev/null && alive=$((alive+1)); done
+          echo "EXCLUSIVE_SOURCE_WORKERS_READY=50"
+          echo "SIMULTANEOUS_ALIVE=$alive"
+          [ "$alive" -eq 50 ] || exit 8
+          date +%s.%N > audit/GO
+          fail=0; for p in "${pids[@]}"; do wait "$p" || fail=$((fail+1)); done
+          echo "WORKER_FAILURES=$fail"; [ "$fail" -eq 0 ] || exit 9
+
+      - name: Merge AAA source audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import glob,json,hashlib
+          rows=[json.load(open(f,encoding='utf-8')) for f in sorted(glob.glob('audit/out/M*.json'))]
+          domains=[r['domain'] for r in rows]; pids=[r['pid'] for r in rows]; lanes=[r['lane'] for r in rows]
+          report={'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32','packet':'M420-M469','outputs':len(rows),'unique_domains':len(set(domains)),'unique_pids':len(set(pids)),'unique_lanes':len(set(lanes)),'all_50_exclusive':len(rows)==50 and len(set(domains))==50 and len(set(pids))==50 and len(set(lanes))==50,'http_success':sum(1 for r in rows if r.get('status') and 200<=r['status']<400),'worker_errors':sum(1 for r in rows if r.get('error')),'rows':rows}
+          raw=json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode(); report['sha256']=hashlib.sha256(raw).hexdigest()
+          json.dump(report,open('RLF_G32_P50_M420_M469_SOURCE_AUDIT.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:report[k] for k in ['outputs','unique_domains','unique_pids','unique_lanes','all_50_exclusive','http_success','worker_errors']}))
+          if not report['all_50_exclusive']: raise SystemExit(10)
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-G32-P50-M420-M469-SOURCE-AUDIT
+          path: |
+            RLF_G32_P50_M420_M469_SOURCE_AUDIT.json
+            audit/out/*.json
+          retention-days: 7
