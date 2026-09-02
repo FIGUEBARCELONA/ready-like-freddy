@@ -24,7 +24,7 @@ jobs:
           curl -fsSL 'https://raw.githubusercontent.com/euraf/eu-nuts-lau/main/v1/DE/DE300_LAU_RG_01M_2024_4326.geojson' -o berlin.geojson
 
           python3 - <<'PYBUILD'
-          import hashlib,json,math,re,unicodedata,urllib.request
+          import hashlib,json,math,re,time,unicodedata,urllib.request
           from shapely.geometry import Point,box,mapping,shape
 
           geom=shape(json.load(open('berlin.geojson'))['features'][0]['geometry'])
@@ -33,8 +33,18 @@ jobs:
           bbox=[minx,miny+dy,minx+dx,miny+2*dy]
           clip=geom.intersection(box(*bbox))
           q='''[out:json][timeout:80];(nwr[shop=second_hand]({s},{w},{n},{e});nwr[shop=clothes][second_hand]({s},{w},{n},{e});nwr[shop=clothes][clothes=second_hand]({s},{w},{n},{e}););out center tags;'''.format(s=bbox[1],w=bbox[0],n=bbox[3],e=bbox[2])
-          req=urllib.request.Request('https://overpass-api.de/api/interpreter',data=q.encode(),headers={'User-Agent':'RLF-census/1.0'})
-          with urllib.request.urlopen(req,timeout=95) as r:data=json.load(r)
+          data=None;errors=[]
+          endpoints=['https://overpass.kumi.systems/api/interpreter','https://overpass-api.de/api/interpreter','https://overpass.private.coffee/api/interpreter']
+          for endpoint in endpoints:
+            for attempt in range(2):
+              try:
+                req=urllib.request.Request(endpoint,data=q.encode(),headers={'User-Agent':'RLF-census/1.0'})
+                with urllib.request.urlopen(req,timeout=110) as r:data=json.load(r)
+                break
+              except Exception as exc:
+                errors.append({'endpoint':endpoint,'attempt':attempt+1,'error':type(exc).__name__+': '+str(exc)});time.sleep(2+attempt)
+            if data is not None:break
+          if data is None:raise SystemExit('OVERPASS_PREFLIGHT_FAILED '+json.dumps(errors))
 
           raw=[]
           for el in data.get('elements',[]):
