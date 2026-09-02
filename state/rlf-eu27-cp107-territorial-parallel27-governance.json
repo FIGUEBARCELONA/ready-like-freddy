@@ -1,0 +1,96 @@
+{
+  "schema": "RLF_EU27_CP107_TERRITORIAL_PARALLEL27_GOVERNANCE_V1",
+  "checkpoint": "CP107_TERRITORIAL_PARALLEL27_STRICT_ORDER",
+  "source_checkpoint": "CP106_DISCOVERY_RUNTIME_VALIDATED",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "phase_2_kb": "LOCKED",
+  "canonical_counts_at_entry": {"verified": 413, "eligible": 70, "hold": 343, "remaining": 9587},
+  "canonical_delta": 0,
+  "policy": "APPEND_ONLY_FAIL_CLOSED_TERRITORIAL_EXHAUSTION_V3_PARALLEL27_SERIAL_LANES",
+  "supersedes_only": "V2 global single-country ACTIVE restriction",
+  "preserves": [
+    "append-only canonical ledger",
+    "one canonical supplier identity counts once",
+    "AAA adjudication before promotion",
+    "official geometry required for closure",
+    "15 consecutive no-new searches after last promotion",
+    "counter resets to 0 on any new qualified identity",
+    "Phase 2 blocked until Phase 1 complete",
+    "UK and prohibited marketplaces excluded"
+  ],
+  "parallelism": {
+    "country_lanes": 27,
+    "country_lanes_may_run_concurrently": true,
+    "cross_country_serial_dependency_removed": true,
+    "within_each_country_lane_serial_order_mandatory": true,
+    "within_lane_sequence": "city_rank ascending -> zone_order ascending -> candidate resolution -> freeze -> fresh 15/15 exhaustion -> next zone -> next city",
+    "no_skips": true,
+    "no_out_of_order_promotions": true,
+    "no_cross_lane_work_stealing": true,
+    "no_redundant_lane_search": true,
+    "no_loop_without_material_trigger": true
+  },
+  "territorial_sources": {
+    "city_registry": "cities_top100_27_eu.csv",
+    "city_order_rule": "descending population; up to 100 positive-population LAU/local units per country; fewer only where canonical source contains fewer",
+    "zone_registry": "provider_search_segments_27_eu.csv",
+    "zone_order_rule": "canonical zone_order only; normally deterministic 3x3 LAU-clipped grid; official arrondissements retained for Paris/Lyon/Marseille",
+    "geometry_rule": "official LAU-clipped geometry is authoritative; bbox is discovery gate only",
+    "registry_summary": {"local_units_total": 2549, "search_zones_total": 21887, "countries": 27}
+  },
+  "promotion_gate": {
+    "discovery_is_not_verification": true,
+    "cp106_4417_rows_are_evidence_only": true,
+    "candidate_must_match_current_lane_country": true,
+    "candidate_must_match_current_unlocked_city_and_zone": true,
+    "outside_current_zone_action": "DEFER_TO_EXACT_FUTURE_ZONE_WITH_DELTA_0",
+    "global_operator_dedup_before_promotion": true,
+    "cross_lane_duplicate_action": "EVIDENCE_ONLY_DELTA_0",
+    "directories_maps_search_snippets_not_sufficient_for_promotion": true,
+    "legal_or_responsible_identity_required": true,
+    "current_professional_secondhand_apparel_activity_required": true,
+    "unknown_is_zero": false
+  },
+  "closure_gate": {
+    "official_polygon_materialized_and_validated": true,
+    "all_in_zone_discoveries_terminal": true,
+    "open_dedup_conflicts": 0,
+    "candidate_set_frozen": true,
+    "fresh_consecutive_no_new_required": 15,
+    "technical_source_failure_exhaustion_credit": 0,
+    "closure_certificate_and_hashes_required": true
+  },
+  "cursor_policy": {
+    "one_active_city_per_lane": true,
+    "one_active_zone_per_lane": true,
+    "next_zone_locked_until_current_closed": true,
+    "next_city_locked_until_all_current_city_zones_closed": true,
+    "country_closed_only_after_all_canonical_city_rows_closed": true,
+    "cursor_may_never_be_inferred_when_source_row_missing": true,
+    "missing_cursor_source_action": "FAIL_CLOSED_NO_WRITE"
+  },
+  "germany_exact_cursor": {
+    "lane_id": "L11",
+    "iso": "DE",
+    "owner_lock": "L11:DE",
+    "city_rank": 2,
+    "city_id": "DE_02000000",
+    "city_name": "Hamburg, Freie und Hansestadt",
+    "zone_id": "DE_02000000_G13",
+    "pending": 38,
+    "candidate_set": "NOT_FROZEN",
+    "exhaustion": "0/15",
+    "later_zones_locked": ["DE_02000000_G23", "DE_02000000_G31"]
+  },
+  "non_de_lane_cursor_materialization": {
+    "status": "MANDATORY_BEFORE_FIRST_TERRITORIAL_WRITE",
+    "source_only": ["cities_top100_27_eu.csv", "provider_search_segments_27_eu.csv"],
+    "initial_city_rank": 1,
+    "initial_zone": "lowest canonical zone_order physically present for city_rank 1",
+    "capital_or_G11_assumptions_forbidden": true
+  },
+  "lanes": [
+    {"lane_id":"L01","iso":"AT","owner_lock":"L01:AT"},{"lane_id":"L02","iso":"BE","owner_lock":"L02:BE"},{"lane_id":"L03","iso":"BG","owner_lock":"L03:BG"},{"lane_id":"L04","iso":"HR","owner_lock":"L04:HR"},{"lane_id":"L05","iso":"CY","owner_lock":"L05:CY"},{"lane_id":"L06","iso":"CZ","owner_lock":"L06:CZ"},{"lane_id":"L07","iso":"DK","owner_lock":"L07:DK"},{"lane_id":"L08","iso":"EE","owner_lock":"L08:EE"},{"lane_id":"L09","iso":"FI","owner_lock":"L09:FI"},{"lane_id":"L10","iso":"FR","owner_lock":"L10:FR"},{"lane_id":"L11","iso":"DE","owner_lock":"L11:DE"},{"lane_id":"L12","iso":"GR","owner_lock":"L12:GR"},{"lane_id":"L13","iso":"HU","owner_lock":"L13:HU"},{"lane_id":"L14","iso":"IE","owner_lock":"L14:IE"},{"lane_id":"L15","iso":"IT","owner_lock":"L15:IT"},{"lane_id":"L16","iso":"LV","owner_lock":"L16:LV"},{"lane_id":"L17","iso":"LT","owner_lock":"L17:LT"},{"lane_id":"L18","iso":"LU","owner_lock":"L18:LU"},{"lane_id":"L19","iso":"MT","owner_lock":"L19:MT"},{"lane_id":"L20","iso":"NL","owner_lock":"L20:NL"},{"lane_id":"L21","iso":"PL","owner_lock":"L21:PL"},{"lane_id":"L22","iso":"PT","owner_lock":"L22:PT"},{"lane_id":"L23","iso":"RO","owner_lock":"L23:RO"},{"lane_id":"L24","iso":"SK","owner_lock":"L24:SK"},{"lane_id":"L25","iso":"SI","owner_lock":"L25:SI"},{"lane_id":"L26","iso":"ES","owner_lock":"L26:ES"},{"lane_id":"L27","iso":"SE","owner_lock":"L27:SE"}
+  ],
+  "next_action": "Materialize the exact current city/zone cursor for every non-DE lane from the canonical registries, validate 27/27 unique ownership and serial predecessor gates, then consume CP106 discovery only when it belongs to the currently unlocked zone. Do not perform new broad country discovery until the CP106 queue has been territorially routed and deduplicated."
+}
