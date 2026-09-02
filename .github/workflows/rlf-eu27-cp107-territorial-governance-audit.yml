@@ -1,0 +1,90 @@
+name: RLF EU27 CP107 territorial governance audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'state/rlf-eu27-cp107-territorial-parallel27-governance.json'
+      - '.github/workflows/rlf-eu27-cp107-territorial-governance-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  governance-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate CP107 strict-order invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, hashlib
+          p='state/rlf-eu27-cp107-territorial-parallel27-governance.json'
+          d=json.load(open(p,encoding='utf-8'))
+          assert d['checkpoint']=='CP107_TERRITORIAL_PARALLEL27_STRICT_ORDER'
+          assert d['source_checkpoint']=='CP106_DISCOVERY_RUNTIME_VALIDATED'
+          assert d['phase']=='FASE_1_CENS_PROVEIDORS_UE'
+          assert d['phase_2_kb']=='LOCKED'
+          c=d['canonical_counts_at_entry']
+          assert c=={'verified':413,'eligible':70,'hold':343,'remaining':9587}
+          assert c['eligible']+c['hold']==c['verified']
+          assert 10000-c['verified']==c['remaining']
+          assert d['canonical_delta']==0
+          assert d['parallelism']['country_lanes']==27
+          assert d['parallelism']['country_lanes_may_run_concurrently'] is True
+          assert d['parallelism']['within_each_country_lane_serial_order_mandatory'] is True
+          assert d['parallelism']['no_skips'] is True
+          assert d['parallelism']['no_out_of_order_promotions'] is True
+          assert d['parallelism']['no_cross_lane_work_stealing'] is True
+          assert d['parallelism']['no_redundant_lane_search'] is True
+          assert d['parallelism']['no_loop_without_material_trigger'] is True
+          assert d['promotion_gate']['cp106_4417_rows_are_evidence_only'] is True
+          assert d['promotion_gate']['global_operator_dedup_before_promotion'] is True
+          assert d['promotion_gate']['outside_current_zone_action']=='DEFER_TO_EXACT_FUTURE_ZONE_WITH_DELTA_0'
+          assert d['closure_gate']['fresh_consecutive_no_new_required']==15
+          assert d['closure_gate']['technical_source_failure_exhaustion_credit']==0
+          assert d['cursor_policy']['one_active_city_per_lane'] is True
+          assert d['cursor_policy']['one_active_zone_per_lane'] is True
+          assert d['cursor_policy']['next_zone_locked_until_current_closed'] is True
+          assert d['cursor_policy']['next_city_locked_until_all_current_city_zones_closed'] is True
+          assert d['cursor_policy']['cursor_may_never_be_inferred_when_source_row_missing'] is True
+          assert d['non_de_lane_cursor_materialization']['capital_or_G11_assumptions_forbidden'] is True
+          lanes=d['lanes']
+          assert len(lanes)==27
+          ids=[x['lane_id'] for x in lanes]; isos=[x['iso'] for x in lanes]; locks=[x['owner_lock'] for x in lanes]
+          assert len(set(ids))==27 and len(set(isos))==27 and len(set(locks))==27
+          assert all(x['owner_lock']==f"{x['lane_id']}:{x['iso']}" for x in lanes)
+          de=d['germany_exact_cursor']
+          assert de['lane_id']=='L11' and de['iso']=='DE' and de['owner_lock']=='L11:DE'
+          assert de['city_rank']==2 and de['city_id']=='DE_02000000'
+          assert de['zone_id']=='DE_02000000_G13' and de['pending']==38 and de['exhaustion']=='0/15'
+          assert set(de['later_zones_locked'])=={'DE_02000000_G23','DE_02000000_G31'}
+          digest=hashlib.sha256(open(p,'rb').read()).hexdigest()
+          report={
+            'checkpoint':d['checkpoint'],
+            'quality_gate':'PASS',
+            'lanes':27,
+            'unique_lane_ids':27,
+            'unique_iso_owners':27,
+            'unique_owner_locks':27,
+            'strict_city_order':'PASS',
+            'strict_zone_order':'PASS',
+            'fresh_15_of_15_required':'PASS',
+            'out_of_order_promotion':'PROHIBITED',
+            'cp106_discovery_auto_promotion':'PROHIBITED',
+            'phase_2':'LOCKED',
+            'governance_sha256':digest
+          }
+          open('RLF_EU27_CP107_TERRITORIAL_GOVERNANCE_AUDIT.json','w').write(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Upload governance evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP107-TERRITORIAL-GOVERNANCE-AUDIT
+          path: RLF_EU27_CP107_TERRITORIAL_GOVERNANCE_AUDIT.json
+          retention-days: 30
