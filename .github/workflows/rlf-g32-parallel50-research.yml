@@ -1,0 +1,149 @@
+name: RLF G32 Parallel50 real research
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-g32-parallel50-research.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research:
+    name: "G32 ${{ matrix.area_id }} ${{ matrix.vector_id }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix:
+        area_id: [A01_REINICKENDORF, A02_WITTENAU, A03_MAERKISCHES_VIERTEL, A04_WAIDMANNSLUST, A05_LUEBARS, A06_HERMSDORF, A07_FROHNAU, A08_ROSENTHAL_NIEDERSCHOENHAUSEN, A09_PANKOW_NORD, A10_BUCH_KAROW]
+        vector_id: [V1_DIRECT_OWNED, V2_SOCIAL_CHARITY, V3_VINTAGE_CONSIGNMENT, V4_FAMILY_CHILDREN, V5_LOCAL_DIRECTORIES]
+    steps:
+      - name: Real web discovery lane
+        shell: bash
+        env:
+          AREA_ID: ${{ matrix.area_id }}
+          VECTOR_ID: ${{ matrix.vector_id }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import html, json, os, re, time, urllib.parse, urllib.request
+          area_map = {
+            'A01_REINICKENDORF':'Reinickendorf',
+            'A02_WITTENAU':'Wittenau',
+            'A03_MAERKISCHES_VIERTEL':'Märkisches Viertel',
+            'A04_WAIDMANNSLUST':'Waidmannslust',
+            'A05_LUEBARS':'Lübars',
+            'A06_HERMSDORF':'Hermsdorf',
+            'A07_FROHNAU':'Frohnau',
+            'A08_ROSENTHAL_NIEDERSCHOENHAUSEN':'Rosenthal Niederschönhausen',
+            'A09_PANKOW_NORD':'Pankow Nord',
+            'A10_BUCH_KAROW':'Buch Karow',
+          }
+          vector_queries = {
+            'V1_DIRECT_OWNED': ['second hand laden {area} Berlin eigene website', 'secondhand bekleidung {area} Berlin shop'],
+            'V2_SOCIAL_CHARITY': ['sozialkaufhaus kleidung {area} Berlin', 'gemeinnützig second hand kleidung {area} Berlin'],
+            'V3_VINTAGE_CONSIGNMENT': ['vintage mode laden {area} Berlin second hand', 'kommissionsladen mode {area} Berlin'],
+            'V4_FAMILY_CHILDREN': ['kinder second hand bekleidung {area} Berlin', 'familien secondhand laden {area} Berlin'],
+            'V5_LOCAL_DIRECTORIES': ['secondhand shop {area} Berlin branchenbuch', 'gebrauchtwaren kleidung {area} Berlin geschäft'],
+          }
+          aid=os.environ['AREA_ID']; vid=os.environ['VECTOR_ID']; area=area_map[aid]
+          ua='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
+          all_results=[]
+          for qtpl in vector_queries[vid]:
+            q=qtpl.format(area=area)
+            url='https://html.duckduckgo.com/html/?q='+urllib.parse.quote(q)
+            req=urllib.request.Request(url,headers={'User-Agent':ua,'Accept-Language':'de-DE,de;q=0.9,en;q=0.5'})
+            try:
+              with urllib.request.urlopen(req,timeout=20) as r:
+                body=r.read().decode('utf-8','replace')
+              pairs=re.findall(r'class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>',body,re.I|re.S)
+              for href,title in pairs[:12]:
+                title=re.sub('<[^>]+>',' ',title)
+                title=html.unescape(re.sub(r'\s+',' ',title)).strip()
+                href=html.unescape(href)
+                if 'uddg=' in href:
+                  try:
+                    href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                  except Exception: pass
+                all_results.append({'query':q,'title':title,'url':href})
+            except Exception as e:
+              all_results.append({'query':q,'error':type(e).__name__+': '+str(e)})
+            time.sleep(1)
+          # lane-local URL dedup only; global canonical dedup happens in merge job.
+          seen=set(); cleaned=[]
+          for x in all_results:
+            u=x.get('url')
+            key=u or ('ERR:'+x.get('query','')+':'+x.get('error',''))
+            if key in seen: continue
+            seen.add(key); cleaned.append(x)
+          out={
+            'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32',
+            'area_id':aid,'area':area,'vector_id':vid,
+            'execution':'REAL_GITHUB_HOSTED_RUNNER_WEB_REQUESTS',
+            'results':cleaned
+          }
+          fn=f"lane-{aid}-{vid}.json"
+          with open(fn,'w',encoding='utf-8') as f: json.dump(out,f,ensure_ascii=False,indent=2)
+          print(json.dumps({'lane':f'{aid}:{vid}','results':len(cleaned)},ensure_ascii=False))
+          PY
+
+      - name: Upload lane evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: "lane-${{ matrix.area_id }}-${{ matrix.vector_id }}"
+          path: "lane-${{ matrix.area_id }}-${{ matrix.vector_id }}.json"
+          if-no-files-found: error
+          retention-days: 7
+
+  merge:
+    name: G32 Parallel50 evidence barrier
+    needs: research
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download all 50 lane artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: lane-*
+          path: lanes
+          merge-multiple: true
+      - name: Verify 50 unique lane outputs and global URL dedup
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import glob,json,hashlib,os
+          files=sorted(glob.glob('lanes/lane-*.json'))
+          lanes=[]; urls={}; errors=[]
+          for fn in files:
+            d=json.load(open(fn,encoding='utf-8'))
+            key=d['area_id']+':'+d['vector_id']; lanes.append(key)
+            for r in d.get('results',[]):
+              if 'error' in r: errors.append({'lane':key,**r}); continue
+              u=r.get('url')
+              if u: urls.setdefault(u,[]).append({'lane':key,'title':r.get('title'),'query':r.get('query')})
+          report={
+            'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32',
+            'expected_lanes':50,'materialized_lanes':len(files),'unique_lane_keys':len(set(lanes)),
+            'all_50_materialized':len(files)==50 and len(set(lanes))==50,
+            'unique_urls':len(urls),'duplicate_url_observations':sum(max(0,len(v)-1) for v in urls.values()),
+            'errors':errors,'url_evidence':urls
+          }
+          raw=json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+          report['sha256']=hashlib.sha256(raw).hexdigest()
+          json.dump(report,open('G32_PARALLEL50_REAL_EVIDENCE.json','w',encoding='utf-8'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:report[k] for k in ['expected_lanes','materialized_lanes','unique_lane_keys','all_50_materialized','unique_urls','duplicate_url_observations']},ensure_ascii=False))
+          if not report['all_50_materialized']: raise SystemExit(3)
+          PY
+      - name: Upload merged evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: G32-PARALLEL50-REAL-EVIDENCE
+          path: G32_PARALLEL50_REAL_EVIDENCE.json
+          if-no-files-found: error
+          retention-days: 7
