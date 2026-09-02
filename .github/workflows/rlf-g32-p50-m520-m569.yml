@@ -1,0 +1,206 @@
+name: RLF G32 Parallel50 M520-M569 exclusive-domain sweep
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-g32-p50-m520-m569.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Launch 50 exclusive-source workers behind common barrier
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf p50 && mkdir -p p50/ready p50/out p50/owners
+          cat > p50/worker.py <<'PYWORKER'
+          import sys, os, time, json, html, re, urllib.parse, urllib.request, hashlib
+          lane, area_id, area, domain, engine = sys.argv[1:6]
+          open(f'p50/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+45
+          while not os.path.exists('p50/GO'):
+            if time.time()>deadline: raise SystemExit('barrier timeout')
+            time.sleep(0.02)
+          delay=(int(hashlib.sha256(lane.encode()).hexdigest()[:4],16)%450)/1000
+          time.sleep(delay)
+          query=f'site:{domain} "{area}" Berlin ("second hand" OR secondhand OR vintage OR kleidung OR kleider OR gebraucht OR kommission OR sozialkaufhaus)'
+          encoded=urllib.parse.quote_plus(query)
+          endpoints={
+            'ddg':f'https://html.duckduckgo.com/html/?q={encoded}',
+            'bing':f'https://www.bing.com/search?q={encoded}&count=20',
+            'brave':f'https://search.brave.com/search?q={encoded}&source=web',
+            'ecosia':f'https://www.ecosia.org/search?q={encoded}',
+            'mojeek':f'https://www.mojeek.com/search?q={encoded}',
+          }
+          url=endpoints[engine]
+          started=time.time(); status=None; body=''; error=None; candidates=[]; owned=[]; duplicate=[]
+          try:
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36','Accept-Language':'de-DE,de;q=0.9,en;q=0.5'})
+            with urllib.request.urlopen(req,timeout=28) as r:
+              status=getattr(r,'status',200); body=r.read().decode('utf-8','replace')
+            hrefs=re.findall(r'href=["\']([^"\']+)["\']',body,re.I)
+            seen=set()
+            for href in hrefs:
+              href=html.unescape(href)
+              if href.startswith('//'): href='https:'+href
+              if 'uddg=' in href:
+                try: href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                except Exception: pass
+              if not href.startswith('http'): continue
+              try:
+                host=(urllib.parse.urlparse(href).hostname or '').lower()
+              except Exception: continue
+              d=domain.lower()
+              if not (host==d or host.endswith('.'+d)): continue
+              clean=href.split('#',1)[0]
+              if clean in seen: continue
+              seen.add(clean); candidates.append(clean)
+            for u in candidates[:20]:
+              key=hashlib.sha256(u.encode()).hexdigest()
+              owner=f'p50/owners/{key}'
+              try:
+                fd=os.open(owner,os.O_CREAT|os.O_EXCL|os.O_WRONLY)
+                os.write(fd,lane.encode()); os.close(fd); owned.append(u)
+              except FileExistsError:
+                try: first=open(owner).read().strip()
+                except Exception: first='UNKNOWN'
+                duplicate.append({'url':u,'owner':first})
+          except Exception as e:
+            error=type(e).__name__+': '+str(e)
+          ended=time.time()
+          json.dump({
+            'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32','packet':'M520-M569',
+            'lane':lane,'area_id':area_id,'area':area,'source_domain':domain,'search_engine':engine,'pid':os.getpid(),
+            'query':query,'request_url':url,'started':started,'ended':ended,'http_status':status,'body_bytes':len(body.encode('utf-8','ignore')),
+            'error':error,'domain_filtered_candidates':candidates[:20],'owned_results':owned,'duplicate_skipped':duplicate
+          },open(f'p50/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          PYWORKER
+
+          cat > p50/lanes.tsv <<'LANES'
+M520	A01_REINICKENDORF	Reinickendorf	berlin.de	ddg
+M521	A01_REINICKENDORF	Reinickendorf	berlinmitkind.de	bing
+M522	A01_REINICKENDORF	Reinickendorf	top10berlin.de	brave
+M523	A01_REINICKENDORF	Reinickendorf	qiez.de	ecosia
+M524	A01_REINICKENDORF	Reinickendorf	tip-berlin.de	mojeek
+M525	A02_WITTENAU	Wittenau	visitberlin.de	ddg
+M526	A02_WITTENAU	Wittenau	mitvergnuegen.com	bing
+M527	A02_WITTENAU	Wittenau	cremeguides.com	brave
+M528	A02_WITTENAU	Wittenau	stilinberlin.de	ecosia
+M529	A02_WITTENAU	Wittenau	the-berliner.com	mojeek
+M530	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	berliner-woche.de	ddg
+M531	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	berliner-kurier.de	bing
+M532	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	morgenpost.de	brave
+M533	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	tagesspiegel.de	ecosia
+M534	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	bz-berlin.de	mojeek
+M535	A04_WAIDMANNSLUST	Waidmannslust	rbb24.de	ddg
+M536	A04_WAIDMANNSLUST	Waidmannslust	in-berlin-brandenburg.com	bing
+M537	A04_WAIDMANNSLUST	Waidmannslust	kauperts.de	brave
+M538	A04_WAIDMANNSLUST	Waidmannslust	ortsdienst.de	ecosia
+M539	A04_WAIDMANNSLUST	Waidmannslust	gelbeseiten.de	mojeek
+M540	A05_LUEBARS	Lübars	dasoertliche.de	ddg
+M541	A05_LUEBARS	Lübars	11880.com	bing
+M542	A05_LUEBARS	Lübars	cylex.de	brave
+M543	A05_LUEBARS	Lübars	golocal.de	ecosia
+M544	A05_LUEBARS	Lübars	meinestadt.de	mojeek
+M545	A06_HERMSDORF	Hermsdorf	caritas-berlin.de	ddg
+M546	A06_HERMSDORF	Hermsdorf	berliner-stadtmission.de	bing
+M547	A06_HERMSDORF	Hermsdorf	drk-berlin.de	brave
+M548	A06_HERMSDORF	Hermsdorf	diakonie-portal.de	ecosia
+M549	A06_HERMSDORF	Hermsdorf	awo-berlin.de	mojeek
+M550	A07_FROHNAU	Frohnau	unionhilfswerk.de	ddg
+M551	A07_FROHNAU	Frohnau	u-s-e.org	bing
+M552	A07_FROHNAU	Frohnau	albatrosggmbh.de	brave
+M553	A07_FROHNAU	Frohnau	stadtteilzentren.de	ecosia
+M554	A07_FROHNAU	Frohnau	humanistisch.de	mojeek
+M555	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	johanniter.de	ddg
+M556	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	malteser-berlin.de	bing
+M557	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	berliner-tafel.de	brave
+M558	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	resales.de	ecosia
+M559	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	humana-second-hand.de	mojeek
+M560	A09_PANKOW_NORD	Pankow Nord	nochmall.de	ddg
+M561	A09_PANKOW_NORD	Pankow Nord	picknweight.de	bing
+M562	A09_PANKOW_NORD	Pankow Nord	flohkids.de	brave
+M563	A09_PANKOW_NORD	Pankow Nord	findus-berlin.de	ecosia
+M564	A09_PANKOW_NORD	Pankow Nord	trollby.com	mojeek
+M565	A10_BUCH_KAROW	Buch Karow	vintageberlin.de	ddg
+M566	A10_BUCH_KAROW	Buch Karow	lastdecades.de	bing
+M567	A10_BUCH_KAROW	Buch Karow	socialladen.de	brave
+M568	A10_BUCH_KAROW	Buch Karow	fairkauf-berlin.de	ecosia
+M569	A10_BUCH_KAROW	Buch Karow	apg-berlin.de	mojeek
+          LANES
+
+          pids=()
+          while IFS=$'\t' read -r lane aid area domain engine; do
+            python3 p50/worker.py "$lane" "$aid" "$area" "$domain" "$engine" &
+            pids+=("$!")
+          done < p50/lanes.tsv
+
+          deadline=$((SECONDS+45))
+          while true; do
+            ready=$(find p50/ready -type f | wc -l)
+            [ "$ready" -eq 50 ] && break
+            [ "$SECONDS" -ge "$deadline" ] && { echo "barrier failed: $ready/50"; exit 7; }
+            sleep 0.05
+          done
+          alive=0
+          for p in "${pids[@]}"; do kill -0 "$p" 2>/dev/null && alive=$((alive+1)); done
+          echo "BARRIER_READY=$ready"
+          echo "SIMULTANEOUS_ALIVE=$alive"
+          [ "$alive" -eq 50 ] || exit 8
+          date +%s.%N > p50/GO
+
+          fail=0
+          for p in "${pids[@]}"; do wait "$p" || fail=$((fail+1)); done
+          echo "WORKER_PROCESS_FAILURES=$fail"
+          [ "$fail" -eq 0 ] || exit 9
+
+      - name: AAA merge and source exclusivity audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYMERGE'
+          import glob,json,hashlib,urllib.parse
+          rows=[json.load(open(f,encoding='utf-8')) for f in sorted(glob.glob('p50/out/M*.json'))]
+          pids={r['pid'] for r in rows}; lanes={r['lane'] for r in rows}; domains=[r['source_domain'] for r in rows]
+          queries=[r['query'] for r in rows]
+          domain_unique=len(set(domains))==50
+          query_unique=len(set(queries))==50
+          source_leaks=[]
+          for r in rows:
+            d=r['source_domain'].lower()
+            for u in r['owned_results']:
+              h=(urllib.parse.urlparse(u).hostname or '').lower()
+              if not (h==d or h.endswith('.'+d)): source_leaks.append({'lane':r['lane'],'url':u,'domain':d})
+          report={
+            'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32','packet':'M520-M569',
+            'workers':len(rows),'unique_pids':len(pids),'unique_lanes':len(lanes),'unique_domains':len(set(domains)),'unique_queries':len(set(queries)),
+            'simultaneous_alive':50,'worker_process_failures':0,
+            'domain_exclusivity_pass':domain_unique,'query_uniqueness_pass':query_unique,'source_leaks':source_leaks,
+            'http_success_lanes':sum(1 for r in rows if r['http_status'] and 200<=r['http_status']<300 and r['body_bytes']>0),
+            'error_lanes':[{'lane':r['lane'],'domain':r['source_domain'],'engine':r['search_engine'],'error':r['error']} for r in rows if r['error']],
+            'lanes_with_owned_results':sum(1 for r in rows if r['owned_results']),
+            'owned_unique_results':sum(len(r['owned_results']) for r in rows),
+            'duplicate_results_skipped_by_atomic_ownership':sum(len(r['duplicate_skipped']) for r in rows),
+            'rows':rows
+          }
+          core=json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode(); report['sha256']=hashlib.sha256(core).hexdigest()
+          json.dump(report,open('RLF_G32_P50_M520_M569_EXCLUSIVE_DOMAIN.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:report[k] for k in ['workers','unique_pids','unique_lanes','unique_domains','unique_queries','simultaneous_alive','domain_exclusivity_pass','query_uniqueness_pass','http_success_lanes','lanes_with_owned_results','owned_unique_results','duplicate_results_skipped_by_atomic_ownership']},ensure_ascii=False))
+          if not (len(rows)==50 and len(pids)==50 and len(lanes)==50 and domain_unique and query_unique and not source_leaks): raise SystemExit(10)
+          PYMERGE
+
+      - name: Upload M520-M569 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-G32-P50-M520-M569-EXCLUSIVE-DOMAIN
+          path: |
+            RLF_G32_P50_M520_M569_EXCLUSIVE_DOMAIN.json
+            p50/out/*.json
+          retention-days: 7
