@@ -1,0 +1,165 @@
+name: RLF G32 Parallel50 M570-M619 postcode-vector sweep
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-g32-p50-m570-m619.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel50:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Launch 50 real unique-query workers
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf p50 && mkdir -p p50/ready p50/out p50/owners
+          cat > p50/worker.py <<'PYWORKER'
+          import sys,os,time,json,html,re,urllib.parse,urllib.request,hashlib
+          lane,area_id,area,postcodes,vector_id,engine=sys.argv[1:7]
+          terms={
+            'V6_ANKAUF_VERKAUF':'ankauf verkauf gebrauchte kleidung -vinted -ebay -kleinanzeigen',
+            'V7_KLEIDERBOERSE':'kleiderboerse kleiderladen gebraucht verkauf -flohmarkt -tausch',
+            'V8_PRELOVED':'preloved mode secondhand shop -marketplace',
+            'V9_REUSE_TEXTIL':'wiederverwendung textilien gebraucht laden verkauf -container',
+            'V10_GEBRAUCHTWAREN':'gebrauchtwarenladen bekleidung secondhand einzelhandel -moebel',
+          }[vector_id]
+          open(f'p50/ready/{lane}','w').write(str(os.getpid()))
+          deadline=time.time()+45
+          while not os.path.exists('p50/GO'):
+            if time.time()>deadline: raise SystemExit('barrier timeout')
+            time.sleep(.02)
+          delay=(int(hashlib.sha256(lane.encode()).hexdigest()[:4],16)%1200)/1000
+          time.sleep(delay)
+          pc=' OR '.join(postcodes.split())
+          query=f'"{area}" Berlin ({pc}) {terms}'
+          q=urllib.parse.quote_plus(query)
+          url=(f'https://html.duckduckgo.com/html/?q={q}' if engine=='ddg' else f'https://www.bing.com/search?q={q}&count=25')
+          status=None;body='';err=None;raw=[];owned=[];dups=[];started=time.time()
+          try:
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36','Accept-Language':'de-DE,de;q=0.9,en;q=0.5'})
+            with urllib.request.urlopen(req,timeout=28) as r:
+              status=getattr(r,'status',200);body=r.read().decode('utf-8','replace')
+            hrefs=re.findall(r'href=["\']([^"\']+)["\']',body,re.I)
+            seen=set()
+            for href in hrefs:
+              href=html.unescape(href)
+              if href.startswith('//'):href='https:'+href
+              if 'uddg=' in href:
+                try:href=urllib.parse.parse_qs(urllib.parse.urlparse(href).query).get('uddg',[href])[0]
+                except Exception:pass
+              if not href.startswith('http'):continue
+              host=(urllib.parse.urlparse(href).hostname or '').lower()
+              if any(x in host for x in ['duckduckgo.com','bing.com','microsoft.com']):continue
+              clean=href.split('#',1)[0]
+              if clean in seen:continue
+              seen.add(clean);raw.append(clean)
+            for u in raw[:25]:
+              key=hashlib.sha256(u.encode()).hexdigest(); owner=f'p50/owners/{key}'
+              try:
+                fd=os.open(owner,os.O_CREAT|os.O_EXCL|os.O_WRONLY);os.write(fd,lane.encode());os.close(fd);owned.append(u)
+              except FileExistsError:
+                try:first=open(owner).read().strip()
+                except Exception:first='UNKNOWN'
+                dups.append({'url':u,'owner':first})
+          except Exception as e:err=type(e).__name__+': '+str(e)
+          ended=time.time()
+          json.dump({'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32','packet':'M570-M619','lane':lane,'area_id':area_id,'area':area,'postcodes':postcodes,'vector_id':vector_id,'search_engine':engine,'pid':os.getpid(),'query':query,'http_status':status,'body_bytes':len(body.encode('utf-8','ignore')),'error':err,'started':started,'ended':ended,'owned_results':owned,'duplicate_skipped':dups},open(f'p50/out/{lane}.json','w'),ensure_ascii=False,indent=2)
+          PYWORKER
+
+          cat > p50/lanes.tsv <<'LANES'
+          M570	A01_REINICKENDORF	Reinickendorf	13403 13407 13409	V6_ANKAUF_VERKAUF	ddg
+          M571	A01_REINICKENDORF	Reinickendorf	13403 13407 13409	V7_KLEIDERBOERSE	bing
+          M572	A01_REINICKENDORF	Reinickendorf	13403 13407 13409	V8_PRELOVED	ddg
+          M573	A01_REINICKENDORF	Reinickendorf	13403 13407 13409	V9_REUSE_TEXTIL	bing
+          M574	A01_REINICKENDORF	Reinickendorf	13403 13407 13409	V10_GEBRAUCHTWAREN	ddg
+          M575	A02_WITTENAU	Wittenau	13435 13437	V6_ANKAUF_VERKAUF	bing
+          M576	A02_WITTENAU	Wittenau	13435 13437	V7_KLEIDERBOERSE	ddg
+          M577	A02_WITTENAU	Wittenau	13435 13437	V8_PRELOVED	bing
+          M578	A02_WITTENAU	Wittenau	13435 13437	V9_REUSE_TEXTIL	ddg
+          M579	A02_WITTENAU	Wittenau	13435 13437	V10_GEBRAUCHTWAREN	bing
+          M580	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	13439	V6_ANKAUF_VERKAUF	ddg
+          M581	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	13439	V7_KLEIDERBOERSE	bing
+          M582	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	13439	V8_PRELOVED	ddg
+          M583	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	13439	V9_REUSE_TEXTIL	bing
+          M584	A03_MAERKISCHES_VIERTEL	Märkisches Viertel	13439	V10_GEBRAUCHTWAREN	ddg
+          M585	A04_WAIDMANNSLUST	Waidmannslust	13469	V6_ANKAUF_VERKAUF	bing
+          M586	A04_WAIDMANNSLUST	Waidmannslust	13469	V7_KLEIDERBOERSE	ddg
+          M587	A04_WAIDMANNSLUST	Waidmannslust	13469	V8_PRELOVED	bing
+          M588	A04_WAIDMANNSLUST	Waidmannslust	13469	V9_REUSE_TEXTIL	ddg
+          M589	A04_WAIDMANNSLUST	Waidmannslust	13469	V10_GEBRAUCHTWAREN	bing
+          M590	A05_LUEBARS	Lübars	13469	V6_ANKAUF_VERKAUF	ddg
+          M591	A05_LUEBARS	Lübars	13469	V7_KLEIDERBOERSE	bing
+          M592	A05_LUEBARS	Lübars	13469	V8_PRELOVED	ddg
+          M593	A05_LUEBARS	Lübars	13469	V9_REUSE_TEXTIL	bing
+          M594	A05_LUEBARS	Lübars	13469	V10_GEBRAUCHTWAREN	ddg
+          M595	A06_HERMSDORF	Hermsdorf	13467	V6_ANKAUF_VERKAUF	bing
+          M596	A06_HERMSDORF	Hermsdorf	13467	V7_KLEIDERBOERSE	ddg
+          M597	A06_HERMSDORF	Hermsdorf	13467	V8_PRELOVED	bing
+          M598	A06_HERMSDORF	Hermsdorf	13467	V9_REUSE_TEXTIL	ddg
+          M599	A06_HERMSDORF	Hermsdorf	13467	V10_GEBRAUCHTWAREN	bing
+          M600	A07_FROHNAU	Frohnau	13465	V6_ANKAUF_VERKAUF	ddg
+          M601	A07_FROHNAU	Frohnau	13465	V7_KLEIDERBOERSE	bing
+          M602	A07_FROHNAU	Frohnau	13465	V8_PRELOVED	ddg
+          M603	A07_FROHNAU	Frohnau	13465	V9_REUSE_TEXTIL	bing
+          M604	A07_FROHNAU	Frohnau	13465	V10_GEBRAUCHTWAREN	ddg
+          M605	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	13156 13158 13159	V6_ANKAUF_VERKAUF	bing
+          M606	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	13156 13158 13159	V7_KLEIDERBOERSE	ddg
+          M607	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	13156 13158 13159	V8_PRELOVED	bing
+          M608	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	13156 13158 13159	V9_REUSE_TEXTIL	ddg
+          M609	A08_ROSENTHAL_NIEDERSCHOENHAUSEN	Rosenthal Niederschönhausen	13156 13158 13159	V10_GEBRAUCHTWAREN	bing
+          M610	A09_PANKOW_NORD	Pankow Nord	13187 13189	V6_ANKAUF_VERKAUF	ddg
+          M611	A09_PANKOW_NORD	Pankow Nord	13187 13189	V7_KLEIDERBOERSE	bing
+          M612	A09_PANKOW_NORD	Pankow Nord	13187 13189	V8_PRELOVED	ddg
+          M613	A09_PANKOW_NORD	Pankow Nord	13187 13189	V9_REUSE_TEXTIL	bing
+          M614	A09_PANKOW_NORD	Pankow Nord	13187 13189	V10_GEBRAUCHTWAREN	ddg
+          M615	A10_BUCH_KAROW	Buch Karow	13125 13127 13129	V6_ANKAUF_VERKAUF	bing
+          M616	A10_BUCH_KAROW	Buch Karow	13125 13127 13129	V7_KLEIDERBOERSE	ddg
+          M617	A10_BUCH_KAROW	Buch Karow	13125 13127 13129	V8_PRELOVED	bing
+          M618	A10_BUCH_KAROW	Buch Karow	13125 13127 13129	V9_REUSE_TEXTIL	ddg
+          M619	A10_BUCH_KAROW	Buch Karow	13125 13127 13129	V10_GEBRAUCHTWAREN	bing
+          LANES
+
+          pids=()
+          while IFS=$'\t' read -r lane aid area pcs vec engine; do
+            python3 p50/worker.py "$lane" "$aid" "$area" "$pcs" "$vec" "$engine" & pids+=("$!")
+          done < p50/lanes.tsv
+          deadline=$((SECONDS+45))
+          while true; do
+            ready=$(find p50/ready -type f|wc -l); [ "$ready" -eq 50 ] && break
+            [ "$SECONDS" -ge "$deadline" ] && { echo "barrier failed $ready/50"; exit 7; }; sleep .05
+          done
+          alive=0; for p in "${pids[@]}"; do kill -0 "$p" 2>/dev/null && alive=$((alive+1)); done
+          echo "BARRIER_READY=$ready"; echo "SIMULTANEOUS_ALIVE=$alive"; [ "$alive" -eq 50 ] || exit 8
+          date +%s.%N > p50/GO
+          fail=0; for p in "${pids[@]}"; do wait "$p" || fail=$((fail+1)); done
+          echo "WORKER_PROCESS_FAILURES=$fail"; [ "$fail" -eq 0 ] || exit 9
+
+      - name: AAA merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYMERGE'
+          import glob,json,hashlib
+          rows=[json.load(open(f,encoding='utf-8')) for f in sorted(glob.glob('p50/out/M*.json'))]
+          report={'phase':'FASE_1_CENS_PROVEIDORS_UE','zone':'DE_11000000_G32','packet':'M570-M619','workers':len(rows),'unique_pids':len({r['pid'] for r in rows}),'unique_lanes':len({r['lane'] for r in rows}),'unique_queries':len({r['query'] for r in rows}),'simultaneous_alive':50,'worker_process_failures':0,'http_success_lanes':sum(1 for r in rows if r['http_status'] and 200<=r['http_status']<300 and r['body_bytes']>0),'error_lanes':[{'lane':r['lane'],'error':r['error']} for r in rows if r['error']],'lanes_with_owned_results':sum(1 for r in rows if r['owned_results']),'owned_unique_results':sum(len(r['owned_results']) for r in rows),'duplicate_results_skipped_by_atomic_ownership':sum(len(r['duplicate_skipped']) for r in rows),'rows':rows}
+          core=json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode();report['sha256']=hashlib.sha256(core).hexdigest()
+          json.dump(report,open('RLF_G32_P50_M570_M619_POSTCODE_VECTOR.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({k:report[k] for k in ['workers','unique_pids','unique_lanes','unique_queries','simultaneous_alive','http_success_lanes','lanes_with_owned_results','owned_unique_results','duplicate_results_skipped_by_atomic_ownership']},ensure_ascii=False))
+          if not (report['workers']==50 and report['unique_pids']==50 and report['unique_lanes']==50 and report['unique_queries']==50):raise SystemExit(10)
+          PYMERGE
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-G32-P50-M570-M619-POSTCODE-VECTOR
+          path: |
+            RLF_G32_P50_M570_M619_POSTCODE_VECTOR.json
+            p50/out/*.json
+          retention-days: 7
