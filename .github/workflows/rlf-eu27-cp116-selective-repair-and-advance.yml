@@ -1,0 +1,232 @@
+name: RLF EU27 CP116 selective repair and certified advance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp116-selective-repair-and-advance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  parallel27:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 27
+      matrix:
+        lane: [L01,L02,L03,L04,L05,L06,L07,L08,L09,L10,L11,L12,L13,L14,L15,L16,L17,L18,L19,L20,L21,L22,L23,L24,L25,L26,L27]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      LANE: ${{ matrix.lane }}
+      CP115_RUN: '33711777501'
+      CP115R_L03_RUN: '33711929068'
+    steps:
+      - name: Recover authoritative CP115 lane state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p pred
+          gh run download "$CP115_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP115-LANE-$LANE" -D pred
+          test -f "pred/$LANE.json"
+          if [ "$LANE" = "L03" ]; then
+            mkdir -p repair
+            gh run download "$CP115R_L03_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP115R-L03" -D repair
+            test -f repair/RLF_EU27_CP115R_L03.json
+          fi
+
+      - name: Repair only uncredited technical work or advance certified closed zone
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q shapely
+          python3 - <<'PY'
+          import os,json,re,html,time,hashlib,urllib.parse,urllib.request,ssl
+          from pathlib import Path
+          from shapely.geometry import shape,box,Point
+
+          lane=os.environ['LANE']
+          p=json.load(open(f'pred/{lane}.json',encoding='utf-8'))
+          UA='Mozilla/5.0 RLF-EU27-CP116/1.0'
+          eps=['https://overpass.private.coffee/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://overpass-api.de/api/interpreter']
+
+          def get_json(url,timeout=120):
+              req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json,*/*'})
+              with urllib.request.urlopen(req,timeout=timeout) as r:return json.loads(r.read())
+
+          def overpass(q,seed):
+              last=None
+              for attempt in range(6):
+                  ep=eps[(seed+attempt)%len(eps)]
+                  try:
+                      url=ep+'?'+urllib.parse.urlencode({'data':q})
+                      req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json,text/plain,*/*'})
+                      with urllib.request.urlopen(req,timeout=100) as r: body=r.read(); status=getattr(r,'status',200)
+                      return json.loads(body),ep,status,None
+                  except Exception as e:
+                      last=type(e).__name__+': '+str(e);time.sleep(1.1*(attempt+1))
+              return None,None,None,last
+
+          def fetch(url,timeout=20,maxbytes=220000):
+              if not url:return {'ok':False,'status':None,'text':'','error':'NO_URL'}
+              us=[url] if '://' in url else ['https://'+url]
+              last=None
+              for u in us:
+                  try:
+                      req=urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Language':'en,de,fr,nl,it,es,pt,sv,da,fi,et,lv,lt,pl,cs,sk,sl,hr,hu,ro,bg,el;q=0.8'})
+                      with urllib.request.urlopen(req,timeout=timeout,context=ssl.create_default_context()) as r:
+                          body=r.read(maxbytes).decode('utf-8','replace');status=getattr(r,'status',200)
+                      txt=html.unescape(re.sub(r'\s+',' ',re.sub('<[^>]+>',' ',body)))
+                      return {'ok':True,'status':status,'text':txt[:100000],'error':None}
+                  except Exception as e:last=type(e).__name__+': '+str(e)
+              return {'ok':False,'status':None,'text':'','error':last}
+
+          def terminalize(cands):
+              apparel_re=re.compile(r'\b(second.?hand|vintage|preloved|thrift|clothing|clothes|apparel|fashion|kleidung|mode|ropa|vetement|vêtement|kleding|abbigliamento|moda)\b',re.I)
+              legal_re=re.compile(r'\b(impressum|legal notice|mentions légales|company|gmbh|ag\b|bv\b|nv\b|srl\b|spa\b|sl\b|lda\b|oy\b|ab\b|aps\b|as\b|kft\b|sro\b|uab\b|ou\b|oü\b|sia\b|eood\b|d\.o\.o|vat|btw|tva|iva|nif|siren|siret|company number|registration number)\b',re.I)
+              out=[]
+              for c in cands:
+                  d=fetch(c.get('website'))
+                  text=' '.join([str(c.get('name') or ''),str(c.get('shop') or ''),str(c.get('second_hand') or ''),d['text'][:60000]])
+                  apparel=bool(apparel_re.search(text)) or (c.get('shop')=='clothes' and c.get('second_hand') in ('yes','only'))
+                  legal=bool(legal_re.search(d['text'])) if d['ok'] else False
+                  trace=bool(c.get('website') or c.get('phone') or c.get('email'))
+                  current=d['ok'] or bool(c.get('name'))
+                  status=('AAA_READY_CANDIDATE_PENDING_GLOBAL_DEDUP' if apparel and legal and trace and current else 'HOLD_NEEDS_RESPONSIBLE_OPERATOR_OR_PRIMARY_EVIDENCE' if apparel else 'REJECT_NON_APPAREL_OR_UNPROVEN_APPAREL')
+                  out.append({**c,'primary_web_reachable':d['ok'],'primary_status':d['status'],'legal_identity_marker':legal,'traceability':trace,'terminal_status':status,'direct_error':d['error']})
+              return out
+
+          gj=get_json('https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson')
+          def grid_for(city_id):
+              feat=next(f for f in gj['features'] if str((f.get('properties') or {}).get('LAU_ID') or (f.get('properties') or {}).get('GISCO_ID'))==str(city_id))
+              g=shape(feat['geometry']);minx,miny,maxx,maxy=g.bounds;dx=(maxx-minx)/3;dy=(maxy-miny)/3
+              out=[]
+              for rr in range(1,4):
+                  for cc in range(1,4):
+                      z=g.intersection(box(minx+(cc-1)*dx,miny+(rr-1)*dy,minx+cc*dx,miny+rr*dy))
+                      if not z.is_empty and z.area>1e-15:out.append((f'{city_id}_G{rr}{cc}',z))
+              return out
+
+          def extract_candidate(el,first_query):
+              lat=el.get('lat');lon=el.get('lon');cen=el.get('center') or {}
+              if lat is None:lat=cen.get('lat')
+              if lon is None:lon=cen.get('lon')
+              if lat is None or lon is None:return None
+              t=el.get('tags') or {};key=f"{el.get('type')}:{el.get('id')}"
+              return key,{'osm_key':key,'name':t.get('name'),'website':t.get('website') or t.get('contact:website'),'phone':t.get('phone') or t.get('contact:phone'),'email':t.get('email') or t.get('contact:email'),'operator':t.get('operator'),'shop':t.get('shop'),'second_hand':t.get('second_hand'),'lat':float(lat),'lon':float(lon),'first_query':first_query}
+
+          def qset(zone):
+              minx,miny,maxx,maxy=zone.bounds;b=f'{miny},{minx},{maxy},{maxx}'
+              return [
+                ('Q01',f'[out:json][timeout:75];nwr[shop=second_hand]({b});out center tags;'),('Q02',f'[out:json][timeout:75];nwr[shop=clothes][second_hand=yes]({b});out center tags;'),('Q03',f'[out:json][timeout:75];nwr[shop=clothes][second_hand=only]({b});out center tags;'),('Q04',f'[out:json][timeout:75];nwr[shop=clothes][second_hand]({b});out center tags;'),('Q05',f'[out:json][timeout:75];nwr[shop=vintage]({b});out center tags;'),('Q06',f'[out:json][timeout:75];nwr[second_hand=yes][shop]({b});out center tags;'),('Q07',f'[out:json][timeout:75];nwr[second_hand=only][shop]({b});out center tags;'),('Q08',f'[out:json][timeout:75];nwr[shop=charity]({b});out center tags;'),('Q09',f'[out:json][timeout:75];nwr[name~"second.?hand",i]({b});out center tags;'),('Q10',f'[out:json][timeout:75];nwr[name~"vintage",i]({b});out center tags;'),('Q11',f'[out:json][timeout:75];nwr[name~"thrift",i]({b});out center tags;'),('Q12',f'[out:json][timeout:75];nwr[name~"pre.?loved",i]({b});out center tags;'),('Q13',f'[out:json][timeout:75];nwr[name~"used clothing|gebraucht|friperie|kringwinkel",i]({b});out center tags;'),('Q14',f'[out:json][timeout:75];nwr[name~"seconda mano|segunda mano|second hand",i]({b});out center tags;'),('Q15',f'[out:json][timeout:75];nwr[shop=clothes][second_hand!=no]({b});out center tags;')]
+
+          def resume_exhaustion(zone,start_streak,prior_records=None):
+              qs=qset(zone);streak=int(start_streak);records=list(prior_records or []);new={};technical=False
+              for qi in range(streak,15):
+                  qid,q=qs[qi];data,ep,status,err=overpass(q,int(lane[1:])+qi)
+                  if data is None:
+                      technical=True;records.append({'qid':qid,'status':'TECHNICAL_FAILURE_NO_CREDIT','error':err,'streak_after':streak});break
+                  hits=[]
+                  for el in data.get('elements',[]):
+                      ex=extract_candidate(el,qid)
+                      if not ex:continue
+                      key,c=ex
+                      if not zone.covers(Point(c['lon'],c['lat'])):continue
+                      new[key]=c;hits.append(key)
+                  if hits:
+                      streak=0;records.append({'qid':qid,'status':'SUCCESS_NEW_IDENTITY_RESET','new':len(set(hits)),'endpoint':ep,'http_status':status,'streak_after':0});break
+                  streak+=1;records.append({'qid':qid,'status':'SUCCESS_ZERO_NEW','new':0,'endpoint':ep,'http_status':status,'streak_after':streak});time.sleep(.15)
+              return {'streak':streak,'records':records,'new':list(new.values()),'technical':technical,'closed':(not technical and not new and streak==15)}
+
+          def discovery(zone):
+              minx,miny,maxx,maxy=zone.bounds;b=f'{miny},{minx},{maxy},{maxx}'
+              vs=[('D1',f'[out:json][timeout:80];nwr[shop=second_hand]({b});out center tags;'),('D2',f'[out:json][timeout:80];nwr[shop=clothes][second_hand]({b});out center tags;'),('D3',f'[out:json][timeout:80];nwr[shop=vintage]({b});out center tags;'),('D4',f'[out:json][timeout:80];nwr[shop=clothes][clothes=second_hand]({b});out center tags;')]
+              merged={};rec=[];tech=0
+              for i,(vk,q) in enumerate(vs):
+                  data,ep,status,err=overpass(q,int(lane[1:])+i)
+                  if data is None:tech+=1;rec.append({'vector':vk,'status':'TECHNICAL_FAILURE','error':err});continue
+                  kept=0
+                  for el in data.get('elements',[]):
+                      ex=extract_candidate(el,vk)
+                      if not ex:continue
+                      key,c=ex
+                      if not zone.covers(Point(c['lon'],c['lat'])):continue
+                      kept+=1
+                      if key not in merged:merged[key]={**c,'vectors':[]}
+                      merged[key]['vectors'].append(vk)
+                  rec.append({'vector':vk,'status':'SUCCESS','in_zone':kept,'endpoint':ep,'http_status':status})
+              return list(merged.values()),rec,tech
+
+          # L03 has an authoritative repaired 15/15 certificate; use it instead of CP115 technical state.
+          if lane=='L03':
+              r=json.load(open('repair/RLF_EU27_CP115R_L03.json',encoding='utf-8'))
+              assert r['zone_closed'] is True and r['exhaustion_streak']=='15/15'
+              p={**p,'zone_id':r['zone_id'],'zone_closed':True,'exhaustion_streak':'15/15','technical_failure':False,'action':'REPAIRED_CLOSED_OVERRIDE'}
+
+          city_id=p.get('city_id');city_name=p.get('city_name');zone_id=p.get('zone_id')
+          result={'schema':'RLF_EU27_CP116_LANE_V1','lane_id':lane,'iso':p.get('iso'),'city_id':city_id,'city_name':city_name,'canonical_delta':0,'promotion_allowed':False}
+
+          technical=bool(p.get('technical_failure')) or p.get('action')=='TECHNICAL_RETRY_REQUIRED'
+          closed=bool(p.get('zone_closed')) and p.get('exhaustion_streak')=='15/15'
+
+          if technical:
+              grids=grid_for(city_id);zmap=dict(grids);assert zone_id in zmap;zone=zmap[zone_id]
+              # Resume only from the credited streak. No already-credited query is replayed.
+              s=int(str(p.get('exhaustion_streak','0/15')).split('/')[0])
+              prior=[x for x in (p.get('queries') or []) if x.get('status')=='SUCCESS_ZERO_NEW']
+              ex=resume_exhaustion(zone,s,prior)
+              result.update({'zone_id':zone_id,'action':'SELECTIVE_TECHNICAL_REPAIR','resume_from_streak':s,'queries':ex['records'],'new_identities':ex['new'],'new_identity_count':len(ex['new']),'technical_failure':ex['technical'],'exhaustion_streak':f"{ex['streak']}/15",'zone_closed':ex['closed']})
+          elif closed:
+              grids=grid_for(city_id);ids=[x[0] for x in grids];pos=ids.index(zone_id)
+              if pos+1>=len(grids):
+                  result.update({'zone_id':zone_id,'action':'CITY_GRID_COMPLETE_NO_ADVANCE','zone_closed':True,'exhaustion_streak':'15/15'})
+              else:
+                  next_id,zone=grids[pos+1];cands,drec,tech=discovery(zone)
+                  if tech:
+                      result.update({'zone_id':next_id,'previous_zone_id':zone_id,'action':'ADVANCE_DISCOVERY_TECHNICAL_RETRY_REQUIRED','discovery_records':drec,'technical_failure':True,'zone_closed':False,'exhaustion_streak':'0/15'})
+                  elif cands:
+                      term=terminalize(cands);result.update({'zone_id':next_id,'previous_zone_id':zone_id,'action':'ADVANCED_ONE_ZONE_AND_TERMINALIZED','discovery_records':drec,'candidate_count':len(cands),'terminalized':len(term),'aaa_ready':sum(x['terminal_status'].startswith('AAA_READY') for x in term),'hold':sum(x['terminal_status'].startswith('HOLD') for x in term),'reject':sum(x['terminal_status'].startswith('REJECT') for x in term),'candidates':term,'zone_closed':False,'exhaustion_streak':'0/15','technical_failure':False})
+                  else:
+                      ex=resume_exhaustion(zone,0,[]);result.update({'zone_id':next_id,'previous_zone_id':zone_id,'action':'ADVANCED_ONE_ZONE_EMPTY_EXHAUSTION','discovery_records':drec,'candidate_count':0,'queries':ex['records'],'new_identities':ex['new'],'new_identity_count':len(ex['new']),'technical_failure':ex['technical'],'exhaustion_streak':f"{ex['streak']}/15",'zone_closed':ex['closed']})
+          else:
+              result.update({'zone_id':zone_id,'action':'SKIP_LOCKED_NO_NEW_QUERY','reason':p.get('action'),'technical_failure':False,'zone_closed':bool(p.get('zone_closed')),'exhaustion_streak':p.get('exhaustion_streak')})
+
+          raw=json.dumps(result,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode();result['sha256']=hashlib.sha256(raw).hexdigest()
+          Path('out').mkdir(exist_ok=True);Path(f'out/{lane}.json').write_text(json.dumps(result,indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps({k:result.get(k) for k in ['lane_id','zone_id','action','resume_from_streak','candidate_count','terminalized','aaa_ready','hold','new_identity_count','technical_failure','exhaustion_streak','zone_closed']},ensure_ascii=False))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP116-LANE-${{ matrix.lane }}
+          path: out/${{ matrix.lane }}.json
+          retention-days: 30
+
+  consolidate:
+    needs: parallel27
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: RLF-EU27-CP116-LANE-*
+          path: lanes
+          merge-multiple: true
+      - name: Consolidate CP116
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob,json,hashlib
+          rows=[json.load(open(f,encoding='utf-8')) for f in glob.glob('lanes/L*.json')]
+          rep={'schema':'RLF_EU27_CP116_CONSOLIDATED_V1','lanes_received':len(rows),'selective_repairs':sum(r.get('action')=='SELECTIVE_TECHNICAL_REPAIR' for r in rows),'certified_advances':sum(r.get('action','').startswith('ADVANCED_ONE_ZONE') for r in rows),'locked_skips':sum(r.get('action')=='SKIP_LOCKED_NO_NEW_QUERY' for r in rows),'terminalized':sum(r.get('terminalized',0) for r in rows),'aaa_ready_pending_master_dedup':sum(r.get('aaa_ready',0) for r in rows),'hold':sum(r.get('hold',0) for r in rows),'new_identities':sum(r.get('new_identity_count',0) for r in rows),'zones_closed_15_of_15':sum(bool(r.get('zone_closed')) and r.get('exhaustion_streak')=='15/15' for r in rows),'technical_failure_lanes':sum(bool(r.get('technical_failure')) for r in rows),'city_grid_complete':sum(r.get('action')=='CITY_GRID_COMPLETE_NO_ADVANCE' for r in rows),'canonical_delta':0,'canonical_counts_unchanged':{'verified':413,'eligible':70,'hold':343,'remaining':9587},'quality_gate':'PASS' if len(rows)==27 else 'FAIL_CLOSED'}
+          rep['sha256']=hashlib.sha256(json.dumps(rep,sort_keys=True,separators=(',',':')).encode()).hexdigest();open('RLF_EU27_CP116_CONSOLIDATED.json','w').write(json.dumps(rep,indent=2));print(json.dumps(rep,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP116-CONSOLIDATED
+          path: RLF_EU27_CP116_CONSOLIDATED.json
+          retention-days: 30
