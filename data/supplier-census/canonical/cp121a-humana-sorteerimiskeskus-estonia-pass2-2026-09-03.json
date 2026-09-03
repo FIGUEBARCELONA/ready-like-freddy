@@ -1,0 +1,87 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP121A",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L08",
+  "country_code": "EE",
+  "city": "Tallinn",
+  "territorial_zone": "EE_0784_G11",
+  "canonical_supplier_id": "registry:EE:10775392",
+  "canonical_identity_key": "ee:humana-sorteerimiskeskus-ou-10775392",
+  "trading_names": ["Humana Estonia", "Humana", "Vintage Humana", "Humana 2"],
+  "legal_or_responsible_name": "Osaühing HUMANA SORTEERIMISKESKUS",
+  "registry_code": "10775392",
+  "vat_id": "EE100693919",
+  "legal_address": "Jälgimäe tee 13, Tänassilma küla, Saku vald, Harju maakond 76406, Estonia",
+  "canonical_domain": "humanae.ee",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All Estonian Humana, Vintage Humana and Humana 2 stores managed by HUMANA SORTEERIMISKESKUS OÜ count as one Estonian legal supplier operator. This Estonian company is legally distinct from the already-canonical German and Spanish Humana operators.",
+  "reason": "Independent PASS2 confirms a current Estonian professional second-hand clothing operator. First-party contact information identifies Humana Sorteerimiskeskus OÜ, registry code 10775392, VAT EE100693919 and its company contact details; the Estonian e-Business Register independently confirms Osaühing HUMANA SORTEERIMISKESKUS, registry code 10775392, active registered status and humanae.ee. Current first-party pages state that the company manages Humana stores, operates 20 stores in nine Estonian cities, and sells second-hand and vintage clothing and footwear, with current 2026 activity. No current item-level remote apparel catalogue, direct checkout for used garments or ordinary delivery to Spain was established, so the operator is VERIFIED_HOLD rather than ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_OFFICIAL_ESTONIAN_REGISTER",
+    "first_party_legal_traceability": "PASS_REGISTRY_AND_VAT",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "current_estonian_store_network": "PASS_20_STORES_9_CITIES",
+    "current_tallinn_operation": "PASS",
+    "current_secondhand_and_vintage_apparel": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_NOT_ESTABLISHED",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_ESTONIAN_LEGAL_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://humanae.ee/en/contact/",
+      "kind": "first_party_legal_identity",
+      "finding": "Humana Sorteerimiskeskus OÜ identifies registry code 10775392, VAT EE100693919, legal contact details and a dedicated shops contact."
+    },
+    {
+      "url": "https://ariregister.rik.ee/eng/company/10775392/Osa%C3%BChing-HUMANA-SORTEERIMISKESKUS",
+      "kind": "official_estonian_business_register",
+      "finding": "Official e-Business Register identifies Osaühing HUMANA SORTEERIMISKESKUS, registry code 10775392, active entered status, registered address and humanae.ee."
+    },
+    {
+      "url": "https://humanae.ee/meist/",
+      "kind": "first_party_current_secondhand_network",
+      "finding": "Current first-party page states that Humana operates 20 stores in nine Estonian cities; Vintage Humana sells retro clothing and footwear and Humana/Humana 2 sell quality second-hand goods."
+    },
+    {
+      "url": "https://humanae.ee/",
+      "kind": "first_party_current_activity_2026",
+      "finding": "Current homepage documents active reuse/second-hand clothing operations and fresh July-August 2026 news."
+    },
+    {
+      "url": "https://humanae.ee/en/about-us/faq/",
+      "kind": "first_party_used_clothing_supply_model",
+      "finding": "FAQ documents procurement, sorting and sale of used clothing through Humana stores and confirms unique second-hand garments are sold through the network."
+    }
+  ],
+  "dedup_audit": {
+    "cp121_lane_packet": "L08 surfaced a fresh Humana identity in Tallinn after prior-wave and canonical-domain dedup.",
+    "current_repo_exact_search_result": "Exact repository searches for humanae.ee and registry code 10775392 returned no prior canonical promotion before CP121A.",
+    "cross_country_humana_rule": "COUNTRY_LEGAL_ENTITIES_ARE_NOT_MERGED_WHEN_REGISTRY_IDENTITIES_DIFFER",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp121-parallel27-fresh-discovery-l08",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp121a",
+  "canonical_counts_after_promotion": {
+    "verified": 439,
+    "eligible": 73,
+    "hold": 366,
+    "remaining_to_10000": 9561
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
