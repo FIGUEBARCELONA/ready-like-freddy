@@ -1,0 +1,86 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP120A",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "vat:DE284106078",
+  "canonical_identity_key": "de:carou-gmbh-hrb91341-vintagerevivals",
+  "trading_names": ["Vintage Revivals"],
+  "legal_or_responsible_name": "carou GmbH",
+  "register_court": "Amtsgericht Darmstadt",
+  "register_number": "HRB 91341",
+  "vat_id": "DE284106078",
+  "legal_address": "Pallaswiesenstraße 154, 64293 Darmstadt, Germany",
+  "hamburg_store_address": "Schulterblatt 18, 20357 Hamburg, Germany",
+  "canonical_domain": "vintagerevivals.de",
+  "outcome": "PASS2_VERIFIED_ELIGIBLE",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "ELIGIBLE_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_ELIGIBLE",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": true,
+  "counted_as_verified_hold": false,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All Vintage Revivals stores and vintagerevivals.de are operated by carou GmbH and count as one supplier legal operator.",
+  "reason": "Independent PASS2 confirms a current German professional second-hand fashion operator with a Hamburg store and a large current item-level online secondhand catalogue. First-party imprint identifies carou GmbH, HRB 91341 and VAT DE284106078. Current category pages expose more than one thousand secondhand apparel items with prices and add-to-cart actions. First-party terms govern online delivery contracts and the current shipping page explicitly lists Spain among served EU countries. The operator therefore satisfies the direct remote purchase and ordinary Spain-delivery gates and is promoted as VERIFIED_ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_FIRST_PARTY_REGISTER_AND_VAT",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "hamburg_physical_operation": "PASS",
+    "current_item_level_secondhand_apparel_catalogue": "PASS_1470_PLUS_WOMEN_ITEMS_OBSERVED",
+    "direct_remote_purchase_capability": "PASS_ADD_TO_CART",
+    "consumer_terms_and_withdrawal": "PASS",
+    "ordinary_delivery_to_spain": "PASS_EXPLICIT_EU_SHIPPING_LIST",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_CAROU_GMBH_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.vintagerevivals.de/de/imprint",
+      "kind": "first_party_legal_identity",
+      "finding": "First-party imprint identifies carou GmbH, managing director Thomas Böschen, Amtsgericht Darmstadt HRB 91341 and VAT DE284106078."
+    },
+    {
+      "url": "https://www.vintagerevivals.de/de/women.html",
+      "kind": "first_party_current_item_level_secondhand_catalogue",
+      "finding": "Current women category identifies secondhand apparel, shows 1,470 items and item-level prices with add-to-cart actions."
+    },
+    {
+      "url": "https://www.vintagerevivals.de/de/damen-1/kleidung/kleider-overalls.html",
+      "kind": "first_party_current_transactable_products",
+      "finding": "Current secondhand dresses/overalls category exposes priced unique garments and add-to-cart actions."
+    },
+    {
+      "url": "https://www.vintagerevivals.de/de/versand-retoure",
+      "kind": "first_party_spain_shipping",
+      "finding": "Current shipping page explicitly lists Spain among EU destinations served at ordinary published shipping rates."
+    },
+    {
+      "url": "https://www.vintagerevivals.de/en/store-hamburg",
+      "kind": "first_party_hamburg_store",
+      "finding": "Current store page lists Vintage Revivals at Schulterblatt 18, 20357 Hamburg with opening hours."
+    }
+  ],
+  "dedup_audit": {
+    "cp120_lane_packet": "L11 proposed Vintage Revivals as PASS2_EVIDENCE_PACK_READY.",
+    "current_repo_exact_search_result": "Exact repository search for vintagerevivals.de returned no prior canonical promotion before CP120A.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp120-parallel27-next-wave-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp120a",
+  "canonical_counts_after_promotion": {
+    "verified": 433,
+    "eligible": 73,
+    "hold": 360,
+    "remaining_to_10000": 9567
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
