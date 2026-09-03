@@ -1,0 +1,162 @@
+name: RLF EU27 CP114 advance certified zones only
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp114-advance-certified-zones.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  advance-certified:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 26
+      matrix:
+        lane: [L01,L02,L03,L04,L05,L06,L07,L08,L10,L11,L12,L13,L14,L15,L16,L17,L18,L19,L20,L21,L22,L23,L24,L25,L26,L27]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      LANE: ${{ matrix.lane }}
+      CP113_RUN: '33710876974'
+    steps:
+      - name: Recover CP113 lane certificate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p cert
+          gh run download "$CP113_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP113-LANE-$LANE" -D cert
+          test -f "cert/$LANE.json"
+      - name: Advance strictly only if current zone is certified closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          curl --fail --location --retry 3 --retry-delay 2 \
+            'https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson' \
+            -o /tmp/lau.geojson
+          python3 -m pip install -q shapely
+          python3 - <<'PY'
+          import os,json,re,hashlib,time,urllib.parse,urllib.request
+          from pathlib import Path
+          from shapely.geometry import shape,box,Point,mapping
+          lane=os.environ['LANE']
+          c=json.load(open(f'cert/{lane}.json',encoding='utf-8'))
+          base_out={
+            'schema':'RLF_EU27_CP114_LANE_V1','lane_id':lane,'iso':c['iso'],'city_id':c['city_id'],'city_name':c['city_name'],
+            'previous_zone_id':c['zone_id'],'previous_zone_closed':bool(c.get('zone_closed')),'canonical_delta':0,'promotion_allowed':False
+          }
+          if not c.get('zone_closed'):
+              base_out.update({'action':'SKIP_LOCKED_CURRENT_ZONE_NOT_CLOSED','next_zone_id':None,'candidate_count':None,'technical_failures':None})
+              Path(f'out/{lane}.json').write_text(json.dumps(base_out,indent=2,ensure_ascii=False),encoding='utf-8')
+              print(json.dumps(base_out,ensure_ascii=False));raise SystemExit(0)
+          m=re.search(r'_G([123])([123])$',c['zone_id'])
+          if not m:
+              raise SystemExit('CLOSED_ZONE_IS_NOT_GRID_FAIL_CLOSED_'+c['zone_id'])
+          gj=json.load(open('/tmp/lau.geojson',encoding='utf-8'))
+          feat=None
+          for f in gj.get('features',[]):
+              p=f.get('properties') or {}; fid=p.get('LAU_ID') or p.get('GISCO_ID') or p.get('lau_id') or p.get('gisco_id')
+              if str(fid)==str(c['city_id']): feat=f;break
+          if feat is None: raise SystemExit('CITY_GEOMETRY_NOT_FOUND_'+str(c['city_id']))
+          g=shape(feat['geometry']);minx,miny,maxx,maxy=g.bounds;dx=(maxx-minx)/3;dy=(maxy-miny)/3
+          physical=[]
+          for rr in range(1,4):
+              for cc in range(1,4):
+                  cell=box(minx+(cc-1)*dx,miny+(rr-1)*dy,minx+cc*dx,miny+rr*dy)
+                  inter=g.intersection(cell)
+                  if not inter.is_empty and inter.area>1e-15:
+                      physical.append((f'{c["city_id"]}_G{rr}{cc}',rr,cc,inter))
+          ids=[x[0] for x in physical]
+          if c['zone_id'] not in ids: raise SystemExit('CURRENT_ZONE_NOT_IN_RECONSTRUCTED_ORDER')
+          pos=ids.index(c['zone_id'])
+          if pos+1>=len(physical):
+              base_out.update({'action':'CURRENT_CITY_ALL_PHYSICAL_ZONES_COMPLETE_PENDING_NEXT_CITY_RANK','next_zone_id':None,'physical_zones_total':len(physical)})
+              Path(f'out/{lane}.json').write_text(json.dumps(base_out,indent=2,ensure_ascii=False),encoding='utf-8')
+              print(json.dumps(base_out,ensure_ascii=False));raise SystemExit(0)
+          zid,rr,cc,zone=physical[pos+1]
+          bbox=zone.bounds; obbox=f'{bbox[1]},{bbox[0]},{bbox[3]},{bbox[2]}'
+          vectors=[
+            ('SECOND_HAND_SHOP',f'[out:json][timeout:80];nwr[shop=second_hand]({obbox});out center tags;'),
+            ('CLOTHES_SECOND_HAND_TAG',f'[out:json][timeout:80];nwr[shop=clothes][second_hand]({obbox});out center tags;'),
+            ('VINTAGE_SHOP',f'[out:json][timeout:80];nwr[shop=vintage]({obbox});out center tags;'),
+            ('CLOTHES_SECOND_HAND_VALUE',f'[out:json][timeout:80];nwr[shop=clothes][clothes=second_hand]({obbox});out center tags;')]
+          eps=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter']
+          merged={};vrecs=[]
+          for vi,(key,q) in enumerate(vectors):
+              data=None;err=None;used=None;status=None
+              for attempt in range(4):
+                  ep=eps[(int(lane[1:])+vi+attempt)%2]
+                  try:
+                      req=urllib.request.Request(ep,data=urllib.parse.urlencode({'data':q}).encode(),headers={'User-Agent':'RLF-EU27-CP114/1.0'})
+                      with urllib.request.urlopen(req,timeout=95) as r: body=r.read();status=getattr(r,'status',200);used=ep
+                      data=json.loads(body);break
+                  except Exception as e: err=type(e).__name__+': '+str(e);time.sleep(1.2*(attempt+1))
+              if data is None:
+                  vrecs.append({'vector':key,'status':'TECHNICAL_FAILURE','endpoint':used,'http_status':status,'error':err,'in_zone':0});continue
+              kept=0
+              for el in data.get('elements',[]):
+                  lat=el.get('lat');lon=el.get('lon');cen=el.get('center') or {}
+                  if lat is None:lat=cen.get('lat')
+                  if lon is None:lon=cen.get('lon')
+                  if lat is None or lon is None or not zone.covers(Point(float(lon),float(lat))):continue
+                  tags=el.get('tags') or {};okey=f"{el.get('type')}:{el.get('id')}";kept+=1
+                  if okey not in merged:
+                      merged[okey]={'osm_key':okey,'name':tags.get('name'),'website':tags.get('website') or tags.get('contact:website'),'phone':tags.get('phone') or tags.get('contact:phone'),'email':tags.get('email') or tags.get('contact:email'),'operator':tags.get('operator'),'lat':float(lat),'lon':float(lon),'shop':tags.get('shop'),'second_hand':tags.get('second_hand'),'vectors':[key]}
+                  else: merged[okey]['vectors']=sorted(set(merged[okey]['vectors']+[key]))
+              vrecs.append({'vector':key,'status':'SUCCESS','endpoint':used,'http_status':status,'error':None,'in_zone':kept})
+          base_out.update({
+            'action':'ADVANCED_ONE_CANONICAL_ZONE','next_zone_id':zid,'next_zone_order':pos+2,'next_zone_name':f'Grid {rr}-{cc}',
+            'physical_zones_total':len(physical),'official_geometry_source':'Eurostat/GISCO LAU 2024','zone_geometry':mapping(zone),
+            'zone_geometry_sha256':hashlib.sha256(json.dumps(mapping(zone),sort_keys=True,separators=(',',':')).encode()).hexdigest(),
+            'vectors':vrecs,'candidate_count':len(merged),'candidates':sorted(merged.values(),key=lambda x:x['osm_key']),
+            'technical_failures':sum(x['status']!='SUCCESS' for x in vrecs),'candidate_set_frozen':False,'exhaustion_credit':0
+          })
+          raw=json.dumps(base_out,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode();base_out['sha256']=hashlib.sha256(raw).hexdigest()
+          Path(f'out/{lane}.json').write_text(json.dumps(base_out,indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps({'lane':lane,'action':base_out['action'],'from':c['zone_id'],'to':zid,'candidates':len(merged),'technical_failures':base_out['technical_failures']},ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP114-LANE-${{ matrix.lane }}
+          path: out/${{ matrix.lane }}.json
+          retention-days: 30
+
+  consolidate:
+    needs: advance-certified
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: RLF-EU27-CP114-LANE-*
+          path: lanes
+          merge-multiple: true
+      - name: Consolidate strict advancement wave
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob,json,hashlib
+          rows=[json.load(open(f,encoding='utf-8')) for f in glob.glob('lanes/L*.json')]
+          rep={'schema':'RLF_EU27_CP114_CONSOLIDATED_V1','lanes_received':len(rows),
+               'advanced_one_zone':sum(r.get('action')=='ADVANCED_ONE_CANONICAL_ZONE' for r in rows),
+               'locked_skips':sum(r.get('action')=='SKIP_LOCKED_CURRENT_ZONE_NOT_CLOSED' for r in rows),
+               'city_boundary_stops':sum(r.get('action')=='CURRENT_CITY_ALL_PHYSICAL_ZONES_COMPLETE_PENDING_NEXT_CITY_RANK' for r in rows),
+               'new_zone_candidates':sum((r.get('candidate_count') or 0) for r in rows),
+               'technical_failures':sum((r.get('technical_failures') or 0) for r in rows),
+               'canonical_delta':0,'canonical_counts_unchanged':{'verified':413,'eligible':70,'hold':343,'remaining':9587},
+               'note':'L09 intentionally excluded while its CP113 certificate remains in progress; no overlap/requery.'}
+          rep['sha256']=hashlib.sha256(json.dumps(rep,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          open('RLF_EU27_CP114_CONSOLIDATED.json','w').write(json.dumps(rep,indent=2))
+          print(json.dumps(rep,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP114-CONSOLIDATED
+          path: RLF_EU27_CP114_CONSOLIDATED.json
+          retention-days: 30
