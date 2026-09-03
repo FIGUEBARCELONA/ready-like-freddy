@@ -1,0 +1,81 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP121B",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L02",
+  "country_code": "BE",
+  "city": "Antwerpen / Anvers",
+  "territorial_zone": "BE_11002_G12",
+  "canonical_supplier_id": "vat:BE0408643875",
+  "canonical_identity_key": "be:oxfam-solidariteit-0408643875",
+  "trading_names": ["Oxfam Solidariteit", "Oxfam-Solidarité", "Oxfam Tweedehands", "Oxfam Seconde Main"],
+  "legal_or_responsible_name": "OXFAM SOLIDARITEIT vzw / OXFAM SOLIDARITÉ asbl",
+  "enterprise_number": "0408.643.875",
+  "vat_id": "BE0408643875",
+  "legal_address": "Wetstraat / Rue de la Loi 26, 1000 Brussels, Belgium",
+  "canonical_domain": "oxfamsol.be",
+  "canonical_domains": ["oxfamsol.be", "oxfambelgie.be", "oxfambelgique.be"],
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All Oxfam Solidariteit/Solidarité second-hand stores and boutiques operated under enterprise/VAT BE0408.643.875 count as one Belgian legal supplier operator. The two CP121 Antwerp Oxfam discovery hits do not count separately. Oxfam België vzw and Oxfam-Wereldwinkels are distinct legal entities and are not silently merged into this supplier.",
+  "reason": "Independent PASS2 confirms a current Belgian professional second-hand apparel operator. Oxfam's current official Antwerp Brederode shop page identifies a live Oxfam Tweedehands store selling clothing, shoes and unique retro/vintage pieces, provides an @oxfamsol.be contact, and the same official site identifies Oxfam-Solidariteit VAT BE0408.643.875. Oxfam's July 2026 privacy policy separately lists Oxfam Solidarité as enterprise 0408.643.875, distinct from Oxfam België, Oxfam Wereldwinkels and Oxfam Fair Trade. Current official pages state that Oxfam has about 30 second-hand shops in Belgium and that most sell clothing. No current item-level remote second-hand apparel catalogue or ordinary delivery of those used garments to Spain was established for Oxfam Solidariteit, so the operator is VERIFIED_HOLD rather than ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_FIRST_PARTY_ENTERPRISE_AND_VAT",
+    "legal_entity_boundary": "PASS_OXFAM_SOLIDARITEIT_DISTINCT_ENTITY",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "current_antwerp_secondhand_apparel_store": "PASS",
+    "current_belgian_secondhand_network": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability_for_used_apparel": "HOLD_NOT_ESTABLISHED",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_OXFAM_SOLIDARITEIT_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.oxfamsol.be/nl/oxfam-shop-antwerpen-brederode",
+      "kind": "first_party_current_antwerp_secondhand_store_and_vat",
+      "finding": "Official page redirects to Oxfam België's current Antwerp Brederode second-hand store page: clothing and shoes, changing quality clothing/accessories/books, retro/vintage focus, address Brederodestraat 27, contact boutique.antwerpen@oxfamsol.be; footer identifies Oxfam-Solidariteit VAT BE0408.643.875."
+    },
+    {
+      "url": "https://oxfambelgique.be/vieprivee",
+      "kind": "first_party_legal_entity_boundary",
+      "finding": "Privacy policy updated 02/07/2026 lists OXFAM SOLIDARITÉ asbl, Rue de la Loi 26 Brussels, enterprise 0408.643.875, separately from OXFAM BELGIQUE, OXFAM WERELDWINKELS and OXFAM FAIR TRADE."
+    },
+    {
+      "url": "https://oxfambelgique.be/acheter-en-seconde-main",
+      "kind": "first_party_current_secondhand_apparel_activity",
+      "finding": "Current Oxfam Belgium page states that most Oxfam second-hand stores sell clothing and that the network offers modern/vintage clothing and shoes."
+    },
+    {
+      "url": "https://oxfambelgique.be/shop-finder",
+      "kind": "first_party_current_secondhand_network",
+      "finding": "Current shop finder states roughly 30 second-hand shops in Belgium."
+    }
+  ],
+  "dedup_audit": {
+    "cp121_lane_packet": "L02 surfaced two fresh Oxfam charity-shop identities in Antwerp; they are consolidated at legal-operator level and count once.",
+    "current_repo_exact_search_result": "Exact repository searches for oxfamsol.be and enterprise number 0408643875 returned no prior canonical promotion before CP121B.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp121-parallel27-fresh-discovery-l02",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp121b",
+  "canonical_counts_after_promotion": {
+    "verified": 440,
+    "eligible": 73,
+    "hold": 367,
+    "remaining_to_10000": 9560
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
