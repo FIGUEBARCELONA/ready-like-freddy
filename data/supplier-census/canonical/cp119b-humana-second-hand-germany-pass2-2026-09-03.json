@@ -1,0 +1,82 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP119B",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "vat:DE178817297",
+  "canonical_identity_key": "de:humana-second-hand-kleidung-gmbh-hrb12920ff",
+  "trading_names": ["HUMANA Second Hand", "HUMANA Secondhand & Vintage Fashion"],
+  "legal_or_responsible_name": "HUMANA Second Hand Kleidung GmbH",
+  "vat_id": "DE178817297",
+  "register_number": "HR B 12920 FF, AG Frankfurt/Oder",
+  "legal_address": "Industriestr. 12-14, 15366 Hoppegarten, Germany",
+  "management": "Jytte Nielsen",
+  "canonical_domain": "humana-second-hand.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All German HUMANA Second Hand shops operated by HUMANA Second Hand Kleidung GmbH count as one supplier. Hamburg, Berlin, Potsdam, Dresden, Leipzig, Cologne and other German branches are not counted separately. HUMANA Spain / FUNDACIÓN PUEBLO PARA PUEBLO is a distinct legal operator and remains a separate supplier identity.",
+  "reason": "Independent PASS2 confirms a current German professional second-hand/vintage apparel network. The current first-party site states that HUMANA Second Hand operates 34 shops in Germany, including five in Hamburg, and explicitly markets second-hand and vintage apparel. Current 2026 offer/news pages document daily new second-hand pieces, current collections and active nationwide shops. The first-party imprint identifies HUMANA Second Hand Kleidung GmbH, Hoppegarten, HR B 12920 FF, VAT DE178817297 and managing director Jytte Nielsen. The current model reviewed is physical retail; no current item-level remote purchase catalogue or ordinary delivery to Spain was established for this German legal operator, so it is VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_FIRST_PARTY_IMPRINT",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS_MULTI_STORE_NETWORK",
+    "professional_contactability": "PASS",
+    "current_secondhand_apparel_assortment": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_PHYSICAL_RETAIL_NETWORK",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_GERMAN_GMBH_ACROSS_BRANCHES_AND_DISTINCT_FROM_FOREIGN_HUMANA_ENTITIES",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.humana-second-hand.de/",
+      "kind": "first_party_current_secondhand_activity",
+      "finding": "Current site explicitly markets Secondhand & Vintage and states that HUMANA Second Hand has 34 German shops, including five in Hamburg."
+    },
+    {
+      "url": "https://www.humana-second-hand.de/mode/angebote.html",
+      "kind": "first_party_current_2026_stock_activity",
+      "finding": "Current 2026 offers page documents daily new second-hand pieces and current collections across the shops."
+    },
+    {
+      "url": "https://www.humana-second-hand.de/mode/impressum.html",
+      "kind": "first_party_legal_identity",
+      "finding": "Imprint identifies HUMANA Second Hand Kleidung GmbH, Industriestr. 12-14, 15366 Hoppegarten, HR B 12920 FF, AG Frankfurt/Oder, VAT DE178817297 and managing director Jytte Nielsen."
+    },
+    {
+      "url": "https://www.humana-second-hand.de/mode/downloads/HSH-factsheet-2025-EN-web-v02.pdf",
+      "kind": "recent_first_party_company_factsheet",
+      "finding": "2025 factsheet confirms the business model of operating German second-hand shops, broad women/men/children/vintage assortment and 36 shops at year-end 2025."
+    }
+  ],
+  "dedup_audit": {
+    "current_repo_exact_search_result": "Exact repository search for humana-second-hand.de returned no prior canonical promotion before CP119B.",
+    "foreign_entity_separation": "CP118C HUMANA Spain is FUNDACIÓN PUEBLO PARA PUEBLO, NIF G63059521; it is legally distinct and is not merged with HUMANA Second Hand Kleidung GmbH.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp119-parallel27-deepening-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp119b",
+  "canonical_counts_after_promotion": {
+    "verified": 431,
+    "eligible": 72,
+    "hold": 359,
+    "remaining_to_10000": 9569
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
