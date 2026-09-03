@@ -1,0 +1,76 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP121I",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "vat:DE219014135",
+  "canonical_identity_key": "de:sprungbrett-dienstleistungen-ggmbh-hrb82554",
+  "trading_names": ["Sozialkaufhaus Bergedorf", "MÖBELBERGedorf"],
+  "legal_or_responsible_name": "Sprungbrett Dienstleistungen gGmbH",
+  "register_court": "Amtsgericht Hamburg",
+  "register_number": "HRB 82554",
+  "vat_id": "DE219014135",
+  "legal_address": "Brookkehre 4, 21029 Hamburg, Germany",
+  "canonical_domain": "sprungbrett-hh.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_ACCESS_RESTRICTED",
+  "freshness_status": "CURRENT_OPERATOR_SITE",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "Sozialkaufhaus Bergedorf and MÖBELBERGedorf are projects/sales surfaces of Sprungbrett Dienstleistungen gGmbH and count once.",
+  "reason": "Independent PASS2 confirms a professional Hamburg social second-hand operator. The current first-party imprint identifies Sprungbrett Dienstleistungen gGmbH, Geschäftsführer Peter Bakker, Hamburg HRB 82554 and UID DE219014135. First-party Sozialkaufhaus material documents intake of clothing and furniture donations and retail work helping customers select clothing or furniture; customers' eligibility cards are checked. The operation therefore has genuine used-clothing sales but restricted access, and no current item-level remote apparel catalogue or ordinary delivery to Spain is established. It is counted as VERIFIED_HOLD, not ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_FIRST_PARTY_HRB_AND_UID",
+    "professional_secondhand_activity": "PASS_FIRST_PARTY_SOCIAL_DEPARTMENT_STORE",
+    "current_hamburg_operator": "PASS",
+    "used_clothing_sales_activity": "PASS",
+    "ordinary_public_access": "HOLD_BERECHTIGUNGSAUSWEIS_CHECK",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_NOT_ESTABLISHED",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_GGMBH_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.sprungbrett-hh.de/rechtliches/impressum/",
+      "kind": "first_party_legal_identity",
+      "finding": "Current first-party imprint identifies Sprungbrett Dienstleistungen gGmbH, Peter Bakker, Brookkehre 4, Hamburg HRB 82554 and UID DE219014135."
+    },
+    {
+      "url": "https://www.sprungbrett-hh.de/04-1-agh/agh-mb/",
+      "kind": "first_party_secondhand_clothing_sales_model",
+      "finding": "Sozialkaufhaus page describes acceptance of clothing/furniture donations and retail duties helping customers find clothing or furniture; eligibility cards are checked before goods are handed out."
+    },
+    {
+      "url": "https://www.sprungbrett-hh.de/index.html",
+      "kind": "first_party_current_operator_site",
+      "finding": "Current company website confirms active Sprungbrett Dienstleistungen gGmbH operation in Hamburg-Bergedorf."
+    }
+  ],
+  "dedup_audit": {
+    "cp121_lane_packet": "L11 surfaced MÖBELBERGedorf; independent review resolved the wider Sozialkaufhaus clothing-sales operation under the same legal operator.",
+    "current_repo_exact_search_result": "Exact repository search for HRB 82554 returned no prior canonical promotion before CP121I.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp121-l11-fresh-discovery-resolution",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp121i",
+  "canonical_counts_after_promotion": {
+    "verified": 447,
+    "eligible": 74,
+    "hold": 373,
+    "remaining_to_10000": 9553
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
