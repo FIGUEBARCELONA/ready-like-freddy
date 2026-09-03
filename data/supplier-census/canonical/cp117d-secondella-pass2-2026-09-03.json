@@ -1,0 +1,90 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117D",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "vat:DE220005121",
+  "canonical_identity_key": "kg:secondella-hra96748",
+  "trading_names": ["SECONDELLA", "Secondella"],
+  "legal_or_responsible_name": "SECONDELLA GmbH & Co. KG",
+  "vat_id": "DE220005121",
+  "commercial_register": "HRA 96748, Amtsgericht Hamburg",
+  "legal_address": "Hohe Bleichen 5, 20354 Hamburg, Germany",
+  "canonical_domain": "secondella.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "SECONDELLA main shop, depot and outlet at Hohe Bleichen 5 are one legal operator and count as one supplier.",
+  "reason": "Independent PASS2 confirms a current German professional second-hand designer apparel operator. First-party legal notice identifies SECONDELLA GmbH & Co. KG, HRA 96748 and VAT DE220005121. Current item-level product pages explicitly identify used/second-hand garments, condition, price and Add to cart, and consumer terms provide withdrawal rights. Current shipping evidence reviewed establishes domestic German delivery but does not establish ordinary delivery to Spain, so the operator is verified HOLD rather than operationally eligible. The expanded backup contains only a discovery-only OSM record for this identity and no prior verified canonical promotion.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "current_item_level_apparel_catalogue": "PASS",
+    "direct_purchase_capability": "PASS",
+    "professional_contactability": "PASS",
+    "consumer_terms_and_compliance": "PASS",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.secondella.de/impressum/",
+      "kind": "first_party_legal_identity",
+      "finding": "SECONDELLA GmbH & Co. KG, Hamburg, HRA 96748, VAT DE220005121 and current contact details."
+    },
+    {
+      "url": "https://secondella.de/women/bekleidung/kleider/maxikleider/loewe-maxikleid-ohne-aermel-in-schwarz/",
+      "kind": "current_item_level_apparel_checkout",
+      "finding": "Current used second-hand garment with price, condition, stock and Add to cart."
+    },
+    {
+      "url": "https://secondella.de/women/bekleidung/kleider/minikleider/gucci-vintage-kleid-in-schwarz-mit-taillenguertel/",
+      "kind": "independent_current_item_level_apparel_checkout",
+      "finding": "Current vintage used garment with price, condition and Add to cart."
+    },
+    {
+      "url": "https://secondella.de/widerrufsrecht/",
+      "kind": "consumer_terms",
+      "finding": "Current first-party withdrawal terms with 14-day return framework and seller identity."
+    },
+    {
+      "url": "https://www.secondella.de/versand/",
+      "kind": "shipping",
+      "finding": "Shipping page documents DHL shipment and German Packstation delivery; ordinary Spain delivery was not established in the reviewed evidence."
+    },
+    {
+      "url": "https://secondella.de/our-stores/",
+      "kind": "physical_operation",
+      "finding": "Current Hamburg location with main shop, depot and outlet at Hohe Bleichen 5."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "One discovery-only OSM record exists for Secondella with evidence_status not_verified and decision not_verified; no prior verified promotion was present.",
+    "current_repo_exact_search_result": "Exact searches for secondella.de and SECONDELLA returned no prior canonical promotion before CP117D.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117d",
+  "canonical_counts_after_promotion": {
+    "verified": 417,
+    "eligible": 71,
+    "hold": 346,
+    "remaining_to_10000": 9583
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
