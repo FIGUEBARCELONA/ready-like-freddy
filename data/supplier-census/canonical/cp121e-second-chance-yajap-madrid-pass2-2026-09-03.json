@@ -1,0 +1,85 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP121E",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L26",
+  "country_code": "ES",
+  "city": "Madrid",
+  "territorial_zone": "ES_28079_G12",
+  "canonical_supplier_id": "cif:ES:B86235306",
+  "canonical_identity_key": "es:yajap-sl-b86235306-second-chance",
+  "trading_names": ["Second Chance", "Second Chance Luxury & Vintage"],
+  "legal_or_responsible_name": "YAJAP S.L.",
+  "cif": "B86235306",
+  "mercantile_registry": "Registro Mercantil de Madrid, Tomo 29066, Folio 34, Sección 8, Hoja M-523357",
+  "legal_address": "Plaza San Juan de la Cruz 9, 28003 Madrid, Spain",
+  "canonical_domain": "second-chance.es",
+  "outcome": "PASS2_VERIFIED_ELIGIBLE",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "ELIGIBLE_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_ELIGIBLE",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": true,
+  "counted_as_verified_hold": false,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All Second Chance Luxury & Vintage Madrid locations and second-chance.es count as one YAJAP S.L. legal supplier operator.",
+  "reason": "Independent PASS2 confirms a current Madrid professional pre-owned luxury and fashion operator with direct ecommerce. First-party legal terms identify YAJAP S.L., CIF B86235306, Madrid registered office and Mercantile Registry details. The current first-party clothing collection contains 135 apparel products, overwhelmingly in used/good/very-good condition, with prices, stock and add-to-cart. Current product pages expose item-level condition, size/material details, checkout, consumer guarantees, 14-day withdrawal and published shipping. Peninsular Spain delivery is explicitly offered, so the operator satisfies RLF's operational sourcing gate and is VERIFIED_ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_FIRST_PARTY_CIF_AND_MERCANTILE_REGISTER",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY_PRE_OWNED",
+    "current_madrid_operation": "PASS",
+    "current_item_level_secondhand_apparel_catalogue": "PASS_135_CLOTHING_PRODUCTS",
+    "direct_remote_purchase_capability": "PASS_ADD_TO_CART_AND_CHECKOUT",
+    "consumer_terms_and_withdrawal": "PASS_14_DAY_WITHDRAWAL",
+    "ordinary_delivery_to_spain": "PASS_EXPLICIT_PENINSULAR_SHIPPING",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_YAJAP_SL_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.second-chance.es/pages/terminos-y-condiciones",
+      "kind": "first_party_legal_identity",
+      "finding": "Current terms identify YAJAP S.L., CIF B86235306, Plaza San Juan de la Cruz 9 Madrid, and Madrid Mercantile Registry Tomo 29066, Folio 34, Sección 8, Hoja M-523357; the stated web purpose includes second-hand watches, jewellery, bags and accessories."
+    },
+    {
+      "url": "https://www.second-chance.es/collections/ropa",
+      "kind": "first_party_current_secondhand_apparel_catalogue",
+      "finding": "Current clothing collection exposes 135 apparel products with condition filters including Muy buen estado, Buen estado and Usado, prices, stock and current branded garments."
+    },
+    {
+      "url": "https://www.second-chance.es/collections/ropa/products/conjunto-de-vestido-y-chaqueta",
+      "kind": "first_party_item_level_transactable_used_apparel",
+      "finding": "Current item page for a vintage Andersen dress-and-jacket set shows price, Buen estado condition, size/material details and Agregar al carrito."
+    },
+    {
+      "url": "https://www.second-chance.es/products/vestido-negro-de-encaje",
+      "kind": "first_party_item_level_transactable_used_apparel",
+      "finding": "Current Pedro del Hierro dress page shows Buen estado, price, stock, specifications and add-to-cart."
+    },
+    {
+      "url": "https://www.second-chance.es/collections/ropa/products/conjunto-de-vestido-y-chaqueta",
+      "kind": "first_party_shipping_returns_and_consumer_terms",
+      "finding": "Product information publishes 48/72h Peninsular Spain shipping, EU shipping tariffs, insured shipping, 14-day withdrawal and current YAJAP S.L. consumer guarantees."
+    }
+  ],
+  "dedup_audit": {
+    "cp121_lane_packet": "L26 surfaced Second Chance Luxury Vintage as a fresh Madrid OSM identity without website metadata; independent PASS2 linked it to the current owned domain and legal operator.",
+    "current_repo_exact_search_result": "Exact repository searches for second-chance.es and B86235306 returned no prior canonical promotion before CP121E.",
+    "marketplace_exclusion": "No marketplace listing is needed or used for canonical promotion; first-party ecommerce evidence is sufficient.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp121-parallel27-fresh-discovery-l26",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp121e",
+  "canonical_counts_after_promotion": {
+    "verified": 443,
+    "eligible": 74,
+    "hold": 369,
+    "remaining_to_10000": 9557
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
