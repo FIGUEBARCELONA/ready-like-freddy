@@ -1,0 +1,173 @@
+name: RLF EU27 CP119 Parallel27 PASS2 deepening
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp119-parallel27-pass2-deepening.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  deepen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    strategy:
+      fail-fast: false
+      max-parallel: 27
+      matrix:
+        lane: [L01,L02,L03,L04,L05,L06,L07,L08,L09,L10,L11,L12,L13,L14,L15,L16,L17,L18,L19,L20,L21,L22,L23,L24,L25,L26,L27]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      LANE: ${{ matrix.lane }}
+      CP118_RUN: '33757807782'
+      CP117_RUN: '33714142136'
+      CP116_RUN: '33713443841'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recover source plus prior microblock
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source prior
+          gh run download "$CP118_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP118-LANE-$LANE" -D prior
+          if gh run download "$CP117_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP117-LANE-$LANE" -D source 2>/dev/null; then
+            echo 'SOURCE_CHECKPOINT=CP117' >> "$GITHUB_ENV"
+          else
+            rm -rf source/*
+            gh run download "$CP116_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP116-LANE-$LANE" -D source
+            echo 'SOURCE_CHECKPOINT=CP116_FALLBACK' >> "$GITHUB_ENV"
+          fi
+          test -f "prior/$LANE.json"
+          test -f "source/$LANE.json"
+
+      - name: Deep PASS2 evidence microblock
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,json,re,html,hashlib,ssl,urllib.request
+          from pathlib import Path
+          from urllib.parse import urlparse,urljoin
+
+          lane=os.environ['LANE']; source_checkpoint=os.environ['SOURCE_CHECKPOINT']
+          src=json.load(open(f'source/{lane}.json',encoding='utf-8'))
+          prior=json.load(open(f'prior/{lane}.json',encoding='utf-8'))
+          UA='Mozilla/5.0 (compatible; RLF-EU27-CP119/1.0; +https://github.com/FIGUEBARCELONA/ready-like-freddy)'
+          sslctx=ssl.create_default_context()
+
+          def dom(url):
+              if not url:return None
+              try:
+                  u=url if '://' in str(url) else 'https://'+str(url)
+                  h=(urlparse(u).hostname or '').lower().strip('.')
+                  return h[4:] if h.startswith('www.') else h
+              except:return None
+
+          excluded=set()
+          for p in Path('data/supplier-census/canonical').glob('*.json'):
+              try:d=json.load(open(p,encoding='utf-8'))
+              except:continue
+              vals=[]
+              if d.get('canonical_domain'): vals.append(d['canonical_domain'])
+              vals+=list(d.get('canonical_domains') or [])
+              for x in vals:
+                  y=dom(x)
+                  if y: excluded.add(y)
+          for c in prior.get('candidates') or []:
+              y=dom(c.get('domain') or c.get('website'))
+              if y: excluded.add(y)
+
+          rows=src.get('enriched_candidates') or src.get('candidates') or src.get('new_identities') or []
+          if isinstance(rows,dict): rows=list(rows.values())
+          def quality(r):
+              s=str(r.get('enrichment_status') or r.get('terminal_status') or '')
+              return (0 if 'READY' in s else 1, 0 if r.get('website') else 1, str(r.get('name') or '').lower())
+          rows=sorted(rows,key=quality)
+          chosen=[]; local=set()
+          for r in rows:
+              web=r.get('website') or r.get('direct_url')
+              d=r.get('canonical_domain_candidate') or dom(web)
+              if not web or not d or d in excluded or d in local: continue
+              local.add(d); chosen.append((r,web,d))
+              if len(chosen)>=5: break
+
+          legal=re.compile(r'\b(impressum|legal|privacy|privacy policy|terms|conditions|company|gmbh|ug\b|ohg\b|kg\b|srl\b|s\.l\.|sl\b|bv\b|oy\b|ab\b|aps\b|kft\b|sro\b|uab\b|oü\b|sia\b|vat|iva|nif|cif|siret|siren|kvk|ust.?id|uid|register|registro|registo)\b',re.I)
+          second=re.compile(r'\b(second[ -]?hand|pre[ -]?loved|preowned|pre-owned|vintage|thrift|used clothing|used clothes|gebraucht|secondhand|friperie|segunda mano|roupa usada|seconda mano|kringwinkel|bazar używan|odjeća iz druge ruke)\b',re.I)
+          apparel=re.compile(r'\b(clothes|clothing|apparel|fashion|garment|kleidung|mode|ropa|roupa|abbigliamento|kleding|odzież|oblečen|dress|shirt|jacket|coat|trousers|jeans|skirt|blouse|sweater|shoes)\b',re.I)
+          commerce=re.compile(r'\b(add to cart|add to basket|checkout|buy now|shop now|basket|cart|warenkorb|panier|carrito|carrello|winkelwagen|koszyk|price|€|eur)\b',re.I)
+          shipping=re.compile(r'\b(shipping|delivery|dispatch|versand|lieferung|envío|envios|livraison|spedizione|verzending|wysyłka|shipping policy)\b',re.I)
+          spain=re.compile(r'\b(spain|españa|espagne|spanien|spagna|spanje|hiszpania|españa peninsular)\b',re.I)
+
+          paths=['/','/impressum','/imprint','/legal','/legal-notice','/aviso-legal','/mentions-legales','/privacy','/privacy-policy','/policies/privacy-policy','/policies/contact-information','/terms','/terms-and-conditions','/conditions-generales-de-vente','/agb','/policies/terms-of-service','/shipping','/shipping-policy','/pages/shipping','/versand','/envios','/contact','/contacto','/kontakt','/about','/about-us']
+          def fetch(url):
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'text/html,application/xhtml+xml,*/*','Accept-Language':'en;q=0.9,*;q=0.6'})
+                  with urllib.request.urlopen(req,timeout=7,context=sslctx) as res:
+                      raw=res.read(240000); status=getattr(res,'status',200); final=res.geturl()
+                  txt=html.unescape(re.sub(r'\s+',' ',re.sub('<[^>]+>',' ',raw.decode('utf-8','replace'))))[:120000]
+                  return status,final,txt,None
+              except Exception as e:return None,url,'',type(e).__name__+': '+str(e)[:160]
+
+          out=[]
+          for r,web,d in chosen:
+              base=(web if '://' in str(web) else 'https://'+str(web)).rstrip('/')
+              pages=[]
+              for p in paths:
+                  st,u,txt,err=fetch(base+p)
+                  if not txt: continue
+                  marks={'legal':bool(legal.search(txt)),'secondhand':bool(second.search(txt)),'apparel':bool(apparel.search(txt)),'commerce':bool(commerce.search(txt)),'shipping':bool(shipping.search(txt)),'spain':bool(spain.search(txt))}
+                  pages.append({'path':p,'url':u,'status':st,'markers':marks,'sha256':hashlib.sha256(txt.encode()).hexdigest()})
+                  if sum(x['markers']['legal'] for x in pages)>=1 and sum(x['markers']['secondhand'] and x['markers']['apparel'] for x in pages)>=1 and len(pages)>=4: break
+              agg={k:any(p['markers'][k] for p in pages) for k in ['legal','secondhand','apparel','commerce','shipping','spain']}
+              if agg['legal'] and agg['secondhand'] and agg['apparel']:
+                  status='PASS2_EVIDENCE_PACK_READY'
+              elif agg['secondhand'] and agg['apparel']:
+                  status='PASS2_ACTIVITY_READY_LEGAL_GAP'
+              else:
+                  status='PASS2_EVIDENCE_GAP'
+              out.append({'name':r.get('name'),'website':web,'domain':d,'osm_key':r.get('osm_key'),'source_readiness':r.get('enrichment_status') or r.get('terminal_status'),'pass2_status':status,'markers':agg,'pages':pages})
+
+          payload={'schema':'RLF_EU27_CP119_PASS2_DEEPENING_V1','lane_id':lane,'iso':src.get('iso'),'city_id':src.get('city_id'),'city_name':src.get('city_name'),'zone_id':src.get('zone_id'),'source_checkpoint':source_checkpoint,'prior_domains_excluded':len(excluded),'candidates_harvested':len(out),'evidence_pack_ready':sum(x['pass2_status']=='PASS2_EVIDENCE_PACK_READY' for x in out),'activity_ready_legal_gap':sum(x['pass2_status']=='PASS2_ACTIVITY_READY_LEGAL_GAP' for x in out),'evidence_gap':sum(x['pass2_status']=='PASS2_EVIDENCE_GAP' for x in out),'candidates':out,'canonical_delta':0,'automatic_promotion_prohibited':True,'territorial_credit':'NONE_PASS2_ONLY','quality':'AAA_FAIL_CLOSED'}
+          payload['sha256']=hashlib.sha256(json.dumps(payload,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+          Path('out').mkdir(exist_ok=True); json.dump(payload,open(f'out/{lane}.json','w',encoding='utf-8'),ensure_ascii=False,indent=2,sort_keys=True)
+          print(json.dumps({k:payload[k] for k in ['lane_id','iso','zone_id','candidates_harvested','evidence_pack_ready','activity_ready_legal_gap','evidence_gap']},ensure_ascii=False))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP119-LANE-${{ matrix.lane }}
+          path: out/${{ matrix.lane }}.json
+          retention-days: 30
+
+  consolidate:
+    if: always()
+    needs: deepen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: RLF-EU27-CP119-LANE-*
+          path: lanes
+          merge-multiple: true
+      - name: Consolidate
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,glob,hashlib
+          rows=[]
+          for f in glob.glob('lanes/*.json'):
+              try:rows.append(json.load(open(f,encoding='utf-8')))
+              except:pass
+          out={'schema':'RLF_EU27_CP119_CONSOLIDATED_V1','lanes_received':len(rows),'candidates_harvested':sum(x.get('candidates_harvested',0) for x in rows),'pass2_evidence_pack_ready':sum(x.get('evidence_pack_ready',0) for x in rows),'activity_ready_legal_gap':sum(x.get('activity_ready_legal_gap',0) for x in rows),'evidence_gap':sum(x.get('evidence_gap',0) for x in rows),'fallback_lanes':[x.get('lane_id') for x in rows if 'FALLBACK' in str(x.get('source_checkpoint'))],'canonical_delta':0,'automatic_promotion_prohibited':True,'territorial_credit':'NONE_PASS2_ONLY','quality':'AAA_FAIL_CLOSED'}
+          out['sha256']=hashlib.sha256(json.dumps(out,sort_keys=True).encode()).hexdigest(); json.dump(out,open('CP119-CONSOLIDATED.json','w'),indent=2,sort_keys=True); print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP119-CONSOLIDATED
+          path: CP119-CONSOLIDATED.json
+          retention-days: 30
