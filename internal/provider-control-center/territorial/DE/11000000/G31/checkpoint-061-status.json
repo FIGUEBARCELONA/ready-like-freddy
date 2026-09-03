@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "checkpoint": "061",
+  "checkpoint_id": "RLF-TERRITORIAL-DE-BERLIN-G31-GEOMETRY-061-INITIALISED-CELL-DEFINITION-BLOCKED",
+  "base_checkpoint_id": "RLF-TERRITORIAL-DE-BERLIN-G23-CLOSED-060-EXHAUSTION-MATRIX-001-ZERO-NEW",
+  "policy": "APPEND_ONLY_FAIL_CLOSED_TERRITORIAL_EXHAUSTION_V2",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "phase_2_started": false,
+  "canonical_totals": {"verified": 340, "eligible": 71, "hold": 269, "remaining_to_10000": 9660},
+  "territorial_cursor": {
+    "country": "Germany",
+    "city": "Berlin, Stadt",
+    "current_zone_id": "DE_11000000_G31",
+    "status": "GEOMETRY_SUBGATE_BLOCKED_CANONICAL_CELL_DEFINITION_MISSING",
+    "next_zone_locked": true,
+    "next_city_locked": true,
+    "next_country_locked": true
+  },
+  "authoritative_geometry_source": {
+    "source": "Eurostat GISCO LAU 2024",
+    "source_gisco_id": "DE_11000000",
+    "source_sha256": "ae07901e0a11cb7891d1a6d6a31cfd833e25672ca318908856b0e34a1acca594",
+    "berlin_feature_sha256": "364fe3b6ecc09bba5053769cb2a71fe99eebdcc3f526a7f850429e39769ef88b",
+    "berlin_bounds": [13.089060764000067, 52.33945749900005, 13.760019, 52.67464649900006],
+    "provenance_artifact_id": 9816425203,
+    "recovered_and_rehashed": true
+  },
+  "g31_geometry_gate": {
+    "state": "BLOCKED_FAIL_CLOSED",
+    "canonical_cell_definition_found_in_repository": false,
+    "canonical_bbox": null,
+    "clipped_geometry_materialised": false,
+    "clipped_geometry_sha256": null,
+    "point_in_polygon_enabled": false,
+    "discovery_allowed": false,
+    "blocker": "EXACT_CANONICAL_G31_CELL_DEFINITION_NOT_PERSISTED_IN_CURRENT_REPOSITORY_STATE"
+  },
+  "discovery": {"raw_records": 0, "candidate_records": 0, "open_pending": 0, "exhaustion_counter": 0, "exhaustion_required": 15},
+  "batch061_delta": {"verified": 0, "eligible": 0, "hold": 0, "new_candidates": 0, "count_delta": 0},
+  "locks": {"later_zone_locked": true, "next_city_locked": true, "next_country_locked": true, "phase_2_locked": true},
+  "next_action": "Recover the exact audited G31 cell definition from prior canonical material; then clip, validate and hash before enabling discovery."
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "matrix_id": "G23-DISCOVERY-MATRIX-001",
+  "zone_id": "DE_11000000_G23",
+  "checkpoint_created": "057",
+  "state": "CONFIGURED_NOT_EXECUTED",
+  "geometry_sha256_required": "6c13d2d5a5a426feab68ac3af54e06d9912ce5063ea025873260f9af84eb93df",
+  "atomic_rule": "Raw discoveries may be retained, but no candidate identity may be opened until coordinates pass point-in-polygon and global deduplication passes.",
+  "vectors": [
+    {"ordinal": 1, "vector_id": "g23-d001-v01", "territorial_scope": "Bölschestraße", "query": "\"Bölschestraße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 2, "vector_id": "g23-d001-v02", "territorial_scope": "Bahnhofstraße Köpenick", "query": "\"Bahnhofstraße\" Köpenick second hand vintage clothing shop"},
+    {"ordinal": 3, "vector_id": "g23-d001-v03", "territorial_scope": "Müggelseedamm", "query": "\"Müggelseedamm\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 4, "vector_id": "g23-d001-v04", "territorial_scope": "Seelenbinderstraße", "query": "\"Seelenbinderstraße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 5, "vector_id": "g23-d001-v05", "territorial_scope": "Mahlsdorfer Straße", "query": "\"Mahlsdorfer Straße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 6, "vector_id": "g23-d001-v06", "territorial_scope": "Salvador-Allende-Straße", "query": "\"Salvador-Allende-Straße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 7, "vector_id": "g23-d001-v07", "territorial_scope": "Wendenschloßstraße", "query": "\"Wendenschloßstraße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 8, "vector_id": "g23-d001-v08", "territorial_scope": "Grünauer Straße", "query": "\"Grünauer Straße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 9, "vector_id": "g23-d001-v09", "territorial_scope": "Dörpfeldstraße", "query": "\"Dörpfeldstraße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 10, "vector_id": "g23-d001-v10", "territorial_scope": "Oberspreestraße", "query": "\"Oberspreestraße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 11, "vector_id": "g23-d001-v11", "territorial_scope": "Regattastraße", "query": "\"Regattastraße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 12, "vector_id": "g23-d001-v12", "territorial_scope": "Alt-Köpenick", "query": "\"Alt-Köpenick\" second hand vintage clothing shop"},
+    {"ordinal": 13, "vector_id": "g23-d001-v13", "territorial_scope": "Fürstenwalder Damm", "query": "\"Fürstenwalder Damm\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 14, "vector_id": "g23-d001-v14", "territorial_scope": "Pablo-Neruda-Straße", "query": "\"Pablo-Neruda-Straße\" Berlin second hand vintage clothing shop"},
+    {"ordinal": 15, "vector_id": "g23-d001-v15", "territorial_scope": "Wilhelminenhofstraße", "query": "\"Wilhelminenhofstraße\" Berlin second hand vintage clothing shop"}
+  ],
+  "pre_candidate_gates": [
+    "source URL retained",
+    "street address or coordinates fixed",
+    "point-in-polygon true against accepted G23 geometry hash",
+    "professional operator evidence",
+    "second-hand or preloved apparel evidence",
+    "global normalized-name deduplication",
+    "global domain deduplication",
+    "global address deduplication",
+    "operator-network deduplication"
+  ],
+  "locks": {
+    "G31_locked": true,
+    "phase_2_locked": true
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "checkpoint": "061",
+  "zone_id": "DE_11000000_G31",
+  "gate_id": "G31_OFFICIAL_LAU_CLIPPED_GEOMETRY",
+  "state": "BLOCKED_CELL_DEFINITION_MISSING",
+  "verified_inputs": {
+    "source_sha256": "ae07901e0a11cb7891d1a6d6a31cfd833e25672ca318908856b0e34a1acca594",
+    "berlin_feature_sha256": "364fe3b6ecc09bba5053769cb2a71fe99eebdcc3f526a7f850429e39769ef88b",
+    "berlin_geometry_type": "MultiPolygon",
+    "berlin_bounds": [13.089060764000067, 52.33945749900005, 13.760019, 52.67464649900006]
+  },
+  "repository_audit": {
+    "branch": "rlf/g23-gisco-geometry-gate",
+    "pr_number": 25,
+    "pr_state": "open",
+    "pr_draft": true,
+    "pr_merged": false,
+    "persisted_G31_definition_found_before_checkpoint": false
+  },
+  "forbidden_substitutions": [
+    "Do not infer G31 coordinates from the zone label alone.",
+    "Do not extrapolate G31 from G23 by assuming a uniform grid.",
+    "Do not use the Berlin bounding box itself as G31.",
+    "Do not open discovery until the exact canonical G31 cell definition is recovered or canonically established from prior audited material."
+  ],
+  "requirements_before_pass": [
+    "Recover exact canonical G31 bbox/cell definition.",
+    "Persist the recovered definition with provenance.",
+    "Intersect DE_11000000 official geometry with exact G31 cell.",
+    "Reject an empty or invalid result.",
+    "Persist normalized clipped GeoJSON and SHA-256.",
+    "Only then enable point-in-polygon and discovery."
+  ]
+}

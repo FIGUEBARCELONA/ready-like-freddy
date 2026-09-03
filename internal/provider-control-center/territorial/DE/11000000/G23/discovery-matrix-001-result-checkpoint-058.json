@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0.0",
+  "checkpoint": "058",
+  "matrix_id": "G23-DISCOVERY-MATRIX-001",
+  "zone_id": "DE_11000000_G23",
+  "executed_at": "2026-09-01T21:14:43Z",
+  "vector_count": 15,
+  "vectors_executed": 15,
+  "raw_identity_observations": 7,
+  "candidate_records_opened": 0,
+  "exhaustion_credit": 0,
+  "rule": "Discovery execution is not an exhaustion matrix. No exhaustion credit is granted.",
+  "vectors": [
+    {
+      "vector_id": "g23-d001-v01",
+      "scope": "Bölschestraße",
+      "result": "RAW_UNVERIFIED",
+      "identities": [
+        {
+          "name": "Typingpool Vintage",
+          "address": "Bölschestraße 17, 12587 Berlin",
+          "source": "https://www.instagram.com/",
+          "gate": "BLOCKED_SOCIAL_ONLY_NO_PROVIDER_OWNED_PRODUCT_URL_NO_EXACT_COORDINATES"
+        }
+      ]
+    },
+    {
+      "vector_id": "g23-d001-v02",
+      "scope": "Bahnhofstraße Köpenick",
+      "result": "RAW_UNVERIFIED",
+      "identities": [
+        {
+          "name": "Angelique Vintage Store",
+          "address": "Bahnhofstraße 9, Berlin",
+          "source": "https://ls.maptons.com/p/3050371593",
+          "gate": "BLOCKED_THIRD_PARTY_DIRECTORY_ONLY_NO_PROVIDER_OWNED_PRODUCT_URL_NO_EXACT_COORDINATES"
+        }
+      ]
+    },
+    {
+      "vector_id": "g23-d001-v03",
+      "scope": "Müggelseedamm",
+      "result": "REJECTED_SOURCE_SCOPE",
+      "identities": [
+        {
+          "name": "Kissenknicker",
+          "address": "Müggelseedamm 208, 12587 Berlin",
+          "source": "https://www.etsy.com/listing/4311271701/gdr-training-jacket-sporett-sieger-84",
+          "gate": "REJECTED_MARKETPLACE_ONLY_SOURCE_NO_OWN_PRODUCT_PAGE"
+        }
+      ]
+    },
+    {
+      "vector_id": "g23-d001-v04",
+      "scope": "Seelenbinderstraße",
+      "result": "ZERO_NEW",
+      "identities": []
+    },
+    {
+      "vector_id": "g23-d001-v05",
+      "scope": "Mahlsdorfer Straße",
+      "result": "ZERO_NEW",
+      "identities": []
+    },
+    {
+      "vector_id": "g23-d001-v06",
+      "scope": "Salvador-Allende-Straße",
+      "result": "ZERO_NEW_FALSE_ASSOCIATIONS",
+      "identities": []
+    },
+    {
+      "vector_id": "g23-d001-v07",
+      "scope": "Wendenschloßstraße",
+      "result": "ZERO_NEW_OUT_OF_SCOPE",
+      "identities": []
+    },
+    {
+      "vector_id": "g23-d001-v08",
+      "scope": "Grünauer Straße",
+      "result": "ZERO_NEW",
+      "identities": []
+    },
+    {
+      "vector_id": "g23-d001-v09",
+      "scope": "Dörpfeldstraße",
+      "result": "RAW_UNVERIFIED_OUTSIDE_ENVELOPE_SIGNAL",
+      "identities": [
+        {
+          "name": "Yours Fashion",
+          "address": "Dörpfeldstraße 16, 12489 Berlin",
+          "source": "https://web2.cylex.de/suche/second%20hand%20l%C3%A4den/Berlin/Treptow-Koepenick",
+          "observed_coordinates": [
+            13.543718,
+            52.436385
+          ],
+          "envelope_test": false,
+          "gate": "REJECTED_OUTSIDE_G23_RECTANGULAR_ENVELOPE"
+        }
+      ]
+    },
+    {
+      "vector_id": "g23-d001-v10",
+      "scope": "Oberspreestraße",
+      "result": "RAW_UNVERIFIED",
+      "identities": [
+        {
+          "name": "Socialladen Niederschöneweide",
+          "address": "Oberspreestraße 37, 12439 Berlin",
+          "source": "https://www.golocal.de/berlin/second-hand/?p=4",
+          "gate": "BLOCKED_EXACT_COORDINATES_AND_GLOBAL_DEDUP_PENDING"
+        }
+      ]
+    },
+    {
+      "vector_id": "g23-d001-v11",
+      "scope": "Regattastraße",
+      "result": "RAW_UNVERIFIED",
+      "identities": [
+        {
+          "name": "Socialladen Grünau",
+          "address": "Regattastraße 126, 12527 Berlin",
+          "source": "https://www.golocal.de/berlin/second-hand/?p=4",
+          "gate": "BLOCKED_EXACT_COORDINATES_AND_GLOBAL_DEDUP_PENDING"
+        }
+      ]
+    },
+    {
+      "vector_id": "g23-d001-v12",
+      "scope": "Alt-Köpenick",
+      "result": "REJECTED_TEMPORARY_OR_NON_APPAREL",
+      "identities": []
+    },
+    {
+      "vector_id": "g23-d001-v13",
+      "scope": "Fürstenwalder Damm",
+      "result": "ZERO_NEW",
+      "identities": []
+    },
+    {
+      "vector_id": "g23-d001-v14",
+      "scope": "Pablo-Neruda-Straße",
+      "result": "ZERO_NEW_OUT_OF_SCOPE_RETAIL",
+      "identities": []
+    },
+    {
+      "vector_id": "g23-d001-v15",
+      "scope": "Wilhelminenhofstraße",
+      "result": "REJECTED_TEMPORARY_EVENT",
+      "identities": [
+        {
+          "name": "Pre-loved/archive event at Wilhelminenhofstraße 76/77",
+          "address": "Wilhelminenhofstraße 76/77, 12459 Berlin",
+          "source": "https://www.instagram.com/p/DYRwWJMjf2R/",
+          "gate": "REJECTED_TEMPORARY_EVENT_NOT_STABLE_SUPPLIER"
+        }
+      ]
+    }
+  ]
+}

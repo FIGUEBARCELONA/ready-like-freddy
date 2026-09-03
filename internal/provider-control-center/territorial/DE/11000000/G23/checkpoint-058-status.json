@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "checkpoint": "058",
+  "checkpoint_id": "RLF-TERRITORIAL-DE-BERLIN-G23-DISCOVERY-058-MATRIX-001-EXECUTED-FAIL-CLOSED",
+  "base_checkpoint_id": "RLF-TERRITORIAL-DE-BERLIN-G23-INITIALISED-057-GEOMETRY-PASSED-DISCOVERY-NOT-STARTED",
+  "as_of": "2026-09-01T21:14:43Z",
+  "policy": "APPEND_ONLY_FAIL_CLOSED_TERRITORIAL_EXHAUSTION_V2",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "phase_2_started": false,
+  "canonical_totals": {
+    "verified": 340,
+    "eligible": 71,
+    "hold": 269,
+    "remaining_to_10000": 9660
+  },
+  "territorial_cursor": {
+    "current_zone_id": "DE_11000000_G23",
+    "status": "DISCOVERY_MATRIX_001_EXECUTED_RAW_DISPOSITIONS_RETAINED",
+    "next_zone_id": "DE_11000000_G31",
+    "next_zone_locked": true
+  },
+  "geometry_gate": {
+    "state": "PASSED",
+    "g23_clipped_sha256": "6c13d2d5a5a426feab68ac3af54e06d9912ce5063ea025873260f9af84eb93df",
+    "point_in_polygon_enabled": true
+  },
+  "discovery": {
+    "matrix_id": "G23-DISCOVERY-MATRIX-001",
+    "vector_count": 15,
+    "vectors_executed": 15,
+    "raw_identity_observations": 7,
+    "candidate_records_opened": 0,
+    "open_pending": 0,
+    "exhaustion_counter": 0,
+    "candidate_set_frozen": false
+  },
+  "gates": {
+    "point_in_polygon_completed_for_all_raw": false,
+    "global_dedup_completed_for_all_raw": false,
+    "candidate_creation_allowed": false
+  },
+  "unresolved_raw": [
+    {
+      "name": "Typingpool Vintage",
+      "blocker": "exact coordinates, provider-owned product URL, global dedup"
+    },
+    {
+      "name": "Angelique Vintage Store",
+      "blocker": "authoritative identity, exact coordinates, provider-owned product URL, global dedup"
+    },
+    {
+      "name": "Socialladen Niederschöneweide",
+      "blocker": "exact coordinates and global operator-network dedup"
+    },
+    {
+      "name": "Socialladen Grünau",
+      "blocker": "exact coordinates and global operator-network dedup"
+    }
+  ],
+  "rejected_raw": [
+    "Kissenknicker marketplace-only evidence",
+    "Yours Fashion outside G23 rectangular envelope",
+    "temporary Wilhelminenhofstraße event"
+  ],
+  "locks": {
+    "G31_locked": true,
+    "next_city_locked": true,
+    "next_country_locked": true,
+    "phase_2_locked": true
+  },
+  "next_action": "Resolve the four retained raw identities only: obtain exact coordinates, run point-in-polygon against the accepted G23 polygon, complete global name/domain/address/network deduplication, and open candidates only for identities passing every gate."
+}
