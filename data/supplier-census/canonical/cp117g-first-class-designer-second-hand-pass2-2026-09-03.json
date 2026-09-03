@@ -1,0 +1,79 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117G",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "responsible:stephan-brandt:waitzstrasse17.de",
+  "canonical_identity_key": "responsible:stephan-brandt:hamburg-de",
+  "trading_names": ["First Class Designer Second Hand", "Second Hand Waitzstraße 17"],
+  "legal_or_responsible_name": "Stephan Brandt",
+  "legal_address": "Waitzstraße 17, 22607 Hamburg, Germany",
+  "canonical_domain": "waitzstrasse17.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_RESPONSIBLE_OPERATOR",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "The Waitzstraße 17 physical shop, website and all brand/action pages are one supplier operated by Stephan Brandt.",
+  "reason": "Independent PASS2 confirms a current Hamburg professional designer second-hand operator. The first-party imprint identifies proprietor Stephan Brandt and full contact details; current first-party pages document opening hours, second-hand consignment operations, designer apparel/accessories, authenticity controls and current selling activity. The published purchase terms describe stationary retail and no current item-level remote apparel stock or ordinary delivery to Spain was materialized, so the operator is VERIFIED_HOLD rather than operationally eligible. The expanded backup contains only a discovery-only OSM record and no prior canonical promotion was found in the current repository.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_RESPONSIBLE_OPERATOR",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS_RESPONSIBLE_NAME_ADDRESS_CONTACT",
+    "physical_operation_and_current_activity": "PASS",
+    "professional_contactability": "PASS",
+    "authenticity_process": "PASS",
+    "current_item_level_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_STATIONARY_RETAIL",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.waitzstrasse17.de/about/",
+      "kind": "first_party_responsible_identity",
+      "finding": "Second Hand Waitzstraße 17 identifies proprietor Stephan Brandt, Hamburg address, phone and email."
+    },
+    {
+      "url": "https://www.waitzstrasse17.de/",
+      "kind": "current_physical_operation",
+      "finding": "Current page identifies the designer second-hand shop, Hamburg location, opening hours and supplier intake."
+    },
+    {
+      "url": "https://www.waitzstrasse17.de/markenwelt/",
+      "kind": "secondhand_assortment_and_authenticity",
+      "finding": "First-party page documents designer brand assortment, second-hand consignment criteria and authenticity checking."
+    },
+    {
+      "url": "https://www.waitzstrasse17.de/agb/",
+      "kind": "stationary_purchase_terms",
+      "finding": "Published terms explicitly govern purchase of used goods in stationary retail and the consignment process."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "One OSM discovery-only record exists for node 7845757444 with evidence_status not_verified and decision not_verified; it is not a prior canonical supplier.",
+    "current_repo_exact_search_result": "Exact search for waitzstrasse17.de returned no prior canonical promotion before CP117G.",
+    "branch_counting_rule": "ONE_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117g",
+  "canonical_counts_after_promotion": {
+    "verified": 420,
+    "eligible": 72,
+    "hold": 348,
+    "remaining_to_10000": 9580
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
