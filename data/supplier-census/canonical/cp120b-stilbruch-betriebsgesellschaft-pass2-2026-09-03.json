@@ -1,0 +1,78 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP120B",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "operator:de-stilbruch-betriebsgesellschaft-mbh",
+  "canonical_identity_key": "de:stilbruch-betriebsgesellschaft-mbh-helbingstrasse63",
+  "trading_names": ["Stilbruch", "Stilbruch Gebrauchtwarenkaufhaus"],
+  "legal_or_responsible_name": "Stilbruch-Betriebsgesellschaft mbH",
+  "legal_address": "Helbingstraße 63, 22047 Hamburg, Germany",
+  "canonical_domain": "stilbruch.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "Stilbruch Wandsbek and Stilbruch Altona are two stores of the same Stilbruch-Betriebsgesellschaft mbH and count once.",
+  "reason": "Independent PASS2 confirms a current Hamburg professional second-hand operator. First-party privacy information identifies Stilbruch-Betriebsgesellschaft mbH at Helbingstraße 63. Current first-party pages explicitly advertise continuously changing second-hand clothing, shoes and accessories, and current 2026 contact/store information. Current sales terms govern purchases of used goods. No current item-level remote apparel catalogue, direct checkout for clothing, or ordinary delivery to Spain was established, so the operator is counted as VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "eu_legal_identity": "PASS_FIRST_PARTY_COMPANY_IDENTITY",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "current_apparel_activity": "PASS_SECOND_HAND_CLOTHING_SHOES_ACCESSORIES",
+    "hamburg_physical_operation": "PASS_TWO_CURRENT_STORES",
+    "consumer_sales_terms": "PASS_CURRENT_MAY_2026_AGB",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_PHYSICAL_RETAIL",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_OPERATOR_TWO_STORES",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://stilbruch.de/datenschutzerklaerung/",
+      "kind": "first_party_legal_identity",
+      "finding": "Current privacy page identifies Stilbruch-Betriebsgesellschaft mbH, Helbingstraße 63, 22047 Hamburg, with current telephone and email."
+    },
+    {
+      "url": "https://stilbruch.de/",
+      "kind": "first_party_current_secondhand_apparel_activity",
+      "finding": "Current site explicitly lists continuously changing second-hand clothing, shoes and accessories and current Hamburg store information."
+    },
+    {
+      "url": "https://stilbruch.de/filialen/",
+      "kind": "first_party_store_network",
+      "finding": "Current store page lists Wandsbek and Altona locations and describes inspected used inventory with constant turnover."
+    },
+    {
+      "url": "https://stilbruch.de/agb/",
+      "kind": "first_party_current_used_goods_terms",
+      "finding": "Terms dated May 2026 identify Stilbruch-Betriebsgesellschaft mbH and govern contracts for used goods."
+    }
+  ],
+  "dedup_audit": {
+    "cp120_lane_packet": "L11 proposed Stilbruch as PASS2_EVIDENCE_PACK_READY.",
+    "current_repo_exact_search_result": "Exact repository search for stilbruch.de returned no prior canonical promotion before CP120B.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp120-parallel27-next-wave-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp120b",
+  "canonical_counts_after_promotion": {
+    "verified": 434,
+    "eligible": 73,
+    "hold": 361,
+    "remaining_to_10000": 9566
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
