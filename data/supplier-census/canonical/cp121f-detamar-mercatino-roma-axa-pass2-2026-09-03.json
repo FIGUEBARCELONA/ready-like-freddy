@@ -1,0 +1,79 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP121F",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L15",
+  "country_code": "IT",
+  "city": "Roma",
+  "territorial_zone": "IT_058091_G11",
+  "canonical_supplier_id": "vat:IT10452721003",
+  "canonical_identity_key": "it:detamar-srl-10452721003-roma-axa",
+  "trading_names": ["Mercatino Roma AXA Casal Palocco", "Mercatino Franchising dell'Usato Roma AXA"],
+  "legal_or_responsible_name": "DETAMAR S.R.L.",
+  "vat_id": "IT10452721003",
+  "rea": "RM-1233202",
+  "operating_address": "Via Carneade 11, 00125 Roma, Italy",
+  "canonical_domain": "romaaxa.mercatinousato.com",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_FRANCHISEE_OPERATOR",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "Roma AXA/Casal Palocco is counted once under local franchisee DETAMAR S.R.L. Other Mercatino franchise locations must be adjudicated by their own legal operators and are not merged or counted as branches of DETAMAR without legal evidence.",
+  "reason": "Independent PASS2 confirms a current Rome professional used-goods and used-apparel operator. The current first-party Roma AXA Mercatino site identifies DETAMAR S.R.L. at Via Carneade 11 with current contact and seven-day opening hours. Its current catalogue exposes 'usato firmato' apparel, including men's used/vintage garments with prices. A current commercial-registry-derived source corroborates DETAMAR S.R.L., VAT IT10452721003 and REA RM-1233202. The public site materializes a current item catalogue but does not establish direct remote checkout or ordinary delivery of used apparel to Spain; therefore it is VERIFIED_HOLD rather than ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_FIRST_PARTY_NAME_PLUS_REGISTRY_DERIVED_VAT",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "current_rome_operation": "PASS",
+    "current_item_level_used_apparel_catalogue": "PASS",
+    "direct_remote_purchase_capability": "HOLD_NOT_ESTABLISHED",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_LOCAL_FRANCHISEE_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://romaaxa.mercatinousato.com/newslocali.aspx",
+      "kind": "first_party_current_operator_identity",
+      "finding": "Current local Mercatino site identifies Roma-Axa-Casal Palocco, DETAMAR S.R.L., Via Carneade 11, phone/email and current opening hours."
+    },
+    {
+      "url": "https://romaaxa.mercatinousato.com/prodotti/usato-firmato/uomo/11c/110s",
+      "kind": "first_party_current_used_apparel_catalogue",
+      "finding": "Current 'Usato firmato - Uomo' catalogue exposes used/vintage apparel including a Gucci/North Face T-shirt and a vintage Adidas Liverpool 2008 jacket with prices."
+    },
+    {
+      "url": "https://romaaxa.mercatinousato.com/prodotti/promo?promozione=1",
+      "kind": "first_party_current_secondhand_supply",
+      "finding": "Current local page explicitly invites customers to bring spring/summer clothing and other used goods for resale and confirms the active Roma AXA operation."
+    },
+    {
+      "url": "https://www.ufficiocamerale.it/7309/detamar-srl",
+      "kind": "commercial_registry_derived_legal_corroboration",
+      "finding": "Current registry-derived company record corroborates DETAMAR S.R.L., VAT/CF 10452721003 and REA 1233202."
+    }
+  ],
+  "dedup_audit": {
+    "cp121_lane_packet": "L15 surfaced Mercatino Roma AXA as a fresh Roma identity.",
+    "current_repo_exact_search_result": "Exact repository searches for DETAMAR and 10452721003 returned no prior canonical promotion before CP121F.",
+    "franchise_rule": "COUNT_LOCAL_LEGAL_OPERATOR_NOT_FRANCHISE_BRAND",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp121-parallel27-fresh-discovery-l15",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp121f",
+  "canonical_counts_after_promotion": {
+    "verified": 444,
+    "eligible": 74,
+    "hold": 370,
+    "remaining_to_10000": 9556
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
