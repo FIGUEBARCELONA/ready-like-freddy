@@ -1,0 +1,87 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117B",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L02",
+  "country_code": "BE",
+  "canonical_supplier_id": "vat:BE0442423037",
+  "canonical_identity_key": "vzw:de-kringwinkel-antwerpen-0442423037",
+  "trading_names": ["Kringwinkel Antwerpen", "De Kringwinkel Antwerpen"],
+  "legal_or_responsible_name": "De Kringwinkel Antwerpen VZW",
+  "vat_id": "BE0442423037",
+  "legal_address": "Deurnsebaan 52, 2170 Antwerpen, Belgium",
+  "canonical_domain": "kringwinkel.be",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All Antwerp branches carrying VAT BE0442423037 are one De Kringwinkel Antwerpen VZW supplier identity. No branch is counted separately. Kringwinkel Groep VZW is the platform manager and is not substituted for the Antwerp selling operator.",
+  "reason": "Independent review confirms a current Belgian professional second-hand apparel operator. First-party Kringwinkel pages identify Kringwinkel Antwerpen, VAT BE0442423037, 14 physical second-hand stores, online second-hand sales and vintage clothing. Current item-level apparel pages show used garments, prices, condition, add-to-cart, Bpost delivery, secure payment and 14-day return right, and identify the seller as Kringwinkel Antwerpen with VAT BE0442423037. Spain delivery was not established in this review, therefore verified HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "current_item_level_apparel_catalogue": "PASS",
+    "direct_purchase_capability": "PASS",
+    "professional_contactability": "PASS",
+    "consumer_terms_and_compliance": "PASS",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED"
+  },
+  "evidence": [
+    {
+      "url": "https://www.kringwinkel.be/centra/antwerpen",
+      "kind": "first_party_operator_activity",
+      "finding": "Kringwinkel Antwerpen; 14 physical second-hand stores, online department, vintage clothing, contact data and VAT BE0442423037."
+    },
+    {
+      "url": "https://www.kringwinkel.be/webshop/kleding/dames-kleding",
+      "kind": "current_apparel_catalogue",
+      "finding": "Live second-hand clothing catalogue with hundreds of products and shop filter including Kringwinkel Antwerpen."
+    },
+    {
+      "url": "https://www.kringwinkel.be/item/liu-jo-jassen-s",
+      "kind": "current_item_level_apparel_checkout",
+      "finding": "Used garment, price, condition, add-to-cart, Bpost delivery, 14-day returns; seller Kringwinkel Antwerpen VAT BE0442423037."
+    },
+    {
+      "url": "https://www.kringwinkel.be/item/essentiel-jurken-s-7qmkog",
+      "kind": "independent_current_item_level_apparel_checkout",
+      "finding": "Second live used-clothing product with price, checkout, delivery and seller VAT BE0442423037."
+    },
+    {
+      "url": "https://www.kringwinkel.be/voorwaarden",
+      "kind": "consumer_terms",
+      "finding": "Current platform/webshop terms define second-hand goods, webshop purchases, customers and sellers."
+    },
+    {
+      "url": "https://ebesluit.antwerpen.be/zittingen/25.0115.8579.8154/agendapunten/25.1118.0920.2428",
+      "kind": "public_authority_identity_corroboration",
+      "finding": "City of Antwerp 2026 record identifies De Kringwinkel Antwerpen VZW, Deurnsebaan 52, enterprise number 0442.423.037."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "Multiple Antwerp Kringwinkel branches exist only as not_verified discovery records; these are merged into one legal operator identity.",
+    "file_library_exact_search_result": "Exact searches for BE0442423037, Kringwinkel Antwerpen and canonical promotion returned discovery-only branch records and no prior counted_as_verified canonical match.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l02",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117b",
+  "canonical_counts_after_promotion": {
+    "verified": 415,
+    "eligible": 70,
+    "hold": 345,
+    "remaining_to_10000": 9585
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
