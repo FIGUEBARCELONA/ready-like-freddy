@@ -1,0 +1,76 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP118C",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L26",
+  "country_code": "ES",
+  "city": "Madrid",
+  "territorial_zone": "ES_28079_G12",
+  "canonical_supplier_id": "nif:ES-G63059521",
+  "canonical_identity_key": "es:fundacion-pueblo-para-pueblo-g63059521",
+  "trading_names": ["HUMANA", "Humana Fundación Pueblo para Pueblo"],
+  "legal_or_responsible_name": "FUNDACIÓN PUEBLO PARA PUEBLO",
+  "fiscal_id": "G63059521",
+  "foundation_registry": "Registro Fundaciones Asistenciales del Ministerio de Trabajo y Asuntos Sociales 08-0347",
+  "legal_address": "C/ Aiguafreda 12, 08480 L'Ametlla del Vallès, Barcelona, Spain",
+  "canonical_domain": "humana-spain.org",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All 60 current HUMANA Spain second-hand/vintage stores listed by the same Spanish foundation count as one supplier. Madrid, Barcelona, Sevilla, Granada and Valencia branches are not counted separately. Foreign Humana entities are not silently merged with this Spanish legal operator.",
+  "reason": "Independent PASS2 confirms a current Spanish professional second-hand fashion network. The current first-party legal notice identifies FUNDACIÓN PUEBLO PARA PUEBLO, NIF G63059521, registered office, telephone, email and foundation registry. The current first-party 'Comprar ropa' page documents a network of 60 sustainable-fashion/second-hand shops, including 30 in Madrid and 25 in Barcelona plus stores in Sevilla, Granada and Valencia, with multiple locations explicitly labelled Vintage. No current item-level remote purchase catalogue or ordinary delivery to Spain through ecommerce is established for this legal operator, so the network is counted once as VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_FIRST_PARTY_NIF_IDENTITY",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS_60_STORES",
+    "professional_contactability": "PASS",
+    "current_secondhand_apparel_assortment": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_PHYSICAL_RETAIL_NETWORK",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ECOMMERCE_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_SPANISH_FOUNDATION_ACROSS_BRANCHES",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.humana-spain.org/aviso-legal/",
+      "kind": "first_party_legal_identity",
+      "finding": "Current legal notice identifies FUNDACIÓN PUEBLO PARA PUEBLO, NIF G63059521, registered office C/ Aiguafreda 12, contact details and foundation registry 08-0347."
+    },
+    {
+      "url": "https://www.humana-spain.org/que-puedes-hacer-tu/comprar-ropa/",
+      "kind": "first_party_current_secondhand_store_network",
+      "finding": "Current first-party page states 'NUESTRAS TIENDAS DE MODA DE SEGUNDA MANO' and lists 60 stores: 30 Madrid, 25 Barcelona, 2 Sevilla, 2 Granada and 1 Valencia, including multiple Vintage stores."
+    },
+    {
+      "url": "https://www.humana-spain.org/contacto/",
+      "kind": "first_party_contactability",
+      "finding": "Current contact page corroborates head-office address, telephone and contact channel."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "The 2026-08-28 backup contains multiple discovery-only Humana branch records in several EU countries and no verified canonical Spanish FUNDACIÓN PUEBLO PARA PUEBLO promotion. A separate manual assessment concerns UAB Humana LT / Think2 in Lithuania and is a distinct legal entity; it is not merged with the Spanish foundation.",
+    "current_repo_exact_search_result": "Exact repository searches for humana-spain.org and G63059521 returned no prior canonical promotion before CP118C.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp118-parallel27-pass2-microblock-l26",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp118c",
+  "canonical_counts_after_promotion": {
+    "verified": 428,
+    "eligible": 72,
+    "hold": 356,
+    "remaining_to_10000": 9572
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
