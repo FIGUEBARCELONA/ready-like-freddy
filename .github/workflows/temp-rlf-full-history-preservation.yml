@@ -1,0 +1,40 @@
+name: RLF full history preservation package only
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/temp-rlf-full-history-preservation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Build git history bundle and audit index
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p preserve
+          git bundle create preserve/ready-like-freddy-full-history.bundle --all
+          git log --all --date=iso-strict --pretty='%H%x09%ad%x09%s' > preserve/commit-index.tsv
+          git log --all --name-only --pretty='' | sed '/^$/d' | sort -u > preserve/historical-path-index.txt
+          git rev-list --all --objects > preserve/object-index.txt
+          printf '%s\n' "$(git rev-parse HEAD)" > preserve/head-sha.txt
+          sha256sum preserve/* > preserve/SHA256SUMS.txt
+      - name: Upload exact full history package
+        uses: actions/upload-artifact@v4
+        with:
+          name: RLF-FULL-GIT-HISTORY-PRESERVATION
+          path: preserve/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
