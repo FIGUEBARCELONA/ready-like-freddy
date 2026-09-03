@@ -1,0 +1,83 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP121J",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "vat:DE196919890",
+  "canonical_identity_key": "de:einfal-ggmbh-hrb69039-moebelkiste-hamburg",
+  "trading_names": ["Möbelkiste Hamburg"],
+  "legal_or_responsible_name": "einfal gGmbH",
+  "management": ["Karen Risse", "Grietje Bergmeyer"],
+  "register_court": "Amtsgericht Hamburg",
+  "register_number": "HRB 69039",
+  "vat_id": "DE196919890",
+  "legal_address": "Volksparkstraße 48, 22525 Hamburg, Germany",
+  "shop_address": "Dehnhaide 139-145, 22081 Hamburg, Germany",
+  "canonical_domain": "moebelkiste-hamburg.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_ACCESS_RESTRICTED",
+  "freshness_status": "CURRENT_2026",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "Möbelkiste Hamburg is a project/business operation of einfal gGmbH and counts once at legal-operator level. Other einfal social-shop projects must deduplicate to the same company if encountered.",
+  "reason": "Independent PASS2 confirms a current Hamburg social second-hand retail operator that includes clothing. The first-party site describes a 1,700 m² social department store with new and well-preserved used furniture, clothing and household goods, daily changing stock and current 2026 retail activity including a fashion show. Its first-party imprint identifies einfal gGmbH, Hamburg HRB 69039 and VAT DE196919890. Normal shopping eligibility is restricted to low-income customers who must provide proof and receive a customer card. No current item-level remote apparel purchasing path or ordinary delivery to Spain is established. The operator is therefore VERIFIED_HOLD, not ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_FIRST_PARTY_HRB_AND_VAT",
+    "professional_secondhand_activity": "PASS",
+    "current_hamburg_operation": "PASS_2026",
+    "current_clothing_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "ordinary_public_access": "HOLD_LOW_INCOME_ELIGIBILITY_CARD_REQUIRED",
+    "current_item_level_remote_apparel_catalogue": "HOLD_ONLY_CATEGORY_OVERVIEW_NOT_REMOTE_PURCHASE",
+    "direct_remote_purchase_capability": "HOLD_NOT_AVAILABLE",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_EINFAL_GGMBH_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://moebelkiste-hamburg.de/einrichtungen-mit-denen-wir-zusammenarbeiten/unkompliziert-und-fachmaennisch-helfen-hamburger-abendblatt/",
+      "kind": "first_party_current_secondhand_clothing_retail",
+      "finding": "Current site describes Hamburg's large social department store with new and well-preserved furniture, clothing, household goods and changing offers; includes a 29 March 2026 Sunday opening and fashion show."
+    },
+    {
+      "url": "https://moebelkiste-hamburg.de/wer-darf-bei-uns-einkaufen/",
+      "kind": "first_party_access_restriction",
+      "finding": "Current eligibility page restricts normal shopping to low-income customers and requires proof plus a customer card."
+    },
+    {
+      "url": "https://moebelkiste-hamburg.de/impressum/",
+      "kind": "first_party_legal_identity",
+      "finding": "Imprint identifies Möbelkiste Hamburg as a project of einfal gGmbH, management Karen Risse and Grietje Bergmeyer, Amtsgericht Hamburg HRB 69039 and VAT DE196919890."
+    },
+    {
+      "url": "https://moebelkiste-hamburg.de/product-category/kleidung/",
+      "kind": "first_party_clothing_category",
+      "finding": "Owned site maintains a clothing category and directs customers to the physical store for the broader changing apparel assortment."
+    }
+  ],
+  "dedup_audit": {
+    "cp121_lane_packet": "L11 surfaced Möbelkiste Hamburg as a fresh identity.",
+    "current_repo_exact_search_result": "Exact repository search for HRB 69039 returned no prior canonical promotion before CP121J.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp121-l11-fresh-discovery-resolution",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp121j",
+  "canonical_counts_after_promotion": {
+    "verified": 448,
+    "eligible": 74,
+    "hold": 374,
+    "remaining_to_10000": 9552
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
