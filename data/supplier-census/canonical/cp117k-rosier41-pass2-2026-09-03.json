@@ -1,0 +1,75 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117K",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L02",
+  "country_code": "BE",
+  "city": "Antwerpen / Anvers",
+  "territorial_zone": "BE_11002_G12",
+  "canonical_supplier_id": "vat:BE0825056462",
+  "canonical_identity_key": "be:rosier41-0825056462",
+  "trading_names": ["ROsier 41", "Rosier 41"],
+  "legal_or_responsible_name": "ROSIER 41 SRL",
+  "vat_id": "BE0825056462",
+  "enterprise_number": "0825.056.462",
+  "legal_address": "Rosier 41, 2000 Antwerpen, Belgium",
+  "canonical_domain": "rosier41.be",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "ROsier 41 physical shop, website and consignment activity form one Belgian legal operator and count once.",
+  "reason": "Independent PASS2 confirms a current Antwerp professional fashion resale/consignment operator. Current first-party pages explicitly state that ROsier 41 sells designer clothing including hardly-worn pieces from previous collections and accepts selected labels on consignment, with fresh 2026 activity and current opening/contact information. Belgian public-registry-derived records identify active ROSIER 41 SRL, enterprise/VAT BE0825056462, at Rosier 41, Antwerp. No current item-level remote purchase path or ordinary delivery to Spain was established, so the operator is counted as VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_PUBLIC_BCE_DERIVED",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS",
+    "professional_contactability": "PASS",
+    "current_preowned_apparel_activity": "PASS",
+    "direct_remote_purchase_capability": "HOLD_NOT_MATERIALIZED",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://rosier41.be/about/",
+      "kind": "first_party_secondhand_consignment_activity",
+      "finding": "ROsier 41 states it sells high-fashion labels, including hardly-worn pieces from previous collections, and accepts selected clothing for resale."
+    },
+    {
+      "url": "https://rosier41.be/",
+      "kind": "first_party_current_activity",
+      "finding": "Current 2026 posts, opening hours, telephone and email demonstrate active operation."
+    },
+    {
+      "url": "https://www.pappers.be/fr/company/rosier-41-0825056462",
+      "kind": "belgian_registry_derived_identity",
+      "finding": "ROSIER 41 is active, enterprise number 0825.056.462, VAT BE0825056462, SRL, registered at Rosier 41, Antwerp."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "One ROsier 41 OSM discovery record exists in the 2026-08-28 backup with evidence_status not_verified and decision not_verified; it is not a prior canonical supplier.",
+    "current_repo_exact_search_result": "Exact search for rosier41.be returned no prior canonical promotion before CP117K.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l02",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117k",
+  "canonical_counts_after_promotion": {
+    "verified": 424,
+    "eligible": 72,
+    "hold": 352,
+    "remaining_to_10000": 9576
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
