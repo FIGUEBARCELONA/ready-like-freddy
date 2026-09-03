@@ -1,0 +1,77 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP120D",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "operator:de-torben-otten-otten-von-emmerich",
+  "canonical_identity_key": "de:torben-otten-otten-von-emmerich-grosse-bleichen21",
+  "trading_names": ["Otten von Emmerich"],
+  "legal_or_responsible_name": "Torben Otten",
+  "shop_address": "Große Bleichen 21, 20354 Hamburg, Germany",
+  "canonical_domain": "oveshop.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_RESPONSIBLE_OPERATOR",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT_OPERATION",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "The Hamburg showroom, Otten von Emmerich trading identity and oveshop.de ecommerce surface count as one proprietor-operated supplier.",
+  "reason": "Independent PASS2 confirms a current Hamburg professional second-hand luxury operator. First-party imprint identifies Otten von Emmerich, proprietor Torben Otten, at Große Bleichen 21. The current owned shop has active second-hand luxury inventory and current apparel/footwear examples with condition descriptions, prices and add-to-cart actions, including a Louis Vuitton bikini and used designer footwear. The current public shipping evidence observed in product pages does not establish ordinary delivery to Spain, so the operator is counted as VERIFIED_HOLD rather than ELIGIBLE.",
+  "gates": {
+    "eu_responsible_operator_identity": "PASS_FIRST_PARTY",
+    "professional_secondhand_activity": "PASS",
+    "current_hamburg_operation": "PASS",
+    "current_item_level_used_fashion_inventory": "PASS",
+    "direct_remote_purchase_capability": "PASS_ADD_TO_CART",
+    "consumer_terms_and_withdrawal": "PASS",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_PROPRIETOR_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.oveshop.de/about/",
+      "kind": "first_party_responsible_identity_and_terms",
+      "finding": "First-party imprint/terms identify Otten von Emmerich, proprietor Torben Otten, Große Bleichen 21, Hamburg, and govern online contracts and withdrawal."
+    },
+    {
+      "url": "https://www.oveshop.de/",
+      "kind": "first_party_current_secondhand_luxury_activity",
+      "finding": "Current site describes the active Hamburg showroom and professional purchase/resale of luxury pre-owned goods."
+    },
+    {
+      "url": "https://www.oveshop.de/accessoires/louis-vuitton/kleidung/",
+      "kind": "first_party_current_used_apparel_products",
+      "finding": "Current clothing category includes a Louis Vuitton Stephen Sprouse bikini in very good condition, available with price and add-to-cart action."
+    },
+    {
+      "url": "https://www.oveshop.de/outlet/",
+      "kind": "first_party_current_used_fashion_products",
+      "finding": "Current outlet includes worn designer footwear with condition descriptions, prices and add-to-cart actions."
+    }
+  ],
+  "dedup_audit": {
+    "cp120_lane_packet": "L11 proposed Otten von Emmerich as PASS2_EVIDENCE_PACK_READY.",
+    "current_repo_exact_search_result": "Exact repository search for oveshop.de returned no prior canonical promotion before CP120D.",
+    "branch_counting_rule": "ONE_RESPONSIBLE_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp120-parallel27-next-wave-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp120d",
+  "canonical_counts_after_promotion": {
+    "verified": 436,
+    "eligible": 73,
+    "hold": 363,
+    "remaining_to_10000": 9564
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
