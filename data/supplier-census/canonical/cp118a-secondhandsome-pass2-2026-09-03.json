@@ -1,0 +1,79 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP118A",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L01",
+  "country_code": "AT",
+  "city": "Wien",
+  "territorial_zone": "AT_90001_G11",
+  "canonical_supplier_id": "responsible:judith-schmuck:secondhandsome.at",
+  "canonical_identity_key": "at:judith-schmuck-secondhandsome-wien",
+  "trading_names": ["Secondhandsome", "SECONDHANDSOME"],
+  "legal_or_responsible_name": "Mag. Judith Schmuck",
+  "legal_form": "Einzelunternehmen",
+  "legal_address": "Hetzendorferstr. 100/1/R01, 1120 Wien, Austria",
+  "canonical_domain": "secondhandsome.at",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_RESPONSIBLE_OPERATOR",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "The Vienna shop, website, commission system and any online/offline sales surfaces are one sole-proprietor operator and count once.",
+  "reason": "Independent PASS2 confirms a current Vienna professional second-hand apparel operator. The first-party site explicitly offers second-hand outfits for women and children and documents the physical shop, while the commission agreement defines the operator's sale of used clothing in its own name and gives the responsible identity. The first-party imprint identifies Mag. Judith Schmuck, the Vienna address, WKO Wien and sole-proprietor legal form. Remote sale is described as online/offline, but the current shop page states TOP DROPS are still in progress and shipping is documented only within Austria. Therefore ordinary delivery to Spain and current remotely purchasable item-level second-hand stock are not established, so the operator is VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_FIRST_PARTY_IMPRINT",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS",
+    "professional_contactability": "PASS",
+    "secondhand_consignment_process": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_TOP_DROPS_IN_PROGRESS",
+    "direct_remote_purchase_capability": "HOLD_NOT_MATERIALIZED",
+    "ordinary_delivery_to_spain": "HOLD_ONLY_AUSTRIA_SHIPPING_DOCUMENTED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.secondhandsome.at/",
+      "kind": "first_party_current_secondhand_activity",
+      "finding": "Current site explicitly advertises second-hand outfits offline and online for women and children and gives the Vienna shop contact details."
+    },
+    {
+      "url": "https://www.secondhandsome.at/kommissionsvereinbarung",
+      "kind": "first_party_professional_secondhand_model",
+      "finding": "Commission agreement identifies secondhandsome / Mag. Judith Schmuck and explicitly defines resale of used children's and women's clothing and accessories."
+    },
+    {
+      "url": "https://www.secondhandsome.at/copy-of-datenschutz",
+      "kind": "first_party_imprint",
+      "finding": "Imprint identifies Mag. Judith Schmuck, Vienna address, WKO Wien and legal form Einzelunternehmen."
+    },
+    {
+      "url": "https://www.secondhandsome.at/lead-collection",
+      "kind": "remote_purchase_and_shipping_gap",
+      "finding": "Shop page documents a large physical second-hand selection, says online TOP DROPS are in progress and documents postal shipping only within Austria."
+    }
+  ],
+  "dedup_audit": {
+    "current_repo_exact_search_result": "Exact repository search for secondhandsome.at returned no prior canonical promotion before CP118A.",
+    "branch_counting_rule": "ONE_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp118-parallel27-pass2-microblock-l01",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp118a",
+  "canonical_counts_after_promotion": {
+    "verified": 426,
+    "eligible": 72,
+    "hold": 354,
+    "remaining_to_10000": 9574
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
