@@ -13,7 +13,9 @@
     {"country":"DE","name":"Flohkids","domain":"flohkids.de","reason":"THIRD_PARTY_STALL_RENTAL_FLEA_MARKET_MODEL_NOT_DIRECT_PROFESSIONAL_PRELOVED_SUPPLIER","status":"REJECT_BUSINESS_MODEL"},
     {"country":"DE","name":"Gebr. Falkenhagen oHG","domain":"hut-falkenhagen.de","reason":"CURRENT_FIRST_PARTY_CATALOGUE_IS_NEW_HATS_CAPS_ACCESSORIES;_REPAIR_SERVICE_DOES_NOT_ESTABLISH_SECONDHAND_RESALE","status":"REJECT_SCOPE"},
     {"country":"DE","name":"La moda PALACE","domain":"lamodapalace.de","reason":"FORMER_RETAIL_LOCATION_CLOSED_2025_08_31;CURRENT_PAGE_IDENTIFIES_FORMER_OPERATOR_NOT_CURRENT_SECONDHAND_SHOP","status":"REJECT_CLOSED"},
-    {"country":"DE","name":"LIEBLINGSSTÜCK","domain":"lieblingsstueck.com","reason":"CURRENT_NEW_FASHION_BRAND_RETAILER_NOT_SECONDHAND","status":"REJECT_SCOPE"}
+    {"country":"DE","name":"LIEBLINGSSTÜCK","domain":"lieblingsstueck.com","reason":"CURRENT_NEW_FASHION_BRAND_RETAILER_NOT_SECONDHAND","status":"REJECT_SCOPE"},
+    {"country":"DE","name":"Alimaus Kleiderkammer Don Alfonso","domain":"alimaus.de","reason":"CURRENT_FIRST_PARTY_OPERATION_IS_CLOTHING_ASSISTANCE_FOR_HOMELESS_AND_LOW_INCOME_GUESTS;_DONATED_CLOTHING_DISTRIBUTION_NOT_PROFESSIONAL_RETAIL_SUPPLIER","status":"REJECT_NON_RETAIL_ASSISTANCE"},
+    {"country":"DE","name":"Park-IN Kleiderkammer","domain":"heilsarmee.de","reason":"CURRENT_FIRST_PARTY_OPERATION_IS_A_CLOTHING_CHAMBER_WITHIN_ADDICTION_AND_SOCIAL_ASSISTANCE_SERVICES;_NO_RETAIL_SALE_ACTIVITY_AT_PARK_IN","status":"REJECT_NON_RETAIL_ASSISTANCE"}
   ],
   "quality":"AAA_FAIL_CLOSED"
 }
