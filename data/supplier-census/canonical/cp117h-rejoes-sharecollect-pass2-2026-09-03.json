@@ -1,0 +1,84 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117H",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L20",
+  "country_code": "NL",
+  "city": "Amsterdam",
+  "territorial_zone": "NL_GM0363_G12",
+  "canonical_supplier_id": "kvk:NL57506841",
+  "canonical_identity_key": "bv:sharecollect-57506841",
+  "trading_names": ["Rejoes", "Rejoes Amsterdam", "Rejoes Amsterdam Centrum"],
+  "legal_or_responsible_name": "Sharecollect B.V.",
+  "company_number": "57506841",
+  "registered_branch_address": "Bijlmerplein 135, 1102 DB Amsterdam, Netherlands",
+  "canonical_domain": "rejoes.com",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All Rejoes branches carrying KvK 57506841 are one Sharecollect B.V. supplier identity. Amsterdam, Tilburg and other branch observations do not count separately.",
+  "reason": "Independent PASS2 confirms a current Dutch professional second-hand clothing operator. Current first-party Rejoes pages identify unique thrifted/second-hand fashion, multiple stores, a clothing-library model, purchase options and a Shopify transactional site. Public company-registry-derived sources identify Rejoes Amsterdam under KvK 57506841 / Sharecollect B.V. with SBI 47792 retail in second-hand clothing. However, the current Shopify terms still contain legacy MysteryFits naming and incomplete legal placeholders, current product availability reviewed is inconsistent/sold out, and ordinary delivery to Spain was not established. It is therefore counted as VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_PUBLIC_REGISTRY_CORROBORATED",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS_WITH_FIRST_PARTY_TERMS_HYGIENE_GAP",
+    "current_secondhand_catalogue_or_service": "PASS",
+    "direct_purchase_capability": "PASS_PLATFORM_PRESENT_BUT_STOCK_INCONSISTENT",
+    "professional_contactability": "PASS",
+    "consumer_terms_and_compliance": "HOLD_LEGACY_NAME_AND_PLACEHOLDERS_IN_TERMS",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS_WITH_TERMS_HYGIENE_GAP",
+    "deduplication_identity_network": "PASS_ONE_KVK_OPERATOR_ACROSS_BRANCHES",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://rejoes.com/",
+      "kind": "first_party_current_activity",
+      "finding": "Current Rejoes site markets unique thrifted fits, multiple stores, contactability and Shopify commerce."
+    },
+    {
+      "url": "https://rejoes.com/pages/library",
+      "kind": "first_party_secondhand_model",
+      "finding": "Current Rejoes Library page explicitly describes unlimited second-hand clothing and in-store purchase options."
+    },
+    {
+      "url": "https://rejoes.com/products/the-vintage-box",
+      "kind": "first_party_transactional_secondhand_product",
+      "finding": "Vintage clothing mystery box with price and checkout mechanics; currently sold out in reviewed snapshot."
+    },
+    {
+      "url": "https://www.compadex.com/nl/businesses/nl/rejoes-amsterdam-57506841-58319506",
+      "kind": "public_registry_derived_identity",
+      "finding": "Rejoes Amsterdam is associated with Sharecollect B.V., KvK 57506841, active second-hand clothing retail (SBI 47792), Amsterdam."
+    },
+    {
+      "url": "https://rejoes.com/policies/terms-of-service",
+      "kind": "consumer_terms_gap",
+      "finding": "Current terms support online commerce under Dutch law but retain MysteryFits naming and incomplete legal placeholders, requiring HOLD."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "Multiple Rejoes OSM branch discoveries exist across Dutch cities, all discovery-only/not_verified; they are consolidated into one operator and never counted separately.",
+    "current_repo_exact_search_result": "Exact search for rejoes.com returned no prior canonical promotion before CP117H.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l20",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117h",
+  "canonical_counts_after_promotion": {
+    "verified": 421,
+    "eligible": 72,
+    "hold": 349,
+    "remaining_to_10000": 9579
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
