@@ -1,0 +1,81 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117A",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L26",
+  "country_code": "ES",
+  "canonical_supplier_id": "legal:ES-G78581386",
+  "canonical_identity_key": "association:asociacion-betel-g78581386",
+  "trading_names": ["Rastro Betel", "Segunda Mano Rastro Betel"],
+  "legal_or_responsible_name": "ASOCIACION BETEL",
+  "fiscal_id": "G78581386",
+  "legal_address": "C/ Antonia Rodriguez Sacristan 8, 28044 Madrid, Spain",
+  "canonical_domains": ["rastrobetel.org", "segundamanorastrobetel.com"],
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All Rastro Betel physical branches and both first-party domains are one Asociacion Betel identity. Branches do not count separately.",
+  "reason": "Independent review confirms a current Spanish professional second-hand network operated by ASOCIACION BETEL, CIF G78581386. First-party pages document current second-hand clothing activity across the Rastro Betel shops, a linked owned second-hand ecommerce store with live item pages, prices and photographs, online contracting, VISA/Mastercard, 14-day withdrawal and domestic shipping. No current item-level online clothing listing was materialized in this review, so the operator is verified but held rather than operationally eligible for RLF apparel sourcing.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "direct_purchase_capability": "PASS_GENERAL_SECONDHAND_ECOMMERCE",
+    "professional_contactability": "PASS",
+    "consumer_terms_and_compliance": "PASS",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT",
+    "apparel_item_level_remote_stock": "HOLD_NOT_MATERIALIZED"
+  },
+  "evidence": [
+    {
+      "url": "https://www.rastrobetel.org/aviso-legal/",
+      "kind": "official_legal_notice",
+      "finding": "Names ASOCIACION BETEL, Madrid address and CIF G78581386."
+    },
+    {
+      "url": "https://www.rastrobetel.org/",
+      "kind": "official_activity_and_network",
+      "finding": "Current charitable-shop network sells second-hand goods including clothing and links its online shop."
+    },
+    {
+      "url": "https://segundamanorastrobetel.com/",
+      "kind": "owned_transactional_secondhand_shop",
+      "finding": "Live second-hand ecommerce with item pages, photographs and prices; copyright identifies Asociacion Betel and contact address matches the legal operator."
+    },
+    {
+      "url": "https://segundamanorastrobetel.com/terminos-condiciones",
+      "kind": "official_transaction_and_consumer_terms",
+      "finding": "Online contracting, product photos/features/prices, invoice, 14-day withdrawal, VISA/Mastercard and shipping terms are published."
+    },
+    {
+      "url": "https://segundamanorastrobetel.com/envios-devoluciones",
+      "kind": "official_shipping_returns",
+      "finding": "Domestic shipping workflow and 14-day withdrawal/returns are published."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "Only OSM discovery records marked not_verified/deduplication_pending were found for Rastro Betel; no prior verified canonical decision was found.",
+    "file_library_exact_search_result": "Exact searches for Rastro Betel, rastrobetel.org, ASOCIACION BETEL and G78581386 returned discovery-only Rastro Betel records and no counted_as_verified canonical match.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:web-verification-cp117-rastro-betel",
+  "reviewer_2": "openai:independent-web-and-ledger-review-cp117a",
+  "canonical_counts_after_promotion": {
+    "verified": 414,
+    "eligible": 70,
+    "hold": 344,
+    "remaining_to_10000": 9586
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
