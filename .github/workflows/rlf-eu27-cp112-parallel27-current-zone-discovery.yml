@@ -1,0 +1,252 @@
+name: RLF EU27 CP112 Parallel27 current-zone discovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp112-parallel27-current-zone-discovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-geometries:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build exact current-zone geometries for 27 lanes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p cp112/geometries
+          curl --fail --location --retry 4 --retry-delay 2 \
+            'https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson' \
+            -o cp112/LAU_RG_01M_2024_4326.geojson
+          python3 -m pip install -q shapely
+          python3 - <<'PY'
+          import json,re,hashlib
+          from pathlib import Path
+          from shapely.geometry import shape,box,mapping
+          state=json.load(open('state/rlf-eu27-cp111-parallel27-runtime.json',encoding='utf-8'))
+          gj=json.load(open('cp112/LAU_RG_01M_2024_4326.geojson',encoding='utf-8'))
+          feats=gj['features']
+          def props(f): return f.get('properties') or {}
+          def fid(f):
+              p=props(f)
+              return p.get('LAU_ID') or p.get('GISCO_ID') or p.get('lau_id') or p.get('gisco_id')
+          byid={str(fid(f)):f for f in feats if fid(f) is not None}
+          manifest=[]
+          for lane in state['lanes']:
+              src=lane['geometry_source_id']
+              f=byid.get(src)
+              if not f and lane['iso']=='FR':
+                  # French arrondissement source code is 75101; accept only exact source-code match.
+                  matches=[]
+                  for q in feats:
+                      p=props(q); vals={str(v) for v in p.values() if v is not None}
+                      if '75101' in vals or 'FR_75101' in vals: matches.append(q)
+                  if len(matches)==1: f=matches[0]
+              if not f: raise SystemExit('MISSING_OFFICIAL_GEOMETRY_'+lane['lane_id']+'_'+src)
+              base=shape(f['geometry'])
+              if lane['zone_kind']=='OFFICIAL_ARRONDISSEMENT':
+                  zone=base
+              else:
+                  m=re.search(r'_G([123])([123])$',lane['zone_id'])
+                  if not m: raise SystemExit('BAD_GRID_ZONE_'+lane['zone_id'])
+                  rr,cc=map(int,m.groups())
+                  minx,miny,maxx,maxy=base.bounds
+                  dx=(maxx-minx)/3; dy=(maxy-miny)/3
+                  cell=box(minx+(cc-1)*dx,miny+(rr-1)*dy,minx+cc*dx,miny+rr*dy)
+                  zone=base.intersection(cell)
+              if zone.is_empty or zone.area<=0: raise SystemExit('EMPTY_ZONE_'+lane['lane_id'])
+              payload={
+                'lane_id':lane['lane_id'],'iso':lane['iso'],'owner_lock':lane['owner_lock'],
+                'city_rank':lane['city_rank'],'city_id':lane['city_id'],'city_name':lane['city_name'],
+                'zone_order':lane['zone_order'],'zone_id':lane['zone_id'],'zone_name':lane['zone_name'],
+                'zone_kind':lane['zone_kind'],'geometry_source_id':src,
+                'official_geometry_source':'Eurostat/GISCO LAU 2024',
+                'bbox':list(zone.bounds),'area_deg2':zone.area,'geometry':mapping(zone),
+                'canonical_write_allowed_in_lane':False
+              }
+              raw=json.dumps(payload,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()
+              payload['sha256']=hashlib.sha256(raw).hexdigest()
+              Path(f"cp112/geometries/{lane['lane_id']}.json").write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding='utf-8')
+              manifest.append({k:payload[k] for k in ['lane_id','iso','city_id','zone_id','area_deg2','sha256']})
+          assert len(manifest)==27 and len({x['zone_id'] for x in manifest})==27
+          Path('cp112/GEOMETRY_MANIFEST.json').write_text(json.dumps({'quality_gate':'PASS','lanes':manifest},indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps({'geometry_gate':'PASS','lanes':27,'zones':[x['zone_id'] for x in manifest]},ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP112-ZONE-GEOMETRIES
+          path: cp112/geometries/*.json
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP112-GEOMETRY-MANIFEST
+          path: cp112/GEOMETRY_MANIFEST.json
+          retention-days: 30
+
+  parallel27-discovery:
+    needs: prepare-geometries
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      max-parallel: 27
+      matrix:
+        lane: [L01,L02,L03,L04,L05,L06,L07,L08,L09,L10,L11,L12,L13,L14,L15,L16,L17,L18,L19,L20,L21,L22,L23,L24,L25,L26,L27]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: RLF-EU27-CP112-ZONE-GEOMETRIES
+          path: geom
+      - name: Run four exclusive discovery vectors inside official zone
+        shell: bash
+        env:
+          LANE: ${{ matrix.lane }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q shapely
+          python3 - <<'PY'
+          import os,json,time,urllib.parse,urllib.request,hashlib,random
+          from pathlib import Path
+          from shapely.geometry import shape,Point
+          lane=os.environ['LANE']
+          g=json.load(open(f'geom/{lane}.json',encoding='utf-8'))
+          zone=shape(g['geometry']); minx,miny,maxx,maxy=g['bbox']
+          bbox=f'{miny},{minx},{maxy},{maxx}'
+          vectors=[
+            ('SECOND_HAND_SHOP',f'[out:json][timeout:80];nwr[shop=second_hand]({bbox});out center tags;'),
+            ('CLOTHES_SECOND_HAND_TAG',f'[out:json][timeout:80];nwr[shop=clothes][second_hand]({bbox});out center tags;'),
+            ('VINTAGE_SHOP',f'[out:json][timeout:80];nwr[shop=vintage]({bbox});out center tags;'),
+            ('CLOTHES_SECOND_HAND_VALUE',f'[out:json][timeout:80];nwr[shop=clothes][clothes=second_hand]({bbox});out center tags;')
+          ]
+          endpoints=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter']
+          results=[]; merged={}
+          # Deterministic lane staggering reduces shared-endpoint collision without changing semantics.
+          time.sleep((int(lane[1:])-1)%7 * 0.7)
+          for vi,(key,q) in enumerate(vectors):
+              record={'vector':key,'status':'TECHNICAL_FAILURE','endpoint':None,'http_status':None,'raw_elements':0,'in_zone':0,'error':None}
+              data=None
+              for attempt in range(4):
+                  ep=endpoints[(int(lane[1:])+vi+attempt)%len(endpoints)]
+                  try:
+                      req=urllib.request.Request(ep,data=urllib.parse.urlencode({'data':q}).encode(),headers={'User-Agent':'RLF-EU27-CP112/1.0'})
+                      with urllib.request.urlopen(req,timeout=95) as r:
+                          body=r.read(); record['http_status']=getattr(r,'status',200); record['endpoint']=ep
+                      data=json.loads(body); break
+                  except Exception as e:
+                      record['error']=type(e).__name__+': '+str(e)
+                      time.sleep(1.5*(attempt+1))
+              if data is None:
+                  results.append(record); continue
+              elems=data.get('elements',[]); record['raw_elements']=len(elems); kept=[]
+              for el in elems:
+                  lat=el.get('lat'); lon=el.get('lon')
+                  if lat is None or lon is None:
+                      c=el.get('center') or {}; lat=c.get('lat'); lon=c.get('lon')
+                  if lat is None or lon is None: continue
+                  if not zone.covers(Point(float(lon),float(lat))): continue
+                  tags=el.get('tags') or {}
+                  osm_key=f"{el.get('type')}:{el.get('id')}"
+                  cand={
+                    'osm_key':osm_key,'osm_type':el.get('type'),'osm_id':el.get('id'),
+                    'lat':float(lat),'lon':float(lon),'name':tags.get('name'),
+                    'shop':tags.get('shop'),'second_hand':tags.get('second_hand'),'clothes':tags.get('clothes'),
+                    'website':tags.get('website') or tags.get('contact:website'),
+                    'phone':tags.get('phone') or tags.get('contact:phone'),
+                    'email':tags.get('email') or tags.get('contact:email'),
+                    'operator':tags.get('operator'),'vat_ref':tags.get('ref:vatin') or tags.get('vatin'),
+                    'tags':tags,'discovery_vectors':[key]
+                  }
+                  if osm_key in merged:
+                      merged[osm_key]['discovery_vectors']=sorted(set(merged[osm_key]['discovery_vectors']+[key]))
+                  else: merged[osm_key]=cand
+                  kept.append(osm_key)
+              record['in_zone']=len(set(kept)); record['status']='SUCCESS'; record['error']=None; results.append(record)
+          out={
+            'schema':'RLF_EU27_CP112_LANE_DISCOVERY_V1','phase':'FASE_1_CENS_PROVEIDORS_UE',
+            'lane_id':g['lane_id'],'iso':g['iso'],'owner_lock':g['owner_lock'],'city_id':g['city_id'],'city_name':g['city_name'],
+            'zone_id':g['zone_id'],'zone_name':g['zone_name'],'zone_order':g['zone_order'],'geometry_sha256':g['sha256'],
+            'vectors':results,'candidates':sorted(merged.values(),key=lambda x:x['osm_key']),
+            'candidate_count':len(merged),'successful_vectors':sum(r['status']=='SUCCESS' for r in results),
+            'technical_failures':sum(r['status']!='SUCCESS' for r in results),
+            'canonical_delta':0,'exhaustion_credit':0,'candidate_set_frozen':False,
+            'note':'Discovery/evidence only. No supplier is verified or promoted by this lane.'
+          }
+          raw=json.dumps(out,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode(); out['sha256']=hashlib.sha256(raw).hexdigest()
+          Path('out').mkdir(exist_ok=True); Path(f'out/{lane}.json').write_text(json.dumps(out,indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps({'lane':lane,'zone':g['zone_id'],'candidates':len(merged),'success_vectors':out['successful_vectors'],'technical_failures':out['technical_failures']},ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP112-LANE-${{ matrix.lane }}
+          path: out/${{ matrix.lane }}.json
+          retention-days: 30
+
+  consolidate:
+    needs: parallel27-discovery
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: RLF-EU27-CP112-LANE-*
+          path: lanes
+          merge-multiple: true
+      - name: Central non-mutating consolidation and collision audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import glob,json,hashlib
+          files=sorted(glob.glob('lanes/L*.json'))
+          rows=[json.load(open(f,encoding='utf-8')) for f in files]
+          lane_ids={r['lane_id'] for r in rows}
+          expected={f'L{i:02d}' for i in range(1,28)}
+          missing=sorted(expected-lane_ids)
+          domains={}; operators={}; osm={}; total=0
+          for r in rows:
+              total+=r['candidate_count']
+              for c in r['candidates']:
+                  osm.setdefault(c['osm_key'],[]).append([r['lane_id'],r['iso'],r['zone_id']])
+                  w=c.get('website')
+                  if w:
+                      try:
+                          from urllib.parse import urlparse
+                          d=(urlparse(w).hostname or '').lower().removeprefix('www.')
+                          if d: domains.setdefault(d,[]).append([r['lane_id'],c['osm_key'],c.get('name')])
+                      except: pass
+                  op=(c.get('operator') or '').strip().casefold()
+                  if op: operators.setdefault(op,[]).append([r['lane_id'],c['osm_key'],c.get('name')])
+          report={
+            'schema':'RLF_EU27_CP112_PARALLEL27_CONSOLIDATED_V1','phase':'FASE_1_CENS_PROVEIDORS_UE',
+            'lanes_expected':27,'lanes_artifact_received':len(rows),'missing_lanes':missing,
+            'lanes_with_all_4_vectors_success':sum(r['successful_vectors']==4 for r in rows),
+            'technical_failed_vectors_total':sum(r['technical_failures'] for r in rows),
+            'raw_candidate_records_after_in_lane_dedup':total,
+            'unique_osm_keys':len(osm),
+            'cross_lane_osm_collisions':{k:v for k,v in osm.items() if len(v)>1},
+            'cross_lane_domain_collision_candidates':{k:v for k,v in domains.items() if len({x[0] for x in v})>1},
+            'cross_lane_operator_collision_candidates':{k:v for k,v in operators.items() if len({x[0] for x in v})>1},
+            'canonical_counts_unchanged':{'verified':413,'eligible':70,'hold':343,'remaining':9587},
+            'canonical_delta':0,'exhaustion_credit':0,
+            'next_gate':'AAA candidate terminalization + responsible-operator identity + global dedup + central deterministic replay',
+            'lane_summaries':[{'lane_id':r['lane_id'],'iso':r['iso'],'city_name':r['city_name'],'zone_id':r['zone_id'],'candidate_count':r['candidate_count'],'successful_vectors':r['successful_vectors'],'technical_failures':r['technical_failures'],'sha256':r['sha256']} for r in rows]
+          }
+          if missing: report['quality_gate']='FAIL_MISSING_LANES'
+          elif report['technical_failed_vectors_total']>0: report['quality_gate']='PARTIAL_TECHNICAL_REPAIR_REQUIRED'
+          else: report['quality_gate']='PASS_DISCOVERY_COMPLETE_27X4'
+          raw=json.dumps(report,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode(); report['sha256']=hashlib.sha256(raw).hexdigest()
+          json.dump(report,open('RLF_EU27_CP112_PARALLEL27_CONSOLIDATED.json','w'),indent=2,ensure_ascii=False)
+          print(json.dumps({k:report[k] for k in ['quality_gate','lanes_artifact_received','lanes_with_all_4_vectors_success','technical_failed_vectors_total','raw_candidate_records_after_in_lane_dedup','unique_osm_keys']},ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP112-PARALLEL27-CONSOLIDATED
+          path: RLF_EU27_CP112_PARALLEL27_CONSOLIDATED.json
+          retention-days: 30
