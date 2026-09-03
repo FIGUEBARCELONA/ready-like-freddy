@@ -1,0 +1,91 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP118D",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L26",
+  "country_code": "ES",
+  "city": "Madrid",
+  "territorial_zone": "ES_28079_G12",
+  "canonical_supplier_id": "cif:ES-B86429479",
+  "canonical_identity_key": "es:mil-modelitos-moda-internacional-b86429479",
+  "trading_names": ["Mil Modelitos", "MIL MODELITOS"],
+  "legal_or_responsible_name": "MIL MODELITOS MODA INTERNACIONAL SL",
+  "fiscal_id": "B86429479",
+  "mercantile_registry": "Registro Mercantil de Madrid, hoja M-535786",
+  "registered_address": "C/ Riaza 34, Escalera 1, Piso 3 C, Madrid, Spain",
+  "shop_address": "Calle Tucán 48, 28025 Madrid, Spain",
+  "canonical_domain": "milmodelitos.es",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "The current Calle Tucán shop, website, historical Calle Oca presence and any franchise/brand references attributable to MIL MODELITOS MODA INTERNACIONAL SL are consolidated to one supplier identity. Individual shops are not counted separately.",
+  "reason": "Independent PASS2 confirms a current Madrid professional buy/sell second-hand apparel operation. The current first-party site explicitly describes branded second-hand clothing for women, men and children, immediate purchase of used garments, and the current Calle Tucán 48 shop and contact details. BORME records MIL MODELITOS MODA INTERNACIONAL SL, CIF B86429479, as a Madrid company created for wholesale/retail commercial activity, while current 2026 business-directory records link that exact company name to Calle Tucán 48, the same telephone and milmodelitos.es. Historical OEPM records also link the MIL MODELITOS trade name to the same company. Current first-party item-level remote second-hand stock and ordinary remote delivery to Spain were not sufficiently materialized in this review, so the operator is VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_BORME_PLUS_CURRENT_DIRECTORY_LINKAGE",
+    "professional_secondhand_activity": "PASS_FIRST_PARTY",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS",
+    "professional_contactability": "PASS",
+    "current_secondhand_apparel_assortment": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_NOT_SUFFICIENTLY_MATERIALIZED_FIRST_PARTY",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_DOMAIN_MATCH",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://milmodelitos.es/",
+      "kind": "first_party_current_secondhand_activity",
+      "finding": "Current site explicitly describes purchase and sale of branded second-hand clothing, including women, men and children, and gives Calle Tucán 48 as the Madrid shop."
+    },
+    {
+      "url": "https://milmodelitos.es/contacto/",
+      "kind": "first_party_current_contactability",
+      "finding": "Current contact page corroborates Calle Tucán 48, Madrid, telephone and current opening hours."
+    },
+    {
+      "url": "https://milmodelitos.es/preguntas-frecuentes-en-la-venta-de-ropa-de-segunda-mano/",
+      "kind": "first_party_secondhand_buying_model",
+      "finding": "Current FAQ explicitly states that Mil Modelitos buys modern branded second-hand clothing for women, men and children subject to condition and recency criteria."
+    },
+    {
+      "url": "https://www.boe.es/borme/dias/2012/04/02/pdfs/BORME-A-2012-64-28.pdf",
+      "kind": "official_mercantile_identity",
+      "finding": "BORME records constitution of MIL MODELITOS MODA INTERNACIONAL SL, Madrid, hoja M-535786."
+    },
+    {
+      "url": "https://www.einforma.com/sucursales/mil-modelitos-moda-internacional/madrid/",
+      "kind": "current_company_branch_linkage",
+      "finding": "Current company-information record links MIL MODELITOS MODA INTERNACIONAL SL to the active Calle Tucán 48 Madrid branch and telephone 914617516."
+    },
+    {
+      "url": "https://firmania.es/madrid/mil-modelitos-moda-internacional-sl-653122",
+      "kind": "current_company_web_linkage",
+      "finding": "July 2026 updated business record links MIL MODELITOS MODA INTERNACIONAL SL at Calle Tucán 48 directly to milmodelitos.es and current opening hours."
+    }
+  ],
+  "dedup_audit": {
+    "current_repo_exact_search_result": "Exact repository search for milmodelitos.es returned no prior canonical promotion before CP118D.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp118-parallel27-pass2-microblock-l26",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp118d",
+  "canonical_counts_after_promotion": {
+    "verified": 429,
+    "eligible": 72,
+    "hold": 357,
+    "remaining_to_10000": 9571
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
