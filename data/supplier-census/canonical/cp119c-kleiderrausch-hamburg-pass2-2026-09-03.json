@@ -1,0 +1,80 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP119C",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "operator:de-kleiderrausch-eulenstrasse85-hamburg",
+  "canonical_identity_key": "de:kleiderrausch-janine-kecskes-eulenstrasse85",
+  "trading_names": ["KLEIDERRAUSCH", "Kleiderrausch Second Hand Mode"],
+  "legal_or_responsible_name": "Janine Kecskes",
+  "identity_basis": "Historical first-party proprietor attribution corroborated by unchanged current domain, shop address and telephone; current tax identifier not publicly materialized in this review.",
+  "shop_address": "Eulenstraße 85, 22763 Hamburg, Germany",
+  "canonical_domain": "kleiderrausch.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_RESPONSIBLE_OPERATOR_WITH_IDENTITY_FRESHNESS_HOLD",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT_OPERATION_IDENTITY_PARTIALLY_HISTORICAL",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "Kleiderrausch, the Eulenstraße 85 shop, its current website and the historical Buntstück/Kleiderrausch joint surface count as one operator identity. No separate count is assigned to the co-located historical Buntstück presentation.",
+  "reason": "Independent PASS2 confirms a current Hamburg professional second-hand women's fashion operator. The current first-party site explicitly states more than 25 years of second-hand fashion activity, a continuously changing assortment of high-quality women's clothing, shoes and accessories, and a formal commission resale model with VAT treatment. It provides the current Eulenstraße 85 address and telephone. Hamburg's current municipal directory, updated November 2025, independently corroborates the same shop, domain, phone, email and second-hand activity; Hamburg Tourism also lists the current operation. A historical first-party joint Kleiderrausch/Buntstück page identifies proprietor Janine Kecskes at the exact same address and phone, but the current first-party site does not expose a fresh proprietor/VAT identifier. The operator is therefore verified but held, with legal-identity freshness explicitly unresolved; no remote item-level catalogue or Spain delivery is established.",
+  "gates": {
+    "eu_physical_operation": "PASS",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "current_operation_and_contactability": "PASS",
+    "consignment_resale_model": "PASS",
+    "legal_or_fiscal_traceability": "HOLD_CURRENT_TAX_OR_FRESH_PROPRIETOR_ID_NOT_PUBLICLY_MATERIALIZED",
+    "historical_responsible_operator_identity": "PASS_JANINE_KECSKES_HISTORICAL_FIRST_PARTY",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_PHYSICAL_RETAIL",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_OPERATOR_LOCATION_DOMAIN",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.kleiderrausch.de/",
+      "kind": "first_party_current_secondhand_activity",
+      "finding": "Current site states over 25 years of second-hand fashion sales, a 90 m² high-quality women's clothing/shoes/accessories assortment, commission resale terms, VAT treatment and current Hamburg contact details."
+    },
+    {
+      "url": "https://www.hamburg.de/branchenbuch/hamburg/eintrag/10117721/",
+      "kind": "current_municipal_directory_corroboration",
+      "finding": "Hamburg directory, updated 13 November 2025, corroborates Kleiderrausch Second Hand Mode at Eulenstraße 85 with current phone, email, domain, opening hours and second-hand assortment."
+    },
+    {
+      "url": "https://www.hamburg-tourism.de/shoppen-geniessen/shoppen-in-hamburg/buntstueck/",
+      "kind": "current_city_tourism_corroboration",
+      "finding": "Current Hamburg Tourism listing corroborates second-hand fashion operation at Eulenstraße 85 and the kleiderrausch.de domain."
+    },
+    {
+      "url": "https://www.kleiderrausch-buntstueck.de/",
+      "kind": "historical_first_party_responsible_identity",
+      "finding": "Historical joint first-party page identifies 'Inh. Janine Kecskes' at Eulenstraße 85 with the same telephone, supporting operator continuity while not substituting for a current tax identifier."
+    }
+  ],
+  "dedup_audit": {
+    "current_repo_exact_search_result": "Exact repository search for kleiderrausch.de returned no prior canonical promotion before CP119C.",
+    "identity_freshness_rule": "Historical proprietor evidence is preserved but not upgraded to current fiscal certainty; any future fresh imprint/register evidence may refine this record without creating a new supplier count.",
+    "branch_counting_rule": "ONE_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp119-parallel27-deepening-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp119c",
+  "canonical_counts_after_promotion": {
+    "verified": 432,
+    "eligible": 72,
+    "hold": 360,
+    "remaining_to_10000": 9568
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
