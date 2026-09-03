@@ -1,0 +1,80 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP122A",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L26",
+  "country_code": "ES",
+  "city": "Madrid",
+  "territorial_zone": "ES_28079_G12",
+  "canonical_supplier_id": "cif:ES:B88164322",
+  "canonical_identity_key": "es:textil-empleo-sl-b88164322-moda-re-madrid",
+  "trading_names": ["Textil Empleo", "Moda re- Madrid"],
+  "legal_or_responsible_name": "TEXTIL EMPLEO S.L.",
+  "cif": "B88164322",
+  "mercantile_sheet": "M-677332",
+  "legal_address": "Calle Francisco Silvela 32, 28028 Madrid, Spain",
+  "canonical_domain": "caritasmadrid.org",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_RETAIL_OPERATOR_BEHIND_MODA_RE_MADRID",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT_2026",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All Madrid Moda re- stores and corners explicitly attributed to Textil Empleo count once under TEXTIL EMPLEO S.L. The separate MODA RE S COOP DE INICIATIVA SOCIAL brand/network entity is not counted as an additional retail supplier for these stores.",
+  "reason": "Independent PASS2 resolves the legal/operator boundary behind the current Moda re- Madrid network. Moda re-'s current Madrid directory attributes the Madrid stores and several Alcampo corners to Textil Empleo. Cáritas Madrid explicitly describes Textil Empleo as an insertion company specializing in collection, reuse and distribution of textiles and states that it gives garments a second life through the commercial activity of Moda re stores in the Community of Madrid. Current Cáritas material lists eight Madrid-area second-hand clothing shops and direct Textil Empleo contact. Registry-derived BORME data identifies TEXTIL EMPLEO SL, CIF B88164322, Madrid Mercantile sheet M-677332, active 2026 appointments and an object including textile recycling and retail/wholesale sale. The operation is verified professional second-hand retail, but no current item-level remote second-hand apparel catalogue, direct online checkout or ordinary delivery to Spain was established, so it is VERIFIED_HOLD rather than ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_REGISTRY_DERIVED_CIF_AND_MERCANTILE_SHEET",
+    "retail_operator_boundary": "PASS_MODA_RE_DIRECTORY_AND_CARITAS_MADRID",
+    "professional_secondhand_activity": "PASS_EXPLICIT_CURRENT_FIRST_PARTY",
+    "current_madrid_store_network": "PASS_8_PLUS_STORES_AND_CORNERS",
+    "current_secondhand_clothing_activity": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_PHYSICAL_RETAIL",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_TEXTIL_EMPLEO_LEGAL_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.caritasmadrid.org/ropa-reciclada-economia-circular-y-solidaria",
+      "kind": "first_party_operator_and_secondhand_activity",
+      "finding": "Cáritas Madrid identifies Textil Empleo as an insertion company for collection/reuse of clothing and states that it gives garments a second life through the commercial activity of Moda re stores in the Community of Madrid."
+    },
+    {
+      "url": "https://modare.org/tiendas-ropa-segunda-mano/madrid/",
+      "kind": "current_network_operator_attribution",
+      "finding": "Current Moda re Madrid directory attributes Madrid Albufera, Alcalá, Bravo Murillo, Embajadores, General Ricardos, Collado Villalba and multiple Alcampo corners to Textil Empleo."
+    },
+    {
+      "url": "https://www.caritasmadrid.org/accion-social/familias-y-personas-exclusion-en-situacion-de-desempleo",
+      "kind": "first_party_current_2026_store_network",
+      "finding": "Current Cáritas Madrid page states Textil Empleo and Moda re are insertion enterprises linked to collection, recovery and sale of second-hand clothing and lists eight Moda re stores in Madrid/Collado Villalba with Textil Empleo contact."
+    },
+    {
+      "url": "https://www.datoscif.es/empresa/textil-empleo-sl",
+      "kind": "borme_derived_legal_corroboration",
+      "finding": "Registry-derived company record identifies TEXTIL EMPLEO SL, CIF B88164322, Madrid address and Mercantile sheet M-677332, with active 2026 appointment and object including textile recycling and retail/wholesale sale."
+    }
+  ],
+  "dedup_audit": {
+    "current_repo_exact_search_result": "Exact repository search for B88164322 returned no prior canonical promotion before CP122A.",
+    "moda_re_brand_boundary": "DO_NOT_COUNT_MODA_RE_COOPERATIVE_AS_THE_SAME_MADRID_RETAIL_OPERATOR_WHEN_STORES_ARE_EXPLICITLY_ATTRIBUTED_TO_TEXTIL_EMPLEO",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp122-madrid-operator-boundary-resolution",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp122a",
+  "canonical_counts_after_promotion": {
+    "verified": 449,
+    "eligible": 74,
+    "hold": 375,
+    "remaining_to_10000": 9551
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
