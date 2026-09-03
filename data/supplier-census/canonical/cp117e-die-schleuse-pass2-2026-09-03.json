@@ -1,0 +1,78 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117E",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "responsible:joe-louis-peters:dieschleuse.com",
+  "canonical_identity_key": "responsible:joe-louis-peters:ellerau-de",
+  "trading_names": ["Die Schleuse", "DIE SCHLEUSE"],
+  "legal_or_responsible_name": "Joe Louis Peters",
+  "legal_address": "Sanddornweg 12, 25479 Ellerau, Germany",
+  "canonical_domain": "dieschleuse.com",
+  "outcome": "PASS2_VERIFIED_ELIGIBLE",
+  "identity_status": "CANONICAL_RESPONSIBLE_OPERATOR",
+  "verification_status": "VERIFIED",
+  "operational_status": "ELIGIBLE_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_ELIGIBLE",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": true,
+  "counted_as_verified_hold": false,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "The Hamburg retail observation and the responsible operator identity are one supplier. Physical observations, website and any storefront references are not counted separately.",
+  "reason": "Independent PASS2 confirms a current German professional vintage/pre-owned apparel seller. The first-party imprint identifies the responsible operator and a German address; the current shop exposes priced products and cart actions, while item pages explicitly state previously worn/vintage condition and stock. First-party shipping terms cover European foreign delivery and provide a 14-day withdrawal framework. The expanded backup contains only a discovery-only OSM record and the current repository exact-domain search found no prior canonical promotion.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_RESPONSIBLE_OPERATOR",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS_RESPONSIBLE_NAME_ADDRESS_CONTACT",
+    "current_item_level_apparel_catalogue": "PASS",
+    "direct_purchase_capability": "PASS",
+    "professional_contactability": "PASS",
+    "consumer_terms_and_compliance": "PASS",
+    "ordinary_delivery_to_spain": "PASS_EUROPEAN_FOREIGN_DELIVERY",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://dieschleuse.com/impressum/",
+      "kind": "first_party_responsible_identity",
+      "finding": "DIE SCHLEUSE identifies Joe Louis Peters, a German address and customer-service email."
+    },
+    {
+      "url": "https://dieschleuse.com/",
+      "kind": "current_catalogue_and_checkout",
+      "finding": "Current shop shows priced vintage/apparel products and cart purchase actions."
+    },
+    {
+      "url": "https://dieschleuse.com/produkt/vintage-amisu-leather-jacket/",
+      "kind": "item_level_secondhand_checkout",
+      "finding": "In-stock vintage garment, explicit previously-worn disclosure, price and Add to cart."
+    },
+    {
+      "url": "https://dieschleuse.com/zahlung-versand/",
+      "kind": "shipping_and_consumer_terms",
+      "finding": "European foreign shipping is documented and the page includes the 14-day withdrawal framework."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "One OSM discovery record exists for node 1053609654 with evidence_status not_verified and decision not_verified; it is not a prior canonical supplier.",
+    "current_repo_exact_search_result": "Exact search for dieschleuse.com returned no prior canonical promotion before CP117E.",
+    "branch_counting_rule": "ONE_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117e",
+  "canonical_counts_after_promotion": {
+    "verified": 418,
+    "eligible": 72,
+    "hold": 346,
+    "remaining_to_10000": 9582
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
