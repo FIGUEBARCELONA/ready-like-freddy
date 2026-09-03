@@ -13,7 +13,7 @@ permissions:
 jobs:
   prepare-geometries:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Build exact current-zone geometries for 27 lanes
@@ -24,11 +24,22 @@ jobs:
           curl --fail --location --retry 4 --retry-delay 2 \
             'https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson' \
             -o cp112/LAU_RG_01M_2024_4326.geojson
+          # France special-source canon: Paris municipal arrondissements are not GISCO LAU rows.
+          # Primary geometry is the City of Paris official Arrondissements dataset.
+          curl --fail --location --retry 4 --retry-delay 2 \
+            'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/arrondissements/exports/geojson?lang=fr&timezone=Europe%2FParis' \
+            -o cp112/paris_arrondissements_official.geojson
+          # Independent administrative-boundary cross-check, sourced from data.gouv/IGN AdminExpress.
+          curl --fail --location --retry 4 --retry-delay 2 \
+            'https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/latest/geojson/communes-100m.geojson' \
+            -o cp112/france_communes_100m.geojson
+          sha256sum cp112/LAU_RG_01M_2024_4326.geojson cp112/paris_arrondissements_official.geojson cp112/france_communes_100m.geojson > cp112/SOURCE_SHA256SUMS.txt
           python3 -m pip install -q shapely
           python3 - <<'PY'
           import json,re,hashlib
           from pathlib import Path
           from shapely.geometry import shape,box,mapping
+
           state=json.load(open('state/rlf-eu27-cp111-parallel27-runtime.json',encoding='utf-8'))
           gj=json.load(open('cp112/LAU_RG_01M_2024_4326.geojson',encoding='utf-8'))
           feats=gj['features']
@@ -37,22 +48,49 @@ jobs:
               p=props(f)
               return p.get('LAU_ID') or p.get('GISCO_ID') or p.get('lau_id') or p.get('gisco_id')
           byid={str(fid(f)):f for f in feats if fid(f) is not None}
+
+          paris=json.load(open('cp112/paris_arrondissements_official.geojson',encoding='utf-8'))
+          paris_matches=[]
+          for f in paris.get('features',[]):
+              p=props(f)
+              val=p.get('c_arinsee') if 'c_arinsee' in p else p.get('C_ARINSEE')
+              if str(val).strip()=='75101': paris_matches.append(f)
+          if len(paris_matches)!=1:
+              raise SystemExit(f'PARIS_75101_PRIMARY_MATCH_COUNT_{len(paris_matches)}')
+          paris_75101=paris_matches[0]
+          paris_geom=shape(paris_75101['geometry'])
+          if paris_geom.is_empty or not paris_geom.is_valid:
+              raise SystemExit('PARIS_75101_PRIMARY_GEOMETRY_INVALID')
+
+          # Secondary exact-code cross-check from current data.gouv administrative contours.
+          fr=json.load(open('cp112/france_communes_100m.geojson',encoding='utf-8'))
+          etalab=[]
+          for f in fr.get('features',[]):
+              vals={str(v).strip() for v in props(f).values() if v is not None}
+              if '75101' in vals: etalab.append(f)
+          if len(etalab)!=1:
+              raise SystemExit(f'PARIS_75101_SECONDARY_MATCH_COUNT_{len(etalab)}')
+          etalab_geom=shape(etalab[0]['geometry'])
+          if etalab_geom.is_empty or not etalab_geom.is_valid:
+              raise SystemExit('PARIS_75101_SECONDARY_GEOMETRY_INVALID')
+          overlap=paris_geom.intersection(etalab_geom).area/paris_geom.area
+          if overlap < 0.90:
+              raise SystemExit(f'PARIS_75101_CROSSCHECK_OVERLAP_TOO_LOW_{overlap}')
+
           manifest=[]
           for lane in state['lanes']:
               src=lane['geometry_source_id']
-              f=byid.get(src)
-              if not f and lane['iso']=='FR':
-                  # French arrondissement source code is 75101; accept only exact source-code match.
-                  matches=[]
-                  for q in feats:
-                      p=props(q); vals={str(v) for v in p.values() if v is not None}
-                      if '75101' in vals or 'FR_75101' in vals: matches.append(q)
-                  if len(matches)==1: f=matches[0]
-              if not f: raise SystemExit('MISSING_OFFICIAL_GEOMETRY_'+lane['lane_id']+'_'+src)
-              base=shape(f['geometry'])
-              if lane['zone_kind']=='OFFICIAL_ARRONDISSEMENT':
-                  zone=base
+              if lane['iso']=='FR':
+                  if lane['zone_kind']!='OFFICIAL_ARRONDISSEMENT' or lane['zone_id']!='FR_75101':
+                      raise SystemExit('FRANCE_RUNTIME_ZONE_CONTRACT_MISMATCH')
+                  zone=paris_geom
+                  source_name='Ville de Paris Open Data — Arrondissements; cross-check data.gouv/IGN AdminExpress'
+                  source_url='https://opendata.paris.fr/explore/dataset/arrondissements/information/'
+                  source_crosscheck_overlap=overlap
               else:
+                  f=byid.get(src)
+                  if not f: raise SystemExit('MISSING_OFFICIAL_GEOMETRY_'+lane['lane_id']+'_'+src)
+                  base=shape(f['geometry'])
                   m=re.search(r'_G([123])([123])$',lane['zone_id'])
                   if not m: raise SystemExit('BAD_GRID_ZONE_'+lane['zone_id'])
                   rr,cc=map(int,m.groups())
@@ -60,23 +98,28 @@ jobs:
                   dx=(maxx-minx)/3; dy=(maxy-miny)/3
                   cell=box(minx+(cc-1)*dx,miny+(rr-1)*dy,minx+cc*dx,miny+rr*dy)
                   zone=base.intersection(cell)
-              if zone.is_empty or zone.area<=0: raise SystemExit('EMPTY_ZONE_'+lane['lane_id'])
+                  source_name='Eurostat/GISCO LAU 2024'
+                  source_url='https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson'
+                  source_crosscheck_overlap=None
+              if zone.is_empty or zone.area<=0 or not zone.is_valid:
+                  raise SystemExit('EMPTY_OR_INVALID_ZONE_'+lane['lane_id'])
               payload={
                 'lane_id':lane['lane_id'],'iso':lane['iso'],'owner_lock':lane['owner_lock'],
                 'city_rank':lane['city_rank'],'city_id':lane['city_id'],'city_name':lane['city_name'],
                 'zone_order':lane['zone_order'],'zone_id':lane['zone_id'],'zone_name':lane['zone_name'],
                 'zone_kind':lane['zone_kind'],'geometry_source_id':src,
-                'official_geometry_source':'Eurostat/GISCO LAU 2024',
+                'official_geometry_source':source_name,'official_geometry_source_url':source_url,
+                'source_crosscheck_overlap':source_crosscheck_overlap,
                 'bbox':list(zone.bounds),'area_deg2':zone.area,'geometry':mapping(zone),
                 'canonical_write_allowed_in_lane':False
               }
               raw=json.dumps(payload,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()
               payload['sha256']=hashlib.sha256(raw).hexdigest()
               Path(f"cp112/geometries/{lane['lane_id']}.json").write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding='utf-8')
-              manifest.append({k:payload[k] for k in ['lane_id','iso','city_id','zone_id','area_deg2','sha256']})
+              manifest.append({k:payload[k] for k in ['lane_id','iso','city_id','zone_id','area_deg2','official_geometry_source','sha256']})
           assert len(manifest)==27 and len({x['zone_id'] for x in manifest})==27
-          Path('cp112/GEOMETRY_MANIFEST.json').write_text(json.dumps({'quality_gate':'PASS','lanes':manifest},indent=2,ensure_ascii=False),encoding='utf-8')
-          print(json.dumps({'geometry_gate':'PASS','lanes':27,'zones':[x['zone_id'] for x in manifest]},ensure_ascii=False))
+          Path('cp112/GEOMETRY_MANIFEST.json').write_text(json.dumps({'quality_gate':'PASS','lanes':manifest,'france_75101_crosscheck_overlap':overlap},indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps({'geometry_gate':'PASS','lanes':27,'france_75101_crosscheck_overlap':overlap,'zones':[x['zone_id'] for x in manifest]},ensure_ascii=False))
           PY
       - uses: actions/upload-artifact@v4
         with:
@@ -86,7 +129,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: RLF-EU27-CP112-GEOMETRY-MANIFEST
-          path: cp112/GEOMETRY_MANIFEST.json
+          path: |
+            cp112/GEOMETRY_MANIFEST.json
+            cp112/SOURCE_SHA256SUMS.txt
           retention-days: 30
 
   parallel27-discovery:
@@ -111,7 +156,7 @@ jobs:
           set -euo pipefail
           python3 -m pip install -q shapely
           python3 - <<'PY'
-          import os,json,time,urllib.parse,urllib.request,hashlib,random
+          import os,json,time,urllib.parse,urllib.request,hashlib
           from pathlib import Path
           from shapely.geometry import shape,Point
           lane=os.environ['LANE']
@@ -126,7 +171,6 @@ jobs:
           ]
           endpoints=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter']
           results=[]; merged={}
-          # Deterministic lane staggering reduces shared-endpoint collision without changing semantics.
           time.sleep((int(lane[1:])-1)%7 * 0.7)
           for vi,(key,q) in enumerate(vectors):
               record={'vector':key,'status':'TECHNICAL_FAILURE','endpoint':None,'http_status':None,'raw_elements':0,'in_zone':0,'error':None}
@@ -134,7 +178,7 @@ jobs:
               for attempt in range(4):
                   ep=endpoints[(int(lane[1:])+vi+attempt)%len(endpoints)]
                   try:
-                      req=urllib.request.Request(ep,data=urllib.parse.urlencode({'data':q}).encode(),headers={'User-Agent':'RLF-EU27-CP112/1.0'})
+                      req=urllib.request.Request(ep,data=urllib.parse.urlencode({'data':q}).encode(),headers={'User-Agent':'RLF-EU27-CP112/1.1'})
                       with urllib.request.urlopen(req,timeout=95) as r:
                           body=r.read(); record['http_status']=getattr(r,'status',200); record['endpoint']=ep
                       data=json.loads(body); break
