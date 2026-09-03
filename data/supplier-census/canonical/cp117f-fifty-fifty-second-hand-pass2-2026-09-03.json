@@ -1,0 +1,79 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117F",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "responsible:silke-koerber:fiftyfiftysecondhand.com",
+  "canonical_identity_key": "responsible:silke-koerber:hamburg-de",
+  "trading_names": ["FIFTY:FIFTY Second Hand", "FIFTY : FIFTY", "Fifty fifty second hand"],
+  "legal_or_responsible_name": "Silke Körber",
+  "legal_address": "Blankeneser Bahnhofstraße 7, 22587 Hamburg, Germany",
+  "canonical_domain": "fiftyfiftysecondhand.com",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_RESPONSIBLE_OPERATOR",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "The Hamburg shop, website and any brand/category pages are one FIFTY:FIFTY operator and count as one supplier.",
+  "reason": "Independent PASS2 confirms a current, stable Hamburg professional luxury second-hand/preloved apparel operator. The first-party imprint names Silke Körber and the Hamburg address, while current first-party pages document the physical shop, opening hours, consignment model, authenticity controls and a broad second-hand designer assortment. However, this review did not materialize current item-level remotely purchasable apparel stock or ordinary Spain delivery. The operator is therefore counted as VERIFIED_HOLD and not operationally eligible. The expanded backup contains only a discovery-only OSM record and the current repository exact-domain search found no prior canonical promotion.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_RESPONSIBLE_OPERATOR",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS_RESPONSIBLE_NAME_ADDRESS_CONTACT",
+    "physical_operation_and_current_activity": "PASS",
+    "professional_contactability": "PASS",
+    "authenticity_and_consignment_process": "PASS",
+    "current_item_level_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_NOT_MATERIALIZED",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://fiftyfiftysecondhand.com/impressum/",
+      "kind": "first_party_responsible_identity",
+      "finding": "FIFTY:FIFTY Second Hand identifies Silke Körber, Hamburg address, phone and email."
+    },
+    {
+      "url": "https://fiftyfiftysecondhand.com/",
+      "kind": "current_activity_and_assortment",
+      "finding": "Current site documents a professional Hamburg second-hand/preloved luxury-fashion shop operating since 2007 with more than 500 brands and authenticity claims."
+    },
+    {
+      "url": "https://fiftyfiftysecondhand.com/unser-konzept/",
+      "kind": "professional_secondhand_model",
+      "finding": "First-party page documents pre-loved fashion sales, consignment intake, apparel/shoes/bags/accessories and authenticity controls."
+    },
+    {
+      "url": "https://fiftyfiftysecondhand.com/kontakt/",
+      "kind": "current_physical_operation",
+      "finding": "Current contact page provides Hamburg address, telephone, email and opening hours."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "One discovery-only OSM record exists for node 7836458795 with evidence_status not_verified and decision not_verified; it is not a prior canonical supplier.",
+    "current_repo_exact_search_result": "Exact search for fiftyfiftysecondhand.com returned no prior canonical promotion before CP117F.",
+    "branch_counting_rule": "ONE_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117f",
+  "canonical_counts_after_promotion": {
+    "verified": 419,
+    "eligible": 72,
+    "hold": 347,
+    "remaining_to_10000": 9581
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
