@@ -1,0 +1,198 @@
+name: RLF EU27 CP118 Parallel27 PASS2 microblocks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp118-parallel27-pass2-microblocks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  pass2_microblock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    strategy:
+      fail-fast: false
+      max-parallel: 27
+      matrix:
+        lane: [L01,L02,L03,L04,L05,L06,L07,L08,L09,L10,L11,L12,L13,L14,L15,L16,L17,L18,L19,L20,L21,L22,L23,L24,L25,L26,L27]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      LANE: ${{ matrix.lane }}
+      CP117_RUN: '33714142136'
+      CP116_RUN: '33713443841'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recover newest immutable lane packet
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source
+          if gh run download "$CP117_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP117-LANE-$LANE" -D source 2>/dev/null; then
+            echo 'SOURCE_CHECKPOINT=CP117' >> "$GITHUB_ENV"
+          else
+            rm -rf source/*
+            gh run download "$CP116_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP116-LANE-$LANE" -D source
+            echo 'SOURCE_CHECKPOINT=CP116_FALLBACK_REPAIR_REQUIRED' >> "$GITHUB_ENV"
+          fi
+          test -f "source/$LANE.json"
+
+      - name: Harvest independent PASS2 evidence microblock
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,json,re,html,hashlib,ssl,urllib.request
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          lane=os.environ['LANE']; source_checkpoint=os.environ['SOURCE_CHECKPOINT']
+          src=json.load(open(f'source/{lane}.json',encoding='utf-8'))
+          UA='Mozilla/5.0 (compatible; RLF-EU27-CP118/1.0; +https://github.com/FIGUEBARCELONA/ready-like-freddy)'
+          sslctx=ssl.create_default_context()
+
+          def domain(url):
+              if not url:return None
+              try:
+                  u=url if '://' in url else 'https://'+url
+                  h=(urlparse(u).hostname or '').lower().strip('.')
+                  return h[4:] if h.startswith('www.') else h
+              except Exception:return None
+
+          canonical=set()
+          for p in Path('data/supplier-census/canonical').glob('*.json'):
+              try:d=json.load(open(p,encoding='utf-8'))
+              except Exception:continue
+              vals=[]
+              if d.get('canonical_domain'): vals.append(d['canonical_domain'])
+              vals += list(d.get('canonical_domains') or [])
+              for v in vals:
+                  x=domain(v)
+                  if x: canonical.add(x)
+
+          rows=src.get('enriched_candidates') or src.get('candidates') or src.get('new_identities') or []
+          if isinstance(rows,dict): rows=list(rows.values())
+          def ready(r):
+              return (r.get('enrichment_status')=='AAA_REVIEW2_READY_PENDING_GLOBAL_MASTER_DEDUP' or
+                      r.get('terminal_status')=='AAA_READY_CANDIDATE_PENDING_GLOBAL_DEDUP')
+          rows=sorted(rows,key=lambda r:(not ready(r), str(r.get('name') or ''), str(r.get('website') or '')))
+          chosen=[]; seen=set()
+          for r in rows:
+              web=r.get('website') or r.get('direct_url')
+              dom=r.get('canonical_domain_candidate') or domain(web)
+              if not web or not dom or dom in seen or dom in canonical: continue
+              seen.add(dom)
+              chosen.append((r,web,dom))
+              if len(chosen)>=4: break
+
+          legal_re=re.compile(r'\b(impressum|legal notice|mentions légales|aviso legal|privacy|terms|conditions|company|gmbh|srl\b|s\.l\.|bv\b|oy\b|ab\b|aps\b|kft\b|sro\b|uab\b|oü\b|sia\b|vat|iva|nif|cif|siret|siren|kvk|ust.?id|uid)\b',re.I)
+          second_re=re.compile(r'\b(second.?hand|pre.?loved|preowned|pre-owned|vintage|thrift|used clothing|gebraucht|friperie|segunda mano|seconda mano|kringwinkel)\b',re.I)
+          apparel_re=re.compile(r'\b(clothes|clothing|apparel|fashion|garment|kleidung|mode|ropa|abbigliamento|kleding|dress|shirt|jacket|coat|trousers|jeans)\b',re.I)
+          buy_re=re.compile(r'\b(add to cart|add to basket|checkout|buy now|shop now|warenkorb|ajouter au panier|añadir al carrito|carrello|winkelwagen|koszyk)\b',re.I)
+          ship_re=re.compile(r'\b(shipping|delivery|dispatch|versand|lieferung|envío|envios|livraison|spedizione|verzending|wysyłka)\b',re.I)
+          spain_re=re.compile(r'\b(spain|españa|espagne|spanien|spagna|spanje|hiszpania)\b',re.I)
+
+          def fetch(url,timeout=8,maxbytes=220000):
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'text/html,application/xhtml+xml,*/*','Accept-Language':'en;q=0.9,*;q=0.6'})
+                  with urllib.request.urlopen(req,timeout=timeout,context=sslctx) as res:
+                      raw=res.read(maxbytes); status=getattr(res,'status',200); final=res.geturl()
+                  text=html.unescape(re.sub(r'\s+',' ',re.sub('<[^>]+>',' ',raw.decode('utf-8','replace'))))[:100000]
+                  return {'ok':True,'status':status,'url':final,'text':text}
+              except Exception as e:
+                  return {'ok':False,'status':None,'url':url,'text':'','error':type(e).__name__+': '+str(e)[:180]}
+
+          paths=['','/impressum','/legal','/pages/legal-notice','/policies/contact-information','/policies/terms-of-service','/policies/refund-policy','/shipping','/pages/shipping','/versand','/contact','/about']
+          out=[]
+          for r,web,dom in chosen:
+              base=(web if '://' in web else 'https://'+web).rstrip('/')
+              pages=[]
+              for path in paths:
+                  x=fetch(base+path)
+                  if not x['ok']:
+                      if len(pages)<2: pages.append({'path':path or '/','ok':False,'error':x.get('error')})
+                      continue
+                  txt=x.pop('text')
+                  page={
+                    'path':path or '/', 'ok':True, 'status':x['status'], 'url':x['url'],
+                    'legal_marker':bool(legal_re.search(txt)), 'secondhand_marker':bool(second_re.search(txt)),
+                    'apparel_marker':bool(apparel_re.search(txt)), 'purchase_marker':bool(buy_re.search(txt)),
+                    'shipping_marker':bool(ship_re.search(txt)), 'spain_marker':bool(spain_re.search(txt)),
+                    'sha256':hashlib.sha256(txt.encode()).hexdigest()
+                  }
+                  pages.append(page)
+                  if len([p for p in pages if p.get('ok')])>=5: break
+              good=[p for p in pages if p.get('ok')]
+              markers={k:any(p.get(k) for p in good) for k in ['legal_marker','secondhand_marker','apparel_marker','purchase_marker','shipping_marker','spain_marker']}
+              status='PASS2_EVIDENCE_PACK_READY' if markers['legal_marker'] and markers['secondhand_marker'] and markers['apparel_marker'] else 'PASS2_EVIDENCE_GAP'
+              out.append({
+                'name':r.get('name'),'website':web,'domain':dom,'osm_key':r.get('osm_key'),
+                'source_readiness':r.get('enrichment_status') or r.get('terminal_status'),
+                'pass2_status':status,'markers':markers,'pages':pages
+              })
+
+          payload={
+            'schema':'RLF_EU27_CP118_PASS2_MICROBLOCK_V1','lane_id':lane,'iso':src.get('iso'),
+            'city_id':src.get('city_id'),'city_name':src.get('city_name'),'zone_id':src.get('zone_id'),
+            'source_checkpoint':source_checkpoint,'source_action':src.get('action'),
+            'promotion_allowed':False,'canonical_delta':0,'automatic_promotion_prohibited':True,
+            'candidates_considered':len(rows),'canonical_domains_excluded':len(canonical),
+            'candidates_harvested':len(out),'evidence_pack_ready':sum(x['pass2_status']=='PASS2_EVIDENCE_PACK_READY' for x in out),
+            'evidence_gap':sum(x['pass2_status']=='PASS2_EVIDENCE_GAP' for x in out),'candidates':out,
+            'territorial_credit':'NONE_PASS2_ONLY','quality':'AAA_FAIL_CLOSED'
+          }
+          raw=json.dumps(payload,ensure_ascii=False,sort_keys=True).encode(); payload['sha256']=hashlib.sha256(raw).hexdigest()
+          Path('out').mkdir(exist_ok=True)
+          json.dump(payload,open(f'out/{lane}.json','w',encoding='utf-8'),ensure_ascii=False,indent=2,sort_keys=True)
+          print(json.dumps({k:payload[k] for k in ['lane_id','iso','zone_id','source_checkpoint','candidates_harvested','evidence_pack_ready','evidence_gap']},ensure_ascii=False))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP118-LANE-${{ matrix.lane }}
+          path: out/${{ matrix.lane }}.json
+          retention-days: 30
+
+  consolidate:
+    if: always()
+    needs: pass2_microblock
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: RLF-EU27-CP118-LANE-*
+          path: lanes
+          merge-multiple: true
+      - name: Consolidate fail-closed summary
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,glob,hashlib
+          files=glob.glob('lanes/*.json'); rows=[]
+          for f in files:
+              try: rows.append(json.load(open(f,encoding='utf-8')))
+              except: pass
+          out={
+            'schema':'RLF_EU27_CP118_CONSOLIDATED_V1','lanes_received':len(rows),
+            'evidence_candidates_harvested':sum(x.get('candidates_harvested',0) for x in rows),
+            'pass2_evidence_pack_ready':sum(x.get('evidence_pack_ready',0) for x in rows),
+            'pass2_evidence_gap':sum(x.get('evidence_gap',0) for x in rows),
+            'fallback_repair_lanes':[x.get('lane_id') for x in rows if 'FALLBACK' in str(x.get('source_checkpoint'))],
+            'canonical_delta':0,'automatic_promotion_prohibited':True,'territorial_credit':'NONE_PASS2_ONLY','quality':'AAA_FAIL_CLOSED'
+          }
+          out['sha256']=hashlib.sha256(json.dumps(out,sort_keys=True).encode()).hexdigest()
+          json.dump(out,open('CP118-CONSOLIDATED.json','w'),indent=2,sort_keys=True)
+          print(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP118-CONSOLIDATED
+          path: CP118-CONSOLIDATED.json
+          retention-days: 30
