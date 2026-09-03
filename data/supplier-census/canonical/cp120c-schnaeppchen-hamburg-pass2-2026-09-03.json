@@ -1,0 +1,81 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP120C",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "vat:DE232128306",
+  "canonical_identity_key": "de:schnaeppchen-hamburg-de232128306-wandsbeker189",
+  "trading_names": ["Schn€ppchen Hamburg", "Schn€ppchen-Hamburg Second Hand & Vintage"],
+  "legal_or_responsible_name": "Schn€ppchen Hamburg (first-party trading identity; responsible natural person not materialized in this review)",
+  "vat_id": "DE232128306",
+  "shop_address": "Wandsbeker Chaussee 189, 22089 Hamburg, Germany",
+  "canonical_domain": "schneppchen.shop",
+  "canonical_domains": ["schneppchen.shop", "schnaeppchen-hamburg.de"],
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_FISCAL_TRADING_IDENTITY",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "The physical Hamburg shop, schnaeppchen-hamburg.de and the owned Shopify surface schneppchen.shop share the same trading identity, address, email and VAT and count once.",
+  "reason": "Independent PASS2 confirms a current Hamburg professional second-hand/vintage operator. Its first-party shop/contact surface identifies Schn€ppchen Hamburg, the Hamburg address, email and VAT DE232128306. The first-party physical-shop site explicitly states Second Hand & Vintage, daily changing stock and clothing among the assortment. The owned Shopify surface is transactional but its current indexed catalogue is mainly household/vintage objects rather than a materialized apparel assortment; ordinary delivery of second-hand apparel to Spain was not established. The operator is therefore verified and counted as HOLD, not ELIGIBLE. Marketplace listings are intentionally excluded from the canonical evidence chain.",
+  "gates": {
+    "eu_fiscal_identity": "PASS_FIRST_PARTY_VAT",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "current_physical_operation": "PASS",
+    "current_clothing_activity": "PASS_FIRST_PARTY_PHYSICAL_ASSORTMENT",
+    "owned_transactional_surface": "PASS",
+    "current_item_level_secondhand_apparel_catalogue": "HOLD_NOT_MATERIALIZED_ON_OWNED_ECOMMERCE",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "responsible_natural_person_identity": "HOLD_NOT_MATERIALIZED_FIRST_PARTY",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_VAT_ONE_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://schneppchen.shop/pages/contact",
+      "kind": "first_party_fiscal_identity",
+      "finding": "Owned contact page identifies Schn€ppchen Hamburg, Wandsbeker Chaussee 189, 22089 Hamburg, email and VAT DE232128306 and explicitly labels the business Second Hand & Vintage."
+    },
+    {
+      "url": "https://www.schnaeppchen-hamburg.de/",
+      "kind": "first_party_current_secondhand_activity",
+      "finding": "Current physical-shop site explicitly describes Second Hand & Vintage activity, daily new stock, current opening hours and the Hamburg address."
+    },
+    {
+      "url": "https://www.schnaeppchen-hamburg.de/Shop/",
+      "kind": "first_party_current_clothing_assortment",
+      "finding": "Current shop page states that the 400+ m2 assortment includes clothing among household, porcelain, technology, antiques and other used goods."
+    },
+    {
+      "url": "https://schneppchen.shop/collections/all",
+      "kind": "first_party_owned_transactional_catalogue",
+      "finding": "Owned ecommerce surface exposes a current priced second-hand/vintage product catalogue; current indexed assortment is not sufficient to establish a remote apparel supply path."
+    }
+  ],
+  "dedup_audit": {
+    "cp120_lane_packet": "L11 proposed Schn€ppchen as PASS2_EVIDENCE_PACK_READY.",
+    "current_repo_exact_search_result": "Exact repository search for schneppchen.shop returned no prior canonical promotion before CP120C.",
+    "marketplace_exclusion": "No eBay/Kleinanzeigen marketplace evidence is used to establish canonical identity or eligibility.",
+    "branch_counting_rule": "ONE_FISCAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp120-parallel27-next-wave-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp120c",
+  "canonical_counts_after_promotion": {
+    "verified": 435,
+    "eligible": 73,
+    "hold": 362,
+    "remaining_to_10000": 9565
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
