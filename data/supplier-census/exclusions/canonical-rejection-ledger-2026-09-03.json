@@ -1,0 +1,19 @@
+{
+  "schema": "RLF_SUPPLIER_CENSUS_EXCLUSION_LEDGER_V1",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "purpose": "APPEND_ONLY_FAIL_CLOSED exclusion memory. These identities must not be re-promoted or repeatedly investigated unless fresh evidence materially changes the stated exclusion reason.",
+  "canonical_delta": 0,
+  "entries": [
+    {"country":"HU","name":"Walter Fashion","reason":"NEW_APPAREL_MANUFACTURER_RETAILER_NOT_SECONDHAND","status":"REJECT_SCOPE"},
+    {"country":"HU","name":"Triumph","reason":"NEW_APPAREL_RETAIL_NOT_SECONDHAND","status":"REJECT_SCOPE"},
+    {"country":"IE","name":"Penneys / Primark","reason":"NEW_APPAREL_RETAIL_NOT_SECONDHAND","status":"REJECT_SCOPE"},
+    {"country":"LT","name":"Tokvila","reason":"AUTOMOTIVE_BUSINESS_FALSE_POSITIVE","status":"REJECT_FALSE_POSITIVE"},
+    {"country":"HU","name":"Tétény Autó","domain":"tetenyauto.hu","reason":"AUTOMOTIVE_BUSINESS_FALSE_POSITIVE_CP121","status":"REJECT_FALSE_POSITIVE"},
+    {"country":"DE","name":"Flohkids","domain":"flohkids.de","reason":"THIRD_PARTY_STALL_RENTAL_FLEA_MARKET_MODEL_NOT_DIRECT_PROFESSIONAL_PRELOVED_SUPPLIER","status":"REJECT_BUSINESS_MODEL"},
+    {"country":"DE","name":"Gebr. Falkenhagen oHG","domain":"hut-falkenhagen.de","reason":"CURRENT_FIRST_PARTY_CATALOGUE_IS_NEW_HATS_CAPS_ACCESSORIES;_REPAIR_SERVICE_DOES_NOT_ESTABLISH_SECONDHAND_RESALE","status":"REJECT_SCOPE"},
+    {"country":"DE","name":"La moda PALACE","domain":"lamodapalace.de","reason":"FORMER_RETAIL_LOCATION_CLOSED_2025_08_31;CURRENT_PAGE_IDENTIFIES_FORMER_OPERATOR_NOT_CURRENT_SECONDHAND_SHOP","status":"REJECT_CLOSED"},
+    {"country":"DE","name":"LIEBLINGSSTÜCK","domain":"lieblingsstueck.com","reason":"CURRENT_NEW_FASHION_BRAND_RETAILER_NOT_SECONDHAND","status":"REJECT_SCOPE"}
+  ],
+  "quality":"AAA_FAIL_CLOSED"
+}
