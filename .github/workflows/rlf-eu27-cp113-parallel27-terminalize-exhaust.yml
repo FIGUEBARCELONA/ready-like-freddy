@@ -1,0 +1,245 @@
+name: RLF EU27 CP113 Parallel27 terminalize and exhaust current zones
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp113-parallel27-terminalize-exhaust.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  parallel27:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 27
+      matrix:
+        lane: [L01,L02,L03,L04,L05,L06,L07,L08,L09,L10,L11,L12,L13,L14,L15,L16,L17,L18,L19,L20,L21,L22,L23,L24,L25,L26,L27]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      LANE: ${{ matrix.lane }}
+      CP112_RUN: '33708932702'
+    steps:
+      - name: Recover immutable CP112 lane and geometry evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p cp113/lane cp113/geom
+          gh run download "$CP112_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP112-LANE-$LANE" -D cp113/lane
+          gh run download "$CP112_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP112-ZONE-GEOMETRIES" -D cp113/geom
+          test -f "cp113/lane/$LANE.json"
+          test -f "cp113/geom/$LANE.json"
+      - name: AAA terminalization or strict 15-of-15 exhaustion
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q shapely
+          python3 - <<'PY'
+          import os,json,re,time,html,hashlib,urllib.parse,urllib.request,ssl
+          from pathlib import Path
+          from shapely.geometry import shape,Point
+
+          lane=os.environ['LANE']
+          src=json.load(open(f'cp113/lane/{lane}.json',encoding='utf-8'))
+          geo=json.load(open(f'cp113/geom/{lane}.json',encoding='utf-8'))
+          assert src['lane_id']==lane==geo['lane_id']
+          assert src['zone_id']==geo['zone_id']
+          assert src['geometry_sha256']==geo['sha256']
+          zone=shape(geo['geometry'])
+
+          UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36 RLF-CP113'
+          apparel_terms=re.compile(r'\b(cloth|clothes|clothing|fashion|mode|moda|abbigliamento|ropa|vetement|vêtement|kleding|kleidung|textil|vintage|second.?hand|preloved|thrift|garment|apparel|boutique)\b',re.I)
+          legal_terms=re.compile(r'\b(impressum|legal notice|mentions légales|mentions legales|voorwaarden|terms|company|société|societe|gesellschaft|gmbh|ag\b|bv\b|nv\b|srl\b|s\.r\.l|srls|spa\b|s\.p\.a|sl\b|s\.l\.|lda\b|oy\b|ab\b|aps\b|as\b|sp\. z o\.o|kft\b|sro\b|s\.r\.o|uab\b|ou\b|oü\b|sia\b|eood\b|ood\b|d\.o\.o|doo\b|e\.v\.|vzw\b|asbl\b|vat|btw|tva|iva|nif|cif|kvk|siren|siret|ondernemingsnummer|company number|registration number)\b',re.I)
+          contact_terms=re.compile(r'(@|tel\.?|phone|contact|kontakt|contatti|contacto|adresse|address|adres|indirizzo)',re.I)
+
+          def fetch(url,timeout=18,maxbytes=260000):
+              if not url:return {'url':url,'ok':False,'status':None,'text':'','error':'NO_URL'}
+              if url.startswith('http://'): candidates=[url,'https://'+url[7:]]
+              elif url.startswith('https://'): candidates=[url]
+              else:candidates=['https://'+url]
+              last=None
+              for u in candidates:
+                  try:
+                      req=urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Language':'en,de,fr,nl,it,es,pt,sv,da,fi,et,lv,lt,pl,cs,sk,sl,hr,hu,ro,bg,el;q=0.8'})
+                      with urllib.request.urlopen(req,timeout=timeout,context=ssl.create_default_context()) as r:
+                          body=r.read(maxbytes).decode('utf-8','replace')
+                          txt=html.unescape(re.sub(r'\s+',' ',re.sub('<[^>]+>',' ',body)))
+                          return {'url':u,'ok':True,'status':getattr(r,'status',200),'text':txt[:120000],'error':None}
+                  except Exception as e:last=type(e).__name__+': '+str(e)
+              return {'url':candidates[-1],'ok':False,'status':None,'text':'','error':last}
+
+          def search(q,engine='bing'):
+              url=('https://www.bing.com/search?q='+urllib.parse.quote_plus(q)+'&count=10' if engine=='bing' else 'https://html.duckduckgo.com/html/?q='+urllib.parse.quote_plus(q))
+              r=fetch(url,timeout=20,maxbytes=220000)
+              return {'engine':engine,'query':q,'ok':r['ok'],'status':r['status'],'text':r['text'][:45000],'error':r['error']}
+
+          # Candidate-bearing lane: terminalize every discovered identity, no canonical mutation.
+          if src['candidate_count']>0:
+              outc=[]
+              for idx,c in enumerate(src['candidates']):
+                  name=(c.get('name') or '').strip(); website=c.get('website')
+                  direct=fetch(website) if website else {'url':None,'ok':False,'status':None,'text':'','error':'NO_SEED_WEBSITE'}
+                  q=f'"{name}" "{src["city_name"]}" second hand vintage clothing' if name else f'{src["city_name"]} second hand clothing'
+                  srch=search(q,'bing' if idx%2 else 'ddg')
+                  corpus=' '.join([name,str(c.get('shop') or ''),str(c.get('second_hand') or ''),str(c.get('clothes') or ''),direct['text'][:50000],srch['text'][:25000]])
+                  osm_apparel=(c.get('shop')=='clothes' and c.get('second_hand') in ('yes','only')) or bool(c.get('clothes'))
+                  web_apparel=bool(apparel_terms.search(corpus))
+                  apparel=bool(osm_apparel or web_apparel)
+                  legal=bool(legal_terms.search(direct['text'])) if direct['ok'] else False
+                  trace=bool(website or c.get('phone') or c.get('email')) and bool(contact_terms.search(corpus) or c.get('phone') or c.get('email'))
+                  current=direct['ok'] or any(v in str(c.get('tags',{})).lower() for v in ['opening_hours','check_date'])
+                  if not apparel:
+                      status='REJECT_NON_APPAREL_OR_UNPROVEN_APPAREL'
+                  elif direct['ok'] and legal and trace and current:
+                      status='AAA_READY_CANDIDATE_PENDING_GLOBAL_DEDUP'
+                  else:
+                      status='HOLD_NEEDS_RESPONSIBLE_OPERATOR_OR_PRIMARY_EVIDENCE'
+                  outc.append({
+                    'osm_key':c['osm_key'],'name':name,'website':website,'phone':c.get('phone'),'email':c.get('email'),'operator_osm':c.get('operator'),'vat_ref_osm':c.get('vat_ref'),
+                    'lat':c['lat'],'lon':c['lon'],'apparel_evidence':apparel,'osm_apparel_evidence':osm_apparel,'web_apparel_evidence':web_apparel,
+                    'primary_web_reachable':direct['ok'],'primary_http_status':direct['status'],'legal_identity_marker':legal,'traceability':trace,'current_activity_signal':current,
+                    'terminal_status':status,'direct_url':direct['url'],'direct_error':direct['error'],'search_engine':srch['engine'],'search_ok':srch['ok'],'search_error':srch['error']
+                  })
+                  time.sleep(0.15)
+              result={
+                'schema':'RLF_EU27_CP113_LANE_V1','lane_id':lane,'iso':src['iso'],'city_id':src['city_id'],'city_name':src['city_name'],'zone_id':src['zone_id'],
+                'mode':'AAA_TERMINALIZATION','input_candidates':src['candidate_count'],'terminalized':len(outc),
+                'aaa_ready':sum(x['terminal_status'].startswith('AAA_READY') for x in outc),
+                'hold':sum(x['terminal_status'].startswith('HOLD') for x in outc),
+                'reject':sum(x['terminal_status'].startswith('REJECT') for x in outc),
+                'candidate_set_frozen':True,'exhaustion_streak':'0/15','zone_closed':False,
+                'canonical_delta':0,'promotion_allowed':False,'candidates':outc
+              }
+          else:
+              # Empty lane: freeze CP112 candidate set, then execute 15 ordered, distinct, sequential queries.
+              minx,miny,maxx,maxy=geo['bbox']; bbox=f'{miny},{minx},{maxy},{maxx}'
+              qs=[
+                ('Q01','nwr[shop=second_hand]'),
+                ('Q02','nwr[shop=clothes][second_hand=yes]'),
+                ('Q03','nwr[shop=clothes][second_hand=only]'),
+                ('Q04','nwr[shop=clothes][second_hand]'),
+                ('Q05','nwr[shop=vintage]'),
+                ('Q06','nwr[second_hand=yes][shop]'),
+                ('Q07','nwr[second_hand=only][shop]'),
+                ('Q08','nwr[second_hand=yes][shop=clothes]'),
+                ('Q09','nwr[second_hand=only][shop=clothes]'),
+                ('Q10','nwr[shop=charity]'),
+                ('Q11','nwr[name~"second.?hand",i]'),
+                ('Q12','nwr[name~"vintage",i]'),
+                ('Q13','nwr[name~"thrift",i]'),
+                ('Q14','nwr[name~"pre.?loved",i]'),
+                ('Q15','nwr[name~"used clothing|gebraucht|friperie|kringwinkel|vintage|seconda mano|segunda mano",i]')
+              ]
+              endpoints=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter']
+              known=set(c['osm_key'] for c in src['candidates'])
+              streak=0; records=[]; new={}; technical=False
+              for qi,(qid,selector) in enumerate(qs):
+                  q=f'[out:json][timeout:75];{selector}({bbox});out center tags;'
+                  data=None; err=None; used=None; status=None
+                  for attempt in range(3):
+                      ep=endpoints[(int(lane[1:])+qi+attempt)%2]
+                      try:
+                          req=urllib.request.Request(ep,data=urllib.parse.urlencode({'data':q}).encode(),headers={'User-Agent':'RLF-EU27-CP113/1.0'})
+                          with urllib.request.urlopen(req,timeout=90) as r:
+                              body=r.read(); status=getattr(r,'status',200); used=ep
+                          data=json.loads(body); break
+                      except Exception as e:
+                          err=type(e).__name__+': '+str(e); time.sleep(1.2*(attempt+1))
+                  if data is None:
+                      technical=True; records.append({'qid':qid,'status':'TECHNICAL_FAILURE','endpoint':used,'http_status':status,'new_in_zone':0,'error':err}); break
+                  found=[]
+                  for el in data.get('elements',[]):
+                      lat=el.get('lat');lon=el.get('lon');cen=el.get('center') or {}
+                      if lat is None:lat=cen.get('lat')
+                      if lon is None:lon=cen.get('lon')
+                      if lat is None or lon is None or not zone.covers(Point(float(lon),float(lat))):continue
+                      key=f"{el.get('type')}:{el.get('id')}"
+                      if key not in known:
+                          tags=el.get('tags') or {}
+                          new[key]={'osm_key':key,'name':tags.get('name'),'shop':tags.get('shop'),'second_hand':tags.get('second_hand'),'website':tags.get('website') or tags.get('contact:website'),'lat':float(lat),'lon':float(lon),'first_query':qid}
+                          found.append(key)
+                  if found:
+                      records.append({'qid':qid,'status':'SUCCESS_NEW_IDENTITY','endpoint':used,'http_status':status,'new_in_zone':len(set(found)),'error':None})
+                      streak=0; break
+                  streak+=1; records.append({'qid':qid,'status':'SUCCESS_ZERO_NEW','endpoint':used,'http_status':status,'new_in_zone':0,'error':None,'streak_after':streak})
+                  time.sleep(0.25)
+              closed=(not technical and len(new)==0 and streak==15)
+              result={
+                'schema':'RLF_EU27_CP113_LANE_V1','lane_id':lane,'iso':src['iso'],'city_id':src['city_id'],'city_name':src['city_name'],'zone_id':src['zone_id'],
+                'mode':'STRICT_EXHAUSTION','input_candidates':0,'candidate_set_frozen':True,'queries':records,'new_identities':list(new.values()),
+                'new_identity_count':len(new),'technical_failure':technical,'exhaustion_streak':f'{streak}/15','zone_closed':closed,
+                'canonical_delta':0,'promotion_allowed':False,
+                'next_action':('ADVANCE_TO_NEXT_CANONICAL_ZONE' if closed else 'TERMINALIZE_NEW_IDENTITIES_AND_RESET_STREAK' if new else 'RETRY_TECHNICAL_QUERY_NO_CREDIT')
+              }
+          raw=json.dumps(result,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode();result['sha256']=hashlib.sha256(raw).hexdigest()
+          Path('out').mkdir(exist_ok=True);Path(f'out/{lane}.json').write_text(json.dumps(result,indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps({k:result.get(k) for k in ['lane_id','mode','input_candidates','terminalized','aaa_ready','hold','reject','new_identity_count','exhaustion_streak','zone_closed']},ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP113-LANE-${{ matrix.lane }}
+          path: out/${{ matrix.lane }}.json
+          retention-days: 30
+
+  consolidate:
+    needs: parallel27
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: RLF-EU27-CP113-LANE-*
+          path: lanes
+          merge-multiple: true
+      - name: Central deterministic non-mutating replay and dedup audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import glob,json,hashlib,urllib.parse,re
+          rows=[json.load(open(f,encoding='utf-8')) for f in sorted(glob.glob('lanes/L*.json'))]
+          expected={f'L{i:02d}' for i in range(1,28)}; got={r['lane_id'] for r in rows}
+          domains={}; names={}; ready=[]
+          def dom(u):
+              if not u:return None
+              try:
+                  h=(urllib.parse.urlparse(u if '://' in u else 'https://'+u).hostname or '').lower()
+                  return h[4:] if h.startswith('www.') else h
+              except:return None
+          for r in rows:
+              for c in r.get('candidates',[]):
+                  if c.get('terminal_status','').startswith('AAA_READY'):
+                      ready.append([r['lane_id'],r['iso'],r['zone_id'],c.get('osm_key'),c.get('name'),c.get('website')])
+                  d=dom(c.get('website'))
+                  if d:domains.setdefault(d,[]).append([r['lane_id'],c.get('osm_key'),c.get('name')])
+                  n=re.sub(r'\W+','',(c.get('name') or '').lower())
+                  if n:names.setdefault(n,[]).append([r['lane_id'],c.get('osm_key'),c.get('website')])
+          cross_domain={k:v for k,v in domains.items() if len({x[0] for x in v})>1}
+          cross_name={k:v for k,v in names.items() if len({x[0] for x in v})>1}
+          rep={
+            'schema':'RLF_EU27_CP113_CONSOLIDATED_V1','phase':'FASE_1_CENS_PROVEIDORS_UE','lanes_expected':27,'lanes_received':len(rows),'missing_lanes':sorted(expected-got),
+            'candidate_lanes':sum(r['mode']=='AAA_TERMINALIZATION' for r in rows),'exhaustion_lanes':sum(r['mode']=='STRICT_EXHAUSTION' for r in rows),
+            'terminalized_total':sum(r.get('terminalized',0) for r in rows),'aaa_ready_pending_global_master_dedup':sum(r.get('aaa_ready',0) for r in rows),
+            'hold_total':sum(r.get('hold',0) for r in rows),'reject_total':sum(r.get('reject',0) for r in rows),
+            'zones_closed_15_of_15':sum(bool(r.get('zone_closed')) for r in rows),'empty_lanes_with_new_identities':sum(r.get('new_identity_count',0)>0 for r in rows),
+            'new_identities_from_exhaustion':sum(r.get('new_identity_count',0) for r in rows),'technical_failure_lanes':sum(bool(r.get('technical_failure')) for r in rows),
+            'cross_lane_domain_collisions':cross_domain,'cross_lane_name_collision_candidates':cross_name,'aaa_ready_rows':ready,
+            'canonical_counts_unchanged':{'verified':413,'eligible':70,'hold':343,'remaining':9587},'canonical_delta':0,
+            'quality_gate':'PASS' if len(rows)==27 and not (expected-got) else 'FAIL_CLOSED_MISSING_LANES',
+            'next_gate':'GLOBAL_MASTER_IDENTITY_DEDUP + responsible-operator adjudication for AAA_READY; advance only zones with certified 15/15 closure'
+          }
+          raw=json.dumps(rep,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode();rep['sha256']=hashlib.sha256(raw).hexdigest()
+          open('RLF_EU27_CP113_CONSOLIDATED.json','w').write(json.dumps(rep,indent=2,ensure_ascii=False))
+          print(json.dumps({k:rep[k] for k in ['lanes_received','candidate_lanes','exhaustion_lanes','terminalized_total','aaa_ready_pending_global_master_dedup','hold_total','reject_total','zones_closed_15_of_15','empty_lanes_with_new_identities','new_identities_from_exhaustion','technical_failure_lanes','quality_gate']},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP113-CONSOLIDATED
+          path: RLF_EU27_CP113_CONSOLIDATED.json
+          retention-days: 30
