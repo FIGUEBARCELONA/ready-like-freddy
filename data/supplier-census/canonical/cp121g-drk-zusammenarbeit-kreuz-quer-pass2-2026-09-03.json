@@ -1,0 +1,83 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP121G",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "register:DE-HAMBURG-HRB193382",
+  "canonical_identity_key": "de:drk-hamburg-harburg-zusammenarbeit-ggmbh-hrb193382",
+  "trading_names": ["Kreuz & quer", "DRK Secondhand-Kaufhaus Kreuz & quer"],
+  "legal_or_responsible_name": "Deutsches Rotes Kreuz Hamburg-Harburg ZusammenArbeit gGmbH",
+  "register_court": "Amtsgericht Hamburg",
+  "register_number": "HRB 193382",
+  "legal_address": "Rote-Kreuz-Straße 3-5, 21073 Hamburg, Germany",
+  "shop_address": "Schloßmühlendamm 30-32, Hamburg-Harburg, Germany",
+  "canonical_domain": "drk-harburg.hamburg",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_DISTINCT_DRK_SUBSIDIARY",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT_2026",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "Kreuz & quer and the former Schwester Henny second-hand activity are treated as the current successor retail operation under the distinct 2025-founded DRK Hamburg-Harburg ZusammenArbeit gGmbH. This legal operator is separate from the already-canonical DRK Landesverband Hamburg e.V. Kilo-Shop operator and counts once.",
+  "reason": "Independent PASS2 confirms a current professional Hamburg second-hand department store. DRK Hamburg-Harburg states that Kreuz & quer opened in December 2025, offers roughly 1,000 m² of second-hand clothing, furniture and other used goods, and is operated by its newly founded subsidiary DRK Hamburg-Harburg ZusammenArbeit gGmbH. Current DRK job material confirms the gGmbH remains the operating employer in 2026. Registry-derived evidence identifies the distinct company at Amtsgericht Hamburg HRB 193382. The store is open to ordinary shoppers and sells used clothing at prices, but no current item-level remote apparel catalogue, checkout or ordinary delivery to Spain is established, so the operator is VERIFIED_HOLD rather than ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_REGISTER_DERIVED_HRB193382",
+    "distinct_legal_operator_from_existing_drk_hamburg": "PASS",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "current_hamburg_operation": "PASS_2026",
+    "current_secondhand_clothing_assortment": "PASS",
+    "ordinary_public_access": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_PHYSICAL_RETAIL",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_HRB_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.drk-harburg.hamburg/aktuell/presse-service/meldung/eroeffnung-des-sozialkaufhauses-kreuz-quer.html",
+      "kind": "first_party_current_secondhand_store_and_operator",
+      "finding": "DRK states Kreuz & quer offers around 1,000 m² of well-preserved clothing, furniture and other second-hand goods and is a project of DRK Hamburg-Harburg ZusammenArbeit gGmbH."
+    },
+    {
+      "url": "https://www.drk-harburg.hamburg/ueber-uns/geschichte-des-drk-harburg.html",
+      "kind": "first_party_legal_operator_history",
+      "finding": "DRK history states the second-hand department store opened in December 2025 and is carried by the newly founded DRK Hamburg-Harburg ZusammenArbeit gGmbH."
+    },
+    {
+      "url": "https://jobs.drk.de/job-postings/deutsches-rotes-kreuz-kreisverband-hamburg-harburg-e-v-servicekraft-fachkraft-gastronomie-m-w-d-fur-unser-cafe-in-hamburg-harburg?from=41",
+      "kind": "current_2026_operator_corroboration",
+      "finding": "Current DRK job posting identifies DRK Hamburg-Harburg ZusammenArbeit gGmbH as operator of the café inside Secondhand-Kaufhaus Kreuz & Quer and names the store management contact."
+    },
+    {
+      "url": "https://fusionbase.com/en/data/organization/98a059ceef006a8804ec3ce6690011f3/deutsches-rotes-kreuz-hamburg-harburg-zusammenarbeit-ggmbh",
+      "kind": "commercial_register_derived_legal_corroboration",
+      "finding": "Registry-derived company record identifies Deutsches Rotes Kreuz Hamburg-Harburg ZusammenArbeit gGmbH, Hamburg HRB 193382, registered 8 July 2025, at Rote-Kreuz-Straße 3-5."
+    }
+  ],
+  "dedup_audit": {
+    "cp121_lane_packet": "L11 surfaced a DRK-Kleiderkammer identity; independent review resolved the currently relevant professional resale successor as Kreuz & quer under a distinct legal subsidiary.",
+    "existing_drk_operator_boundary": "CP118B counts DRK Landesverband Hamburg e.V., VR 4474. CP121G counts a separate gGmbH, HRB 193382; no branch double-count occurs.",
+    "current_repo_exact_search_result": "Exact repository search for 193382 returned no prior canonical promotion before CP121G.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp121-l11-fresh-discovery-resolution",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp121g",
+  "canonical_counts_after_promotion": {
+    "verified": 445,
+    "eligible": 74,
+    "hold": 371,
+    "remaining_to_10000": 9555
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
