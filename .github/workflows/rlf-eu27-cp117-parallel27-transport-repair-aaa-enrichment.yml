@@ -1,0 +1,279 @@
+name: RLF EU27 CP117 Parallel27 transport repair plus AAA enrichment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rlf-eu27-cp117-parallel27-transport-repair-aaa-enrichment.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  parallel27:
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    strategy:
+      fail-fast: false
+      max-parallel: 27
+      matrix:
+        lane: [L01,L02,L03,L04,L05,L06,L07,L08,L09,L10,L11,L12,L13,L14,L15,L16,L17,L18,L19,L20,L21,L22,L23,L24,L25,L26,L27]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      LANE: ${{ matrix.lane }}
+      CP113_RUN: '33710876974'
+      CP115_RUN: '33711777501'
+      CP116_RUN: '33713443841'
+    steps:
+      - name: Recover immutable lane lineage
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p cp113 cp115 cp116
+          gh run download "$CP116_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP116-LANE-$LANE" -D cp116
+          gh run download "$CP115_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP115-LANE-$LANE" -D cp115
+          gh run download "$CP113_RUN" -R "$GITHUB_REPOSITORY" -n "RLF-EU27-CP113-LANE-$LANE" -D cp113
+          test -f "cp116/$LANE.json"
+          test -f "cp115/$LANE.json"
+          test -f "cp113/$LANE.json"
+
+      - name: Repair transport or enrich candidate queue AAA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q shapely
+          python3 - <<'PY'
+          import os,json,re,html,time,hashlib,urllib.parse,urllib.request,ssl,random
+          from pathlib import Path
+          from urllib.parse import urlparse
+          from shapely.geometry import shape,box,Point
+
+          lane=os.environ['LANE']; lane_no=int(lane[1:])
+          a=json.load(open(f'cp116/{lane}.json',encoding='utf-8'))
+          b=json.load(open(f'cp115/{lane}.json',encoding='utf-8'))
+          c=json.load(open(f'cp113/{lane}.json',encoding='utf-8'))
+          UA='Mozilla/5.0 (compatible; RLF-EU27-CP117/1.0; +https://github.com/FIGUEBARCELONA/ready-like-freddy)'
+          sslctx=ssl.create_default_context()
+          time.sleep((lane_no % 7)*1.4)
+
+          endpoints=[
+            'https://overpass.private.coffee/api/interpreter',
+            'https://overpass.kumi.systems/api/interpreter',
+            'https://overpass-api.de/api/interpreter',
+            'https://overpass.osm.ch/api/interpreter',
+            'https://overpass.nchc.org.tw/api/interpreter'
+          ]
+
+          def overpass(q,seed):
+              errs=[]
+              order=list(range(len(endpoints)))
+              random.Random(1000+seed+lane_no).shuffle(order)
+              for cycle in range(2):
+                  for j in order:
+                      ep=endpoints[j]
+                      # POST first: avoids long-query URL and 406 behavior seen in CP115/116.
+                      try:
+                          payload=urllib.parse.urlencode({'data':q}).encode()
+                          req=urllib.request.Request(ep,data=payload,headers={'User-Agent':UA,'Accept':'application/json,*/*','Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'})
+                          with urllib.request.urlopen(req,timeout=105,context=sslctx) as r:
+                              body=r.read(); status=getattr(r,'status',200)
+                          return json.loads(body),ep,'POST',status,None
+                      except Exception as e:
+                          errs.append({'ep':ep,'method':'POST','error':type(e).__name__+': '+str(e)})
+                      # GET fallback on same mirror.
+                      try:
+                          url=ep+'?'+urllib.parse.urlencode({'data':q})
+                          req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json,*/*'})
+                          with urllib.request.urlopen(req,timeout=105,context=sslctx) as r:
+                              body=r.read(); status=getattr(r,'status',200)
+                          return json.loads(body),ep,'GET',status,None
+                      except Exception as e:
+                          errs.append({'ep':ep,'method':'GET','error':type(e).__name__+': '+str(e)})
+                      time.sleep(1.0+0.45*cycle+0.08*lane_no)
+                  time.sleep(4.0+cycle*4.0+(lane_no%5))
+              return None,None,None,None,errs[-8:]
+
+          def get_json(url,timeout=120):
+              req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json,*/*'})
+              with urllib.request.urlopen(req,timeout=timeout,context=sslctx) as r:return json.loads(r.read())
+
+          def grids(city_id):
+              gj=get_json('https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson')
+              feat=next(f for f in gj['features'] if str((f.get('properties') or {}).get('LAU_ID') or (f.get('properties') or {}).get('GISCO_ID'))==str(city_id))
+              g=shape(feat['geometry']);minx,miny,maxx,maxy=g.bounds;dx=(maxx-minx)/3;dy=(maxy-miny)/3
+              arr=[]
+              for rr in range(1,4):
+                  for cc in range(1,4):
+                      z=g.intersection(box(minx+(cc-1)*dx,miny+(rr-1)*dy,minx+cc*dx,miny+rr*dy))
+                      if not z.is_empty and z.area>1e-15:arr.append((f'{city_id}_G{rr}{cc}',z))
+              return arr
+
+          def qset(zone):
+              minx,miny,maxx,maxy=zone.bounds; bb=f'{miny},{minx},{maxy},{maxx}'
+              return [
+                ('Q01',f'[out:json][timeout:70];nwr[shop=second_hand]({bb});out center tags;'),
+                ('Q02',f'[out:json][timeout:70];nwr[shop=clothes][second_hand=yes]({bb});out center tags;'),
+                ('Q03',f'[out:json][timeout:70];nwr[shop=clothes][second_hand=only]({bb});out center tags;'),
+                ('Q04',f'[out:json][timeout:70];nwr[shop=clothes][second_hand]({bb});out center tags;'),
+                ('Q05',f'[out:json][timeout:70];nwr[shop=vintage]({bb});out center tags;'),
+                ('Q06',f'[out:json][timeout:70];nwr[second_hand=yes][shop]({bb});out center tags;'),
+                ('Q07',f'[out:json][timeout:70];nwr[second_hand=only][shop]({bb});out center tags;'),
+                ('Q08',f'[out:json][timeout:70];nwr[shop=charity]({bb});out center tags;'),
+                ('Q09',f'[out:json][timeout:70];nwr[name~"second.?hand",i]({bb});out center tags;'),
+                ('Q10',f'[out:json][timeout:70];nwr[name~"vintage",i]({bb});out center tags;'),
+                ('Q11',f'[out:json][timeout:70];nwr[name~"thrift",i]({bb});out center tags;'),
+                ('Q12',f'[out:json][timeout:70];nwr[name~"pre.?loved",i]({bb});out center tags;'),
+                ('Q13',f'[out:json][timeout:70];nwr[name~"used clothing|gebraucht|friperie|kringwinkel",i]({bb});out center tags;'),
+                ('Q14',f'[out:json][timeout:70];nwr[name~"seconda mano|segunda mano|second hand",i]({bb});out center tags;'),
+                ('Q15',f'[out:json][timeout:70];nwr[shop=clothes][second_hand!=no]({bb});out center tags;')]
+
+          def candidate(el,qid,zone):
+              lat=el.get('lat');lon=el.get('lon');cen=el.get('center') or {}
+              if lat is None:lat=cen.get('lat')
+              if lon is None:lon=cen.get('lon')
+              if lat is None or lon is None:return None
+              lat=float(lat);lon=float(lon)
+              if not zone.covers(Point(lon,lat)):return None
+              t=el.get('tags') or {}; key=f"{el.get('type')}:{el.get('id')}"
+              return key,{'osm_key':key,'name':t.get('name'),'website':t.get('website') or t.get('contact:website'),'phone':t.get('phone') or t.get('contact:phone'),'email':t.get('email') or t.get('contact:email'),'operator':t.get('operator'),'shop':t.get('shop'),'second_hand':t.get('second_hand'),'lat':lat,'lon':lon,'first_query':qid}
+
+          def repair(zone,start,prior):
+              qs=qset(zone);streak=start;new={};records=[x for x in prior if x.get('status')=='SUCCESS_ZERO_NEW']
+              for qi in range(start,15):
+                  qid,q=qs[qi]; data,ep,method,status,err=overpass(q,qi)
+                  if data is None:
+                      records.append({'qid':qid,'status':'TECHNICAL_FAILURE_NO_CREDIT','attempt_errors':err,'streak_after':streak});return {'streak':streak,'records':records,'new':[],'technical':True,'closed':False}
+                  hits=[]
+                  for el in data.get('elements',[]):
+                      x=candidate(el,qid,zone)
+                      if x:
+                          key,rec=x;new[key]=rec;hits.append(key)
+                  if hits:
+                      records.append({'qid':qid,'status':'SUCCESS_NEW_IDENTITY_RESET','new':len(set(hits)),'endpoint':ep,'method':method,'http_status':status,'streak_after':0})
+                      return {'streak':0,'records':records,'new':list(new.values()),'technical':False,'closed':False}
+                  streak+=1
+                  records.append({'qid':qid,'status':'SUCCESS_ZERO_NEW','new':0,'endpoint':ep,'method':method,'http_status':status,'streak_after':streak})
+                  time.sleep(.25)
+              return {'streak':streak,'records':records,'new':[],'technical':False,'closed':streak==15}
+
+          def discover(zone):
+              minx,miny,maxx,maxy=zone.bounds;bb=f'{miny},{minx},{maxy},{maxx}'
+              vectors=[('D1',f'[out:json][timeout:70];nwr[shop=second_hand]({bb});out center tags;'),('D2',f'[out:json][timeout:70];nwr[shop=clothes][second_hand]({bb});out center tags;'),('D3',f'[out:json][timeout:70];nwr[shop=vintage]({bb});out center tags;'),('D4',f'[out:json][timeout:70];nwr[shop=clothes][clothes=second_hand]({bb});out center tags;')]
+              merged={};vr=[]
+              for i,(vid,q) in enumerate(vectors):
+                  data,ep,method,status,err=overpass(q,100+i)
+                  if data is None:return None,vr+[{'vector':vid,'status':'TECHNICAL_FAILURE','attempt_errors':err}]
+                  kept=0
+                  for el in data.get('elements',[]):
+                      x=candidate(el,vid,zone)
+                      if x:
+                          key,rec=x;kept+=1
+                          if key not in merged:merged[key]={**rec,'vectors':[]}
+                          merged[key]['vectors'].append(vid)
+                  vr.append({'vector':vid,'status':'SUCCESS','in_zone':kept,'endpoint':ep,'method':method,'http_status':status})
+              return list(merged.values()),vr
+
+          def normalize_domain(url):
+              if not url:return None
+              try:
+                  u=url if '://' in url else 'https://'+url
+                  h=(urlparse(u).hostname or '').lower().strip('.')
+                  return h[4:] if h.startswith('www.') else h
+              except:return None
+
+          def fetch_text(url,timeout=18,maxbytes=180000):
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'text/html,application/xhtml+xml,*/*','Accept-Language':'en;q=0.9,*;q=0.6'})
+                  with urllib.request.urlopen(req,timeout=timeout,context=sslctx) as r:
+                      body=r.read(maxbytes).decode('utf-8','replace');status=getattr(r,'status',200);final=r.geturl()
+                  txt=html.unescape(re.sub(r'\s+',' ',re.sub('<[^>]+>',' ',body)))
+                  return {'ok':True,'status':status,'url':final,'text':txt[:90000]}
+              except Exception as e:return {'ok':False,'status':None,'url':url,'text':'','error':type(e).__name__+': '+str(e)}
+
+          def enrich_candidates(src):
+              rows=src.get('candidates') or src.get('new_identities') or []
+              legal_re=re.compile(r'\b(impressum|legal notice|mentions légales|aviso legal|terms|conditions|company|societ|gmbh|s\.r\.l|srl\b|s\.l\.|sl\b|b\.v\.|bv\b|oy\b|ab\b|aps\b|kft\b|sro\b|uab\b|oü\b|sia\b|vat|iva|nif|cif|siret|siren|kvk|nip|p\.iva|uid|ust.?id)\b',re.I)
+              apparel_re=re.compile(r'\b(second.?hand|vintage|preloved|thrift|used clothing|clothes|clothing|apparel|fashion|ropa|mode|kleidung|friperie|abbigliamento|kleding)\b',re.I)
+              buy_re=re.compile(r'\b(add to cart|basket|checkout|buy now|shop now|añadir al carrito|agregar al carrito|ajouter au panier|warenkorb|winkelwagen|carrello|koszyk)\b',re.I)
+              out=[]; groups={}
+              for r in rows:
+                  web=r.get('website');dom=normalize_domain(web)
+                  pages=[]
+                  if web:
+                      base=(web if '://' in web else 'https://'+web).rstrip('/')
+                      for path in ['', '/impressum','/legal','/pages/impressum','/pages/legal-notice','/pages/terms-of-service','/policies/terms-of-service','/terms','/contact','/pages/contact','/about','/pages/about-us']:
+                          x=fetch_text(base+path)
+                          if x['ok']:
+                              pages.append({'path':path or '/','url':x['url'],'status':x['status'],'legal_marker':bool(legal_re.search(x['text'])),'apparel_marker':bool(apparel_re.search(x['text'])),'direct_purchase_marker':bool(buy_re.search(x['text'])),'sha256':hashlib.sha256(x['text'].encode()).hexdigest()})
+                              # stop once enough distinct first-party evidence found
+                              if len(pages)>=4 and any(p['legal_marker'] for p in pages) and any(p['apparel_marker'] for p in pages):break
+                  legal=any(x['legal_marker'] for x in pages);apparel=any(x['apparel_marker'] for x in pages) or r.get('shop')=='clothes';buy=any(x['direct_purchase_marker'] for x in pages)
+                  trace=bool(web or r.get('phone') or r.get('email'))
+                  readiness='AAA_REVIEW2_READY_PENDING_GLOBAL_MASTER_DEDUP' if legal and apparel and trace and (buy or web) else 'HOLD_EVIDENCE_GAP'
+                  rec={**r,'canonical_domain_candidate':dom,'first_party_pages':pages,'first_party_legal_marker':legal,'apparel_activity_marker':apparel,'direct_purchase_marker':buy,'traceability_marker':trace,'enrichment_status':readiness}
+                  out.append(rec)
+                  key=dom or ('operator:'+str(r.get('operator') or r.get('name') or r.get('osm_key'))).lower()
+                  groups.setdefault(key,[]).append(r.get('osm_key') or r.get('name'))
+              return out,[{'group_key':k,'member_count':len(v),'members':v,'counting_rule':'ONE_OPERATOR_GROUP_MAX_ONE_CANONICAL_SUPPLIER'} for k,v in groups.items()]
+
+          result={'schema':'RLF_EU27_CP117_LANE_V1','lane_id':lane,'iso':a.get('iso'),'city_id':a.get('city_id'),'city_name':a.get('city_name'),'canonical_delta':0,'promotion_allowed':False}
+
+          if a.get('technical_failure'):
+              city=a['city_id'];zid=a['zone_id']; arr=grids(city); zmap=dict(arr); assert zid in zmap
+              start=int(str(a.get('exhaustion_streak','0/15')).split('/')[0]); ex=repair(zmap[zid],start,a.get('queries') or [])
+              result.update({'zone_id':zid,'action':'ROBUST_TRANSPORT_REPAIR','resume_from_streak':start,'queries':ex['records'],'new_identities':ex['new'],'new_identity_count':len(ex['new']),'technical_failure':ex['technical'],'exhaustion_streak':f"{ex['streak']}/15",'zone_closed':ex['closed']})
+              # If and only if repaired closure is certified, advance exactly one zone and run fresh discovery.
+              if ex['closed']:
+                  ids=[x[0] for x in arr];pos=ids.index(zid)
+                  if pos+1>=len(arr):
+                      result['post_repair_next_action']='CITY_GRID_COMPLETE'
+                  else:
+                      nzid,nzone=arr[pos+1]; cands,vrec=discover(nzone)
+                      result['post_repair_advance']={'from_zone_id':zid,'to_zone_id':nzid,'discovery_records':vrec,'technical_failure':cands is None,'candidate_count':None if cands is None else len(cands),'candidates':cands or []}
+                      result['post_repair_next_action']='DISCOVERY_RETRY' if cands is None else ('ADJUDICATE_CANDIDATES' if cands else 'START_15_OF_15')
+          else:
+              # Use the newest predecessor containing an actual candidate queue.
+              src=b if (b.get('candidates') or b.get('new_identities')) else c
+              if src.get('candidates') or src.get('new_identities'):
+                  enriched,groups=enrich_candidates(src)
+                  result.update({'zone_id':a.get('zone_id'),'action':'AAA_FIRST_PARTY_ENRICHMENT_ONLY','source_checkpoint':'CP115' if src is b else 'CP113','candidate_rows_enriched':len(enriched),'operator_groups':groups,'operator_group_count':len(groups),'review2_ready_pending_master_dedup':sum(x['enrichment_status'].startswith('AAA_REVIEW2_READY') for x in enriched),'hold_evidence_gap':sum(x['enrichment_status']=='HOLD_EVIDENCE_GAP' for x in enriched),'enriched_candidates':enriched,'technical_failure':False})
+              else:
+                  result.update({'zone_id':a.get('zone_id'),'action':'SKIP_NO_AUTHORIZED_NEW_WORK','reason':a.get('action'),'technical_failure':False})
+
+          raw=json.dumps(result,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode();result['sha256']=hashlib.sha256(raw).hexdigest()
+          Path('out').mkdir(exist_ok=True);Path(f'out/{lane}.json').write_text(json.dumps(result,indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps({k:result.get(k) for k in ['lane_id','zone_id','action','resume_from_streak','new_identity_count','technical_failure','exhaustion_streak','zone_closed','candidate_rows_enriched','operator_group_count','review2_ready_pending_master_dedup','hold_evidence_gap','post_repair_next_action']},ensure_ascii=False))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP117-LANE-${{ matrix.lane }}
+          path: out/${{ matrix.lane }}.json
+          retention-days: 30
+
+  consolidate:
+    needs: parallel27
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: RLF-EU27-CP117-LANE-*
+          path: lanes
+          merge-multiple: true
+      - name: Consolidate CP117
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob,json,hashlib
+          rows=[json.load(open(f,encoding='utf-8')) for f in glob.glob('lanes/L*.json')]
+          rep={'schema':'RLF_EU27_CP117_CONSOLIDATED_V1','lanes_received':len(rows),'transport_repairs':sum(r.get('action')=='ROBUST_TRANSPORT_REPAIR' for r in rows),'aaa_enrichment_lanes':sum(r.get('action')=='AAA_FIRST_PARTY_ENRICHMENT_ONLY' for r in rows),'no_work_skips':sum(r.get('action')=='SKIP_NO_AUTHORIZED_NEW_WORK' for r in rows),'candidate_rows_enriched':sum(r.get('candidate_rows_enriched',0) for r in rows),'operator_groups_after_lane_dedup':sum(r.get('operator_group_count',0) for r in rows),'review2_ready_pending_master_dedup':sum(r.get('review2_ready_pending_master_dedup',0) for r in rows),'hold_evidence_gap':sum(r.get('hold_evidence_gap',0) for r in rows),'new_identities':sum(r.get('new_identity_count',0) for r in rows),'zones_closed_15_of_15':sum(bool(r.get('zone_closed')) and r.get('exhaustion_streak')=='15/15' for r in rows),'post_repair_advances':sum(bool(r.get('post_repair_advance')) for r in rows),'technical_failure_lanes':sum(bool(r.get('technical_failure')) for r in rows),'canonical_delta':0,'canonical_counts_unchanged':{'verified':413,'eligible':70,'hold':343,'remaining':9587},'quality_gate':'PASS' if len(rows)==27 else 'FAIL_CLOSED'}
+          rep['sha256']=hashlib.sha256(json.dumps(rep,sort_keys=True,separators=(',',':')).encode()).hexdigest();open('RLF_EU27_CP117_CONSOLIDATED.json','w').write(json.dumps(rep,indent=2));print(json.dumps(rep,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RLF-EU27-CP117-CONSOLIDATED
+          path: RLF_EU27_CP117_CONSOLIDATED.json
+          retention-days: 30
