@@ -1,0 +1,77 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP118B",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "register:DE-HAMBURG-VR4474",
+  "canonical_identity_key": "de:drk-landesverband-hamburg-vr4474",
+  "trading_names": ["DRK Kilo-Shop Altona", "DRK Kilo-Shop"],
+  "legal_or_responsible_name": "DRK Landesverband Hamburg e.V.",
+  "register_number": "VR 4474, Amtsgericht Hamburg",
+  "tax_id_published": "1187 12 663",
+  "legal_address": "Behrmannplatz 3, 22529 Hamburg, Germany",
+  "shop_address": "Neue Große Bergstraße 4-6, 22767 Hamburg, Germany",
+  "canonical_domain": "drk-hamburg.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_RESPONSIBLE_OPERATOR",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "The Altona Kilo-Shop and any additional DRK Hamburg Kilo-Shop observations governed by the same responsible Hamburg DRK identity are one supplier for census counting. Physical branches are not counted separately.",
+  "reason": "Independent PASS2 confirms a current Hamburg professional second-hand clothing retail operation. The official DRK Hamburg Kilo-Shop page identifies the Altona shop, current opening hours and sale of carefully selected used clothing by weight and as individual fashion pieces. The same current first-party website identifies DRK Landesverband Hamburg e.V. as provider, with Behrmannplatz 3, register VR 4474 and published tax ID. No remote item-level catalogue, direct remote purchase path or ordinary delivery to Spain is established for this operator, so it is VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_FIRST_PARTY_IMPRINT",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS",
+    "professional_contactability": "PASS",
+    "current_secondhand_apparel_assortment": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_PHYSICAL_RETAIL",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_DOMAIN_MATCH",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.drk-hamburg.de/angebote/alltagshilfen/kilo-shop.html",
+      "kind": "first_party_current_secondhand_operation",
+      "finding": "Current DRK page lists DRK Kilo-Shop Altona at Neue Große Bergstraße 4-6, current opening hours, and explicitly describes sale of selected used clothing by weight and individual fashion pieces."
+    },
+    {
+      "url": "https://www.drk-hamburg.de/service/impressum-kontakt.html",
+      "kind": "first_party_legal_identity",
+      "finding": "Current imprint identifies DRK Landesverband Hamburg e.V., Behrmannplatz 3, Vorstand, Vereinsregister VR 4474 and published tax ID."
+    },
+    {
+      "url": "https://www.hamburg.de/branchenbuch/hamburg/eintrag/10120595/",
+      "kind": "municipal_directory_corroboration",
+      "finding": "Hamburg directory corroborates current DRK Kilo-Shop Altona as a second-hand clothing shop."
+    }
+  ],
+  "dedup_audit": {
+    "current_repo_exact_search_result": "Exact repository search for drk-hamburg.de and DRK Kilo-Shop Altona returned no prior canonical promotion before CP118B.",
+    "branch_counting_rule": "ONE_RESPONSIBLE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER",
+    "historical_operator_note": "Older DRK publications associated Kilo-Shops with a DRK Hamburg service subsidiary. The current 2026 first-party Kilo-Shop page is published under and legally attributed by the site imprint to DRK Landesverband Hamburg e.V.; this record uses the current responsible first-party identity and remains eligible for later identity refinement without increasing the supplier count."
+  },
+  "reviewer_1": "openai:cp118-parallel27-pass2-microblock-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp118b",
+  "canonical_counts_after_promotion": {
+    "verified": 427,
+    "eligible": 72,
+    "hold": 355,
+    "remaining_to_10000": 9573
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
