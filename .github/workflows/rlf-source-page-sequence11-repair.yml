@@ -1,0 +1,110 @@
+name: RLF sequence 11 source page repair
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-source-page-sequence11-repair.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: rlf-sequence-11-source-page-repair
+  cancel-in-progress: true
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Download sequence 11 discovery artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/rlf-sequence11
+          gh api /repos/${GITHUB_REPOSITORY}/actions/artifacts/9531737243/zip > /tmp/rlf-sequence11/discovery.zip
+          unzip -q /tmp/rlf-sequence11/discovery.zip -d /tmp/rlf-sequence11/discovery
+      - name: Reconstruct complete signed source-page delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const crypto = require('node:crypto');
+          function stableValue(value) {
+            if (Array.isArray(value)) return value.map(stableValue);
+            if (!value || typeof value !== 'object') return value;
+            return Object.fromEntries(Object.keys(value).sort().map(key => [key, stableValue(value[key])]));
+          }
+          function stableJson(value) { return JSON.stringify(stableValue(value)); }
+          const records = fs.readFileSync('/tmp/rlf-sequence11/discovery/consolidated/records.ndjson', 'utf8')
+            .split(/\r?\n/).filter(Boolean).map(JSON.parse);
+          const attemptedSourcePages = records.map(record => ({
+            url: record.requestedUrl,
+            sourceSha256: record.sourceSha256,
+            slot: record.slot,
+            fetchOk: Boolean(record.fetchOk),
+            observedAt: record.observedAt ?? null,
+            sourceTransport: record.sourceTransport ?? null,
+            sourceMarket: record.sourceMarket ?? null,
+            sourceScope: record.sourceDiscoveryScope ?? null,
+            productLinkCandidateCount: Number(record.productLinkCandidateCount ?? 0),
+          }));
+          const delta = {
+            schemaVersion: 1,
+            runId: '32758087459',
+            acceptedAt: '2026-08-24T17:48:31.095Z',
+            sourceArtifact: {
+              artifactId: 9531737243,
+              artifactDigest: 'sha256:ef94513a6efafee18bc19c147ee1ff56a5fea52537ad9fdbe8980590681710d6',
+              artifactName: 'rlf-kb-official-discovery-32758087459',
+            },
+            attemptedSourcePageCount: attemptedSourcePages.length,
+            uniqueSourcePageCount: new Set(attemptedSourcePages.map(page => page.url)).size,
+            successfulSourcePageCount: attemptedSourcePages.filter(page => page.fetchOk).length,
+            attemptedSourcePages,
+            status: 'AUDITED_DISCOVERY_SOURCE_PAGES_NOT_PRODUCT_IDENTITIES',
+          };
+          delta.sourcePageDeltaSha256 = crypto.createHash('sha256').update(stableJson(delta)).digest('hex');
+          if (delta.attemptedSourcePageCount !== 232 || delta.uniqueSourcePageCount !== 232 || delta.successfulSourcePageCount !== 227) {
+            throw new Error(`Unexpected sequence 11 source-page counts: ${JSON.stringify(delta)}`);
+          }
+          if (delta.sourcePageDeltaSha256 !== 'daeb4b9200be0251be848349afef07be506f1257c29807bc35dffc271ee3f827') {
+            throw new Error(`Unexpected sequence 11 source-page hash: ${delta.sourcePageDeltaSha256}`);
+          }
+          fs.mkdirSync('data/execution/source-page-deltas', { recursive: true });
+          fs.writeFileSync('data/execution/source-page-deltas/32758087459.json', `${JSON.stringify(delta, null, 2)}\n`);
+          NODE
+          node --input-type=module <<'NODE'
+          import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
+          const ledger = await loadSourcePageLedger();
+          const actual = {
+            deltaCount: ledger.deltaCount,
+            observationCount: ledger.attemptedObservationCount,
+            uniquePageCount: ledger.uniqueAttemptedSourcePageCount,
+            ledgerSha256: ledger.ledgerSha256,
+          };
+          console.log(JSON.stringify(actual, null, 2));
+          if (actual.deltaCount !== 4 || actual.observationCount !== 782 || actual.uniquePageCount !== 497) {
+            throw new Error(`Sequence 11 source-page ledger mismatch: ${JSON.stringify(actual)}`);
+          }
+          NODE
+      - name: Commit repaired authoritative delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/source-page-deltas/32758087459.json
+          git commit -m 'Repair complete sequence 11 source page delta'
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
+          git push origin HEAD:feature/rlf-execution-backend-20260823

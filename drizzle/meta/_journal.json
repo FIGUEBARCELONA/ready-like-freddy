@@ -1,0 +1,83 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1787413278924,
+      "tag": "0000_windy_lockjaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787413561389,
+      "tag": "0001_simple_veda",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787413887695,
+      "tag": "0002_burly_vargas",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1787413928017,
+      "tag": "0003_medical_madame_hydra",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1787415631840,
+      "tag": "0004_worthless_doctor_faustus",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1787415783984,
+      "tag": "0005_married_kronos",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1787416113770,
+      "tag": "0006_smooth_firedrake",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1787416221063,
+      "tag": "0007_empty_silver_fox",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1787416505488,
+      "tag": "0008_tough_sandman",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1787417813547,
+      "tag": "0009_parched_frog_thor",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1787418359922,
+      "tag": "0010_mature_wonder_man",
+      "breakpoints": true
+    }
+  ]
+}

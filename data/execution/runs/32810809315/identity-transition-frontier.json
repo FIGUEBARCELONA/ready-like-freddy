@@ -1,0 +1,715 @@
+{
+  "schemaVersion": 1,
+  "frontierId": "RLF-SEQUENCE18-IDENTITY-TRANSITION-32810809315",
+  "createdAt": "2026-08-25T04:55:38.265Z",
+  "targetSequence": 18,
+  "phaseId": "IDENTITY_TRANSITION_ARCHIVE_EVIDENCE_GATE_01",
+  "priorRunId": "32784949243",
+  "priorLedgerSha256": "0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7",
+  "priorDeltaCount": 11,
+  "workerCount": 50,
+  "activeLaneCount": 3,
+  "auditedIdleLaneCount": 47,
+  "selectedIdentityCount": 3,
+  "selectedIdentitySha256": "af5c06fbcb2fdea5be542b5c93527bb20bda95d996682ad0a2e1ee8942eeb728",
+  "ledgerMutationAllowed": false,
+  "archiveEvidencePolicy": {
+    "originalUrlMustBeOfficialFredPerryHttps": true,
+    "archiveCaptureAloneNeverEstablishesCodeAlias": true,
+    "exactCodeColourMediaUrlRequiredForExactMediaCandidate": true,
+    "samePageCrossCodeMediaAssociationRequiredForTransitionCandidate": true,
+    "transitionCandidateRequiresSeparateRecoveryGate": true
+  },
+  "candidates": [
+    {
+      "schemaVersion": 1,
+      "slot": "F01",
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "exactSku": "HW2300-843",
+      "requestedProductUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html"
+      ],
+      "siteMapUrls": [
+        "https://www.fredperry.com/ae-en/site-map",
+        "https://www.fredperry.com/eg-en/site-map",
+        "https://www.fredperry.com/sa-en/site-map",
+        "https://www.fredperry.com/site-map"
+      ],
+      "independentlyObservedOfficialProbeUrls": [
+        {
+          "url": "https://www.fredperry.com/ae-ar/twill-cap-hw2300-843.html",
+          "productCode": "HW2300",
+          "colourCode": "843",
+          "probeRelation": "EXACT_CODE_COLOUR_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        },
+        {
+          "url": "https://www.fredperry.com/sa-ar/accessories/twill-cap-hw2300-843.html",
+          "productCode": "HW2300",
+          "colourCode": "843",
+          "probeRelation": "EXACT_CODE_COLOUR_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        }
+      ],
+      "transitionProbeEnabled": false,
+      "transitionPolicy": {
+        "exactColourRequired": true,
+        "oneTerminalLetterCodeVariantOnly": true,
+        "sameOfficialPageCrossCodeMediaAssociationRequired": true,
+        "sameColourOrProductNameAloneInsufficient": true,
+        "automaticAliasPromotionAllowed": false
+      },
+      "archiveProviders": [
+        "INTERNET_ARCHIVE_CDX_EXACT_OFFICIAL_URL",
+        "COMMON_CRAWL_INDEX_WARC_EXACT_OFFICIAL_URL"
+      ],
+      "evidenceScope": "EXACT_OFFICIAL_MEDIA_OR_EXPLICIT_SAME_PAGE_CODE_TRANSITION_GATE"
+    },
+    {
+      "schemaVersion": 1,
+      "slot": "F02",
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "exactSku": "M1588-81B",
+      "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+        "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html"
+      ],
+      "siteMapUrls": [
+        "https://www.fredperry.com/eu-de/site-map",
+        "https://www.fredperry.com/eu-es/site-map",
+        "https://www.fredperry.com/site-map"
+      ],
+      "independentlyObservedOfficialProbeUrls": [
+        {
+          "url": "https://www.fredperry.com/eu-de/herren/t-shirts/twin-tipped-t-shirt-m1588v-81b.html",
+          "productCode": "M1588V",
+          "colourCode": "81B",
+          "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        },
+        {
+          "url": "https://www.fredperry.com/eu-es/camiseta-con-el-ribete-con-dos-franjas-m1588v-81b.html",
+          "productCode": "M1588V",
+          "colourCode": "81B",
+          "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        },
+        {
+          "url": "https://www.fredperry.com/eu-fr/homme/t-shirts/t-shirt-a-double-lisere-m1588-81b.html",
+          "productCode": "M1588",
+          "colourCode": "81B",
+          "probeRelation": "EXACT_CODE_COLOUR_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        },
+        {
+          "url": "https://www.fredperry.com/men/t-shirts/twin-tipped-t-shirt-m1588v-81b.html",
+          "productCode": "M1588V",
+          "colourCode": "81B",
+          "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        }
+      ],
+      "transitionProbeEnabled": true,
+      "transitionPolicy": {
+        "exactColourRequired": true,
+        "oneTerminalLetterCodeVariantOnly": true,
+        "sameOfficialPageCrossCodeMediaAssociationRequired": true,
+        "sameColourOrProductNameAloneInsufficient": true,
+        "automaticAliasPromotionAllowed": false
+      },
+      "archiveProviders": [
+        "INTERNET_ARCHIVE_CDX_EXACT_OFFICIAL_URL",
+        "COMMON_CRAWL_INDEX_WARC_EXACT_OFFICIAL_URL"
+      ],
+      "evidenceScope": "EXACT_OFFICIAL_MEDIA_OR_EXPLICIT_SAME_PAGE_CODE_TRANSITION_GATE"
+    },
+    {
+      "schemaVersion": 1,
+      "slot": "F03",
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "exactSku": "M1588-84B",
+      "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+        "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html"
+      ],
+      "siteMapUrls": [
+        "https://www.fredperry.com/eu-de/site-map",
+        "https://www.fredperry.com/eu-es/site-map",
+        "https://www.fredperry.com/site-map"
+      ],
+      "independentlyObservedOfficialProbeUrls": [
+        {
+          "url": "https://www.fredperry.com/eu-es/camiseta-con-el-ribete-con-dos-franjas-m1588v-84b.html",
+          "productCode": "M1588V",
+          "colourCode": "84B",
+          "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        },
+        {
+          "url": "https://www.fredperry.com/eu-fr/t-shirt-a-double-lisere-m1588-84b.html",
+          "productCode": "M1588",
+          "colourCode": "84B",
+          "probeRelation": "EXACT_CODE_COLOUR_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        },
+        {
+          "url": "https://www.fredperry.com/eu-it/uomo/t-shirt-con-doppia-riga-m1588v-84b.html",
+          "productCode": "M1588V",
+          "colourCode": "84B",
+          "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        },
+        {
+          "url": "https://www.fredperry.com/men/twin-tipped-t-shirt-m1588v-84b.html",
+          "productCode": "M1588V",
+          "colourCode": "84B",
+          "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+          "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+          "independentlyObservedAt": "2026-08-25",
+          "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+        }
+      ],
+      "transitionProbeEnabled": true,
+      "transitionPolicy": {
+        "exactColourRequired": true,
+        "oneTerminalLetterCodeVariantOnly": true,
+        "sameOfficialPageCrossCodeMediaAssociationRequired": true,
+        "sameColourOrProductNameAloneInsufficient": true,
+        "automaticAliasPromotionAllowed": false
+      },
+      "archiveProviders": [
+        "INTERNET_ARCHIVE_CDX_EXACT_OFFICIAL_URL",
+        "COMMON_CRAWL_INDEX_WARC_EXACT_OFFICIAL_URL"
+      ],
+      "evidenceScope": "EXACT_OFFICIAL_MEDIA_OR_EXPLICIT_SAME_PAGE_CODE_TRANSITION_GATE"
+    }
+  ],
+  "assignments": [
+    {
+      "slot": "F01",
+      "index": 0,
+      "candidates": [
+        {
+          "schemaVersion": 1,
+          "slot": "F01",
+          "identityKey": "HW2300|843",
+          "productCode": "HW2300",
+          "colourCode": "843",
+          "exactSku": "HW2300-843",
+          "requestedProductUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html"
+          ],
+          "siteMapUrls": [
+            "https://www.fredperry.com/ae-en/site-map",
+            "https://www.fredperry.com/eg-en/site-map",
+            "https://www.fredperry.com/sa-en/site-map",
+            "https://www.fredperry.com/site-map"
+          ],
+          "independentlyObservedOfficialProbeUrls": [
+            {
+              "url": "https://www.fredperry.com/ae-ar/twill-cap-hw2300-843.html",
+              "productCode": "HW2300",
+              "colourCode": "843",
+              "probeRelation": "EXACT_CODE_COLOUR_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            },
+            {
+              "url": "https://www.fredperry.com/sa-ar/accessories/twill-cap-hw2300-843.html",
+              "productCode": "HW2300",
+              "colourCode": "843",
+              "probeRelation": "EXACT_CODE_COLOUR_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            }
+          ],
+          "transitionProbeEnabled": false,
+          "transitionPolicy": {
+            "exactColourRequired": true,
+            "oneTerminalLetterCodeVariantOnly": true,
+            "sameOfficialPageCrossCodeMediaAssociationRequired": true,
+            "sameColourOrProductNameAloneInsufficient": true,
+            "automaticAliasPromotionAllowed": false
+          },
+          "archiveProviders": [
+            "INTERNET_ARCHIVE_CDX_EXACT_OFFICIAL_URL",
+            "COMMON_CRAWL_INDEX_WARC_EXACT_OFFICIAL_URL"
+          ],
+          "evidenceScope": "EXACT_OFFICIAL_MEDIA_OR_EXPLICIT_SAME_PAGE_CODE_TRANSITION_GATE"
+        }
+      ],
+      "assignmentStatus": "ACTIVE_IDENTITY_TRANSITION_ARCHIVE_GATE"
+    },
+    {
+      "slot": "F02",
+      "index": 1,
+      "candidates": [
+        {
+          "schemaVersion": 1,
+          "slot": "F02",
+          "identityKey": "M1588|81B",
+          "productCode": "M1588",
+          "colourCode": "81B",
+          "exactSku": "M1588-81B",
+          "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+            "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html"
+          ],
+          "siteMapUrls": [
+            "https://www.fredperry.com/eu-de/site-map",
+            "https://www.fredperry.com/eu-es/site-map",
+            "https://www.fredperry.com/site-map"
+          ],
+          "independentlyObservedOfficialProbeUrls": [
+            {
+              "url": "https://www.fredperry.com/eu-de/herren/t-shirts/twin-tipped-t-shirt-m1588v-81b.html",
+              "productCode": "M1588V",
+              "colourCode": "81B",
+              "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            },
+            {
+              "url": "https://www.fredperry.com/eu-es/camiseta-con-el-ribete-con-dos-franjas-m1588v-81b.html",
+              "productCode": "M1588V",
+              "colourCode": "81B",
+              "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            },
+            {
+              "url": "https://www.fredperry.com/eu-fr/homme/t-shirts/t-shirt-a-double-lisere-m1588-81b.html",
+              "productCode": "M1588",
+              "colourCode": "81B",
+              "probeRelation": "EXACT_CODE_COLOUR_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            },
+            {
+              "url": "https://www.fredperry.com/men/t-shirts/twin-tipped-t-shirt-m1588v-81b.html",
+              "productCode": "M1588V",
+              "colourCode": "81B",
+              "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            }
+          ],
+          "transitionProbeEnabled": true,
+          "transitionPolicy": {
+            "exactColourRequired": true,
+            "oneTerminalLetterCodeVariantOnly": true,
+            "sameOfficialPageCrossCodeMediaAssociationRequired": true,
+            "sameColourOrProductNameAloneInsufficient": true,
+            "automaticAliasPromotionAllowed": false
+          },
+          "archiveProviders": [
+            "INTERNET_ARCHIVE_CDX_EXACT_OFFICIAL_URL",
+            "COMMON_CRAWL_INDEX_WARC_EXACT_OFFICIAL_URL"
+          ],
+          "evidenceScope": "EXACT_OFFICIAL_MEDIA_OR_EXPLICIT_SAME_PAGE_CODE_TRANSITION_GATE"
+        }
+      ],
+      "assignmentStatus": "ACTIVE_IDENTITY_TRANSITION_ARCHIVE_GATE"
+    },
+    {
+      "slot": "F03",
+      "index": 2,
+      "candidates": [
+        {
+          "schemaVersion": 1,
+          "slot": "F03",
+          "identityKey": "M1588|84B",
+          "productCode": "M1588",
+          "colourCode": "84B",
+          "exactSku": "M1588-84B",
+          "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+            "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html"
+          ],
+          "siteMapUrls": [
+            "https://www.fredperry.com/eu-de/site-map",
+            "https://www.fredperry.com/eu-es/site-map",
+            "https://www.fredperry.com/site-map"
+          ],
+          "independentlyObservedOfficialProbeUrls": [
+            {
+              "url": "https://www.fredperry.com/eu-es/camiseta-con-el-ribete-con-dos-franjas-m1588v-84b.html",
+              "productCode": "M1588V",
+              "colourCode": "84B",
+              "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            },
+            {
+              "url": "https://www.fredperry.com/eu-fr/t-shirt-a-double-lisere-m1588-84b.html",
+              "productCode": "M1588",
+              "colourCode": "84B",
+              "probeRelation": "EXACT_CODE_COLOUR_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            },
+            {
+              "url": "https://www.fredperry.com/eu-it/uomo/t-shirt-con-doppia-riga-m1588v-84b.html",
+              "productCode": "M1588V",
+              "colourCode": "84B",
+              "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            },
+            {
+              "url": "https://www.fredperry.com/men/twin-tipped-t-shirt-m1588v-84b.html",
+              "productCode": "M1588V",
+              "colourCode": "84B",
+              "probeRelation": "ONE_TERMINAL_LETTER_CODE_VARIANT_OFFICIAL_PAGE_PROBE_TARGET",
+              "observationBasis": "PUBLICLY_INDEXED_OFFICIAL_FREDPERRY_PAGE_REVALIDATE_IN_WORKER",
+              "independentlyObservedAt": "2026-08-25",
+              "evidenceStatus": "PROBE_TARGET_NOT_ACCEPTED_EVIDENCE"
+            }
+          ],
+          "transitionProbeEnabled": true,
+          "transitionPolicy": {
+            "exactColourRequired": true,
+            "oneTerminalLetterCodeVariantOnly": true,
+            "sameOfficialPageCrossCodeMediaAssociationRequired": true,
+            "sameColourOrProductNameAloneInsufficient": true,
+            "automaticAliasPromotionAllowed": false
+          },
+          "archiveProviders": [
+            "INTERNET_ARCHIVE_CDX_EXACT_OFFICIAL_URL",
+            "COMMON_CRAWL_INDEX_WARC_EXACT_OFFICIAL_URL"
+          ],
+          "evidenceScope": "EXACT_OFFICIAL_MEDIA_OR_EXPLICIT_SAME_PAGE_CODE_TRANSITION_GATE"
+        }
+      ],
+      "assignmentStatus": "ACTIVE_IDENTITY_TRANSITION_ARCHIVE_GATE"
+    },
+    {
+      "slot": "F04",
+      "index": 3,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F05",
+      "index": 4,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F06",
+      "index": 5,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F07",
+      "index": 6,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F08",
+      "index": 7,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F09",
+      "index": 8,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F10",
+      "index": 9,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F11",
+      "index": 10,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F12",
+      "index": 11,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F13",
+      "index": 12,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F14",
+      "index": 13,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F15",
+      "index": 14,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F16",
+      "index": 15,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F17",
+      "index": 16,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F18",
+      "index": 17,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F19",
+      "index": 18,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F20",
+      "index": 19,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F21",
+      "index": 20,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F22",
+      "index": 21,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F23",
+      "index": 22,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F24",
+      "index": 23,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F25",
+      "index": 24,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F26",
+      "index": 25,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F27",
+      "index": 26,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F28",
+      "index": 27,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F29",
+      "index": 28,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F30",
+      "index": 29,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F31",
+      "index": 30,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F32",
+      "index": 31,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F33",
+      "index": 32,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F34",
+      "index": 33,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F35",
+      "index": 34,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F36",
+      "index": 35,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F37",
+      "index": 36,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F38",
+      "index": 37,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F39",
+      "index": 38,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F40",
+      "index": 39,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F41",
+      "index": 40,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F42",
+      "index": 41,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F43",
+      "index": 42,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F44",
+      "index": 43,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F45",
+      "index": 44,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F46",
+      "index": 45,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F47",
+      "index": 46,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F48",
+      "index": 47,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F49",
+      "index": 48,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F50",
+      "index": 49,
+      "candidates": [],
+      "assignmentStatus": "AUDITED_IDLE_LANE"
+    }
+  ],
+  "frontierSha256": "403be442367d92d80aa184c8dd72161331dec108be21d29d7be438d543dfaab7"
+}

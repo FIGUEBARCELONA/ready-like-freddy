@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 15,
+  "planId": "RLF-KB-OFFICIAL-SOURCE-PAGE-ROTATION-20260824-S15-R2-TERMINAL",
+  "pilotRunSequence": 15,
+  "phaseId": "OFFICIAL_ARCHIVE_SOURCE_PAGE_ROTATION_06_TERMINAL",
+  "purpose": "KB_DOCUMENTARY_NONCOMMERCIAL",
+  "periodStart": "1940-01-01",
+  "periodEnd": "2026-08-31",
+  "geographyScope": "GLOBAL",
+  "targetMarkets": [
+    "GB",
+    "US",
+    "ES",
+    "DE",
+    "FR",
+    "IT",
+    "PT",
+    "AE",
+    "EG",
+    "SA",
+    "ID",
+    "AU"
+  ],
+  "targetRegionGroups": [
+    "EUROPE",
+    "NORTH_AMERICA",
+    "MIDDLE_EAST",
+    "SOUTHEAST_ASIA",
+    "OCEANIA"
+  ],
+  "workerCount": 50,
+  "pilotPerWorkerLimit": 5,
+  "manualDefaultPerWorkerLimit": 5,
+  "productPilotPerWorkerLimit": 5,
+  "productManualDefaultPerWorkerLimit": 5,
+  "requestDelayMs": 750,
+  "maxResponseBytes": 8388608,
+  "discoveryPolicy": {
+    "strategy": "EXHAUST_ALL_REMAINING_AUDITED_CATALOG_SOURCE_PAGES_ACROSS_50_LANES",
+    "scopeOrder": [
+      "MEN_CORE",
+      "WOMEN_CORE",
+      "COLLABORATIONS",
+      "HERITAGE",
+      "ACCESSORIES_KIDS",
+      "OTHER_CATALOG"
+    ],
+    "exactlyFiftyNonEmptyLanesRequired": true,
+    "maximumCategoryPagesPerRun": 250,
+    "minimumEffectiveCategoryBatchSize": 50,
+    "preflightMeasuredEffectiveCategoryBatchSize": 76,
+    "requiredPriorityEntryPointCount": 0,
+    "previousPriorityEntryPointCount": 23,
+    "priorityEntryPointsMustBeInjectedExactlyOnce": false,
+    "priorityEntryPointRevisitPolicy": "SKIP_IF_PREVIOUSLY_CAPTURED_SOURCE_PAGE",
+    "sourcePageDeltaDirectory": "data/execution/source-page-deltas",
+    "minimumPreviouslyAttemptedSourcePageExclusions": 800,
+    "preflightMeasuredPreviouslyAttemptedSourcePageExclusions": 815,
+    "terminalFrontierExhaustionMode": true,
+    "requireAllRemainingEligibleSourcePagesInBatch": true,
+    "preflightAllRemainingEligibleSourcePagesScheduled": true,
+    "preflightQueueSha256": "17a7364ed9e65ae7d4562546040b840e2722194dd0dd84b3220f89725207825a",
+    "excludePreviouslyAttemptedSourcePages": true,
+    "sourcePageRotationSequence": 6,
+    "globalQueueUrlsMustBeUnique": true,
+    "firstBatchUrlsMustNotOverlapSourcePageLedger": true,
+    "prioritizeBackCatalogueCollaborationsAndMadeInEngland": true,
+    "archivePageMustNeverInferManufactureDate": true,
+    "currentAvailabilityMustNeverBoundHistoricalUniverse": true,
+    "retailMarketMustNeverInferFactory": true,
+    "runPointerRequired": true
+  },
+  "transportPolicy": {
+    "directAttempts": 2,
+    "readerAttemptsPerScheme": 3,
+    "readerSchemes": [
+      "https",
+      "http"
+    ],
+    "retryableReaderStatuses": [
+      401,
+      408,
+      425,
+      429,
+      500,
+      502,
+      503,
+      504
+    ]
+  },
+  "imagePolicy": {
+    "storeBinary": false,
+    "recordSourceUrls": true,
+    "allowedAssetPathPrefix": "/media/catalog/product/",
+    "requireMatchingOfficialProductImageForCompletion": true,
+    "defaultRightsStatus": "UNKNOWN",
+    "defaultIngestionStatus": "NOT_INGESTED"
+  },
+  "identityPolicy": {
+    "candidateKey": [
+      "productCode",
+      "colourCode"
+    ],
+    "preserveAliasUrls": true,
+    "fetchPreferredUrlThenAliases": true,
+    "continueAcrossAliasesUntilStrictCapture": true,
+    "rejectSoft404Responses": true,
+    "quarantineTransformedReaderPrices": true,
+    "completedIdentityLedger": "data/execution/product-progress.json",
+    "appendOnlyDeltaDirectory": "data/execution/progress-deltas",
+    "canonicalLedgerDeltaGenerator": "scripts/execution/generate-ledger-delta.mjs",
+    "requireSourceManifestFrontierAndDeltaHashAgreement": true,
+    "rejectCompletedIdentityOverlapBeforePersistence": true,
+    "prioritizePendingRetries": true,
+    "maximumPersistentRetryAttemptsPerRun": 1,
+    "deduplicateAgainstCompletedBeforeAssignment": true,
+    "globalCanonicalProductRequiresCrossSourceEvidence": true
+  },
+  "stageGates": {
+    "discoveryRequiresUniqueProductIdentities": 0,
+    "discoveryRequiresNewIdentities": 0,
+    "terminalZeroIdentityBatchAllowedOnlyAfterFullFrontierExhaustion": true,
+    "discoveryRequiresEveryRemainingEligibleSourcePageScheduled": true,
+    "discoveryRequiresNoRepeatedFirstBatchSourcePages": true,
+    "discoveryRequiresSourcePageLedger": true,
+    "productStageRequiresAllSelectedIdentitiesAccountedFor": true,
+    "terminalProductStageRequiresFiftyAuditedWorkerOutputs": true,
+    "partialStrictBatchMayPersistSuccessfulIdentitiesAndRetries": true,
+    "canonicalLedgerDeltaAuditRequiredBeforePersistence": true,
+    "canonicalProductsRemainZeroUntilCrossSourceDeduplication": true,
+    "factoryVerifiedCountRemainsZeroWithoutIndependentEvidence": true
+  },
+  "historicalPolicy": {
+    "backCatalogueClass": "OFFICIAL_ARCHIVE_PREVIOUS_COLLECTIONS",
+    "madeInEnglandCategoryClass": "OFFICIAL_HERITAGE_CATEGORY",
+    "collaborationCategoryClass": "OFFICIAL_COLLABORATION_CURRENT_OR_ARCHIVAL_ENTRY",
+    "categoryPresenceDoesNotProveProductManufactureYear": true,
+    "productPageEvidenceRequiredForIdentityAcceptance": true,
+    "historicalCoverageTarget": "1940S_THROUGH_2026_08"
+  },
+  "phaseSeparation": {
+    "productIdentityEvidence": "ACTIVE",
+    "sourcePageRotation": "ACTIVE_APPEND_ONLY_TERMINAL_FRONTIER",
+    "metadataEnrichment": "SEPARATE_FUTURE_STAGE",
+    "factoryEvidence": "SEPARATE_INDEPENDENT_CORPUS",
+    "globalCanonicalization": "BLOCKED_UNTIL_CROSS_SOURCE_REVIEW"
+  }
+}

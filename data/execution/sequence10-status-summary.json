@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "capturedAt": "2026-08-24T17:16:01Z",
+  "revision": "3",
+  "run": {
+    "id": 32754804084,
+    "run_number": 57,
+    "status": "completed",
+    "conclusion": "failure",
+    "head_sha": "cdd8e0cd0521ebd5dce8b9599db36698ab8ab1c5",
+    "updated_at": "2026-08-24T17:15:25Z",
+    "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32754804084"
+  },
+  "totals": {
+    "jobs": 103,
+    "completed": 100,
+    "successful": 100,
+    "failed": 0,
+    "cancelled": 0,
+    "inProgress": 0,
+    "queued": 0,
+    "artifacts": 104
+  },
+  "discovery": {
+    "total": 50,
+    "successful": 50,
+    "failed": 0,
+    "active": 0
+  },
+  "product": {
+    "total": 48,
+    "successful": 48,
+    "failed": 0,
+    "active": 0
+  },
+  "specialJobs": [
+    {
+      "id": 97519742263,
+      "name": "Prepare verified official queue",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 97521497713,
+      "name": "Consolidate code-colour identity frontier",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "failedJobs": [],
+  "finalArtifacts": [
+    {
+      "id": 9530679835,
+      "name": "rlf-kb-product-pages-32754804084",
+      "size_in_bytes": 36879,
+      "digest": "sha256:9501521a11541212f6fda66b61919f96b8982ea36dc634df0bbaf7179fc899b7"
+    },
+    {
+      "id": 9530611276,
+      "name": "rlf-kb-official-discovery-32754804084",
+      "size_in_bytes": 1473220,
+      "digest": "sha256:d9f11351a7f08578e23d4a6d69c7962ec1a00e0c178d398e5aa1a3416f890078"
+    }
+  ]
+}

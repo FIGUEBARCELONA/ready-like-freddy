@@ -1,0 +1,2 @@
+-- Intentionally empty reconciliation marker. The research scope foreign key is
+-- created with the compatible rsc_partition_fk name in 0002_burly_vargas.sql.

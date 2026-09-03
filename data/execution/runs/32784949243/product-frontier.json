@@ -1,0 +1,623 @@
+{
+  "schemaVersion": 5,
+  "frontierId": "RLF-SEQUENCE16-RETRY-32784949243",
+  "createdAt": "2026-08-24T22:30:11.214Z",
+  "sourceQueueId": "RLF-SEQUENCE16-RETRY-RECOVERY",
+  "sourceQueueSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+  "workerCount": 50,
+  "uniqueProductUrlCount": 11,
+  "uniqueProductIdentityCount": 6,
+  "aliasProductUrlCount": 5,
+  "previouslyCompletedIdentityCount": 1354,
+  "remainingIdentityCountBeforeSelection": 6,
+  "retryIdentityCount": 6,
+  "productPerWorkerLimit": 1,
+  "batchCapacity": 50,
+  "selectedIdentityCount": 6,
+  "expectedProductCaptureCount": 6,
+  "selectedIdentitySha256": "f71c3b1c5d2c7356c6f4b2183115ccbca2ce6427db5dbf534cbfef89ae509aa7",
+  "progressSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+  "progressDeltaCount": 10,
+  "assignments": [
+    {
+      "slot": "F01",
+      "index": 0,
+      "products": [
+        {
+          "schemaVersion": 5,
+          "queueId": "RLF-SEQUENCE16-RETRY-RECOVERY",
+          "queueSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+          "slot": "F01",
+          "candidateKey": "4294b3447147b2e8b297f1de13c10c2ad6b2ce4b855493d9a5d9e60e65775930",
+          "productUrl": "https://www.fredperry.com/id-en/women/the-gift-list-id/g3636-g3636-z77.html",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/women/the-gift-list-id/g3636-g3636-z77.html",
+          "productCode": "G3636",
+          "colourCode": "Z77",
+          "displayName": null,
+          "observedPrice": null,
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "transportHttpStatus": 200,
+          "identityKey": "G3636|Z77",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/women/the-gift-list-id/g3636-g3636-z77.html"
+          ],
+          "aliasCount": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/women/the-gift-list-id"
+          ],
+          "sourceSlots": [
+            "F01"
+          ],
+          "sourceMarkets": [
+            "id-en"
+          ],
+          "sourceLocales": [],
+          "sourceRegionGroups": [],
+          "sourceDiscoveryScopes": [
+            "RETRY_RECOVERY"
+          ],
+          "sourceLaneVectorKeys": [
+            "F01|RETRY_RECOVERY"
+          ],
+          "categoryImageEvidence": {
+            "identityKey": "G3636|Z77",
+            "productCode": "G3636",
+            "colourCode": "Z77",
+            "preferredProductUrl": "https://www.fredperry.com/id-en/women/the-gift-list-id/g3636-g3636-z77.html",
+            "sourcePageUrl": "https://www.fredperry.com/id-en/women/the-gift-list-id",
+            "sourcePageSha256": "f26314f88d197b5c73f674a0099c7d035d6a86f5ffabe72eab1026148a3e4e20",
+            "sourceQueueId": "RLF-OFFICIAL-20260824174151723",
+            "sourceQueueSha256": "da7a5cbc2c2fd6deea6c3083ad1cfee2a52dcc099c38581a2e3e325a0e7c0008",
+            "sourceArtifact": {
+              "runId": "32758087459",
+              "artifactId": 9531737243,
+              "artifactDigest": "sha256:ef94513a6efafee18bc19c147ee1ff56a5fea52537ad9fdbe8980590681710d6"
+            },
+            "imageReferences": [
+              {
+                "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/bd7c0e85d450ed569e8321a5a4cfd14c/G/3/G3636_Z77_V2_Q325_MOD1_FRONT.JPG",
+                "rightsStatus": "UNKNOWN",
+                "ingestionStatus": "NOT_INGESTED",
+                "hostAllowed": true,
+                "assetClass": "PRODUCT_MEDIA"
+              }
+            ],
+            "evidenceStatus": "OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"
+          },
+          "priorFailureReasons": [
+            "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+            "IDENTITY_CAPTURE_NOT_VALID"
+          ],
+          "uniquenessStatus": "CURRENT_RETRY_CODE_COLOUR_IDENTITY",
+          "evidenceStatus": "OFFICIAL_RETRY_RECOVERY_CANDIDATE"
+        }
+      ]
+    },
+    {
+      "slot": "F02",
+      "index": 1,
+      "products": [
+        {
+          "schemaVersion": 5,
+          "queueId": "RLF-SEQUENCE16-RETRY-RECOVERY",
+          "queueSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+          "slot": "F02",
+          "candidateKey": "eef60351cf75346934d1e6533359484fe6b194222660ed6fe21d21329287be16",
+          "productUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+          "preferredProductUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+          "productCode": "HW2300",
+          "colourCode": "843",
+          "displayName": null,
+          "observedPrice": null,
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "transportHttpStatus": 200,
+          "identityKey": "HW2300|843",
+          "aliasUrls": [
+            "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html"
+          ],
+          "aliasCount": 4,
+          "sourcePageUrls": [],
+          "sourceSlots": [
+            "F02"
+          ],
+          "sourceMarkets": [
+            "sa-en",
+            "ae-en",
+            "eg-en"
+          ],
+          "sourceLocales": [],
+          "sourceRegionGroups": [],
+          "sourceDiscoveryScopes": [
+            "RETRY_RECOVERY"
+          ],
+          "sourceLaneVectorKeys": [
+            "F02|RETRY_RECOVERY"
+          ],
+          "categoryImageEvidence": null,
+          "priorFailureReasons": [
+            "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+            "IDENTITY_CAPTURE_NOT_VALID"
+          ],
+          "uniquenessStatus": "CURRENT_RETRY_CODE_COLOUR_IDENTITY",
+          "evidenceStatus": "OFFICIAL_RETRY_RECOVERY_CANDIDATE"
+        }
+      ]
+    },
+    {
+      "slot": "F03",
+      "index": 2,
+      "products": [
+        {
+          "schemaVersion": 5,
+          "queueId": "RLF-SEQUENCE16-RETRY-RECOVERY",
+          "queueSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+          "slot": "F03",
+          "candidateKey": "66fa36e837cd1ad4712e713cbdb81c7be2f2e532dee4428bd01f8a05a941cb82",
+          "productUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+          "preferredProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+          "productCode": "M1588",
+          "colourCode": "81B",
+          "displayName": null,
+          "observedPrice": null,
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "transportHttpStatus": 200,
+          "identityKey": "M1588|81B",
+          "aliasUrls": [
+            "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+            "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html"
+          ],
+          "aliasCount": 2,
+          "sourcePageUrls": [],
+          "sourceSlots": [
+            "F03"
+          ],
+          "sourceMarkets": [
+            "eu-de",
+            "eu-es"
+          ],
+          "sourceLocales": [],
+          "sourceRegionGroups": [],
+          "sourceDiscoveryScopes": [
+            "RETRY_RECOVERY"
+          ],
+          "sourceLaneVectorKeys": [
+            "F03|RETRY_RECOVERY"
+          ],
+          "categoryImageEvidence": null,
+          "priorFailureReasons": [
+            "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+            "IDENTITY_CAPTURE_NOT_VALID"
+          ],
+          "uniquenessStatus": "CURRENT_RETRY_CODE_COLOUR_IDENTITY",
+          "evidenceStatus": "OFFICIAL_RETRY_RECOVERY_CANDIDATE"
+        }
+      ]
+    },
+    {
+      "slot": "F04",
+      "index": 3,
+      "products": [
+        {
+          "schemaVersion": 5,
+          "queueId": "RLF-SEQUENCE16-RETRY-RECOVERY",
+          "queueSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+          "slot": "F04",
+          "candidateKey": "17dc2729afeebaedee831ea0ff358841e93bc4b8eaddb1288e8e51e9f8ff792c",
+          "productUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+          "preferredProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+          "productCode": "M1588",
+          "colourCode": "84B",
+          "displayName": null,
+          "observedPrice": null,
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "transportHttpStatus": 200,
+          "identityKey": "M1588|84B",
+          "aliasUrls": [
+            "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+            "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html"
+          ],
+          "aliasCount": 2,
+          "sourcePageUrls": [],
+          "sourceSlots": [
+            "F04"
+          ],
+          "sourceMarkets": [
+            "eu-de",
+            "eu-es"
+          ],
+          "sourceLocales": [],
+          "sourceRegionGroups": [],
+          "sourceDiscoveryScopes": [
+            "RETRY_RECOVERY"
+          ],
+          "sourceLaneVectorKeys": [
+            "F04|RETRY_RECOVERY"
+          ],
+          "categoryImageEvidence": null,
+          "priorFailureReasons": [
+            "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+            "IDENTITY_CAPTURE_NOT_VALID"
+          ],
+          "uniquenessStatus": "CURRENT_RETRY_CODE_COLOUR_IDENTITY",
+          "evidenceStatus": "OFFICIAL_RETRY_RECOVERY_CANDIDATE"
+        }
+      ]
+    },
+    {
+      "slot": "F05",
+      "index": 4,
+      "products": [
+        {
+          "schemaVersion": 5,
+          "queueId": "RLF-SEQUENCE16-RETRY-RECOVERY",
+          "queueSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+          "slot": "F05",
+          "candidateKey": "5bdef90ade7b6fbcbf48ad8fbdc2baf07141ffa3ee82795c4bdcc97654c24cf1",
+          "productUrl": "https://www.fredperry.com/id-en/men/t-shirts/contrast-tape-ringer-t-shirt-m4613-41a.html",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/men/t-shirts/contrast-tape-ringer-t-shirt-m4613-41a.html",
+          "productCode": "M4613",
+          "colourCode": "41A",
+          "displayName": null,
+          "observedPrice": null,
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "transportHttpStatus": 200,
+          "identityKey": "M4613|41A",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/men/t-shirts/contrast-tape-ringer-t-shirt-m4613-41a.html"
+          ],
+          "aliasCount": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/men/t-shirts"
+          ],
+          "sourceSlots": [
+            "F05"
+          ],
+          "sourceMarkets": [
+            "id-en"
+          ],
+          "sourceLocales": [],
+          "sourceRegionGroups": [],
+          "sourceDiscoveryScopes": [
+            "RETRY_RECOVERY"
+          ],
+          "sourceLaneVectorKeys": [
+            "F05|RETRY_RECOVERY"
+          ],
+          "categoryImageEvidence": {
+            "identityKey": "M4613|41A",
+            "productCode": "M4613",
+            "colourCode": "41A",
+            "preferredProductUrl": "https://www.fredperry.com/id-en/men/t-shirts/contrast-tape-ringer-t-shirt-m4613-41a.html",
+            "sourcePageUrl": "https://www.fredperry.com/id-en/men/t-shirts",
+            "sourcePageSha256": "8e05f7c891568ec3ceafd51522e4661e2d6fc96d6ac38b764149d356250d6763",
+            "sourceQueueId": "RLF-OFFICIAL-20260824210614389",
+            "sourceQueueSha256": "2b04b82516ece50c9977f70f5226b1a601795eb88596bcec90a1474a78b3f40c",
+            "sourceArtifact": {
+              "runId": "32777623316",
+              "artifactId": 9538670301,
+              "artifactDigest": "sha256:abba93dce9bd9a70fe6167ec321402ff723970a64234b7b154430a94f8992fdd"
+            },
+            "imageReferences": [
+              {
+                "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/d1d2575542ae7cf224a096c50cc35900/M/4/M4613_41A_V2_Q425_MOD1_FRONT.JPG",
+                "rightsStatus": "UNKNOWN",
+                "ingestionStatus": "NOT_INGESTED",
+                "hostAllowed": true,
+                "assetClass": "PRODUCT_MEDIA"
+              }
+            ],
+            "evidenceStatus": "OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"
+          },
+          "priorFailureReasons": [
+            "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+            "IDENTITY_CAPTURE_NOT_VALID"
+          ],
+          "uniquenessStatus": "CURRENT_RETRY_CODE_COLOUR_IDENTITY",
+          "evidenceStatus": "OFFICIAL_RETRY_RECOVERY_CANDIDATE"
+        }
+      ]
+    },
+    {
+      "slot": "F06",
+      "index": 5,
+      "products": [
+        {
+          "schemaVersion": 5,
+          "queueId": "RLF-SEQUENCE16-RETRY-RECOVERY",
+          "queueSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+          "slot": "F06",
+          "candidateKey": "78e300e9a1a549a0240fe3994aacd64b238e8e69c9c0e8e5fcb255ce19246a25",
+          "productUrl": "https://www.fredperry.com/id-en/kids/kids-twin-tipped-fred-perry-shirt-sy3660-46a.html",
+          "preferredProductUrl": "https://www.fredperry.com/id-en/kids/kids-twin-tipped-fred-perry-shirt-sy3660-46a.html",
+          "productCode": "SY3660",
+          "colourCode": "46A",
+          "displayName": null,
+          "observedPrice": null,
+          "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+          "transportHttpStatus": 200,
+          "identityKey": "SY3660|46A",
+          "aliasUrls": [
+            "https://www.fredperry.com/id-en/kids/kids-twin-tipped-fred-perry-shirt-sy3660-46a.html"
+          ],
+          "aliasCount": 1,
+          "sourcePageUrls": [
+            "https://www.fredperry.com/id-en/kids"
+          ],
+          "sourceSlots": [
+            "F06"
+          ],
+          "sourceMarkets": [
+            "id-en"
+          ],
+          "sourceLocales": [],
+          "sourceRegionGroups": [],
+          "sourceDiscoveryScopes": [
+            "RETRY_RECOVERY"
+          ],
+          "sourceLaneVectorKeys": [
+            "F06|RETRY_RECOVERY"
+          ],
+          "categoryImageEvidence": {
+            "identityKey": "SY3660|46A",
+            "productCode": "SY3660",
+            "colourCode": "46A",
+            "preferredProductUrl": "https://www.fredperry.com/id-en/kids/kids-twin-tipped-fred-perry-shirt-sy3660-46a.html",
+            "sourcePageUrl": "https://www.fredperry.com/id-en/kids",
+            "sourcePageSha256": "2a0d24c0cf20946e4f14fff7439477c9a33e614e459d914ca74444e4388313ae",
+            "sourceQueueId": "RLF-OFFICIAL-20260824174151723",
+            "sourceQueueSha256": "da7a5cbc2c2fd6deea6c3083ad1cfee2a52dcc099c38581a2e3e325a0e7c0008",
+            "sourceArtifact": {
+              "runId": "32758087459",
+              "artifactId": 9531737243,
+              "artifactDigest": "sha256:ef94513a6efafee18bc19c147ee1ff56a5fea52537ad9fdbe8980590681710d6"
+            },
+            "imageReferences": [
+              {
+                "sourceUrl": "https://www.fredperry.com/media/catalog/product/cache/47999abab475dd652fef8cdb7ddad83f/S/Y/SY3660_46A_V2_Q425_FLATSQUARE.JPG",
+                "rightsStatus": "UNKNOWN",
+                "ingestionStatus": "NOT_INGESTED",
+                "hostAllowed": true,
+                "assetClass": "PRODUCT_MEDIA"
+              }
+            ],
+            "evidenceStatus": "OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"
+          },
+          "priorFailureReasons": [
+            "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+            "IDENTITY_CAPTURE_NOT_VALID"
+          ],
+          "uniquenessStatus": "CURRENT_RETRY_CODE_COLOUR_IDENTITY",
+          "evidenceStatus": "OFFICIAL_RETRY_RECOVERY_CANDIDATE"
+        }
+      ]
+    },
+    {
+      "slot": "F07",
+      "index": 6,
+      "products": []
+    },
+    {
+      "slot": "F08",
+      "index": 7,
+      "products": []
+    },
+    {
+      "slot": "F09",
+      "index": 8,
+      "products": []
+    },
+    {
+      "slot": "F10",
+      "index": 9,
+      "products": []
+    },
+    {
+      "slot": "F11",
+      "index": 10,
+      "products": []
+    },
+    {
+      "slot": "F12",
+      "index": 11,
+      "products": []
+    },
+    {
+      "slot": "F13",
+      "index": 12,
+      "products": []
+    },
+    {
+      "slot": "F14",
+      "index": 13,
+      "products": []
+    },
+    {
+      "slot": "F15",
+      "index": 14,
+      "products": []
+    },
+    {
+      "slot": "F16",
+      "index": 15,
+      "products": []
+    },
+    {
+      "slot": "F17",
+      "index": 16,
+      "products": []
+    },
+    {
+      "slot": "F18",
+      "index": 17,
+      "products": []
+    },
+    {
+      "slot": "F19",
+      "index": 18,
+      "products": []
+    },
+    {
+      "slot": "F20",
+      "index": 19,
+      "products": []
+    },
+    {
+      "slot": "F21",
+      "index": 20,
+      "products": []
+    },
+    {
+      "slot": "F22",
+      "index": 21,
+      "products": []
+    },
+    {
+      "slot": "F23",
+      "index": 22,
+      "products": []
+    },
+    {
+      "slot": "F24",
+      "index": 23,
+      "products": []
+    },
+    {
+      "slot": "F25",
+      "index": 24,
+      "products": []
+    },
+    {
+      "slot": "F26",
+      "index": 25,
+      "products": []
+    },
+    {
+      "slot": "F27",
+      "index": 26,
+      "products": []
+    },
+    {
+      "slot": "F28",
+      "index": 27,
+      "products": []
+    },
+    {
+      "slot": "F29",
+      "index": 28,
+      "products": []
+    },
+    {
+      "slot": "F30",
+      "index": 29,
+      "products": []
+    },
+    {
+      "slot": "F31",
+      "index": 30,
+      "products": []
+    },
+    {
+      "slot": "F32",
+      "index": 31,
+      "products": []
+    },
+    {
+      "slot": "F33",
+      "index": 32,
+      "products": []
+    },
+    {
+      "slot": "F34",
+      "index": 33,
+      "products": []
+    },
+    {
+      "slot": "F35",
+      "index": 34,
+      "products": []
+    },
+    {
+      "slot": "F36",
+      "index": 35,
+      "products": []
+    },
+    {
+      "slot": "F37",
+      "index": 36,
+      "products": []
+    },
+    {
+      "slot": "F38",
+      "index": 37,
+      "products": []
+    },
+    {
+      "slot": "F39",
+      "index": 38,
+      "products": []
+    },
+    {
+      "slot": "F40",
+      "index": 39,
+      "products": []
+    },
+    {
+      "slot": "F41",
+      "index": 40,
+      "products": []
+    },
+    {
+      "slot": "F42",
+      "index": 41,
+      "products": []
+    },
+    {
+      "slot": "F43",
+      "index": 42,
+      "products": []
+    },
+    {
+      "slot": "F44",
+      "index": 43,
+      "products": []
+    },
+    {
+      "slot": "F45",
+      "index": 44,
+      "products": []
+    },
+    {
+      "slot": "F46",
+      "index": 45,
+      "products": []
+    },
+    {
+      "slot": "F47",
+      "index": 46,
+      "products": []
+    },
+    {
+      "slot": "F48",
+      "index": 47,
+      "products": []
+    },
+    {
+      "slot": "F49",
+      "index": 48,
+      "products": []
+    },
+    {
+      "slot": "F50",
+      "index": 49,
+      "products": []
+    }
+  ],
+  "sourceMarketCounts": {},
+  "sourceScopeCounts": {
+    "RETRY_RECOVERY": 6
+  },
+  "frontierSha256": "ee2d122e85d2db19521b50d0bd6248067b719e26d66d5221a8273096b203f3df"
+}

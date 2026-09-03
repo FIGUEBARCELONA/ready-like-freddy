@@ -1,0 +1,197 @@
+name: RLF sequence 19 reader media candidate discovery
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence19-reader-media-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-sequence19-reader-media-probe
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare immutable reader transport plan
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      plan_sha: ${{ steps.plan.outputs.plan_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - id: plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFile,appendFile } from 'node:fs/promises';
+          const plan=JSON.parse(await readFile('data/execution/sequence19-reader-media-preflight.json','utf8'));
+          if(!plan.passed||plan.targetSequence!==19||plan.assignmentCount!==50||plan.uniqueReaderUrlCount!==100)throw new Error('Sequence 19 preflight gate failed');
+          const slots=plan.assignments.map(item=>item.slot);
+          if(slots.length!==50||new Set(slots).size!==50)throw new Error('Sequence 19 slot matrix invalid');
+          await appendFile(process.env.GITHUB_OUTPUT,`matrix=${JSON.stringify({slot:slots})}\nplan_sha=${plan.planSha256}\n`);
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence19-reader-plan
+          path: data/execution/sequence19-reader-media-preflight.json
+          retention-days: 30
+
+  reader:
+    name: Reader ${{ matrix.slot }}
+    needs: prepare
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch exclusive reader source, discover candidates and verify direct media
+        shell: bash
+        env:
+          SLOT: ${{ matrix.slot }}
+          EXPECTED_PLAN_SHA: ${{ needs.prepare.outputs.plan_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "execution/sequence19-workers/${SLOT}"
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readFile,writeFile } from 'node:fs/promises';
+
+          const slot=process.env.SLOT;
+          const plan=JSON.parse(await readFile('data/execution/sequence19-reader-media-preflight.json','utf8'));
+          if(plan.planSha256!==process.env.EXPECTED_PLAN_SHA)throw new Error('Sequence 19 plan SHA mismatch');
+          const assignment=plan.assignments.find(item=>item.slot===slot);
+          if(!assignment)throw new Error(`No assignment for ${slot}`);
+          const allowedOfficialHost=host=>host==='fredperry.com'||host.endsWith('.fredperry.com');
+          const identityPattern=new RegExp(`${assignment.productCode}[-_]${assignment.colourCode}(?:[-_.]|$)`,'i');
+          const readerAttempts=[];
+          let selectedReader=null;
+          let readerBody=Buffer.alloc(0);
+          for(const readerUrl of assignment.readerUrls){
+            try{
+              const response=await fetch(readerUrl,{redirect:'follow',signal:AbortSignal.timeout(70000),headers:{'user-agent':'Mozilla/5.0 (compatible; RLF-EvidenceBot/1.0; +https://readylikefreddy.shop)','accept':'text/plain,text/markdown,text/html,application/json;q=0.9,*/*;q=0.8'}});
+              const buffer=Buffer.from(await response.arrayBuffer()).subarray(0,12*1024*1024);
+              const attempt={readerUrl,status:response.status,ok:response.ok,contentType:response.headers.get('content-type'),effectiveUrl:response.url,bytes:buffer.length,bodySha256:createHash('sha256').update(buffer).digest('hex'),error:null};
+              readerAttempts.push(attempt);
+              if(response.ok){selectedReader=attempt;readerBody=buffer;break;}
+            }catch(error){readerAttempts.push({readerUrl,status:null,ok:false,contentType:null,effectiveUrl:null,bytes:0,bodySha256:null,error:error instanceof Error?error.message:String(error)});}
+          }
+          const raw=readerBody.toString('utf8').replace(/\\u002[fF]/g,'/').replace(/\\\//g,'/').replaceAll('&amp;','&');
+          const exactTextOccurrenceCount=(raw.match(new RegExp(`${assignment.productCode}[-_]${assignment.colourCode}`,'gi'))??[]).length;
+          const rawUrls=[...(raw.match(/https?:\/\/[^\s"'<>\\)\]]+/gi)??[])];
+          const relativeUrls=[...(raw.match(/\/(?:media\/catalog\/product|media\/wysiwyg|static\/version[^\s"'<>\\)\]]*)\/[^\s"'<>\\)\]]+/gi)??[])];
+          const officialCandidates=[];
+          for(const value of [...rawUrls,...relativeUrls]){
+            try{
+              const url=new URL(value,assignment.sourceUrl);
+              if(!allowedOfficialHost(url.hostname.toLowerCase()))continue;
+              let pathname;try{pathname=decodeURIComponent(url.pathname);}catch{pathname=url.pathname;}
+              if(!identityPattern.test(pathname))continue;
+              const cleaned=url.toString().replace(/[),.;\]}]+$/g,'');
+              officialCandidates.push(cleaned);
+            }catch{}
+          }
+          const candidates=[...new Set(officialCandidates)].slice(0,50);
+          const directAttempts=[];
+          const verifiedMedia=[];
+          for(const candidateUrl of candidates){
+            try{
+              const response=await fetch(candidateUrl,{redirect:'follow',signal:AbortSignal.timeout(30000),headers:{'user-agent':'Mozilla/5.0 (compatible; RLF-EvidenceBot/1.0; +https://readylikefreddy.shop)','accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'}});
+              const contentType=response.headers.get('content-type')??'';
+              const finalUrl=response.url;
+              const final=new URL(finalUrl);
+              let pathname;try{pathname=decodeURIComponent(final.pathname);}catch{pathname=final.pathname;}
+              const valid=response.status===200&&contentType.toLowerCase().startsWith('image/')&&allowedOfficialHost(final.hostname.toLowerCase())&&identityPattern.test(pathname);
+              let bytes=0,sha256=null;
+              if(valid){const buffer=Buffer.from(await response.arrayBuffer()).subarray(0,12*1024*1024);bytes=buffer.length;sha256=createHash('sha256').update(buffer).digest('hex');}
+              const attempt={candidateUrl,finalUrl,status:response.status,contentType,valid,bytes,sha256,error:null};
+              directAttempts.push(attempt);
+              if(valid)verifiedMedia.push({schemaVersion:1,identityKey:assignment.identityKey,productCode:assignment.productCode,colourCode:assignment.colourCode,sourceUrl:finalUrl,httpStatus:200,contentType,bytes,sha256,sourceReaderUrl:selectedReader?.readerUrl??null,sourceOfficialUrl:assignment.sourceUrl,sourceSlot:slot,verificationStatus:'DIRECT_OFFICIAL_HTTP_200_IMAGE_EXACT_CODE_COLOUR',rightsStatus:'UNKNOWN',ingestionStatus:'NOT_INGESTED',observedAt:new Date().toISOString()});
+            }catch(error){directAttempts.push({candidateUrl,finalUrl:null,status:null,contentType:null,valid:false,bytes:0,sha256:null,error:error instanceof Error?error.message:String(error)});}
+          }
+          const record={schemaVersion:1,slot,planSha256:plan.planSha256,assignment,readerAttempts,selectedReader,readerFetchOk:Boolean(selectedReader),exactTextOccurrenceCount,officialCandidateCount:candidates.length,officialCandidateUrls:candidates,directAttempts,verifiedMedia,verifiedMediaCount:verifiedMedia.length,observedAt:new Date().toISOString()};
+          record.recordSha256=createHash('sha256').update(JSON.stringify(record)).digest('hex');
+          const out=`execution/sequence19-workers/${slot}`;
+          await writeFile(`${out}/record.json`,`${JSON.stringify(record,null,2)}\n`);
+          await writeFile(`${out}/verified-media.json`,`${JSON.stringify(verifiedMedia,null,2)}\n`);
+          console.log(JSON.stringify({slot,identityKey:assignment.identityKey,readerFetchOk:record.readerFetchOk,selectedReaderStatus:selectedReader?.status??null,readerBytes:selectedReader?.bytes??0,exactTextOccurrenceCount,officialCandidateCount:candidates.length,verifiedMediaCount:verifiedMedia.length},null,2));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence19-reader-worker-${{ matrix.slot }}
+          path: execution/sequence19-workers/${{ matrix.slot }}
+          retention-days: 30
+
+  consolidate:
+    name: Consolidate sequence 19 reader candidates
+    needs: [prepare,reader]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rlf-sequence19-reader-worker-*
+          path: /tmp/rlf-sequence19/workers
+      - name: Audit F01-F50 reader records and consolidate verified media
+        shell: bash
+        env:
+          EXPECTED_PLAN_SHA: ${{ needs.prepare.outputs.plan_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p execution/sequence19-consolidated data/execution
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readdir,readFile,writeFile } from 'node:fs/promises';
+          import { join } from 'node:path';
+          const plan=JSON.parse(await readFile('data/execution/sequence19-reader-media-preflight.json','utf8'));
+          if(plan.planSha256!==process.env.EXPECTED_PLAN_SHA)throw new Error('Sequence 19 consolidator plan mismatch');
+          async function walk(path){const out=[];for(const entry of await readdir(path,{withFileTypes:true})){const full=join(path,entry.name);if(entry.isDirectory())out.push(...await walk(full));else out.push(full);}return out;}
+          const files=await walk('/tmp/rlf-sequence19/workers');
+          const records=[];for(const path of files.filter(path=>path.endsWith('/record.json')))records.push(JSON.parse(await readFile(path,'utf8')));
+          const slots=records.map(item=>item.slot).sort();const expectedSlots=Array.from({length:50},(_,i)=>`F${String(i+1).padStart(2,'0')}`);
+          if(records.length!==50||new Set(slots).size!==50||JSON.stringify(slots)!==JSON.stringify(expectedSlots))throw new Error('Sequence 19 requires 50 unique records');
+          if(records.some(item=>item.planSha256!==plan.planSha256))throw new Error('Sequence 19 worker plan mismatch');
+          const sources=records.map(item=>item.assignment.sourceUrl);if(new Set(sources).size!==50)throw new Error('Sequence 19 source overlap');
+          const allowedHost=host=>host==='fredperry.com'||host.endsWith('.fredperry.com');
+          const verifiedRaw=records.flatMap(item=>item.verifiedMedia);
+          for(const item of verifiedRaw){const u=new URL(item.sourceUrl);const p=new RegExp(`${item.productCode}[-_]${item.colourCode}(?:[-_.]|$)`,'i');if(!allowedHost(u.hostname.toLowerCase())||item.httpStatus!==200||!String(item.contentType).toLowerCase().startsWith('image/')||!p.test(decodeURIComponent(u.pathname))||!item.sha256||item.bytes<1)throw new Error(`Invalid verified media: ${item.sourceUrl}`);}
+          const verified=[...new Map(verifiedRaw.map(item=>[`${item.identityKey}|${item.sourceUrl}|${item.sha256}`,item])).values()].sort((a,b)=>a.identityKey.localeCompare(b.identityKey)||a.sourceUrl.localeCompare(b.sourceUrl));
+          const candidateUrls=[...new Set(records.flatMap(item=>item.officialCandidateUrls))].sort();
+          const readerStatusCounts=records.flatMap(item=>item.readerAttempts).reduce((m,item)=>{const k=String(item.status??'null');m[k]=(m[k]??0)+1;return m;},{});
+          const identityResults=plan.assignments.reduce((map,item)=>{map[item.identityKey]??={identityKey:item.identityKey,productCode:item.productCode,colourCode:item.colourCode,sourceCount:0,readerSuccessCount:0,exactTextOccurrenceSourceCount:0,candidateUrls:[],verifiedMedia:[]};return map;},{});
+          for(const record of records){const result=identityResults[record.assignment.identityKey];result.sourceCount++;if(record.readerFetchOk)result.readerSuccessCount++;if(record.exactTextOccurrenceCount>0)result.exactTextOccurrenceSourceCount++;result.candidateUrls.push(...record.officialCandidateUrls);result.verifiedMedia.push(...record.verifiedMedia);}
+          const identityRows=Object.values(identityResults).map(item=>({...item,candidateUrls:[...new Set(item.candidateUrls)].sort(),verifiedMedia:[...new Map(item.verifiedMedia.map(media=>[`${media.sourceUrl}|${media.sha256}`,media])).values()]})).sort((a,b)=>a.identityKey.localeCompare(b.identityKey));
+          const totals={sourceCount:records.length,uniqueSourceCount:new Set(sources).size,readerAttemptCount:records.reduce((s,item)=>s+item.readerAttempts.length,0),readerSuccessCount:records.filter(item=>item.readerFetchOk).length,readerFailureCount:records.filter(item=>!item.readerFetchOk).length,exactTextOccurrenceSourceCount:records.filter(item=>item.exactTextOccurrenceCount>0).length,officialCandidateRawCount:records.reduce((s,item)=>s+item.officialCandidateCount,0),officialCandidateUniqueCount:candidateUrls.length,directVerificationAttemptCount:records.reduce((s,item)=>s+item.directAttempts.length,0),verifiedMediaRawCount:verifiedRaw.length,verifiedMediaCount:verified.length,identitiesWithVerifiedMedia:identityRows.filter(item=>item.verifiedMedia.length>0).length};
+          const manifest={schemaVersion:1,runId:process.env.GITHUB_RUN_ID,generatedAt:new Date().toISOString(),sourceCommitSha:process.env.GITHUB_SHA,phaseId:'READER_OFFICIAL_MEDIA_CANDIDATE_DISCOVERY_01',planSha256:plan.planSha256,workerCount:50,orchestrationStatus:'FIFTY_OF_FIFTY_EXCLUSIVE_READER_SOURCES_CONSOLIDATED',acceptancePolicy:plan.acceptancePolicy,readerStatusCounts,totals,identityResults:identityRows,status:verified.length?'DIRECT_OFFICIAL_MEDIA_VERIFIED_REQUIRES_SEPARATE_RETRY_RECOVERY':'READER_CANDIDATE_DISCOVERY_COMPLETE_NO_DIRECTLY_VERIFIED_MEDIA'};
+          manifest.passed=manifest.workerCount===50&&totals.sourceCount===50&&totals.uniqueSourceCount===50;
+          manifest.manifestSha256=createHash('sha256').update(JSON.stringify(manifest)).digest('hex');
+          await writeFile('execution/sequence19-consolidated/records.json',`${JSON.stringify(records,null,2)}\n`);await writeFile('execution/sequence19-consolidated/candidate-urls.json',`${JSON.stringify(candidateUrls,null,2)}\n`);await writeFile('execution/sequence19-consolidated/verified-media.json',`${JSON.stringify(verified,null,2)}\n`);await writeFile('execution/sequence19-consolidated/manifest.json',`${JSON.stringify(manifest,null,2)}\n`);await writeFile('data/execution/sequence19-reader-media-manifest.json',`${JSON.stringify(manifest,null,2)}\n`);await writeFile('data/execution/sequence19-reader-media-evidence.json',`${JSON.stringify({schemaVersion:1,runId:manifest.runId,planSha256:plan.planSha256,candidateUrls,verifiedMedia:verified,records:records.map(item=>({slot:item.slot,identityKey:item.assignment.identityKey,sourceUrl:item.assignment.sourceUrl,readerAttempts:item.readerAttempts,selectedReader:item.selectedReader,readerFetchOk:item.readerFetchOk,exactTextOccurrenceCount:item.exactTextOccurrenceCount,officialCandidateCount:item.officialCandidateCount,verifiedMediaCount:item.verifiedMediaCount,recordSha256:item.recordSha256}))},null,2)}\n`);
+          console.log(JSON.stringify(manifest,null,2));if(!manifest.passed)throw new Error('Sequence 19 consolidated audit failed');
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence19-reader-media-${{ github.run_id }}
+          path: execution/sequence19-consolidated
+          retention-days: 30
+      - name: Persist sequence 19 reader checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823';git config user.name 'github-actions[bot]';git config user.email '41898282+github-actions[bot]@users.noreply.github.com';git add data/execution/sequence19-reader-media-manifest.json data/execution/sequence19-reader-media-evidence.json;git commit -m "Persist sequence 19 reader media candidates ${GITHUB_RUN_ID}";for attempt in 1 2 3 4 5;do git fetch origin "$branch";if git rebase "origin/$branch"&&git push origin "HEAD:$branch";then exit 0;fi;git rebase --abort 2>/dev/null||true;sleep $((attempt*3));done;exit 1

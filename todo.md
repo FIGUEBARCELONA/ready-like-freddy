@@ -1,0 +1,47 @@
+# Project TODO
+
+- [x] Definir el contrato funcional y los límites fail-closed del dashboard RLF.
+- [x] Documentar y aplicar la separación de alcance: KB/visor documental frente a etiquetas, pool comercial y proveedores externos.
+- [x] Modelar workstreams F01–F50, tareas atómicas, dependencias, incidencias, eventos y reasignaciones en la base de datos.
+- [x] Modelar ámbitos exclusivos de investigación, huellas de alcance y detección bloqueante de solapamiento entre workstreams.
+- [x] Garantizar que los 50 workstreams solo aceptan ámbitos de KB mundial documental y no comercial.
+- [x] Configurar los 50 workstreams para una cobertura progresiva mundial de productos y fábricas desde los años 1940 hasta agosto de 2026, sin afirmar exhaustividad ni inferir evidencia ausente.
+- [x] Aplicar y probar un control transversal: prohibidos datos, estados, métricas, imágenes o evidencias simuladas, placeholder, fake o inventadas.
+- [x] Cubrir con pruebas de API el rechazo de contenido fabricado en todas las mutaciones operativas.
+- [x] Extender la barrera de realidad a razones libres de reasignación, invalidación y verificación de manifestos.
+- [x] Revisar la UI operativa para eliminar cualquier valor precargado o texto de ejemplo restante.
+- [x] Extender la revisión anti-placeholders a toda la UI servida y a los componentes compartidos del dashboard, con una comprobación reproducible.
+- [x] Derivar y escanear exhaustivamente todos los módulos de interfaz alcanzables desde las rutas autenticadas, y repetir la verificación visual de navegación.
+- [x] Implementar una cola dinámica persistente con bloqueo por dependencia y auditoría inmutable de transiciones.
+- [x] Implementar caché compartida de verificaciones con procedencia, URL, locale, SHA-256, timestamps e invalidación controlada.
+- [x] Implementar manifiestos e importaciones canónicas RLF de solo lectura con checksum, versionado y registro de importación.
+- [x] Implementar API tRPC protegida con permisos, validaciones fail-closed, prohibición de mappings SKU y protección de derechos visuales.
+- [x] Construir un dashboard interno autenticado con overview, cuadrícula F01–F50, cola, auditoría, caché, importaciones y calibración.
+- [x] Respetar y documentar el libro de estilo visual existente del proyecto.
+- [x] Añadir vista de calibración que acepte exclusivamente métricas y registros canónicos verificados.
+- [x] Construir el visor documental RLF sobre datos canónicos de solo lectura, sin comercio, imágenes no acreditadas ni enlaces de compra.
+- [x] Definir el protocolo visual forense por pieza única: 4 vistas estándar y 5–6 macros canónicas con roles no solapados.
+- [x] Modelar manifiestos visuales con hash, derechos, custodia, escala, rol de captura, variante exacta y QA fail-closed.
+- [x] Bloquear en la aplicación cualquier asset visual sin derechos acreditados, duplicado, desalineado con la variante o incompleto.
+- [x] Mantener en cuarentena los assets con derechos `UNKNOWN` o `REJECTED` y excluirlos de todo estado operativo del visor.
+- [x] Validar la alineación de cada asset con una variante exacta documentada antes de permitir la validación de su manifiesto.
+- [x] Añadir pruebas de API para el flujo visual de registro, revisión de derechos, validación de manifiesto y resumen del visor.
+- [ ] Probar la transición de revisión de derechos `UNKNOWN` a `ACREDITED` o `REJECTED`, el bloqueo de rerevisión y el efecto sobre el manifiesto.
+- [ ] Probar el bloqueo, promoción y trazabilidad de tareas con dependencias en la cola.
+- [ ] Probar la protección de procedimientos autenticados y administrativos contra usuarios no autorizados.
+- [ ] Probar el registro y verificación de manifestos canónicos en casos íntegros y fallidos.
+- [x] Separar en la API y la interfaz los conteos de assets totales, acreditados, pendientes y rechazados.
+- [x] Definir niveles `VERIFIED`, `SUPPORTED`, `INCONCLUSIVE` y `CONTRADICTED` para autenticidad, identidad y conservación; prohibir certificaciones desde evidencia insuficiente.
+- [x] Diferenciar la tria por fotos y texto de proveedor de la verificación final con paquete forense y revisión humana de la pieza física.
+- [x] Definir y modelar detalles discriminantes: etiquetas, corona de laurel, costuras, piqué/tricot, botones, ferratges, medidas, composición, origen y coherencia temporal.
+- [x] Definir niveles `VERIFIED`, `SUPPORTED`, `INCONCLUSIVE` y `CONTRADICTED` para autenticidad, identidad y conservación; prohibir certificaciones desde evidencia insuficiente.
+- [x] Diferenciar la tria por fotos y texto de proveedor de la verificación final con paquete forense y revisión humana de la pieza física.
+- [x] Escribir pruebas unitarias y de integración para estados, dependencias, permisos, importaciones y controles fail-closed.
+- [ ] Verificar visualmente el dashboard en escritorio y móvil, y ejecutar una prueba completa de no regresión.
+- [ ] Bloquear el inicio de nuevas búsquedas documentales hasta que el dashboard, la cola, las particiones, el visor y el QA integral estén validados.
+
+- [x] Crear backup autocontenido del proyecto actual excluyendo solo artefactos regenerables y secretos.
+- [x] Dividir el backup en diez partes y generar hashes de cada parte y del archivo reconstruido.
+- [x] Verificar la reconstrucción íntegra del backup antes de entregarlo.
+- [ ] Continuar el QA pendiente después de entregar el backup, sin iniciar búsquedas documentales antes del cierre de la aplicación.
+

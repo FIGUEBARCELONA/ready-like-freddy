@@ -1,0 +1,290 @@
+name: RLF repair sequence 9 delta hash
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-repair-sequence9-delta-hash.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: rlf-repair-sequence9-delta-hash
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download immutable sequence 9 artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/seq9-product /tmp/seq9-discovery
+          mkdir -p /tmp/seq9-product /tmp/seq9-discovery
+          gh run download 32748405808 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name rlf-kb-product-pages-32748405808 \
+            --dir /tmp/seq9-product
+          gh run download 32748405808 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name rlf-kb-official-discovery-32748405808 \
+            --dir /tmp/seq9-discovery
+          test "$(gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/9528238324" --jq .digest)" = \
+            'sha256:5bea19597f12cda9c755285fb6116719d17eb11e06070b90de3e6e8ba3a78763'
+          test "$(gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/9528164175" --jq .digest)" = \
+            'sha256:ff76608cae233c52913efe7db5bf471f641de171afb5295d75a17c5f300a9a96'
+      - name: Reconstruct persisted delta from signed artifact content
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/execution/progress-delta-corrections
+          ORIGINAL_BLOB_SHA="$(git hash-object data/execution/progress-deltas/32748405808.json)"
+          export ORIGINAL_BLOB_SHA
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const crypto = require('node:crypto');
+          const deltaPath = 'data/execution/progress-deltas/32748405808.json';
+          const deltasDir = 'data/execution/progress-deltas';
+          const correctionPath = 'data/execution/progress-delta-corrections/32748405808.json';
+          const productDir = '/tmp/seq9-product/products-consolidated';
+          const discoveryDir = '/tmp/seq9-discovery/consolidated';
+          const expectedOriginalBlobSha = 'd83da1132dab8e5e917d43b7fd390be031672ae6';
+          const expectedPreviousClaim = '35bb930c717de65b61d1a5aa4b4602575d703bf45fe70cdca20dbb01fe4c2b03';
+          const sha256File = file => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+          const stableValue = value => {
+            if (Array.isArray(value)) return value.map(stableValue);
+            if (!value || typeof value !== 'object') return value;
+            return Object.fromEntries(Object.keys(value).sort().map(key => [key, stableValue(value[key])]));
+          };
+          const stableJson = value => JSON.stringify(stableValue(value));
+          if (process.env.ORIGINAL_BLOB_SHA !== expectedOriginalBlobSha) {
+            throw new Error(`Unexpected original persisted delta blob: ${process.env.ORIGINAL_BLOB_SHA}`);
+          }
+          const persisted = JSON.parse(fs.readFileSync(deltaPath, 'utf8'));
+          const sourceDeltaPath = path.join(productDir, 'product-progress-delta.json');
+          const productManifestPath = path.join(productDir, 'product-manifest.json');
+          const discoveryManifestPath = path.join(discoveryDir, 'manifest.json');
+          const productFrontierPath = path.join(discoveryDir, 'product-frontier.json');
+          const sourceDelta = JSON.parse(fs.readFileSync(sourceDeltaPath, 'utf8'));
+          const productManifest = JSON.parse(fs.readFileSync(productManifestPath, 'utf8'));
+          const discoveryManifest = JSON.parse(fs.readFileSync(discoveryManifestPath, 'utf8'));
+          const productFrontier = JSON.parse(fs.readFileSync(productFrontierPath, 'utf8'));
+          const sourceDeltaFileSha256 = sha256File(sourceDeltaPath);
+          const productManifestFileSha256 = sha256File(productManifestPath);
+          const discoveryManifestFileSha256 = sha256File(discoveryManifestPath);
+          if (persisted.runId !== '32748405808' || sourceDelta.runId !== '32748405808') {
+            throw new Error('Sequence 9 runId mismatch');
+          }
+          if (persisted.ledgerDeltaSha256 !== expectedPreviousClaim) {
+            throw new Error(`Unexpected previous ledger hash claim: ${persisted.ledgerDeltaSha256}`);
+          }
+          if (sourceDeltaFileSha256 !== '9168a17b44008b33cac30464653b46d6ce52eece126e43f0df326e6402101bf1') {
+            throw new Error(`Source delta file hash mismatch: ${sourceDeltaFileSha256}`);
+          }
+          if (sourceDelta.deltaSha256 !== '36519a5f5268ef0e48d90f0516d7daae9a3da56127972c8971d47c2bf6789e85') {
+            throw new Error(`Source delta logical hash mismatch: ${sourceDelta.deltaSha256}`);
+          }
+          if (productManifestFileSha256 !== '538248c21d379e67aaaae0ddfea07ded5d043e7cb9d2a26c8796a1ff2d33b58d' ||
+              productManifest.manifestSha256 !== 'b0f6e244c2a80f0ff9cff9d261c203ceef459f3d89c83458f6cb0622878a5389') {
+            throw new Error('Product manifest hash mismatch');
+          }
+          if (discoveryManifestFileSha256 !== '37c05de635bb5fbacf1972c4d9423d9dcf709e6db838a7b15ccffe30ab55df24' ||
+              discoveryManifest.manifestSha256 !== 'c62ac7c3d7bf4cc1bbe73ee00fa2ccdbbd38b500eb7a2f00e461ce494bc3e163') {
+            throw new Error('Discovery manifest hash mismatch');
+          }
+          if (sourceDelta.completedIdentityKeys.length !== 95 || sourceDelta.failedIdentities.length !== 2) {
+            throw new Error('Unexpected source delta cardinality');
+          }
+          if (productManifest.totals.successfulIdentityCaptureCount !== 95 ||
+              productManifest.totals.failedIdentityCaptureCount !== 2 ||
+              productFrontier.selectedIdentityCount !== 97) {
+            throw new Error('Manifest/frontier cardinality mismatch');
+          }
+          if (sourceDelta.frontierSha256 !== productFrontier.frontierSha256 ||
+              sourceDelta.selectedIdentitySha256 !== productFrontier.selectedIdentitySha256) {
+            throw new Error('Source delta/frontier hash mismatch');
+          }
+          const prior = new Set(
+            JSON.parse(fs.readFileSync('data/execution/product-progress.json', 'utf8')).completed?.identityKeys ?? [],
+          );
+          const priorDeltaNames = fs.readdirSync(deltasDir)
+            .filter(name => name.endsWith('.json') && name !== '32748405808.json')
+            .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+          for (const name of priorDeltaNames) {
+            const priorDelta = JSON.parse(fs.readFileSync(path.join(deltasDir, name), 'utf8'));
+            for (const identityKey of priorDelta.completedIdentityKeys ?? []) prior.add(identityKey);
+          }
+          const sourceKeys = [...sourceDelta.completedIdentityKeys];
+          const sourceKeySet = new Set(sourceKeys);
+          const persistedKeys = [...(persisted.completedIdentityKeys ?? [])];
+          const persistedKeySet = new Set(persistedKeys);
+          const sourceOverlapWithPrior = sourceKeys.filter(identityKey => prior.has(identityKey)).sort();
+          const missingFromPersisted = sourceKeys.filter(identityKey => !persistedKeySet.has(identityKey)).sort();
+          const extraneousInPersisted = persistedKeys.filter(identityKey => !sourceKeySet.has(identityKey)).sort();
+          if (prior.size !== 906 || sourceOverlapWithPrior.length !== 0) {
+            throw new Error(`Source identity overlap audit failed: ${JSON.stringify({priorSize: prior.size, sourceOverlapWithPrior})}`);
+          }
+          const reconstructed = {
+            ...persisted,
+            productManifestSha256: productManifest.manifestSha256,
+            productManifestFileSha256,
+            sourceProgressDeltaSha256: sourceDelta.deltaSha256,
+            sourceProgressDeltaFileSha256: sourceDeltaFileSha256,
+            discoveryManifestSha256: discoveryManifest.manifestSha256,
+            discoveryManifestFileSha256,
+            frontier: {
+              candidateUrlCount: productFrontier.uniqueProductUrlCount,
+              candidateIdentityCount: productFrontier.uniqueProductIdentityCount,
+              previouslyCompletedIdentityCount: productFrontier.previouslyCompletedIdentityCount,
+              remainingIdentityCountBeforeSelection: productFrontier.remainingIdentityCountBeforeSelection,
+              selectedIdentityCount: productFrontier.selectedIdentityCount,
+              retryIdentityCount: productFrontier.retryIdentityCount,
+              frontierSha256: productFrontier.frontierSha256,
+              selectedIdentitySha256: productFrontier.selectedIdentitySha256,
+            },
+            completedIdentityKeys: sourceKeys,
+            capturedProductUrlCount: sourceDelta.capturedProductUrlCount,
+            failedIdentities: sourceDelta.failedIdentities,
+            counters: sourceDelta.counters,
+            metadataGaps: sourceDelta.metadataGaps,
+            qualityGatePassed: sourceDelta.qualityGatePassed,
+          };
+          delete reconstructed.ledgerDeltaSha256;
+          reconstructed.ledgerDeltaSha256 = crypto
+            .createHash('sha256')
+            .update(stableJson(reconstructed))
+            .digest('hex');
+          const correction = {
+            schemaVersion: 3,
+            runId: persisted.runId,
+            correctedAt: new Date().toISOString(),
+            targetPath: deltaPath,
+            originalPersistedBlobSha: process.env.ORIGINAL_BLOB_SHA,
+            originalPersistedLedgerDeltaSha256: expectedPreviousClaim,
+            correctedLedgerDeltaSha256: reconstructed.ledgerDeltaSha256,
+            correctionScope: 'ARTIFACT_DERIVED_DELTA_CONTENT_RECONSTRUCTION',
+            identityAndCounterFieldsChanged: true,
+            originalPersistedCompletedIdentityCount: persistedKeys.length,
+            sourceArtifactCompletedIdentityCount: sourceKeys.length,
+            netNewIdentityCount: sourceKeys.length - sourceOverlapWithPrior.length,
+            sourceOverlapWithPrior,
+            missingFromPersisted,
+            extraneousInPersisted,
+            sourceArtifact: {
+              productArtifactId: 9528238324,
+              productArtifactDigest: 'sha256:5bea19597f12cda9c755285fb6116719d17eb11e06070b90de3e6e8ba3a78763',
+              discoveryArtifactId: 9528164175,
+              discoveryArtifactDigest: 'sha256:ff76608cae233c52913efe7db5bf471f641de171afb5295d75a17c5f300a9a96',
+              productManifestSha256: productManifest.manifestSha256,
+              productManifestFileSha256,
+              sourceProgressDeltaSha256: sourceDelta.deltaSha256,
+              sourceProgressDeltaFileSha256: sourceDeltaFileSha256,
+              discoveryManifestSha256: discoveryManifest.manifestSha256,
+              discoveryManifestFileSha256,
+              frontierSha256: productFrontier.frontierSha256,
+              selectedIdentitySha256: productFrontier.selectedIdentitySha256,
+            },
+            reason: 'PERSISTED_CHECKPOINT_IDENTITY_KEYS_DID_NOT_MATCH_THE_SIGNED_PRODUCT_PROGRESS_DELTA_ARTIFACT',
+          };
+          fs.writeFileSync(deltaPath, `${JSON.stringify(reconstructed, null, 2)}\n`);
+          fs.writeFileSync(correctionPath, `${JSON.stringify(correction, null, 2)}\n`);
+          console.log(JSON.stringify({
+            correctedLedgerDeltaSha256: reconstructed.ledgerDeltaSha256,
+            originalPersistedCompletedIdentityCount: persistedKeys.length,
+            sourceArtifactCompletedIdentityCount: sourceKeys.length,
+            missingFromPersistedCount: missingFromPersisted.length,
+            extraneousInPersistedCount: extraneousInPersisted.length,
+            sourceOverlapWithPrior,
+          }, null, 2));
+          NODE
+      - name: Rebuild exact cumulative ledger after artifact reconstruction
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from 'node:fs/promises';
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          const state = await loadProgressLedger();
+          const correction = JSON.parse(await readFile('data/execution/progress-delta-corrections/32748405808.json', 'utf8'));
+          const expected = {
+            identityCount: 1001,
+            productUrlCaptureCount: 1641,
+            imageCount: 8847,
+            materialCount: 1332,
+            manufacturingClaimCount: 59,
+            descriptionMissing: 470,
+            priceMissing: 414,
+            materialMissing: 66,
+            retryKeys: ['B2328|560', 'HW2300|843'],
+            deltaCount: 4,
+            sourceArtifactCompletedIdentityCount: 95,
+            netNewIdentityCount: 95,
+            sourceOverlapWithPriorCount: 0,
+          };
+          const actual = {
+            identityCount: state.completed.identityCount,
+            productUrlCaptureCount: state.completed.productUrlCaptureCount,
+            imageCount: state.counters.officialProductImageReferenceCount,
+            materialCount: state.counters.materialEvidenceCount,
+            manufacturingClaimCount: state.counters.manufacturingClaimCount,
+            descriptionMissing: state.metadataGaps.descriptionMissingIdentityCount,
+            priceMissing: state.metadataGaps.priceMissingIdentityCount,
+            materialMissing: state.metadataGaps.materialMissingIdentityCount,
+            retryKeys: state.retry.identities.map(item => item.identityKey).sort(),
+            deltaCount: state.deltaCount,
+            sourceArtifactCompletedIdentityCount: correction.sourceArtifactCompletedIdentityCount,
+            netNewIdentityCount: correction.netNewIdentityCount,
+            sourceOverlapWithPriorCount: correction.sourceOverlapWithPrior.length,
+            factoryVerifiedCount: state.counters.factoryVerifiedCount,
+            globalCanonicalProductCount: state.counters.globalCanonicalProductCount,
+            ledgerSha256: state.ledgerSha256,
+          };
+          const mismatches = [];
+          for (const key of ['identityCount','productUrlCaptureCount','imageCount','materialCount','manufacturingClaimCount','descriptionMissing','priceMissing','materialMissing','deltaCount','sourceArtifactCompletedIdentityCount','netNewIdentityCount','sourceOverlapWithPriorCount']) {
+            if (actual[key] !== expected[key]) mismatches.push([key, actual[key], expected[key]]);
+          }
+          if (JSON.stringify(actual.retryKeys) !== JSON.stringify(expected.retryKeys)) {
+            mismatches.push(['retryKeys', actual.retryKeys, expected.retryKeys]);
+          }
+          if (actual.factoryVerifiedCount !== 0) mismatches.push(['factoryVerifiedCount', actual.factoryVerifiedCount, 0]);
+          if (actual.globalCanonicalProductCount !== 0) mismatches.push(['globalCanonicalProductCount', actual.globalCanonicalProductCount, 0]);
+          const checkpoint = {
+            schemaVersion: 3,
+            sourceRunId: '32748405808',
+            generatedAt: new Date().toISOString(),
+            expected,
+            actual,
+            mismatches,
+            passed: mismatches.length === 0,
+          };
+          await writeFile('data/execution/sequence9-ledger-checkpoint.json', `${JSON.stringify(checkpoint, null, 2)}\n`);
+          console.log(JSON.stringify(checkpoint, null, 2));
+          if (mismatches.length) throw new Error(`Sequence 9 ledger mismatch: ${JSON.stringify(mismatches)}`);
+          NODE
+      - name: Commit audited artifact-derived reconstruction
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/execution/progress-deltas/32748405808.json \
+            data/execution/progress-delta-corrections/32748405808.json \
+            data/execution/sequence9-ledger-checkpoint.json
+          git commit -m 'Reconstruct sequence 9 delta from signed artifacts'
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
+          git push origin HEAD:feature/rlf-execution-backend-20260823

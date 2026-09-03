@@ -1,0 +1,134 @@
+name: RLF sequence 18 live official media preflight
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence18-live-media-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-sequence18-live-media-preflight
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Build exact unique F01-F50 live probe plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/execution
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { writeFile } from 'node:fs/promises';
+
+          const targets={
+            'HW2300|843':{identityKey:'HW2300|843',productCode:'HW2300',colourCode:'843'},
+            'M1588|81B':{identityKey:'M1588|81B',productCode:'M1588',colourCode:'81B'},
+            'M1588|84B':{identityKey:'M1588|84B',productCode:'M1588',colourCode:'84B'},
+          };
+          const knownPages=[
+            ['HW2300|843','https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html'],
+            ['HW2300|843','https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html'],
+            ['HW2300|843','https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html'],
+            ['HW2300|843','https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html'],
+            ['M1588|81B','https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html'],
+            ['M1588|81B','https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html'],
+            ['M1588|84B','https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html'],
+            ['M1588|84B','https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html'],
+          ].map(([identityKey,url])=>({
+            ...targets[identityKey],
+            probeType:'KNOWN_OFFICIAL_PRODUCT_PAGE',
+            probeUrl:url,
+            derivation:'SEQUENCE17_VERIFIED_OFFICIAL_PAGE_ALIAS',
+          }));
+          const localeMap={
+            'HW2300|843':['ae-en','eg-en','sa-en','gb-en','eu-en','au-en','us-en'],
+            'M1588|81B':['eu-de','eu-es','gb-en','eu-en','us-en','au-en','ae-en'],
+            'M1588|84B':['eu-de','eu-es','gb-en','eu-en','us-en','au-en','ae-en'],
+          };
+          const searchProbes=[];
+          for(const [identityKey,locales] of Object.entries(localeMap)){
+            const target=targets[identityKey];
+            for(const locale of locales){
+              for(const queryVariant of [`${target.productCode}+${target.colourCode}`,`${target.productCode}-${target.colourCode}`]){
+                searchProbes.push({
+                  ...target,
+                  probeType:'OFFICIAL_MAGENTO_CATALOG_SEARCH',
+                  probeUrl:`https://www.fredperry.com/${locale}/catalogsearch/result/?q=${queryVariant}`,
+                  derivation:`EXACT_CODE_COLOUR_SEARCH_${locale}_${queryVariant.includes('+')?'SPACE':'HYPHEN'}`,
+                });
+              }
+            }
+          }
+          const probes=[...knownPages,...searchProbes];
+          const urls=probes.map(item=>item.probeUrl);
+          const slots=probes.map((item,index)=>({...item,slot:`F${String(index+1).padStart(2,'0')}`,index}));
+          const invalidHosts=slots.filter(item=>{const u=new URL(item.probeUrl);return u.protocol!=='https:'||!(u.hostname==='fredperry.com'||u.hostname.endsWith('.fredperry.com'));});
+          const targetCounts=Object.fromEntries(Object.keys(targets).map(key=>[key,slots.filter(item=>item.identityKey===key).length]));
+          const unsigned={
+            schemaVersion:1,
+            generatedAt:new Date().toISOString(),
+            sourceCommitSha:process.env.GITHUB_SHA,
+            targetSequence:18,
+            phaseId:'LIVE_OFFICIAL_MEDIA_PROBE_01',
+            acceptancePolicy:{
+              officialHostRequired:true,
+              exactCodeColourPathRequired:true,
+              mediaHttpStatusRequired:200,
+              mediaContentTypePrefixRequired:'image/',
+              candidateProbeIsNotEvidence:true,
+              transformedReaderMediaVerificationProhibited:true,
+              factoryInferenceProhibited:true,
+              priceVerificationProhibited:true,
+            },
+            targetIdentities:Object.values(targets),
+            probeCount:slots.length,
+            uniqueProbeUrlCount:new Set(urls).size,
+            assignmentCount:slots.length,
+            nonemptyLaneCount:slots.length,
+            knownOfficialPageProbeCount:knownPages.length,
+            officialSearchProbeCount:searchProbes.length,
+            targetCounts,
+            duplicateProbeUrls:urls.filter((url,index)=>urls.indexOf(url)!==index),
+            invalidHosts:invalidHosts.map(item=>item.probeUrl),
+            assignments:slots,
+          };
+          const plan={...unsigned,planSha256:createHash('sha256').update(JSON.stringify(unsigned)).digest('hex')};
+          plan.passed=
+            plan.probeCount===50 && plan.uniqueProbeUrlCount===50 &&
+            plan.assignmentCount===50 && plan.nonemptyLaneCount===50 &&
+            plan.knownOfficialPageProbeCount===8 && plan.officialSearchProbeCount===42 &&
+            plan.duplicateProbeUrls.length===0 && plan.invalidHosts.length===0 &&
+            Object.values(plan.targetCounts).reduce((a,b)=>a+b,0)===50 &&
+            plan.assignments.every((item,index)=>item.slot===`F${String(index+1).padStart(2,'0')}`);
+          await writeFile('data/execution/sequence18-live-media-preflight.json',`${JSON.stringify(plan,null,2)}\n`);
+          console.log(JSON.stringify({...plan,assignments:plan.assignments.map(item=>({slot:item.slot,identityKey:item.identityKey,probeType:item.probeType,probeUrl:item.probeUrl}))},null,2));
+          if(!plan.passed) throw new Error('Sequence 18 live media preflight failed');
+          NODE
+      - name: Publish exact sequence 18 preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence18-live-media-preflight.json
+          git commit -m 'Persist sequence 18 fifty-lane live official media preflight'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1

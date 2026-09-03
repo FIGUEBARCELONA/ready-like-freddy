@@ -1,0 +1,115 @@
+name: RLF validation proof
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-validation-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-validation-proof
+  cancel-in-progress: true
+
+jobs:
+  prove:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enable pinned pnpm
+        run: corepack enable
+      - name: Execute complete sequence 19 validation
+        id: validate
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            pnpm install --frozen-lockfile
+            find scripts/execution -name '*.mjs' -print0 | sort -z | xargs -0 -n1 node --check
+            node --input-type=module <<'NODE'
+          import { readdir, readFile, writeFile } from 'node:fs/promises';
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
+
+          const identity=await loadProgressLedger();
+          const sourcePages=await loadSourcePageLedger();
+          const preflight=JSON.parse(await readFile('data/execution/sequence19-reader-media-preflight.json','utf8'));
+          const manifest=JSON.parse(await readFile('data/execution/sequence19-reader-media-manifest.json','utf8'));
+          const evidence=JSON.parse(await readFile('data/execution/sequence19-reader-media-evidence.json','utf8'));
+          const dashboard=JSON.parse(await readFile('data/execution/workflow-runs-snapshot.json','utf8'));
+          const snapshot=JSON.parse(await readFile('data/execution/sequence19-ledger-snapshot.json','utf8'));
+          const countJson=async dir=>(await readdir(dir)).filter(name=>name.endsWith('.json')).length;
+          const expectedRetries=['HW2300|843','M1588|81B','M1588|84B'];
+          const actual={
+            identity:{completedIdentityCount:identity.completed.identityCount,productUrlCaptureCount:identity.completed.productUrlCaptureCount,officialProductImageReferenceCount:identity.counters.officialProductImageReferenceCount,materialEvidenceCount:identity.counters.materialEvidenceCount,manufacturingClaimCount:identity.counters.manufacturingClaimCount,descriptionMissingIdentityCount:identity.metadataGaps.descriptionMissingIdentityCount,priceMissingIdentityCount:identity.metadataGaps.priceMissingIdentityCount,materialMissingIdentityCount:identity.metadataGaps.materialMissingIdentityCount,retryIdentityKeys:identity.retry.identities.map(item=>item.identityKey).sort(),deltaCount:identity.deltaCount,latestRunId:String(identity.latestRunId),factoryVerifiedCount:identity.counters.factoryVerifiedCount,globalCanonicalProductCount:identity.counters.globalCanonicalProductCount,ledgerSha256:identity.ledgerSha256},
+            sourcePages:{deltaCount:sourcePages.deltaCount,attemptedObservationCount:sourcePages.attemptedObservationCount,uniqueAttemptedSourcePageCount:sourcePages.uniqueAttemptedSourcePageCount,ledgerSha256:sourcePages.ledgerSha256},
+            canonicalJson:{identityDeltas:await countJson('data/execution/progress-deltas'),sourcePageDeltas:await countJson('data/execution/source-page-deltas'),sourcePageAudits:await countJson('data/execution/source-page-delta-audits')},
+          };
+          const expected={
+            identity:{completedIdentityCount:1357,productUrlCaptureCount:2155,officialProductImageReferenceCount:11708,materialEvidenceCount:1748,manufacturingClaimCount:64,descriptionMissingIdentityCount:826,priceMissingIdentityCount:770,materialMissingIdentityCount:86,retryIdentityKeys:expectedRetries,deltaCount:11,latestRunId:'32784949243',factoryVerifiedCount:0,globalCanonicalProductCount:0,ledgerSha256:'0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7'},
+            sourcePages:{deltaCount:8,attemptedObservationCount:1524,uniqueAttemptedSourcePageCount:1239,ledgerSha256:'19545d43003400957b788bb5ecd25019413dfe2c225c86c5c28e827ccfc386e3'},
+            canonicalJson:{identityDeltas:11,sourcePageDeltas:8,sourcePageAudits:4},
+          };
+          const mismatches=[];
+          const compare=(prefix,a,e)=>{for(const [key,value] of Object.entries(e))if(JSON.stringify(a[key])!==JSON.stringify(value))mismatches.push([`${prefix}.${key}`,a[key],value]);};
+          compare('identity',actual.identity,expected.identity);compare('sourcePages',actual.sourcePages,expected.sourcePages);compare('canonicalJson',actual.canonicalJson,expected.canonicalJson);
+
+          if(!preflight.passed||preflight.targetSequence!==19||preflight.planSha256!=='e8167be1c91516f5f75f0698304385eb44fc427ed4d32fd6cfd2bb9d4477eb8d')mismatches.push(['sequence19.preflight',preflight,'passed exact plan']);
+          compare('sequence19.preflightCounts',{sourceUrlCount:preflight.sourceUrlCount,uniqueSourceUrlCount:preflight.uniqueSourceUrlCount,readerUrlCount:preflight.readerUrlCount,uniqueReaderUrlCount:preflight.uniqueReaderUrlCount,assignmentCount:preflight.assignmentCount,nonemptyLaneCount:preflight.nonemptyLaneCount},{sourceUrlCount:50,uniqueSourceUrlCount:50,readerUrlCount:100,uniqueReaderUrlCount:100,assignmentCount:50,nonemptyLaneCount:50});
+          if(preflight.duplicateSourceUrls.length||preflight.duplicateReaderUrls.length||preflight.invalidReaderUrls.length||preflight.assignments.length!==50)mismatches.push(['sequence19.preflightPartition',preflight,'50 sources, 100 unique reader URLs']);
+
+          if(!manifest.passed||manifest.runId!=='32862831870'||manifest.sourceCommitSha!=='b68b0b55ded4eb9dd24c3cedb0f4d4983ef757e5'||manifest.planSha256!==preflight.planSha256||manifest.manifestSha256!=='659ddcd44507de5d6577f8904d771412c693874b76fe6d4acaabd6fdd6a3d0bd')mismatches.push(['sequence19.manifestIdentity',manifest,'passed exact run/commit/hash']);
+          if(manifest.workerCount!==50||manifest.orchestrationStatus!=='FIFTY_OF_FIFTY_EXCLUSIVE_READER_SOURCES_CONSOLIDATED'||manifest.status!=='READER_CANDIDATE_DISCOVERY_COMPLETE_NO_DIRECTLY_VERIFIED_MEDIA')mismatches.push(['sequence19.manifestGate',[manifest.workerCount,manifest.orchestrationStatus,manifest.status],[50,'FIFTY_OF_FIFTY_EXCLUSIVE_READER_SOURCES_CONSOLIDATED','READER_CANDIDATE_DISCOVERY_COMPLETE_NO_DIRECTLY_VERIFIED_MEDIA']]);
+          compare('sequence19.readerStatusCounts',manifest.readerStatusCounts,{'200':50});
+          compare('sequence19.totals',manifest.totals,{sourceCount:50,uniqueSourceCount:50,readerAttemptCount:50,readerSuccessCount:50,readerFailureCount:0,exactTextOccurrenceSourceCount:36,officialCandidateRawCount:62,officialCandidateUniqueCount:48,directVerificationAttemptCount:62,verifiedMediaRawCount:0,verifiedMediaCount:0,identitiesWithVerifiedMedia:0});
+          if(manifest.identityResults.length!==3||manifest.identityResults.some(item=>item.verifiedMedia.length))mismatches.push(['sequence19.identityResults',manifest.identityResults,'three identities, zero verified media']);
+
+          if(String(evidence.runId)!=='32862831870'||evidence.planSha256!==preflight.planSha256||evidence.records.length!==50||evidence.candidateUrls.length!==48||evidence.verifiedMedia.length!==0)mismatches.push(['sequence19.evidence',[evidence.runId,evidence.planSha256,evidence.records.length,evidence.candidateUrls.length,evidence.verifiedMedia.length],['32862831870',preflight.planSha256,50,48,0]]);
+          const mediaCandidates=evidence.candidateUrls.filter(value=>new URL(value).pathname.includes('/media/'));
+          if(mediaCandidates.length)mismatches.push(['sequence19.mediaCandidates',mediaCandidates,[]]);
+          if(evidence.records.some(item=>!item.readerFetchOk||item.selectedReader?.status!==200||item.verifiedMediaCount!==0))mismatches.push(['sequence19.readerRecords',evidence.records,'50 successful transformed readers and zero verified media']);
+
+          const expectedDashboard={totalJobs:52,prepareTotal:1,prepareSuccess:1,readerTotal:50,readerSuccess:50,readerFailed:0,readerActive:0,consolidateTotal:1,consolidateSuccess:1,readerWorkerArtifacts:50,planArtifacts:1,consolidatedArtifacts:1,totalArtifacts:52};
+          if(!dashboard.passed||dashboard.run.status!=='completed'||dashboard.run.conclusion!=='success'||dashboard.run.head_sha!=='b68b0b55ded4eb9dd24c3cedb0f4d4983ef757e5')mismatches.push(['sequence19.dashboardRun',dashboard.run,'completed success exact head']);
+          compare('sequence19.dashboard',dashboard.counts,expectedDashboard);
+          const consolidatedArtifact=dashboard.artifacts.find(item=>item.name==='rlf-sequence19-reader-media-32862831870');
+          if(!consolidatedArtifact||consolidatedArtifact.digest!=='sha256:18d4e12a6e5b1f9c715e9a9151b9ea957eb1993144689479e93261e872022c91')mismatches.push(['sequence19.consolidatedArtifact',consolidatedArtifact,'exact digest']);
+          if(!snapshot.passed||snapshot.identity.ledgerSha256!==expected.identity.ledgerSha256||snapshot.sourcePages.ledgerSha256!==expected.sourcePages.ledgerSha256||snapshot.sequence19.manifestSha256!==manifest.manifestSha256)mismatches.push(['sequence19.snapshot',snapshot,'passed exact reader no-mutation checkpoint']);
+          const completed=new Set(identity.completed.identityKeys);for(const key of expectedRetries)if(completed.has(key))mismatches.push([`sequence19.falseResolution.${key}`,true,false]);
+
+          const checkpoint={schemaVersion:13,sourceRunId:'32862831870',generatedAt:new Date().toISOString(),expected,actual,sequence19:{planSha256:preflight.planSha256,manifestSha256:manifest.manifestSha256,status:manifest.status,readerStatusCounts:manifest.readerStatusCounts,totals:manifest.totals,candidateKinds:{PAGE_OR_FRAGMENT:evidence.candidateUrls.length},dashboardCounts:dashboard.counts,consolidatedArtifactDigest:consolidatedArtifact?.digest??null},mismatches,passed:mismatches.length===0};
+          await writeFile('/tmp/rlf-ledger-checkpoint.json',`${JSON.stringify(checkpoint,null,2)}\n`);console.log(JSON.stringify(checkpoint,null,2));if(mismatches.length)throw new Error(`Sequence 19 validation mismatch: ${JSON.stringify(mismatches)}`);
+          NODE
+            pnpm check
+            pnpm build
+          } 2>&1 | tee /tmp/rlf-validation.log
+      - name: Generate validation proof
+        if: always()
+        shell: bash
+        env:
+          VALIDATION_OUTCOME: ${{ steps.validate.outcome }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('node:fs');const crypto=require('node:crypto');const log=fs.existsSync('/tmp/rlf-validation.log')?fs.readFileSync('/tmp/rlf-validation.log'):Buffer.from('missing validation log');const checkpoint=fs.existsSync('/tmp/rlf-ledger-checkpoint.json')?JSON.parse(fs.readFileSync('/tmp/rlf-ledger-checkpoint.json','utf8')):null;const proof={schemaVersion:13,recordedAt:new Date().toISOString(),sourceCommitSha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT||'1'),validationOutcome:process.env.VALIDATION_OUTCOME,nodeVersion:process.version,logSha256:crypto.createHash('sha256').update(log).digest('hex'),ledgerCheckpoint:checkpoint,requiredChecks:['pnpm_install_frozen_lockfile','execution_script_syntax','canonical_json_11_identity_8_source_page_4_persisted_audits','exact_sequence19_no_mutation_ledgers','fifty_of_fifty_reader_workers','fifty_unique_official_sources','one_hundred_unique_reader_urls','fifty_reader_http_200','forty_eight_page_or_fragment_candidates','zero_media_path_candidates','zero_verified_media','three_retries_remain_open','factory_verified_zero','global_canonical_products_zero','typescript_no_emit','production_build']};fs.writeFileSync('data/execution/validation-proof.json',`${JSON.stringify(proof,null,2)}\n`);
+          NODE
+      - name: Publish proof
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823';git config user.name 'github-actions[bot]';git config user.email '41898282+github-actions[bot]@users.noreply.github.com';git add data/execution/validation-proof.json;git commit -m "Persist RLF sequence 19 validation proof ${GITHUB_RUN_ID}";for attempt in 1 2 3 4 5;do git fetch origin "$branch";if git rebase "origin/$branch"&&git push origin "HEAD:$branch";then exit 0;fi;git rebase --abort 2>/dev/null||true;sleep $((attempt*3));done;exit 1
+      - name: Enforce validation success
+        if: steps.validate.outcome != 'success'
+        run: exit 1

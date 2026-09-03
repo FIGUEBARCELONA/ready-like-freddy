@@ -1,0 +1,153 @@
+name: RLF source page rotation validation
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-source-page-rotation-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PREFLIGHT_REVISION: '9'
+
+concurrency:
+  group: rlf-source-page-rotation-validation
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build terminal sequence 15 preflight without activating mass workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'data/execution/rlf-kb-run-plan.json';
+          const plan = JSON.parse(fs.readFileSync(path, 'utf8'));
+          plan.schemaVersion = 15;
+          plan.planId = 'RLF-KB-SOURCE-PAGE-ROTATION-20260824-S15-TERMINAL-PREFLIGHT';
+          plan.pilotRunSequence = 15;
+          plan.phaseId = 'OFFICIAL_ARCHIVE_SOURCE_PAGE_ROTATION_06_TERMINAL_PREFLIGHT';
+          plan.discoveryPolicy = {
+            ...plan.discoveryPolicy,
+            strategy: 'EXHAUST_ALL_REMAINING_AUDITED_CATALOG_SOURCE_PAGES_ACROSS_50_LANES',
+            requiredPriorityEntryPointCount: 0,
+            previousPriorityEntryPointCount: 23,
+            sourcePageDeltaDirectory: 'data/execution/source-page-deltas',
+            minimumPreviouslyAttemptedSourcePageExclusions: 800,
+            minimumEffectiveCategoryBatchSize: 50,
+            terminalFrontierExhaustionMode: true,
+            requireAllRemainingEligibleSourcePagesInBatch: true,
+            excludePreviouslyAttemptedSourcePages: true,
+            sourcePageRotationSequence: 6,
+          };
+          fs.writeFileSync(path, `${JSON.stringify(plan, null, 2)}\n`);
+          NODE
+          node scripts/execution/prepare-official-queue.mjs --out=execution/queue-rotation-test
+          node --input-type=module <<'NODE'
+          import { readFile, writeFile } from 'node:fs/promises';
+          import { loadSourcePageLedger } from './scripts/execution/source-page-ledger.mjs';
+          const queue = JSON.parse(await readFile('execution/queue-rotation-test/queue.json', 'utf8'));
+          const summary = JSON.parse(await readFile('execution/queue-rotation-test/summary.json', 'utf8'));
+          const ledger = await loadSourcePageLedger();
+          const perWorkerLimit = Number(queue.plan.pilotPerWorkerLimit ?? 5);
+          const theoreticalBatchCapacity = queue.assignments.length * perWorkerLimit;
+          const firstBatch = queue.assignments.flatMap(assignment => assignment.urls.slice(0, perWorkerLimit));
+          const repeated = firstBatch.filter(entry => ledger.attemptedUrlSet.has(entry.url));
+          const allUrls = queue.assignments.flatMap(assignment => assignment.urls.map(entry => entry.url));
+          const emptySlots = queue.assignments.filter(assignment => assignment.urls.length === 0).map(assignment => assignment.slot);
+          const forbiddenRoutePatterns = [
+            /\/(?:shop-finder|store-finder|helpcentre|help-center|help-centre|df-social-connect|social-connect|customercare|customer-care)(?:\/|$)/i,
+            /\/(?:aboutus|about-us)\/statements(?:\/|$)/i,
+            /(?:privacy|privacidad|privacidade|datenschutz|confidentialit|cookies?|legal|accessibility)/i,
+          ];
+          const forbiddenFirstBatch = firstBatch.filter(entry => forbiddenRoutePatterns.some(pattern => pattern.test(new URL(entry.url).pathname)));
+          const result = {
+            schemaVersion: 9,
+            validatedAt: new Date().toISOString(),
+            sourceCommitSha: process.env.GITHUB_SHA,
+            targetSequence: 15,
+            terminalFrontierExhaustionMode: true,
+            workerCount: queue.assignments.length,
+            sourcePageLedgerDeltaCount: ledger.deltaCount,
+            sourcePageLedgerObservationCount: ledger.attemptedObservationCount,
+            uniquePreviouslyAttemptedSourcePageCount: ledger.uniqueAttemptedSourcePageCount,
+            excludedPreviouslyAttemptedSourcePageCount: queue.excludedPreviouslyAttemptedSourcePageCount,
+            minimumEligiblePreviouslyAttemptedSourcePageExclusions: 800,
+            skippedPriorityEntryPointCount: queue.skippedPriorityEntryPointCount,
+            injectedPriorityEntryPointCount: queue.priorityEntryPointCount,
+            reassignedEmptyLaneCount: queue.reassignedEmptyLaneCount ?? 0,
+            balancedLaneTransferCount: queue.balancedLaneTransferCount ?? 0,
+            remainingQueueUrlCount: allUrls.length,
+            allRemainingEligibleSourcePagesScheduled: firstBatch.length === allUrls.length,
+            theoreticalBatchCapacity,
+            minimumRequiredEffectiveBatchCapacity: 50,
+            effectiveBatchCapacity: firstBatch.length,
+            effectiveBatchUtilization: firstBatch.length / theoreticalBatchCapacity,
+            repeatedFirstBatchUrlCount: repeated.length,
+            forbiddenFirstBatchUrlCount: forbiddenFirstBatch.length,
+            forbiddenFirstBatchUrls: forbiddenFirstBatch.map(entry => entry.url),
+            duplicateRemainingQueueUrlCount: allUrls.length - new Set(allUrls).size,
+            emptySlots,
+            minimumUrlsPerWorker: summary.minimumUrlsPerWorker,
+            maximumUrlsPerWorker: summary.maximumUrlsPerWorker,
+            queueSha256: queue.queueSha256,
+            sourcePageLedgerSha256: ledger.ledgerSha256,
+          };
+          result.passed =
+            result.workerCount === 50 &&
+            result.sourcePageLedgerDeltaCount === 7 &&
+            result.sourcePageLedgerObservationCount === 1448 &&
+            result.uniquePreviouslyAttemptedSourcePageCount === 1163 &&
+            result.sourcePageLedgerSha256 === '8de01546abe681f1c271755341f19641083cb59f32cbd63bd7eae1f8980fee24' &&
+            result.excludedPreviouslyAttemptedSourcePageCount >= result.minimumEligiblePreviouslyAttemptedSourcePageExclusions &&
+            result.skippedPriorityEntryPointCount === 23 &&
+            result.injectedPriorityEntryPointCount === 0 &&
+            result.effectiveBatchCapacity >= result.minimumRequiredEffectiveBatchCapacity &&
+            result.allRemainingEligibleSourcePagesScheduled === true &&
+            result.repeatedFirstBatchUrlCount === 0 &&
+            result.forbiddenFirstBatchUrlCount === 0 &&
+            result.duplicateRemainingQueueUrlCount === 0 &&
+            result.emptySlots.length === 0 &&
+            result.minimumUrlsPerWorker >= 1 &&
+            result.maximumUrlsPerWorker <= perWorkerLimit;
+          await writeFile('data/execution/source-page-rotation-validation.json', `${JSON.stringify(result, null, 2)}\n`);
+          console.log(JSON.stringify(result, null, 2));
+          NODE
+      - name: Publish auditable terminal preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          git checkout -- data/execution/rlf-kb-run-plan.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/source-page-rotation-validation.json
+          git commit -m 'Persist sequence 15 terminal frontier preflight'
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
+          git push origin HEAD:feature/rlf-execution-backend-20260823
+      - name: Enforce sequence 15 terminal preflight gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+          const result = JSON.parse(await readFile('data/execution/source-page-rotation-validation.json', 'utf8'));
+          if (!result.passed) {
+            console.error(JSON.stringify(result, null, 2));
+            throw new Error('Sequence 15 terminal frontier preflight failed');
+          }
+          NODE

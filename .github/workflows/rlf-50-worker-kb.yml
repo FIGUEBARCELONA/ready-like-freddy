@@ -1,0 +1,438 @@
+name: RLF 50-worker KB official discovery
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - 'data/execution/rlf-kb-official-seeds.json'
+      - 'data/execution/rlf-kb-run-plan.json'
+  workflow_dispatch:
+    inputs:
+      per_worker_limit:
+        description: Maximum official category pages fetched by each discovery worker
+        required: true
+        default: '5'
+        type: string
+      product_per_worker_limit:
+        description: Maximum code-colour identities fetched by each product worker
+        required: true
+        default: '5'
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  SOURCE_BRANCH: feature/rlf-execution-backend-20260823
+
+concurrency:
+  group: rlf-kb-50-workers
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    name: Prepare verified official queue
+    runs-on: ubuntu-24.04
+    outputs:
+      queue_sha256: ${{ steps.queue.outputs.queue_sha256 }}
+      queue_id: ${{ steps.queue.outputs.queue_id }}
+      discovery_limit: ${{ steps.queue.outputs.discovery_limit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - id: queue
+        name: Discover official Fred Perry entry points
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/execution/prepare-official-queue.mjs --out=execution/queue
+          printf 'queue_sha256=%s\n' "$(node -p "require('./execution/queue/queue.json').queueSha256")" >> "$GITHUB_OUTPUT"
+          printf 'queue_id=%s\n' "$(node -p "require('./execution/queue/queue.json').queueId")" >> "$GITHUB_OUTPUT"
+          printf 'discovery_limit=%s\n' "$(node -p "require('./execution/queue/queue.json').plan.pilotPerWorkerLimit")" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rlf-official-queue
+          path: execution/queue
+          if-no-files-found: warn
+          retention-days: 14
+
+  discovery_worker:
+    name: Discovery ${{ matrix.slot }}
+    needs: prepare
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix:
+        slot: [F01, F02, F03, F04, F05, F06, F07, F08, F09, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33, F34, F35, F36, F37, F38, F39, F40, F41, F42, F43, F44, F45, F46, F47, F48, F49, F50]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download official queue with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-official-queue \
+            --dest execution/queue
+      - name: Capture category evidence and extract product links
+        env:
+          RLF_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.per_worker_limit || needs.prepare.outputs.discovery_limit }}
+        run: |
+          node scripts/execution/run-official-worker.mjs \
+            --slot=${{ matrix.slot }} \
+            --queue=execution/queue/queue.json \
+            --out=execution/workers/${{ matrix.slot }}
+          node scripts/execution/enrich-discovery-lane.mjs \
+            --slot=${{ matrix.slot }} \
+            --queue=execution/queue/queue.json \
+            --dir=execution/workers/${{ matrix.slot }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rlf-discovery-worker-${{ matrix.slot }}
+          path: execution/workers/${{ matrix.slot }}
+          if-no-files-found: error
+          retention-days: 14
+
+  consolidate_discovery:
+    name: Consolidate code-colour identity frontier
+    needs: [prepare, discovery_worker]
+    runs-on: ubuntu-24.04
+    outputs:
+      frontier_sha256: ${{ steps.frontier.outputs.frontier_sha256 }}
+      unique_product_identities: ${{ steps.frontier.outputs.unique_product_identities }}
+      selected_identities: ${{ steps.frontier.outputs.selected_identities }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download official queue with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-official-queue \
+            --dest execution/queue
+      - name: Download 50 discovery artifacts with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --pattern 'rlf-discovery-worker-*' \
+            --dest execution/downloaded-workers
+      - id: frontier
+        name: Consolidate 50 discovery outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/execution/consolidate-worker-results.mjs \
+            --input=execution/downloaded-workers \
+            --queue=execution/queue/queue.json \
+            --progress=data/execution/product-progress.json \
+            --progressDeltas=data/execution/progress-deltas \
+            --out=execution/consolidated
+          node scripts/execution/enrich-product-frontier.mjs \
+            --dir=execution/consolidated
+          printf 'frontier_sha256=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').frontierSha256")" >> "$GITHUB_OUTPUT"
+          printf 'unique_product_identities=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').uniqueProductIdentityCount")" >> "$GITHUB_OUTPUT"
+          printf 'selected_identities=%s\n' "$(node -p "require('./execution/consolidated/product-frontier.json').selectedIdentityCount")" >> "$GITHUB_OUTPUT"
+      - name: Generate discovery SHA-256 evidence manifest
+        run: |
+          find execution/queue execution/downloaded-workers execution/consolidated -type f -print0 \
+            | sort -z | xargs -0 sha256sum > execution/DISCOVERY_EVIDENCE_SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        id: upload_discovery
+        if: always()
+        with:
+          name: rlf-kb-official-discovery-${{ github.run_id }}
+          path: |
+            execution/consolidated
+            execution/DISCOVERY_EVIDENCE_SHA256SUMS.txt
+          if-no-files-found: warn
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-product-frontier
+          path: execution/consolidated/product-frontier.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Assert factual 50-lane discovery and identity frontier
+        run: |
+          node - <<'NODE'
+          const manifest = require('./execution/consolidated/manifest.json');
+          const queue = require('./execution/queue/queue.json');
+          const plan = require('./data/execution/rlf-kb-run-plan.json');
+          const terminalMode = plan.discoveryPolicy?.terminalFrontierExhaustionMode === true;
+          const perWorkerLimit = Number(plan.pilotPerWorkerLimit ?? 5);
+          const allQueueUrls = queue.assignments.flatMap(assignment => assignment.urls);
+          const scheduledUrls = queue.assignments.flatMap(assignment => assignment.urls.slice(0, perWorkerLimit));
+          const terminalFrontierExhausted =
+            terminalMode &&
+            scheduledUrls.length === allQueueUrls.length &&
+            manifest.totals.attemptedUrlCount === allQueueUrls.length &&
+            manifest.totals.successfulFetchCount === allQueueUrls.length &&
+            manifest.totals.failedFetchCount === 0 &&
+            manifest.totals.duplicateSourcePageCount === 0;
+          if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
+            throw new Error('Discovery manifest does not contain exactly 50 workers');
+          }
+          if (!manifest.qualityGatePassed) {
+            throw new Error(`Discovery quality gate failed: ${JSON.stringify(manifest.totals)}`);
+          }
+          if (!terminalMode && (manifest.totals.uniqueProductIdentityCount < 50 || manifest.totals.selectedIdentityCount < 1)) {
+            throw new Error(`Identity frontier is insufficient: ${JSON.stringify(manifest.totals)}`);
+          }
+          if (terminalMode && manifest.totals.selectedIdentityCount < 1 && !terminalFrontierExhausted) {
+            throw new Error(`Zero-identity frontier is only valid after complete terminal exhaustion: ${JSON.stringify(manifest.totals)}`);
+          }
+          console.log(JSON.stringify({
+            terminalMode,
+            terminalFrontierExhausted,
+            sourcePages: manifest.totals.sourcePageCount,
+            uniqueProductIdentities: manifest.totals.uniqueProductIdentityCount,
+            selectedIdentities: manifest.totals.selectedIdentityCount,
+          }, null, 2));
+          NODE
+      - name: Generate canonical append-only source-page delta
+        env:
+          RLF_SOURCE_ARTIFACT_ID: ${{ steps.upload_discovery.outputs.artifact-id }}
+          RLF_SOURCE_ARTIFACT_DIGEST: ${{ steps.upload_discovery.outputs.artifact-digest }}
+          RLF_SOURCE_ARTIFACT_NAME: rlf-kb-official-discovery-${{ github.run_id }}
+        run: |
+          node scripts/execution/generate-source-page-delta.mjs \
+            --records=execution/consolidated/records.ndjson \
+            --manifest=execution/consolidated/manifest.json \
+            --runId=${{ github.run_id }}
+      - name: Persist immutable source-page checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="${SOURCE_BRANCH}"
+          delta="data/execution/source-page-deltas/${GITHUB_RUN_ID}.json"
+          audit="data/execution/source-page-delta-audits/${GITHUB_RUN_ID}.json"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$delta" "$audit"
+          git commit -m "Persist source-page delta ${GITHUB_RUN_ID}"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          echo 'Unable to publish source-page delta after five rebases' >&2
+          exit 1
+
+  product_worker:
+    name: Product ${{ matrix.slot }}
+    needs: consolidate_discovery
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix:
+        slot: [F01, F02, F03, F04, F05, F06, F07, F08, F09, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33, F34, F35, F36, F37, F38, F39, F40, F41, F42, F43, F44, F45, F46, F47, F48, F49, F50]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download product frontier with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-product-frontier \
+            --dest execution/product-frontier
+      - name: Capture individual official product identity
+        env:
+          RLF_PRODUCT_PER_WORKER_LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.product_per_worker_limit || '1' }}
+        run: |
+          node scripts/execution/run-product-worker.mjs \
+            --slot=${{ matrix.slot }} \
+            --frontier=execution/product-frontier/product-frontier.json \
+            --out=execution/product-workers/${{ matrix.slot }}
+          node scripts/execution/enrich-product-worker.mjs \
+            --slot=${{ matrix.slot }} \
+            --frontier=execution/product-frontier/product-frontier.json \
+            --dir=execution/product-workers/${{ matrix.slot }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rlf-product-worker-${{ matrix.slot }}
+          path: execution/product-workers/${{ matrix.slot }}
+          if-no-files-found: error
+          retention-days: 14
+
+  consolidate_products:
+    name: Consolidate identity evidence
+    needs: [consolidate_discovery, product_worker]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download product frontier with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --name rlf-product-frontier \
+            --dest execution/product-frontier
+      - name: Download 50 product artifacts with retry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/execution/download-artifact-retry.sh \
+            --pattern 'rlf-product-worker-*' \
+            --dest execution/downloaded-product-workers
+      - name: Consolidate 50 product worker outputs
+        run: |
+          node scripts/execution/consolidate-product-results.mjs \
+            --input=execution/downloaded-product-workers \
+            --frontier=execution/product-frontier/product-frontier.json \
+            --out=execution/products-consolidated
+      - name: Generate canonical append-only ledger delta
+        run: |
+          node scripts/execution/generate-ledger-delta.mjs \
+            --products=execution/products-consolidated \
+            --frontier=execution/product-frontier/product-frontier.json \
+            --progress=data/execution/product-progress.json \
+            --progressDeltas=data/execution/progress-deltas \
+            --out=execution/products-consolidated/ledger-delta.json \
+            --audit=execution/products-consolidated/ledger-delta-audit.json
+      - name: Generate product SHA-256 evidence manifest
+        run: |
+          find execution/product-frontier execution/downloaded-product-workers execution/products-consolidated -type f -print0 \
+            | sort -z | xargs -0 sha256sum > execution/PRODUCT_EVIDENCE_SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rlf-kb-product-pages-${{ github.run_id }}
+          path: |
+            execution/products-consolidated
+            execution/PRODUCT_EVIDENCE_SHA256SUMS.txt
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Assert audited full or partial strict identity batch
+        run: |
+          node - <<'NODE'
+          const manifest = require('./execution/products-consolidated/product-manifest.json');
+          const sourceDelta = require('./execution/products-consolidated/product-progress-delta.json');
+          const ledgerDelta = require('./execution/products-consolidated/ledger-delta.json');
+          const audit = require('./execution/products-consolidated/ledger-delta-audit.json');
+          const plan = require('./data/execution/rlf-kb-run-plan.json');
+          const totals = manifest.totals;
+          const terminalMode = plan.discoveryPolicy?.terminalFrontierExhaustionMode === true;
+          const terminalZeroBatch =
+            terminalMode &&
+            totals.expectedProductCaptureCount === 0 &&
+            totals.attemptedIdentityCount === 0 &&
+            totals.successfulIdentityCaptureCount === 0 &&
+            totals.failedIdentityCaptureCount === 0 &&
+            sourceDelta.completedIdentityKeys.length === 0 &&
+            sourceDelta.failedIdentities.length === 0 &&
+            ledgerDelta.completedIdentityKeys.length === 0 &&
+            audit.batch.selectedIdentityCount === 0 &&
+            audit.batch.expectedProductCaptureCount === 0;
+          if (manifest.workerCount !== 50 || manifest.workerSummaries.length !== 50) {
+            throw new Error('Product manifest does not contain exactly 50 workers');
+          }
+          if (totals.attemptedIdentityCount !== totals.expectedProductCaptureCount) {
+            throw new Error(`Attempted identity count mismatch: ${JSON.stringify(totals)}`);
+          }
+          if (totals.successfulIdentityCaptureCount + totals.failedIdentityCaptureCount !== totals.expectedProductCaptureCount) {
+            throw new Error(`Selected identities are not fully accounted for: ${JSON.stringify(totals)}`);
+          }
+          if (!terminalZeroBatch && totals.successfulIdentityCaptureCount < 1) {
+            throw new Error('No strict identity evidence was captured outside an audited terminal zero batch');
+          }
+          if (terminalZeroBatch && (!manifest.qualityGatePassed || !sourceDelta.qualityGatePassed || !ledgerDelta.strictQualityGatePassed)) {
+            throw new Error('Audited terminal zero batch did not pass all strict gates');
+          }
+          if (totals.rejectedImageReferenceCount !== 0) {
+            throw new Error(`Rejected images reached consolidation: ${totals.rejectedImageReferenceCount}`);
+          }
+          if (sourceDelta.completedIdentityKeys.length !== totals.successfulIdentityCaptureCount ||
+              ledgerDelta.completedIdentityKeys.length !== totals.successfulIdentityCaptureCount) {
+            throw new Error('Completed identity keys do not match strict successful captures');
+          }
+          if (!audit.passed || audit.batch.overlapWithPrior.length || audit.batch.completedAndFailedOverlap.length) {
+            throw new Error(`Ledger delta audit failed: ${JSON.stringify(audit)}`);
+          }
+          console.log(JSON.stringify({
+            acceptance: ledgerDelta.acceptance,
+            strictSuccesses: totals.successfulIdentityCaptureCount,
+            retries: totals.failedIdentityCaptureCount,
+            terminalZeroBatch,
+            ledgerDeltaSha256: ledgerDelta.ledgerDeltaSha256,
+          }, null, 2));
+          NODE
+      - name: Persist immutable audited run checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          destination="data/execution/runs/${GITHUB_RUN_ID}"
+          delta_destination="data/execution/progress-deltas/${GITHUB_RUN_ID}.json"
+          mkdir -p "$destination" "$(dirname "$delta_destination")"
+          cp execution/products-consolidated/product-manifest.json "$destination/product-manifest.json"
+          cp execution/products-consolidated/product-records.ndjson "$destination/product-records.ndjson"
+          cp execution/products-consolidated/image-manifest.ndjson "$destination/image-manifest.ndjson"
+          cp execution/products-consolidated/product-progress-delta.json "$destination/product-progress-delta.json"
+          cp execution/products-consolidated/ledger-delta.json "$destination/ledger-delta.json"
+          cp execution/products-consolidated/ledger-delta-audit.json "$destination/ledger-delta-audit.json"
+          cp execution/products-consolidated/ledger-delta.json "$delta_destination"
+          cp execution/PRODUCT_EVIDENCE_SHA256SUMS.txt "$destination/PRODUCT_EVIDENCE_SHA256SUMS.txt"
+          node --input-type=module - <<'NODE'
+          import { loadProgressLedger } from './scripts/execution/progress-ledger.mjs';
+          const state = await loadProgressLedger();
+          if (String(state.latestRunId) !== String(process.env.GITHUB_RUN_ID)) {
+            throw new Error(`Persisted ledger latest run mismatch: ${state.latestRunId}`);
+          }
+          if (state.counters.factoryVerifiedCount !== 0 || state.counters.globalCanonicalProductCount !== 0) {
+            throw new Error('Factory or global canonical counts changed without their independent gates');
+          }
+          console.log(JSON.stringify({
+            latestRunId: state.latestRunId,
+            completedIdentityCount: state.completed.identityCount,
+            retryIdentityCount: state.retry.identityCount,
+            ledgerSha256: state.ledgerSha256,
+          }, null, 2));
+          NODE
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$destination" "$delta_destination"
+          git commit -m "Persist audited RLF evidence run ${GITHUB_RUN_ID}"
+          git fetch origin "${SOURCE_BRANCH}"
+          git rebase "origin/${SOURCE_BRANCH}"
+          git push origin "HEAD:${SOURCE_BRANCH}"

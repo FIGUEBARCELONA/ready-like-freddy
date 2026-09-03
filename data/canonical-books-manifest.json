@@ -1,0 +1,71 @@
+{
+  "manifestFormat": "RLF-CANONICAL-BOOKS/1.0",
+  "generatedAtUtc": "2026-08-22T16:49:25.652Z",
+  "sourceRoot": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821",
+  "writePolicy": "NO_WRITES_TO_CANONICAL_SOURCES",
+  "books": [
+    {
+      "relativePath": "data/RLF_GLOBAL_CORPUS_INITIAL_VARIANT_REGISTER_20260822.csv",
+      "sourcePath": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821/data/RLF_GLOBAL_CORPUS_INITIAL_VARIANT_REGISTER_20260822.csv",
+      "sha256": "7f16d9c96bca881676551654c889918021cd158489351958a29655dd2ee67b21",
+      "sizeBytes": 5738,
+      "sourceMode": "READ_ONLY"
+    },
+    {
+      "relativePath": "data/RLF_GLOBAL_CORPUS_INITIAL_GAP_REGISTER_20260822.csv",
+      "sourcePath": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821/data/RLF_GLOBAL_CORPUS_INITIAL_GAP_REGISTER_20260822.csv",
+      "sha256": "b7b5e6e911ce0122f20d66e45f64f6b1e8af46b044a46994538525bfe1f7a129",
+      "sizeBytes": 3218,
+      "sourceMode": "READ_ONLY"
+    },
+    {
+      "relativePath": "data/RLF_OFFICIAL_SOURCE_REGISTRY_20260822.md",
+      "sourcePath": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821/data/RLF_OFFICIAL_SOURCE_REGISTRY_20260822.md",
+      "sha256": "610a747d0a1df0a84f05f74d9d0fd79a6804f7b6882ca220b1650c60e919cae8",
+      "sizeBytes": 27299,
+      "sourceMode": "READ_ONLY"
+    },
+    {
+      "relativePath": "data/RLF_EXACT_VARIANT_RAW_COLOUR_SCOPE_20260822.jsonl",
+      "sourcePath": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821/data/RLF_EXACT_VARIANT_RAW_COLOUR_SCOPE_20260822.jsonl",
+      "sha256": "932eff6bda17d535c89f78d37666134e596148007f45f5ae34a61bc5baf077d2",
+      "sizeBytes": 11269,
+      "sourceMode": "READ_ONLY"
+    },
+    {
+      "relativePath": "data/RLF_GLOBAL_CORPUS_EXACT_VARIANT_COLOUR_NORMALIZATION_20260822.jsonl",
+      "sourcePath": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821/data/RLF_GLOBAL_CORPUS_EXACT_VARIANT_COLOUR_NORMALIZATION_20260822.jsonl",
+      "sha256": "2067144bdfa583d8c99d99c913bc6be65d85a080c476b5bc0ed7e1ecfe375984",
+      "sizeBytes": 17593,
+      "sourceMode": "READ_ONLY"
+    },
+    {
+      "relativePath": "data/RLF_GLOBAL_CORPUS_CONSOLIDATED_NORMALIZATION_METRICS_20260822.txt",
+      "sourcePath": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821/data/RLF_GLOBAL_CORPUS_CONSOLIDATED_NORMALIZATION_METRICS_20260822.txt",
+      "sha256": "c33db683519331179c7d8c67576a1fea231eca1ec47f05fca8a47a9e1f22e28b",
+      "sizeBytes": 1927,
+      "sourceMode": "READ_ONLY"
+    },
+    {
+      "relativePath": "data_contracts/RLF_HISTORICAL_PRODUCT_FACTORY_CORPUS_SCHEMA_v1_20260822.md",
+      "sourcePath": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821/data_contracts/RLF_HISTORICAL_PRODUCT_FACTORY_CORPUS_SCHEMA_v1_20260822.md",
+      "sha256": "9c7843293e11ccc1a55cc114c7eecaa868ab4c794ec3ea20171b5dd45e76f802",
+      "sizeBytes": 7960,
+      "sourceMode": "READ_ONLY"
+    },
+    {
+      "relativePath": "data_contracts/RLF_ORIGINAL_FRED_PERRY_ONLY_OPERATING_POLICY_v1_20260822.md",
+      "sourcePath": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821/data_contracts/RLF_ORIGINAL_FRED_PERRY_ONLY_OPERATING_POLICY_v1_20260822.md",
+      "sha256": "80929f421ebec9f4d836ae37be3d64e390e4d53874b25907cca92943b0487d3e",
+      "sizeBytes": 3548,
+      "sourceMode": "READ_ONLY"
+    },
+    {
+      "relativePath": "data_contracts/RLF_GLOBAL_KB_EU_COMMERCIAL_SCOPE_POLICY_v1_20260822.md",
+      "sourcePath": "/home/ubuntu/rlf_review/RLF_EXECUTION_DOSSIER_20260821/data_contracts/RLF_GLOBAL_KB_EU_COMMERCIAL_SCOPE_POLICY_v1_20260822.md",
+      "sha256": "5615c6a079f684c0a6a8973b3cb36c9cf2536934acf7cd81157a4dbc01826fc7",
+      "sizeBytes": 4451,
+      "sourceMode": "READ_ONLY"
+    }
+  ]
+}

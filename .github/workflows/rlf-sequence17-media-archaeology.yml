@@ -1,0 +1,314 @@
+name: RLF sequence 17 official media archaeology
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence17-media-archaeology.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: rlf-sequence17-media-archaeology
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare immutable 50-shard media plan
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      plan_sha: ${{ steps.plan.outputs.plan_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - id: plan
+        name: Validate exact preflight and emit F01-F50 matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFile, appendFile } from 'node:fs/promises';
+          const plan=JSON.parse(await readFile('data/execution/sequence17-media-archaeology-preflight.json','utf8'));
+          if(!plan.passed) throw new Error('Sequence 17 preflight is not passed');
+          if(plan.targetSequence!==17 || plan.assignmentCount!==50 || plan.nonemptyLaneCount!==50) throw new Error('Sequence 17 preflight shape mismatch');
+          if(plan.assignedFileCount!==80 || plan.uniqueAssignedFileCount!==80 || plan.overlappingAssignments.length || plan.missingFiles.length) throw new Error('Sequence 17 file partition mismatch');
+          const slots=plan.assignments.map(a=>a.slot);
+          if(slots.length!==50 || new Set(slots).size!==50) throw new Error('Sequence 17 slot matrix mismatch');
+          await appendFile(process.env.GITHUB_OUTPUT,`matrix=${JSON.stringify({slot:slots})}\nplan_sha=${plan.planSha256}\n`);
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence17-media-plan
+          path: data/execution/sequence17-media-archaeology-preflight.json
+          retention-days: 30
+
+  archaeology:
+    name: Media ${{ matrix.slot }}
+    needs: prepare
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Download only assigned immutable discovery artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLOT: ${{ matrix.slot }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/rlf-sequence17/corpus
+          node --input-type=module <<'NODE' > /tmp/assigned-runs.txt
+          import { readFile } from 'node:fs/promises';
+          const plan=JSON.parse(await readFile('data/execution/sequence17-media-archaeology-preflight.json','utf8'));
+          const assignment=plan.assignments.find(a=>a.slot===process.env.SLOT);
+          if(!assignment || !assignment.files.length) throw new Error(`Missing assignment for ${process.env.SLOT}`);
+          console.log([...new Set(assignment.files.map(f=>f.sourceRunId))].sort().join('\n'));
+          NODE
+          while IFS= read -r run_id; do
+            [ -n "$run_id" ] || continue
+            mkdir -p "/tmp/rlf-sequence17/corpus/${run_id}"
+            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" \
+              --name "rlf-kb-official-discovery-${run_id}" \
+              --dir "/tmp/rlf-sequence17/corpus/${run_id}"
+          done < /tmp/assigned-runs.txt
+      - name: Scan exclusive shard for exact official code-colour media
+        shell: bash
+        env:
+          SLOT: ${{ matrix.slot }}
+          EXPECTED_PLAN_SHA: ${{ needs.prepare.outputs.plan_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "execution/sequence17-workers/${SLOT}"
+          node --input-type=module <<'NODE'
+          import { readFile, writeFile } from 'node:fs/promises';
+          import { join } from 'node:path';
+          import { createHash } from 'node:crypto';
+
+          const slot=process.env.SLOT;
+          const plan=JSON.parse(await readFile('data/execution/sequence17-media-archaeology-preflight.json','utf8'));
+          if(plan.planSha256!==process.env.EXPECTED_PLAN_SHA) throw new Error('Plan SHA mismatch');
+          const assignment=plan.assignments.find(a=>a.slot===slot);
+          if(!assignment || !assignment.files.length) throw new Error(`No files assigned to ${slot}`);
+          const targets=plan.targetIdentities;
+          const allowedHost=host=>host==='fredperry.com'||host.endsWith('.fredperry.com');
+          const cleanUrl=value=>value
+            .replaceAll('\\/','/')
+            .replaceAll('&amp;','&')
+            .replace(/[),.;\]}]+$/g,'');
+          const evidence=[];
+          const fileAudits=[];
+          for(const file of assignment.files){
+            const path=join('/tmp/rlf-sequence17/corpus',file.corpusPath);
+            const bytes=await readFile(path);
+            const actualSha=createHash('sha256').update(bytes).digest('hex');
+            if(actualSha!==file.sha256) throw new Error(`Corpus SHA mismatch: ${file.corpusPath}`);
+            const raw=bytes.toString('utf8').replace(/\\u002[fF]/g,'/').replace(/\\\//g,'/');
+            const urls=[...new Set(raw.match(/https?:\/\/[^\s"'<>\\]+/gi)??[])].map(cleanUrl);
+            let matchCount=0;
+            for(const target of targets){
+              const identityPattern=new RegExp(`${target.productCode}[-_]${target.colourCode}(?:[-_.]|$)`,'i');
+              const tokenPattern=new RegExp(`${target.productCode}[-_]${target.colourCode}`,'i');
+              const exactTokenHits=(raw.match(new RegExp(tokenPattern.source,'gi'))??[]).length;
+              for(const rawUrl of urls){
+                let url;
+                try{url=new URL(rawUrl);}catch{continue;}
+                if(!allowedHost(url.hostname.toLowerCase())) continue;
+                let pathname;
+                try{pathname=decodeURIComponent(url.pathname);}catch{pathname=url.pathname;}
+                if(!identityPattern.test(pathname)) continue;
+                const image=/\/media\/catalog\/product\//i.test(pathname)||/\.(?:jpe?g|png|webp|gif)$/i.test(pathname);
+                evidence.push({
+                  schemaVersion:1,
+                  slot,
+                  identityKey:target.identityKey,
+                  productCode:target.productCode,
+                  colourCode:target.colourCode,
+                  evidenceType:image?'OFFICIAL_EXACT_CODE_COLOUR_MEDIA_URL':'OFFICIAL_EXACT_CODE_COLOUR_PAGE_URL',
+                  sourceUrl:url.toString(),
+                  sourceHost:url.hostname.toLowerCase(),
+                  sourceRunId:file.sourceRunId,
+                  corpusPath:file.corpusPath,
+                  sourceFileSha256:file.sha256,
+                  exactCodeColourPathMatch:true,
+                  rightsStatus:'UNKNOWN',
+                  ingestionStatus:'NOT_INGESTED',
+                });
+                matchCount++;
+              }
+              if(exactTokenHits>0){
+                evidence.push({
+                  schemaVersion:1,
+                  slot,
+                  identityKey:target.identityKey,
+                  productCode:target.productCode,
+                  colourCode:target.colourCode,
+                  evidenceType:'EXACT_CODE_COLOUR_TEXT_OCCURRENCE',
+                  occurrenceCount:exactTokenHits,
+                  sourceRunId:file.sourceRunId,
+                  corpusPath:file.corpusPath,
+                  sourceFileSha256:file.sha256,
+                });
+                matchCount+=exactTokenHits;
+              }
+            }
+            fileAudits.push({corpusPath:file.corpusPath,sourceRunId:file.sourceRunId,expectedSha256:file.sha256,actualSha256:actualSha,sizeBytes:bytes.length,matchCount});
+          }
+          const deduped=[...new Map(evidence.map(item=>[`${item.identityKey}|${item.evidenceType}|${item.sourceUrl??item.corpusPath}`,item])).values()];
+          const outDir=`execution/sequence17-workers/${slot}`;
+          await writeFile(`${outDir}/evidence.ndjson`,deduped.map(item=>JSON.stringify(item)).join('\n')+(deduped.length?'\n':''));
+          const summary={
+            schemaVersion:1,
+            slot,
+            planSha256:plan.planSha256,
+            assignedFileCount:assignment.files.length,
+            scannedFileCount:fileAudits.length,
+            assignedCorpusPaths:assignment.files.map(f=>f.corpusPath),
+            scannedCorpusPaths:fileAudits.map(f=>f.corpusPath),
+            officialMediaEvidenceCount:deduped.filter(e=>e.evidenceType==='OFFICIAL_EXACT_CODE_COLOUR_MEDIA_URL').length,
+            officialPageEvidenceCount:deduped.filter(e=>e.evidenceType==='OFFICIAL_EXACT_CODE_COLOUR_PAGE_URL').length,
+            textOccurrenceEvidenceCount:deduped.filter(e=>e.evidenceType==='EXACT_CODE_COLOUR_TEXT_OCCURRENCE').length,
+            evidenceCount:deduped.length,
+            fileAudits,
+            completedAt:new Date().toISOString(),
+          };
+          summary.summarySha256=createHash('sha256').update(JSON.stringify(summary)).digest('hex');
+          await writeFile(`${outDir}/summary.json`,`${JSON.stringify(summary,null,2)}\n`);
+          console.log(JSON.stringify({...summary,fileAudits:undefined},null,2));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence17-media-worker-${{ matrix.slot }}
+          path: execution/sequence17-workers/${{ matrix.slot }}
+          retention-days: 30
+
+  consolidate:
+    name: Consolidate sequence 17 media archaeology
+    needs: [prepare, archaeology]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rlf-sequence17-media-worker-*
+          path: /tmp/rlf-sequence17/workers
+      - name: Consolidate and audit all F01-F50 shards
+        shell: bash
+        env:
+          EXPECTED_PLAN_SHA: ${{ needs.prepare.outputs.plan_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p execution/sequence17-consolidated data/execution
+          node --input-type=module <<'NODE'
+          import { readdir, readFile, writeFile } from 'node:fs/promises';
+          import { join } from 'node:path';
+          import { createHash } from 'node:crypto';
+
+          const workersRoot='/tmp/rlf-sequence17/workers';
+          const plan=JSON.parse(await readFile('data/execution/sequence17-media-archaeology-preflight.json','utf8'));
+          if(plan.planSha256!==process.env.EXPECTED_PLAN_SHA) throw new Error('Consolidator plan SHA mismatch');
+          async function walk(path){const out=[];for(const e of await readdir(path,{withFileTypes:true})){const f=join(path,e.name);if(e.isDirectory())out.push(...await walk(f));else out.push(f);}return out;}
+          const files=await walk(workersRoot);
+          const summaries=[];
+          const evidence=[];
+          for(const path of files){
+            if(path.endsWith('/summary.json')) summaries.push(JSON.parse(await readFile(path,'utf8')));
+            if(path.endsWith('/evidence.ndjson')){
+              const text=await readFile(path,'utf8');
+              for(const line of text.split(/\r?\n/)) if(line.trim()) evidence.push(JSON.parse(line));
+            }
+          }
+          const expectedSlots=Array.from({length:50},(_,i)=>`F${String(i+1).padStart(2,'0')}`);
+          const slots=summaries.map(s=>s.slot).sort();
+          if(summaries.length!==50 || new Set(slots).size!==50 || JSON.stringify(slots)!==JSON.stringify(expectedSlots)) throw new Error('Sequence 17 requires 50 unique worker summaries');
+          if(summaries.some(s=>s.planSha256!==plan.planSha256)) throw new Error('Sequence 17 worker plan SHA mismatch');
+          const assigned=summaries.flatMap(s=>s.assignedCorpusPaths);
+          const scanned=summaries.flatMap(s=>s.scannedCorpusPaths);
+          const expected=plan.assignments.flatMap(a=>a.files.map(f=>f.corpusPath)).sort();
+          const uniqueAssigned=[...new Set(assigned)].sort();
+          const uniqueScanned=[...new Set(scanned)].sort();
+          const overlaps=assigned.filter((v,i,a)=>a.indexOf(v)!==i);
+          const missing=expected.filter(path=>!uniqueScanned.includes(path));
+          const unexpected=uniqueScanned.filter(path=>!expected.includes(path));
+          if(assigned.length!==80 || scanned.length!==80 || uniqueAssigned.length!==80 || uniqueScanned.length!==80 || overlaps.length || missing.length || unexpected.length) throw new Error('Sequence 17 corpus coverage invariant failed');
+
+          const allowedHost=host=>host==='fredperry.com'||host.endsWith('.fredperry.com');
+          const valid=[];
+          for(const item of evidence){
+            if(item.evidenceType?.startsWith('OFFICIAL_')){
+              const url=new URL(item.sourceUrl);
+              if(!allowedHost(url.hostname.toLowerCase())) throw new Error(`Non-official URL reached consolidation: ${item.sourceUrl}`);
+              const pattern=new RegExp(`${item.productCode}[-_]${item.colourCode}(?:[-_.]|$)`,'i');
+              const pathname=decodeURIComponent(url.pathname);
+              if(!pattern.test(pathname)) throw new Error(`Non-exact code-colour URL reached consolidation: ${item.sourceUrl}`);
+            }
+            valid.push(item);
+          }
+          const key=item=>`${item.identityKey}|${item.evidenceType}|${item.sourceUrl??item.corpusPath}`;
+          const deduped=[...new Map(valid.map(item=>[key(item),item])).values()].sort((a,b)=>key(a).localeCompare(key(b)));
+          const media=deduped.filter(e=>e.evidenceType==='OFFICIAL_EXACT_CODE_COLOUR_MEDIA_URL');
+          const pages=deduped.filter(e=>e.evidenceType==='OFFICIAL_EXACT_CODE_COLOUR_PAGE_URL');
+          const text=deduped.filter(e=>e.evidenceType==='EXACT_CODE_COLOUR_TEXT_OCCURRENCE');
+          const identityResults=plan.targetIdentities.map(target=>({
+            ...target,
+            officialMediaUrls:[...new Set(media.filter(e=>e.identityKey===target.identityKey).map(e=>e.sourceUrl))].sort(),
+            officialPageUrls:[...new Set(pages.filter(e=>e.identityKey===target.identityKey).map(e=>e.sourceUrl))].sort(),
+            textOccurrenceFiles:[...new Set(text.filter(e=>e.identityKey===target.identityKey).map(e=>e.corpusPath))].sort(),
+          }));
+          const manifest={
+            schemaVersion:1,
+            runId:process.env.GITHUB_RUN_ID,
+            generatedAt:new Date().toISOString(),
+            sourceCommitSha:process.env.GITHUB_SHA,
+            phaseId:'OFFICIAL_MEDIA_ARCHAEOLOGY_01',
+            planSha256:plan.planSha256,
+            workerCount:50,
+            orchestrationStatus:'FIFTY_OF_FIFTY_EXCLUSIVE_MEDIA_SHARDS_CONSOLIDATED',
+            corpus:{expectedFileCount:80,assignedFileCount:assigned.length,scannedFileCount:scanned.length,uniqueScannedFileCount:uniqueScanned.length,overlappingAssignments:overlaps,missingFiles:missing,unexpectedFiles:unexpected},
+            totals:{rawEvidenceCount:evidence.length,deduplicatedEvidenceCount:deduped.length,officialMediaUrlCount:media.length,officialPageUrlCount:pages.length,textOccurrenceEvidenceCount:text.length,identitiesWithOfficialMedia:identityResults.filter(r=>r.officialMediaUrls.length>0).length},
+            identityResults,
+          };
+          manifest.status=manifest.totals.officialMediaUrlCount>0?'EXACT_OFFICIAL_MEDIA_EVIDENCE_FOUND':'IMMUTABLE_OFFICIAL_CORPUS_EXHAUSTED_NO_EXACT_MEDIA';
+          manifest.passed=manifest.workerCount===50&&manifest.corpus.scannedFileCount===80&&manifest.corpus.uniqueScannedFileCount===80&&!overlaps.length&&!missing.length&&!unexpected.length;
+          manifest.manifestSha256=createHash('sha256').update(JSON.stringify(manifest)).digest('hex');
+          await writeFile('execution/sequence17-consolidated/evidence.json',`${JSON.stringify(deduped,null,2)}\n`);
+          await writeFile('execution/sequence17-consolidated/manifest.json',`${JSON.stringify(manifest,null,2)}\n`);
+          await writeFile('data/execution/sequence17-media-archaeology-manifest.json',`${JSON.stringify(manifest,null,2)}\n`);
+          await writeFile('data/execution/sequence17-media-evidence.json',`${JSON.stringify({schemaVersion:1,runId:manifest.runId,planSha256:plan.planSha256,identityResults,evidence:deduped},null,2)}\n`);
+          console.log(JSON.stringify(manifest,null,2));
+          if(!manifest.passed) throw new Error('Sequence 17 consolidated audit failed');
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence17-media-archaeology-${{ github.run_id }}
+          path: execution/sequence17-consolidated
+          retention-days: 30
+      - name: Persist sequence 17 archaeology checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence17-media-archaeology-manifest.json data/execution/sequence17-media-evidence.json
+          git commit -m "Persist sequence 17 official media archaeology ${GITHUB_RUN_ID}"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1

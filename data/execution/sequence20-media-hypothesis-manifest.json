@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "runId": "32864203820",
+  "generatedAt": "2026-08-25T15:12:08.641Z",
+  "sourceCommitSha": "b512f5b41cc131c2b29fa5092cf70f01aaf0a129",
+  "phaseId": "OBSERVED_OFFICIAL_MEDIA_PATTERN_PROBE_01",
+  "planSha256": "027c9a9f501a6316b011aa10be5a223612cf3215aad2e639775eb41ffabb637f",
+  "workerCount": 50,
+  "orchestrationStatus": "FIFTY_OF_FIFTY_EXCLUSIVE_MEDIA_HYPOTHESES_CONSOLIDATED",
+  "acceptancePolicy": {
+    "candidateDerivationIsNotEvidence": true,
+    "sourcePatternMustBeObservedInOfficialArtifact": true,
+    "officialFredPerryHostRequired": true,
+    "exactCodeColourPathRequired": true,
+    "httpStatusRequired": 200,
+    "contentTypePrefixRequired": "image/",
+    "imageBytesSha256Required": true,
+    "priceVerificationProhibited": true,
+    "factoryInferenceProhibited": true
+  },
+  "statusCounts": {
+    "403": 50
+  },
+  "contentTypeCounts": {
+    "text/html; charset=UTF-8": 50
+  },
+  "totals": {
+    "probeCount": 50,
+    "uniqueCandidateUrlCount": 50,
+    "httpOkCount": 0,
+    "httpErrorCount": 50,
+    "directImageResponseCount": 0,
+    "verifiedMediaRawCount": 0,
+    "verifiedMediaCount": 0,
+    "identitiesWithVerifiedMedia": 0
+  },
+  "identityResults": [
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "probeCount": 18,
+      "verifiedMedia": []
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "probeCount": 16,
+      "verifiedMedia": []
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "probeCount": 16,
+      "verifiedMedia": []
+    }
+  ],
+  "status": "OBSERVED_PATTERN_MEDIA_PROBES_COMPLETE_NO_VERIFIED_MEDIA",
+  "passed": true,
+  "manifestSha256": "765559e987f8f74fbd1c430fb84dccbb6aee7ac1b68f64c4fbf24f816aced939"
+}

@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 1,
+  "frontierId": "RLF-SEQUENCE17-MEDIA-PROBE-32787830678",
+  "createdAt": "2026-08-24T23:06:43.616Z",
+  "targetSequence": 17,
+  "phaseId": "EXACT_OFFICIAL_MEDIA_API_PROBE_01",
+  "priorRunId": "32784949243",
+  "priorLedgerSha256": "0476d387dbfb28ea303e9f6c1c642f22a117968537c3bff8c29678c72e60a2b7",
+  "priorDeltaCount": 11,
+  "workerCount": 50,
+  "activeLaneCount": 3,
+  "auditedIdleLaneCount": 47,
+  "selectedIdentityCount": 3,
+  "expectedProbeRecordCount": 10,
+  "selectedIdentitySha256": "af5c06fbcb2fdea5be542b5c93527bb20bda95d996682ad0a2e1ee8942eeb728",
+  "candidates": [
+    {
+      "schemaVersion": 1,
+      "slot": "F01",
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "exactSku": "HW2300-843",
+      "requestedProductUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html"
+      ],
+      "storeCodes": [
+        "ae_en",
+        "eg_en",
+        "sa_en"
+      ],
+      "endpointUrl": "https://www.fredperry.com/graphql",
+      "evidenceScope": "EXACT_OFFICIAL_SKU_MEDIA_API_PROBE"
+    },
+    {
+      "schemaVersion": 1,
+      "slot": "F02",
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "exactSku": "M1588-81B",
+      "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+        "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html"
+      ],
+      "storeCodes": [
+        "eu_de",
+        "eu_es"
+      ],
+      "endpointUrl": "https://www.fredperry.com/graphql",
+      "evidenceScope": "EXACT_OFFICIAL_SKU_MEDIA_API_PROBE"
+    },
+    {
+      "schemaVersion": 1,
+      "slot": "F03",
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "exactSku": "M1588-84B",
+      "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+        "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html"
+      ],
+      "storeCodes": [
+        "eu_de",
+        "eu_es"
+      ],
+      "endpointUrl": "https://www.fredperry.com/graphql",
+      "evidenceScope": "EXACT_OFFICIAL_SKU_MEDIA_API_PROBE"
+    }
+  ],
+  "assignments": [
+    {
+      "slot": "F01",
+      "index": 0,
+      "probes": [
+        {
+          "schemaVersion": 1,
+          "slot": "F01",
+          "identityKey": "HW2300|843",
+          "productCode": "HW2300",
+          "colourCode": "843",
+          "exactSku": "HW2300-843",
+          "requestedProductUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+            "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html"
+          ],
+          "storeCodes": [
+            "ae_en",
+            "eg_en",
+            "sa_en"
+          ],
+          "endpointUrl": "https://www.fredperry.com/graphql",
+          "evidenceScope": "EXACT_OFFICIAL_SKU_MEDIA_API_PROBE"
+        }
+      ]
+    },
+    {
+      "slot": "F02",
+      "index": 1,
+      "probes": [
+        {
+          "schemaVersion": 1,
+          "slot": "F02",
+          "identityKey": "M1588|81B",
+          "productCode": "M1588",
+          "colourCode": "81B",
+          "exactSku": "M1588-81B",
+          "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+            "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html"
+          ],
+          "storeCodes": [
+            "eu_de",
+            "eu_es"
+          ],
+          "endpointUrl": "https://www.fredperry.com/graphql",
+          "evidenceScope": "EXACT_OFFICIAL_SKU_MEDIA_API_PROBE"
+        }
+      ]
+    },
+    {
+      "slot": "F03",
+      "index": 2,
+      "probes": [
+        {
+          "schemaVersion": 1,
+          "slot": "F03",
+          "identityKey": "M1588|84B",
+          "productCode": "M1588",
+          "colourCode": "84B",
+          "exactSku": "M1588-84B",
+          "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+          "aliasUrls": [
+            "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+            "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html"
+          ],
+          "storeCodes": [
+            "eu_de",
+            "eu_es"
+          ],
+          "endpointUrl": "https://www.fredperry.com/graphql",
+          "evidenceScope": "EXACT_OFFICIAL_SKU_MEDIA_API_PROBE"
+        }
+      ]
+    },
+    {
+      "slot": "F04",
+      "index": 3,
+      "probes": []
+    },
+    {
+      "slot": "F05",
+      "index": 4,
+      "probes": []
+    },
+    {
+      "slot": "F06",
+      "index": 5,
+      "probes": []
+    },
+    {
+      "slot": "F07",
+      "index": 6,
+      "probes": []
+    },
+    {
+      "slot": "F08",
+      "index": 7,
+      "probes": []
+    },
+    {
+      "slot": "F09",
+      "index": 8,
+      "probes": []
+    },
+    {
+      "slot": "F10",
+      "index": 9,
+      "probes": []
+    },
+    {
+      "slot": "F11",
+      "index": 10,
+      "probes": []
+    },
+    {
+      "slot": "F12",
+      "index": 11,
+      "probes": []
+    },
+    {
+      "slot": "F13",
+      "index": 12,
+      "probes": []
+    },
+    {
+      "slot": "F14",
+      "index": 13,
+      "probes": []
+    },
+    {
+      "slot": "F15",
+      "index": 14,
+      "probes": []
+    },
+    {
+      "slot": "F16",
+      "index": 15,
+      "probes": []
+    },
+    {
+      "slot": "F17",
+      "index": 16,
+      "probes": []
+    },
+    {
+      "slot": "F18",
+      "index": 17,
+      "probes": []
+    },
+    {
+      "slot": "F19",
+      "index": 18,
+      "probes": []
+    },
+    {
+      "slot": "F20",
+      "index": 19,
+      "probes": []
+    },
+    {
+      "slot": "F21",
+      "index": 20,
+      "probes": []
+    },
+    {
+      "slot": "F22",
+      "index": 21,
+      "probes": []
+    },
+    {
+      "slot": "F23",
+      "index": 22,
+      "probes": []
+    },
+    {
+      "slot": "F24",
+      "index": 23,
+      "probes": []
+    },
+    {
+      "slot": "F25",
+      "index": 24,
+      "probes": []
+    },
+    {
+      "slot": "F26",
+      "index": 25,
+      "probes": []
+    },
+    {
+      "slot": "F27",
+      "index": 26,
+      "probes": []
+    },
+    {
+      "slot": "F28",
+      "index": 27,
+      "probes": []
+    },
+    {
+      "slot": "F29",
+      "index": 28,
+      "probes": []
+    },
+    {
+      "slot": "F30",
+      "index": 29,
+      "probes": []
+    },
+    {
+      "slot": "F31",
+      "index": 30,
+      "probes": []
+    },
+    {
+      "slot": "F32",
+      "index": 31,
+      "probes": []
+    },
+    {
+      "slot": "F33",
+      "index": 32,
+      "probes": []
+    },
+    {
+      "slot": "F34",
+      "index": 33,
+      "probes": []
+    },
+    {
+      "slot": "F35",
+      "index": 34,
+      "probes": []
+    },
+    {
+      "slot": "F36",
+      "index": 35,
+      "probes": []
+    },
+    {
+      "slot": "F37",
+      "index": 36,
+      "probes": []
+    },
+    {
+      "slot": "F38",
+      "index": 37,
+      "probes": []
+    },
+    {
+      "slot": "F39",
+      "index": 38,
+      "probes": []
+    },
+    {
+      "slot": "F40",
+      "index": 39,
+      "probes": []
+    },
+    {
+      "slot": "F41",
+      "index": 40,
+      "probes": []
+    },
+    {
+      "slot": "F42",
+      "index": 41,
+      "probes": []
+    },
+    {
+      "slot": "F43",
+      "index": 42,
+      "probes": []
+    },
+    {
+      "slot": "F44",
+      "index": 43,
+      "probes": []
+    },
+    {
+      "slot": "F45",
+      "index": 44,
+      "probes": []
+    },
+    {
+      "slot": "F46",
+      "index": 45,
+      "probes": []
+    },
+    {
+      "slot": "F47",
+      "index": 46,
+      "probes": []
+    },
+    {
+      "slot": "F48",
+      "index": 47,
+      "probes": []
+    },
+    {
+      "slot": "F49",
+      "index": 48,
+      "probes": []
+    },
+    {
+      "slot": "F50",
+      "index": 49,
+      "probes": []
+    }
+  ],
+  "frontierSha256": "c669290df38d002ada380a2f36898aa4625a2009e0c9afb369aea9cfcbe0d05e"
+}

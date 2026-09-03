@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "runId": "32861233493",
+  "generatedAt": "2026-08-25T14:44:09.760Z",
+  "sourceCommitSha": "497b78ec1694fb7c3833da999c072d48fd7388b8",
+  "phaseId": "OFFICIAL_MEDIA_ARCHAEOLOGY_01",
+  "planSha256": "d9e30f2ff37d662064521e3dea2812892c5bfd4301020c16eb63405f3423e3b3",
+  "workerCount": 50,
+  "orchestrationStatus": "FIFTY_OF_FIFTY_EXCLUSIVE_MEDIA_SHARDS_CONSOLIDATED",
+  "corpus": {
+    "expectedFileCount": 80,
+    "assignedFileCount": 80,
+    "scannedFileCount": 80,
+    "uniqueScannedFileCount": 80,
+    "overlappingAssignments": [],
+    "missingFiles": [],
+    "unexpectedFiles": []
+  },
+  "totals": {
+    "rawEvidenceCount": 95,
+    "deduplicatedEvidenceCount": 43,
+    "officialMediaUrlCount": 0,
+    "officialPageUrlCount": 8,
+    "textOccurrenceEvidenceCount": 35,
+    "identitiesWithOfficialMedia": 0
+  },
+  "identityResults": [
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "officialMediaUrls": [],
+      "officialPageUrls": [
+        "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+        "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html"
+      ],
+      "textOccurrenceFiles": [
+        "32746322369/consolidated/product-candidates.ndjson",
+        "32746322369/consolidated/product-frontier.json",
+        "32746322369/consolidated/product-identities.ndjson",
+        "32746322369/consolidated/product-identity-aliases.json",
+        "32746322369/consolidated/product-link-candidates.ndjson",
+        "32748405808/consolidated/product-candidates.ndjson",
+        "32748405808/consolidated/product-frontier.json",
+        "32748405808/consolidated/product-identities.ndjson",
+        "32748405808/consolidated/product-identity-aliases.json",
+        "32748405808/consolidated/product-link-candidates.ndjson",
+        "32754804084/consolidated/product-candidates.ndjson",
+        "32754804084/consolidated/product-frontier.json",
+        "32754804084/consolidated/product-identities.ndjson",
+        "32754804084/consolidated/product-identity-aliases.json",
+        "32754804084/consolidated/product-link-candidates.ndjson",
+        "32777623316/consolidated/product-candidates.ndjson",
+        "32777623316/consolidated/product-frontier.json",
+        "32777623316/consolidated/product-identities.ndjson",
+        "32777623316/consolidated/product-link-candidates.ndjson"
+      ]
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "officialMediaUrls": [],
+      "officialPageUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+        "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html"
+      ],
+      "textOccurrenceFiles": [
+        "32758087459/consolidated/product-candidates.ndjson",
+        "32758087459/consolidated/product-frontier.json",
+        "32758087459/consolidated/product-identities.ndjson",
+        "32758087459/consolidated/product-link-candidates.ndjson",
+        "32777623316/consolidated/product-candidates.ndjson",
+        "32777623316/consolidated/product-frontier.json",
+        "32777623316/consolidated/product-identities.ndjson",
+        "32777623316/consolidated/product-link-candidates.ndjson"
+      ]
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "officialMediaUrls": [],
+      "officialPageUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+        "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html"
+      ],
+      "textOccurrenceFiles": [
+        "32758087459/consolidated/product-candidates.ndjson",
+        "32758087459/consolidated/product-frontier.json",
+        "32758087459/consolidated/product-identities.ndjson",
+        "32758087459/consolidated/product-link-candidates.ndjson",
+        "32777623316/consolidated/product-candidates.ndjson",
+        "32777623316/consolidated/product-frontier.json",
+        "32777623316/consolidated/product-identities.ndjson",
+        "32777623316/consolidated/product-link-candidates.ndjson"
+      ]
+    }
+  ],
+  "status": "IMMUTABLE_OFFICIAL_CORPUS_EXHAUSTED_NO_EXACT_MEDIA",
+  "passed": true,
+  "manifestSha256": "b18f5d822114ec663beff2492117af224eb40fb99f1e1a13ae5f708302ef2230"
+}

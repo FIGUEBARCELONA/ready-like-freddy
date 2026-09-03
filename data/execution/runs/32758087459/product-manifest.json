@@ -1,0 +1,1945 @@
+{
+  "schemaVersion": 5,
+  "runId": "32758087459",
+  "runAttempt": "1",
+  "repository": "FIGUEBARCELONA/ready-like-freddy",
+  "ref": "feature/rlf-execution-backend-20260823",
+  "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+  "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+  "workerCount": 50,
+  "orchestrationStatus": "FIFTY_OF_FIFTY_PRODUCT_WORKERS_CONSOLIDATED",
+  "transportStatus": "USABLE_PRODUCT_SOURCES_CAPTURED",
+  "contaminationStatus": "OFFICIAL_PRODUCT_MEDIA_ONLY",
+  "qualityGatePassed": false,
+  "totals": {
+    "frontierProductUrlCount": 3280,
+    "frontierProductIdentityCount": 876,
+    "previouslyCompletedIdentityCount": 1054,
+    "selectedIdentityCount": 191,
+    "expectedProductCaptureCount": 191,
+    "attemptedProductCount": 191,
+    "attemptedIdentityCount": 191,
+    "httpFetchSuccessCount": 191,
+    "successfulProductFetchCount": 187,
+    "failedProductFetchCount": 4,
+    "successfulIdentityCaptureCount": 187,
+    "failedIdentityCaptureCount": 4,
+    "soft404IdentityCount": 0,
+    "missingImageIdentityCount": 4,
+    "aliasFallbackSuccessCount": 0,
+    "directSourceCount": 0,
+    "transformedReaderSourceCount": 187,
+    "imageReferenceCount": 1516,
+    "officialProductImageReferenceCount": 1516,
+    "rejectedImageReferenceCount": 0,
+    "descriptionEvidenceCount": 0,
+    "verifiedPriceCount": 0,
+    "materialEvidenceCount": 222,
+    "materialMissingIdentityCount": 18,
+    "manufacturingClaimCount": 4,
+    "factoryVerifiedCount": 0
+  },
+  "productStatus": "CODE_COLOUR_IDENTITY_WITH_IMAGE_EVIDENCE_NOT_GLOBAL_CANONICAL_PRODUCTS",
+  "factoryStatus": "TEXTUAL_CLAIMS_ONLY_NO_FACTORY_VERIFICATION",
+  "imageStatus": "OFFICIAL_SOURCE_URLS_ONLY_RIGHTS_UNKNOWN_NOT_INGESTED",
+  "priceStatus": "ONLY_DIRECT_OFFICIAL_PAGE_PRICE_CANDIDATES_RETAINED_REQUIRES_QA",
+  "progressDeltaSha256": "7c3fa704d332e6382f8f9470903ce2f293ba7a83221559bbe86413e292f94122",
+  "workerSummaries": [
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F01",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 35,
+      "materialEvidenceCount": 7,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:16.865Z",
+      "sourceMarkets": [
+        "DE",
+        "ES",
+        "FR",
+        "GB",
+        "ID",
+        "IT",
+        "PT"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "COLLABORATIONS",
+        "HERITAGE",
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "3beb6dde1116931090ea512fcf9e687e50f5b2b0306bf628f24a2a41910c05df"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F02",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 28,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:23.323Z",
+      "sourceMarkets": [
+        "DE",
+        "ES",
+        "FR",
+        "GB",
+        "ID",
+        "IT",
+        "PT"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "01c33e363dd038e9c3138d021e1fea7a290e16d61888d37bb260def006c12e96"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F03",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 36,
+      "materialEvidenceCount": 7,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:23.391Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "4e35d651099e9017a0c9caec28cf078be2828cef15dd1bde4228db9c52a75a8f"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F04",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 35,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:25.119Z",
+      "sourceMarkets": [
+        "DE",
+        "ES",
+        "FR",
+        "GB",
+        "ID",
+        "IT",
+        "PT"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "70b8c4a1934d27a65870df8eb84025971879d9efe5a81b3d3f889538811aff71"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F05",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 26,
+      "materialEvidenceCount": 4,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:13.804Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "e5bd9a1da3fcdb870de046dcc08b816b3f557e6161b8b4153bceeb430a356c39"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F06",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 39,
+      "materialEvidenceCount": 6,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:30.054Z",
+      "sourceMarkets": [
+        "DE",
+        "ES",
+        "FR",
+        "GB",
+        "ID",
+        "IT",
+        "PT"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "52cbaa5147f0d68c2d1aaa1d2da0b49945659659bcdb61008a87f5e29d698efb"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F07",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 33,
+      "materialEvidenceCount": 8,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:19.892Z",
+      "sourceMarkets": [
+        "ID",
+        "SA"
+      ],
+      "sourceRegionGroups": [
+        "MIDDLE_EAST",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "97b749168b0c142948ac63e7b7908a4463dba5780bd263c6702253e2e27b1e11"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F08",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 34,
+      "materialEvidenceCount": 7,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:20.939Z",
+      "sourceMarkets": [
+        "AU",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "9f60a23c8918e8901ea1242d5c0de2bb8eb5966d566c9aaf929d15f9ae0be1ce"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F09",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 19,
+      "materialEvidenceCount": 6,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:33.749Z",
+      "sourceMarkets": [
+        "AU",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "01fad938b8b9e3adbcf6ad12269108da7c2c0334e386b855759b7262909f9ae0"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F10",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 39,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 1,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:25.653Z",
+      "sourceMarkets": [
+        "ES",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "ed4e7566b8eb714d38ad7bcac0bdb89d56a64557c6a83e3d72284ef3f2e429a2"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F11",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 22,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:50.626Z",
+      "sourceMarkets": [
+        "AU",
+        "DE",
+        "ES",
+        "FR",
+        "GB",
+        "ID",
+        "IT",
+        "PT"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "4d53ed847943e41adcad7481d89d517f5c8e126ac8a3ba13cbbf16800a117b8b"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F12",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 32,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:48:03.570Z",
+      "sourceMarkets": [
+        "AU",
+        "FR",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "d2f87512adf2ac89e494cfe00adb39dfb79bdf89056bc1727285062220ff1415"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F13",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 38,
+      "materialEvidenceCount": 2,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:10.980Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "c7109bbc5f7dcee36472c7cdb37dcc105c846706622ff4811c633a2af4019a24"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F14",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 32,
+      "materialEvidenceCount": 7,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:18.124Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "b9877986e91379c3897361ae1ead216f60d4047303650e58784a1c73f3525b87"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F15",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 34,
+      "materialEvidenceCount": 6,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:10.126Z",
+      "sourceMarkets": [
+        "AE",
+        "EG",
+        "ID",
+        "SA"
+      ],
+      "sourceRegionGroups": [
+        "MIDDLE_EAST",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "COLLABORATIONS",
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "c4b5c67630fe02d4c352d73f25c22e37b468e06a211ea1912ed93821e52e3385"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F16",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 29,
+      "materialEvidenceCount": 4,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:23.319Z",
+      "sourceMarkets": [
+        "FR",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "037e354303c826c8d1a59b85c65122063a233cdbfa2a2e5748d2805eb5660638"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F17",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 37,
+      "materialEvidenceCount": 8,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:12.028Z",
+      "sourceMarkets": [
+        "AU",
+        "FR",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "e6d37fce39459d6f5608e0508fdd16a9ffc587174bab3407bc3b0d1d31934445"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F18",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 20,
+      "materialEvidenceCount": 5,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:48:04.094Z",
+      "sourceMarkets": [
+        "AE",
+        "AU",
+        "EG",
+        "FR",
+        "ID",
+        "SA"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "MIDDLE_EAST",
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "7cb66d35b8b1329be80a5d4d9b75599c35f002b988e58f01f889a4804f80a618"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F19",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 32,
+      "materialEvidenceCount": 5,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:19.488Z",
+      "sourceMarkets": [
+        "AE",
+        "EG",
+        "FR",
+        "ID",
+        "SA"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "MIDDLE_EAST",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "fe3e9b71183d70d4a9880f1db792043cc07e4e4b97bea94349859bd9503eb53d"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F20",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 23,
+      "materialEvidenceCount": 5,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:11.795Z",
+      "sourceMarkets": [
+        "FR",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "faa6c115fe04c1f38564a17ecd0e04efd73fcd8b32feb67c4a43f3ffb8a0d8b5"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F21",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 29,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:29.035Z",
+      "sourceMarkets": [
+        "ES",
+        "FR",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "ce3171583e361345b93582c9fc7515df52f5b45ff35c57516b29558045b1f188"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F22",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 35,
+      "materialEvidenceCount": 2,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:48:09.784Z",
+      "sourceMarkets": [
+        "AU",
+        "FR",
+        "SA"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "MIDDLE_EAST",
+        "OCEANIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "5590c2e028473963bee8dcbdfc3e3b9e9ec5a4a7e3d88d13ee458d9afde2bfd4"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F23",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 36,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:30.569Z",
+      "sourceMarkets": [
+        "AE",
+        "ES",
+        "FR",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "MIDDLE_EAST",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "4919f0d9cedcfea9fa14966c15ba7ed7873b4e5a68d7a8dd9aaba615d5158f71"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F24",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 39,
+      "materialEvidenceCount": 4,
+      "manufacturingClaimCount": 2,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:57.291Z",
+      "sourceMarkets": [
+        "AE",
+        "DE",
+        "ES",
+        "FR",
+        "GB",
+        "ID",
+        "IT",
+        "PT"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "MIDDLE_EAST",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "COLLABORATIONS",
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "84edef03026e0c4e105b2ee0e1ddf562ec0d30bf665abcfdb09a7ca202bbf617"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F25",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 35,
+      "materialEvidenceCount": 6,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:48:14.200Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "349a8f8ba5354c7fc6a33b72fbc0ce916dfbd6b01084c4329cfd66561b9e6409"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F26",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 34,
+      "materialEvidenceCount": 5,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:21.979Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "63ab8ddfe8d8ab132ef23fb3338cf6ed99c0fa24ba22bd225942ce3892008085"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F27",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 39,
+      "materialEvidenceCount": 5,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:18.076Z",
+      "sourceMarkets": [
+        "DE",
+        "ES",
+        "FR",
+        "GB",
+        "ID",
+        "IT",
+        "PT"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "d51a90dab5c289373e5b71b75ca168d206f6ec7936ef5d9164e20380ec36fd24"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F28",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 34,
+      "materialEvidenceCount": 5,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:21.402Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "1cad9dda37000dfd9c1eaca25fd8af0cf75563d04f2416c20c3aadfe82ffee30"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F29",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 36,
+      "materialEvidenceCount": 5,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:23.443Z",
+      "sourceMarkets": [
+        "AU",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "8de8ff5f1f313154307b6f6d8afd0e224852025dd209cb0d8387937eb4077a3c"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F30",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 32,
+      "materialEvidenceCount": 4,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:33.645Z",
+      "sourceMarkets": [
+        "ES",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "41e2b7324df9b5f865bee2e4be8ffb7d32da11bd7ceee4a2299ae49ebf265e87"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F31",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 33,
+      "materialEvidenceCount": 4,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:22.618Z",
+      "sourceMarkets": [
+        "ES",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE"
+      ],
+      "summarySha256": "661af658412b57eeb624fa4f8359097ec75ea9f3f2115430ce5bc11f1d1e4d2b"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F32",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 33,
+      "materialEvidenceCount": 4,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:26.423Z",
+      "sourceMarkets": [
+        "ES",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "6ef65cffe26603add4ba34adc6a738baf13f75a82d102f64466847e5d8011f88"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F33",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 30,
+      "materialEvidenceCount": 6,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:27.817Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "0cadaef91b067e051ee439fff3b9f16467ae51695905c22b27eea5c8e8eee6b3"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F34",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 33,
+      "materialEvidenceCount": 6,
+      "manufacturingClaimCount": 1,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:21.977Z",
+      "sourceMarkets": [
+        "AU",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "f804ba2378db61b45ed44f34892d88e4710814c401df939d53754f726211a194"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F35",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 3,
+      "failedProductFetchCount": 1,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 1,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 3,
+      "imageReferenceCount": 25,
+      "materialEvidenceCount": 6,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:48:12.969Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "a62194536dd4fe5da816b04fa07b327bd8ef17ffbb6137383fec59893bba6f1a"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F36",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 3,
+      "failedProductFetchCount": 1,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 1,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 3,
+      "imageReferenceCount": 25,
+      "materialEvidenceCount": 4,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:36.901Z",
+      "sourceMarkets": [
+        "EG",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "MIDDLE_EAST",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "eb983928a55b5da797caf2157fa7cb83f6becf6c2fb6ce005684b13f8dab842e"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F37",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 36,
+      "materialEvidenceCount": 5,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:31.030Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "3cf3868bca8e6ab77eb9117a78c80ec37e1a82003a8d4bc771a94d1b40d42e07"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F38",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 40,
+      "materialEvidenceCount": 6,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:24.488Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "4e6b27e5fb3cb7bae95d909c3124782bdf2e1d360a5fb1d3e838c4e77203004f"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F39",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 32,
+      "materialEvidenceCount": 7,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:35.041Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE",
+        "WOMEN_CORE"
+      ],
+      "summarySha256": "17641ffabef14e5e72e20bdf194d90bd40a7ec4cbfb54a119c668648b152d34e"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F40",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 31,
+      "materialEvidenceCount": 4,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:48:03.062Z",
+      "sourceMarkets": [
+        "DE",
+        "ES",
+        "FR",
+        "GB",
+        "ID",
+        "IT",
+        "PT"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "20b2060efa6eb532d16900ad7710b11bd5cfd59a880bbc89b25320010c05a42c"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F41",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 4,
+      "expectedProductCount": 4,
+      "attemptedProductCount": 4,
+      "successfulProductFetchCount": 4,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 4,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 4,
+      "imageReferenceCount": 27,
+      "materialEvidenceCount": 4,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:13.782Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "425f11182fbd16a9a6fd8ac59bcdd417be478ada58f335f964bd1a11d576848b"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F42",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 3,
+      "expectedProductCount": 3,
+      "attemptedProductCount": 3,
+      "successfulProductFetchCount": 3,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 3,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 3,
+      "imageReferenceCount": 26,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:55.302Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE"
+      ],
+      "summarySha256": "6801058ed618f3fd2870a312ea8d352a34e70b3a4c34f40204adaa392a4cc90c"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F43",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 3,
+      "expectedProductCount": 3,
+      "attemptedProductCount": 3,
+      "successfulProductFetchCount": 3,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 3,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 3,
+      "imageReferenceCount": 24,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:09.556Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE"
+      ],
+      "summarySha256": "b81c4291275e312d9cbb24188cd40135db4169254890fd532de92a73f54918ff"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F44",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 3,
+      "expectedProductCount": 3,
+      "attemptedProductCount": 3,
+      "successfulProductFetchCount": 3,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 3,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 3,
+      "imageReferenceCount": 23,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:20.106Z",
+      "sourceMarkets": [
+        "AE",
+        "AU",
+        "EG",
+        "ID",
+        "SA"
+      ],
+      "sourceRegionGroups": [
+        "MIDDLE_EAST",
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "99005ef3a23b05b96095d89d7704ac04734e5becb4c07de0c6990a65ecad473c"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F45",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 3,
+      "expectedProductCount": 3,
+      "attemptedProductCount": 3,
+      "successfulProductFetchCount": 3,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 3,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 3,
+      "imageReferenceCount": 22,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:06.043Z",
+      "sourceMarkets": [
+        "AU",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "HERITAGE",
+        "MEN_CORE"
+      ],
+      "summarySha256": "9b57cff0fccd7ffaa2081efff266326da18bb4166afb0471b9c0696282139fc0"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F46",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 3,
+      "expectedProductCount": 3,
+      "attemptedProductCount": 3,
+      "successfulProductFetchCount": 3,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 3,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 3,
+      "imageReferenceCount": 18,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:05.166Z",
+      "sourceMarkets": [
+        "AU",
+        "EG",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "MIDDLE_EAST",
+        "OCEANIA",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE"
+      ],
+      "summarySha256": "987bfade91306d75cbb64af5659637c9db833af4887fa38827f3c3d2409e8b95"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F47",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 3,
+      "expectedProductCount": 3,
+      "attemptedProductCount": 3,
+      "successfulProductFetchCount": 3,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 3,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 3,
+      "imageReferenceCount": 26,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:46:16.789Z",
+      "sourceMarkets": [
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE"
+      ],
+      "summarySha256": "a6c399c325a03aeebd1df81986039eab8899336843ede0c155387eb79c7c14f1"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F48",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 3,
+      "expectedProductCount": 3,
+      "attemptedProductCount": 3,
+      "successfulProductFetchCount": 2,
+      "failedProductFetchCount": 1,
+      "httpFetchSuccessCount": 3,
+      "soft404Count": 0,
+      "missingImageCount": 1,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 2,
+      "imageReferenceCount": 15,
+      "materialEvidenceCount": 1,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:07.874Z",
+      "sourceMarkets": [
+        "ES",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE"
+      ],
+      "summarySha256": "f4bdeec96ea93746f14b42f066568f1512ec98201fc3684897bd36bc6d1721ff"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F49",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 3,
+      "expectedProductCount": 3,
+      "attemptedProductCount": 3,
+      "successfulProductFetchCount": 2,
+      "failedProductFetchCount": 1,
+      "httpFetchSuccessCount": 3,
+      "soft404Count": 0,
+      "missingImageCount": 1,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 2,
+      "imageReferenceCount": 17,
+      "materialEvidenceCount": 2,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:52.538Z",
+      "sourceMarkets": [
+        "DE",
+        "ES",
+        "FR",
+        "GB",
+        "ID",
+        "IT",
+        "PT"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE"
+      ],
+      "summarySha256": "71947d314bbf5d6f5a7d1fdf7343c609ccb6a24f63a9c80738fb473c25e2f845"
+    },
+    {
+      "schemaVersion": 4,
+      "frontierId": "RLF-OFFICIAL-20260824174151723-PRODUCTS",
+      "frontierSha256": "2b24b4bf9965883744e3baa04a9d07c1f135a1fae56d7db3bff28d87073bc5c2",
+      "slot": "F50",
+      "configuredProductLimit": 5,
+      "assignedProductCount": 3,
+      "expectedProductCount": 3,
+      "attemptedProductCount": 3,
+      "successfulProductFetchCount": 3,
+      "failedProductFetchCount": 0,
+      "httpFetchSuccessCount": 3,
+      "soft404Count": 0,
+      "missingImageCount": 0,
+      "aliasFallbackSuccessCount": 0,
+      "directSourceCount": 0,
+      "transformedReaderSourceCount": 3,
+      "imageReferenceCount": 28,
+      "materialEvidenceCount": 3,
+      "manufacturingClaimCount": 0,
+      "verifiedPriceCount": 0,
+      "factoryVerifiedCount": 0,
+      "completedAt": "2026-08-24T17:47:56.449Z",
+      "sourceMarkets": [
+        "GB",
+        "ID"
+      ],
+      "sourceRegionGroups": [
+        "EUROPE",
+        "SOUTHEAST_ASIA"
+      ],
+      "sourceDiscoveryScopes": [
+        "MEN_CORE"
+      ],
+      "summarySha256": "c45bf3d0e1210b4e04d78d7aaaac3b328fe2bf45179ec825c1a6fc9c62e3ee4c"
+    }
+  ],
+  "completedAt": "2026-08-24T17:48:30.948Z",
+  "manifestSha256": "85b3e20670637028d39507c06fba74e4ea31a19a3e103492bad1430c68cced16"
+}

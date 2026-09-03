@@ -1,0 +1,139 @@
+name: RLF sequence 17 media archaeology preflight
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence17-media-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: rlf-sequence17-media-preflight
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Download immutable official discovery corpus
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/rlf-sequence17/corpus
+          runs=(32746322369 32748405808 32754804084 32758087459 32777623316 32780333417 32781308211 32783967794)
+          for run_id in "${runs[@]}"; do
+            artifact="rlf-kb-official-discovery-${run_id}"
+            mkdir -p "/tmp/rlf-sequence17/corpus/${run_id}"
+            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name "$artifact" --dir "/tmp/rlf-sequence17/corpus/${run_id}"
+          done
+      - name: Build exact non-overlapping 50-lane shard plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/execution
+          node --input-type=module <<'NODE'
+          import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
+          import { join, relative, extname } from 'node:path';
+          import { createHash } from 'node:crypto';
+
+          const root='/tmp/rlf-sequence17/corpus';
+          const runIds=['32746322369','32748405808','32754804084','32758087459','32777623316','32780333417','32781308211','32783967794'];
+          const allowed=new Set(['.json','.ndjson','.jsonl','.md','.txt','.html','.htm','.csv','.xml']);
+          async function walk(path){
+            const out=[];
+            for(const entry of await readdir(path,{withFileTypes:true})){
+              const full=join(path,entry.name);
+              if(entry.isDirectory()) out.push(...await walk(full));
+              else if(allowed.has(extname(entry.name).toLowerCase())) out.push(full);
+            }
+            return out;
+          }
+          const paths=(await walk(root)).sort();
+          const files=[];
+          for(const path of paths){
+            const info=await stat(path);
+            const bytes=await readFile(path);
+            files.push({
+              corpusPath:relative(root,path),
+              sourceRunId:relative(root,path).split('/')[0],
+              relativeArtifactPath:relative(join(root,relative(root,path).split('/')[0]),path),
+              sizeBytes:info.size,
+              sha256:createHash('sha256').update(bytes).digest('hex'),
+            });
+          }
+          const duplicatePaths=files.map(f=>f.corpusPath).filter((v,i,a)=>a.indexOf(v)!==i);
+          const duplicateHashes=Object.entries(files.reduce((m,f)=>{(m[f.sha256]??=[]).push(f.corpusPath);return m;},{})).filter(([,p])=>p.length>1);
+          const assignments=Array.from({length:50},(_,i)=>({slot:`F${String(i+1).padStart(2,'0')}`,files:[]}));
+          files.forEach((file,index)=>assignments[index%50].files.push(file));
+          const assigned=assignments.flatMap(a=>a.files.map(f=>f.corpusPath));
+          const missing=files.map(f=>f.corpusPath).filter(path=>!assigned.includes(path));
+          const overlap=assigned.filter((path,index)=>assigned.indexOf(path)!==index);
+          const runInventory=runIds.map(runId=>({runId,fileCount:files.filter(f=>f.sourceRunId===runId).length}));
+          const unsigned={
+            schemaVersion:1,
+            generatedAt:new Date().toISOString(),
+            sourceCommitSha:process.env.GITHUB_SHA,
+            targetSequence:17,
+            phaseId:'OFFICIAL_MEDIA_ARCHAEOLOGY_01',
+            targetIdentities:[
+              {identityKey:'HW2300|843',productCode:'HW2300',colourCode:'843'},
+              {identityKey:'M1588|81B',productCode:'M1588',colourCode:'81B'},
+              {identityKey:'M1588|84B',productCode:'M1588',colourCode:'84B'},
+            ],
+            sourceRunIds:runIds,
+            runInventory,
+            corpus:{textFileCount:files.length,totalBytes:files.reduce((s,f)=>s+f.sizeBytes,0),duplicatePathCount:duplicatePaths.length,duplicateContentGroups:duplicateHashes.length},
+            assignmentCount:assignments.length,
+            nonemptyLaneCount:assignments.filter(a=>a.files.length>0).length,
+            minimumFilesPerLane:Math.min(...assignments.map(a=>a.files.length)),
+            maximumFilesPerLane:Math.max(...assignments.map(a=>a.files.length)),
+            assignedFileCount:assigned.length,
+            uniqueAssignedFileCount:new Set(assigned).size,
+            missingFiles:missing,
+            overlappingAssignments:overlap,
+            assignments,
+          };
+          const canonical=JSON.stringify(unsigned);
+          const plan={...unsigned,planSha256:createHash('sha256').update(canonical).digest('hex')};
+          plan.passed=
+            plan.sourceRunIds.length===8 &&
+            plan.corpus.textFileCount>=50 &&
+            plan.assignmentCount===50 &&
+            plan.nonemptyLaneCount===50 &&
+            plan.minimumFilesPerLane>=1 &&
+            plan.assignedFileCount===plan.corpus.textFileCount &&
+            plan.uniqueAssignedFileCount===plan.corpus.textFileCount &&
+            plan.missingFiles.length===0 &&
+            plan.overlappingAssignments.length===0 &&
+            plan.corpus.duplicatePathCount===0;
+          await writeFile('data/execution/sequence17-media-archaeology-preflight.json',`${JSON.stringify(plan,null,2)}\n`);
+          console.log(JSON.stringify({...plan,assignments:plan.assignments.map(a=>({slot:a.slot,fileCount:a.files.length}))},null,2));
+          if(!plan.passed) throw new Error('Sequence 17 media archaeology preflight failed');
+          NODE
+      - name: Publish exact sequence 17 preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence17-media-archaeology-preflight.json
+          git commit -m 'Persist sequence 17 media archaeology preflight'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1

@@ -1,0 +1,108 @@
+name: RLF sequence 20 official media hypothesis preflight
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence20-media-hypothesis-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: rlf-sequence20-media-hypothesis-preflight
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Recover immutable official product-image corpus
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/rlf-sequence20/artifacts /tmp/rlf-sequence20/corpus data/execution
+          mapfile -t run_ids < <(find data/execution/progress-deltas -maxdepth 1 -type f -name '*.json' -printf '%f\n' | sed 's/\.json$//' | sort -V)
+          printf '%s\n' "${run_ids[@]}" > /tmp/rlf-sequence20/run-ids.txt
+          : > /tmp/rlf-sequence20/artifacts.jsonl
+          for run_id in "${run_ids[@]}"; do
+            gh api --paginate -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts?per_page=100" \
+              --jq '.artifacts[] | select(.name|test("^(rlf-kb-product-pages-|rlf-sequence16-retry-results-)")) | {runId:"'"$run_id"'",id,name,digest,size_in_bytes,expired}' \
+              >> /tmp/rlf-sequence20/artifacts.jsonl
+          done
+          jq -s 'unique_by(.id)' /tmp/rlf-sequence20/artifacts.jsonl > /tmp/rlf-sequence20/artifacts.json
+          jq -e 'length >= 11 and all(.expired == false)' /tmp/rlf-sequence20/artifacts.json >/dev/null
+          while IFS=$'\t' read -r run_id artifact_id artifact_name digest; do
+            mkdir -p "/tmp/rlf-sequence20/corpus/${run_id}"
+            gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > "/tmp/rlf-sequence20/artifacts/${artifact_id}.zip"
+            unzip -q "/tmp/rlf-sequence20/artifacts/${artifact_id}.zip" -d "/tmp/rlf-sequence20/corpus/${run_id}"
+          done < <(jq -r '.[]|[.runId,.id,.name,.digest]|@tsv' /tmp/rlf-sequence20/artifacts.json)
+      - name: Derive fifty exclusive candidates from observed official URL patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readdir,readFile,writeFile } from 'node:fs/promises';
+          import { join } from 'node:path';
+          const stable=value=>Array.isArray(value)?value.map(stable):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(k=>[k,stable(value[k])])):value;
+          const sha=value=>createHash('sha256').update(JSON.stringify(stable(value))).digest('hex');
+          async function walk(path){const out=[];for(const entry of await readdir(path,{withFileTypes:true})){const full=join(path,entry.name);if(entry.isDirectory())out.push(...await walk(full));else out.push(full);}return out;}
+          const files=(await walk('/tmp/rlf-sequence20/corpus')).filter(path=>/\.(?:json|ndjson|txt|html|md)$/i.test(path));
+          const urlRegex=/https?:\/\/www\.fredperry\.com\/media\/catalog\/product\/cache\/[a-f0-9]{16,}\/[A-Za-z0-9]\/[A-Za-z0-9]\/[^\s"'<>\\)\]]+/gi;
+          const observed=[];
+          for(const path of files){let text;try{text=await readFile(path,'utf8');}catch{continue;}for(const raw of text.match(urlRegex)??[]){const cleaned=raw.replace(/[),.;\]}]+$/g,'').replaceAll('&amp;','&');try{const url=new URL(cleaned);const name=url.pathname.split('/').at(-1);const match=name.match(/^([A-Z0-9]+)_([A-Z0-9]+)(_.+\.(?:JPG|JPEG|PNG|WEBP))$/i);const cacheMatch=url.pathname.match(/\/cache\/([a-f0-9]{16,})\//i);if(!match||!cacheMatch)continue;observed.push({sourceUrl:url.toString(),sourceProductCode:match[1].toUpperCase(),sourceColourCode:match[2].toUpperCase(),suffix:match[3],cacheHash:cacheMatch[1],sourceFile:path});}catch{}}
+          }
+          const uniqueObserved=[...new Map(observed.map(item=>[item.sourceUrl,item])).values()];
+          if(uniqueObserved.length<100)throw new Error(`Insufficient observed official media corpus: ${uniqueObserved.length}`);
+          const suffixFreq=new Map(),cacheFreq=new Map();
+          for(const item of uniqueObserved){suffixFreq.set(item.suffix,(suffixFreq.get(item.suffix)??0)+1);cacheFreq.set(item.cacheHash,(cacheFreq.get(item.cacheHash)??0)+1);}
+          const targets=[{identityKey:'HW2300|843',productCode:'HW2300',colourCode:'843',count:18},{identityKey:'M1588|81B',productCode:'M1588',colourCode:'81B',count:16},{identityKey:'M1588|84B',productCode:'M1588',colourCode:'84B',count:16}];
+          const assignments=[];let slotIndex=1;
+          for(const target of targets){
+            const rows=[];
+            for(const source of uniqueObserved){
+              const dirs=`${target.productCode[0]}/${target.productCode[1]}`;
+              const filename=`${target.productCode}_${target.colourCode}${source.suffix}`;
+              const candidateUrl=`https://www.fredperry.com/media/catalog/product/cache/${source.cacheHash}/${dirs}/${filename}`;
+              const familyScore=(source.sourceProductCode[0]===target.productCode[0]?100000:0)+(source.sourceProductCode.slice(0,2)===target.productCode.slice(0,2)?200000:0);
+              const score=familyScore+(suffixFreq.get(source.suffix)??0)*100+(cacheFreq.get(source.cacheHash)??0);
+              rows.push({identityKey:target.identityKey,productCode:target.productCode,colourCode:target.colourCode,candidateUrl,derivation:'OBSERVED_OFFICIAL_CACHE_HASH_AND_FILENAME_SUFFIX_SUBSTITUTION',sourceImageUrl:source.sourceUrl,sourceProductCode:source.sourceProductCode,sourceColourCode:source.sourceColourCode,cacheHash:source.cacheHash,suffix:source.suffix,score});
+            }
+            const unique=[...new Map(rows.sort((a,b)=>b.score-a.score||a.candidateUrl.localeCompare(b.candidateUrl)).map(item=>[item.candidateUrl,item])).values()].slice(0,target.count);
+            if(unique.length!==target.count)throw new Error(`Insufficient candidates for ${target.identityKey}: ${unique.length}`);
+            for(const item of unique)assignments.push({...item,slot:`F${String(slotIndex++).padStart(2,'0')}`});
+          }
+          const artifacts=JSON.parse(await readFile('/tmp/rlf-sequence20/artifacts.json','utf8'));
+          const plan={schemaVersion:1,generatedAt:new Date().toISOString(),sourceCommitSha:process.env.GITHUB_SHA,targetSequence:20,phaseId:'OBSERVED_OFFICIAL_MEDIA_PATTERN_PROBE_01',acceptancePolicy:{candidateDerivationIsNotEvidence:true,sourcePatternMustBeObservedInOfficialArtifact:true,officialFredPerryHostRequired:true,exactCodeColourPathRequired:true,httpStatusRequired:200,contentTypePrefixRequired:'image/',imageBytesSha256Required:true,priceVerificationProhibited:true,factoryInferenceProhibited:true},sourceProgressDeltaCount:(await readdir('data/execution/progress-deltas')).filter(name=>name.endsWith('.json')).length,sourceArtifactCount:artifacts.length,sourceArtifacts:artifacts,scannedTextFileCount:files.length,observedOfficialMediaUrlCount:uniqueObserved.length,observedSuffixCount:suffixFreq.size,observedCacheHashCount:cacheFreq.size,assignmentCount:assignments.length,nonemptyLaneCount:assignments.length,uniqueCandidateUrlCount:new Set(assignments.map(item=>item.candidateUrl)).size,targetCounts:Object.fromEntries(targets.map(t=>[t.identityKey,assignments.filter(a=>a.identityKey===t.identityKey).length])),duplicateCandidateUrls:assignments.map(i=>i.candidateUrl).filter((v,i,a)=>a.indexOf(v)!==i),assignments};
+          plan.planSha256=sha(plan);
+          plan.passed=plan.sourceProgressDeltaCount===11&&plan.sourceArtifactCount>=11&&plan.observedOfficialMediaUrlCount>=100&&plan.assignmentCount===50&&plan.nonemptyLaneCount===50&&plan.uniqueCandidateUrlCount===50&&plan.duplicateCandidateUrls.length===0&&plan.targetCounts['HW2300|843']===18&&plan.targetCounts['M1588|81B']===16&&plan.targetCounts['M1588|84B']===16;
+          await writeFile('data/execution/sequence20-media-hypothesis-preflight.json',`${JSON.stringify(plan,null,2)}\n`);
+          console.log(JSON.stringify({...plan,assignments:undefined,sourceArtifacts:undefined},null,2));
+          if(!plan.passed)throw new Error('Sequence 20 media hypothesis preflight failed');
+          NODE
+      - name: Publish exact sequence 20 preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence20-media-hypothesis-preflight.json
+          git commit -m 'Persist exact sequence 20 media hypothesis preflight'
+          for attempt in 1 2 3 4 5;do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch"&&git push origin "HEAD:$branch";then exit 0;fi
+            git rebase --abort 2>/dev/null||true
+            sleep $((attempt*3))
+          done
+          exit 1

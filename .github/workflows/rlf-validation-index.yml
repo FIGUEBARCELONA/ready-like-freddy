@@ -1,0 +1,104 @@
+name: RLF validation run index
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-code-validation.yml'
+      - '.github/workflows/rlf-50-worker-kb.yml'
+      - 'scripts/execution/**'
+      - 'server/**'
+      - 'client/**'
+      - 'data/execution/product-progress.json'
+      - 'data/execution/progress-deltas/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: rlf-validation-index
+  cancel-in-progress: true
+
+jobs:
+  index:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/rlf-execution-backend-20260823
+      - name: Resolve sibling validation run
+        id: resolve
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          run_json=''
+          for attempt in $(seq 1 36); do
+            run_json="$(gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${GITHUB_SHA}&event=push&per_page=20" --jq '[.workflow_runs[] | select(.name == "RLF code and ledger validation")][0] // empty')"
+            if [[ -n "$run_json" ]]; then break; fi
+            sleep 5
+          done
+          if [[ -z "$run_json" ]]; then
+            echo 'Unable to resolve sibling validation run' >&2
+            exit 1
+          fi
+          printf '%s\n' "$run_json" > /tmp/validation-run.json
+          printf 'run_id=%s\n' "$(jq -r '.id' /tmp/validation-run.json)" >> "$GITHUB_OUTPUT"
+      - name: Wait for validation conclusion
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          run_id="${{ steps.resolve.outputs.run_id }}"
+          for attempt in $(seq 1 120); do
+            gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}" > /tmp/validation-run.json
+            status="$(jq -r '.status' /tmp/validation-run.json)"
+            if [[ "$status" == 'completed' ]]; then break; fi
+            sleep 5
+          done
+          test "$(jq -r '.status' /tmp/validation-run.json)" = 'completed'
+      - name: Publish validation pointer
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/execution
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const run = JSON.parse(fs.readFileSync('/tmp/validation-run.json', 'utf8'));
+          const pointer = {
+            schemaVersion: 2,
+            indexedAt: new Date().toISOString(),
+            sourceCommitSha: process.env.GITHUB_SHA,
+            workflowName: run.name,
+            workflowId: run.workflow_id,
+            runId: String(run.id),
+            runNumber: run.run_number,
+            runAttempt: run.run_attempt,
+            event: run.event,
+            status: run.status,
+            conclusion: run.conclusion,
+            createdAt: run.created_at,
+            updatedAt: run.updated_at,
+            htmlUrl: run.html_url,
+            headBranch: run.head_branch,
+            headSha: run.head_sha,
+          };
+          fs.writeFileSync('data/execution/live-validation.json', `${JSON.stringify(pointer, null, 2)}\n`);
+          NODE
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/live-validation.json
+          if git diff --cached --quiet; then
+            echo 'Validation pointer already current'
+            exit 0
+          fi
+          git commit -m "Index RLF validation run ${{ steps.resolve.outputs.run_id }}"
+          git fetch origin feature/rlf-execution-backend-20260823
+          git rebase origin/feature/rlf-execution-backend-20260823
+          git push origin HEAD:feature/rlf-execution-backend-20260823

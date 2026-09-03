@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-24T16:29:43Z",
+  "targetSha": "ffcee11af170db9f1fc20ce22f538aa4abe6a48d",
+  "targetWorkflow": "RLF code and ledger validation",
+  "matchingRuns": [
+    {
+      "id": 32751093643,
+      "run_number": 18,
+      "run_attempt": 1,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "ffcee11af170db9f1fc20ce22f538aa4abe6a48d",
+      "created_at": "2026-08-24T16:29:05Z",
+      "updated_at": "2026-08-24T16:29:40Z",
+      "html_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32751093643",
+      "jobs_url": "https://api.github.com/repos/FIGUEBARCELONA/ready-like-freddy/actions/runs/32751093643/jobs",
+      "artifacts_url": "https://api.github.com/repos/FIGUEBARCELONA/ready-like-freddy/actions/runs/32751093643/artifacts"
+    }
+  ],
+  "checkRuns": [
+    {
+      "id": 97507977113,
+      "name": "index",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-24T16:29:09Z",
+      "completed_at": null,
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32751093601/job/97507977113",
+      "external_id": "8559ba9a-ca78-5d9e-9eaf-9453307acdb1"
+    },
+    {
+      "id": 97507977059,
+      "name": "validate",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-08-24T16:29:09Z",
+      "completed_at": "2026-08-24T16:29:40Z",
+      "details_url": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32751093643/job/97507977059",
+      "external_id": "1a3abc1b-3658-50b4-a3cf-4db1db2570c2"
+    }
+  ]
+}

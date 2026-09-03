@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 3,
+  "sourceRunId": "32748405808",
+  "generatedAt": "2026-08-24T16:25:49.910Z",
+  "expected": {
+    "identityCount": 1001,
+    "productUrlCaptureCount": 1641,
+    "imageCount": 8847,
+    "materialCount": 1332,
+    "manufacturingClaimCount": 59,
+    "descriptionMissing": 470,
+    "priceMissing": 414,
+    "materialMissing": 66,
+    "retryKeys": [
+      "B2328|560",
+      "HW2300|843"
+    ],
+    "deltaCount": 4,
+    "sourceArtifactCompletedIdentityCount": 95,
+    "netNewIdentityCount": 95,
+    "sourceOverlapWithPriorCount": 0
+  },
+  "actual": {
+    "identityCount": 1001,
+    "productUrlCaptureCount": 1641,
+    "imageCount": 8847,
+    "materialCount": 1332,
+    "manufacturingClaimCount": 59,
+    "descriptionMissing": 470,
+    "priceMissing": 414,
+    "materialMissing": 66,
+    "retryKeys": [
+      "B2328|560",
+      "HW2300|843"
+    ],
+    "deltaCount": 4,
+    "sourceArtifactCompletedIdentityCount": 95,
+    "netNewIdentityCount": 95,
+    "sourceOverlapWithPriorCount": 0,
+    "factoryVerifiedCount": 0,
+    "globalCanonicalProductCount": 0,
+    "ledgerSha256": "0297f280d1d7a66622ee30c5f26f3dd04e85bd066cfffdea527018716ac544c1"
+  },
+  "mismatches": [],
+  "passed": true
+}

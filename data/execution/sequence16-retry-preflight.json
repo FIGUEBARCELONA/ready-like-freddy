@@ -1,0 +1,533 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-24T22:25:25.291Z",
+  "sourceCommitSha": "faa72c8cdc2a1044f27179544fa19668332d579c",
+  "targetSequence": 16,
+  "phaseId": "OFFICIAL_RETRY_RECOVERY_01",
+  "sourceLedger": {
+    "completedIdentityCount": 1354,
+    "retryIdentityCount": 6,
+    "deltaCount": 10,
+    "latestRunId": "32783967794",
+    "ledgerSha256": "843bb27ffc396622b7f962f53f8509e564d96e33c957076dc9027a5d831ebb3b",
+    "factoryVerifiedCount": 0,
+    "globalCanonicalProductCount": 0
+  },
+  "expectedRetryIdentityKeys": [
+    "G3636|Z77",
+    "HW2300|843",
+    "M1588|81B",
+    "M1588|84B",
+    "M4613|41A",
+    "SY3660|46A"
+  ],
+  "retryIdentityKeys": [
+    "G3636|Z77",
+    "HW2300|843",
+    "M1588|81B",
+    "M1588|84B",
+    "M4613|41A",
+    "SY3660|46A"
+  ],
+  "retries": [
+    {
+      "identityKey": "G3636|Z77",
+      "productCode": "G3636",
+      "colourCode": "Z77",
+      "requestedProductUrl": "https://www.fredperry.com/id-en/women/the-gift-list-id/g3636-g3636-z77.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/id-en/women/the-gift-list-id/g3636-g3636-z77.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    },
+    {
+      "identityKey": "HW2300|843",
+      "productCode": "HW2300",
+      "colourCode": "843",
+      "requestedProductUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    },
+    {
+      "identityKey": "M1588|81B",
+      "productCode": "M1588",
+      "colourCode": "81B",
+      "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    },
+    {
+      "identityKey": "M1588|84B",
+      "productCode": "M1588",
+      "colourCode": "84B",
+      "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    },
+    {
+      "identityKey": "M4613|41A",
+      "productCode": "M4613",
+      "colourCode": "41A",
+      "requestedProductUrl": "https://www.fredperry.com/id-en/men/t-shirts/contrast-tape-ringer-t-shirt-m4613-41a.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/id-en/men/t-shirts/contrast-tape-ringer-t-shirt-m4613-41a.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    },
+    {
+      "identityKey": "SY3660|46A",
+      "productCode": "SY3660",
+      "colourCode": "46A",
+      "requestedProductUrl": "https://www.fredperry.com/id-en/kids/kids-twin-tipped-fred-perry-shirt-sy3660-46a.html",
+      "aliasUrls": [
+        "https://www.fredperry.com/id-en/kids/kids-twin-tipped-fred-perry-shirt-sy3660-46a.html"
+      ],
+      "transportHttpStatus": 200,
+      "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+      "failureReasons": [
+        "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+        "IDENTITY_CAPTURE_NOT_VALID"
+      ],
+      "fallbackError": null
+    }
+  ],
+  "assignmentCount": 50,
+  "activeLaneCount": 6,
+  "auditedIdleLaneCount": 44,
+  "assignments": [
+    {
+      "slot": "F01",
+      "index": 0,
+      "retry": {
+        "identityKey": "G3636|Z77",
+        "productCode": "G3636",
+        "colourCode": "Z77",
+        "requestedProductUrl": "https://www.fredperry.com/id-en/women/the-gift-list-id/g3636-g3636-z77.html",
+        "aliasUrls": [
+          "https://www.fredperry.com/id-en/women/the-gift-list-id/g3636-g3636-z77.html"
+        ],
+        "transportHttpStatus": 200,
+        "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+        "failureReasons": [
+          "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+          "IDENTITY_CAPTURE_NOT_VALID"
+        ],
+        "fallbackError": null
+      },
+      "status": "ASSIGNED_REAL_RETRY"
+    },
+    {
+      "slot": "F02",
+      "index": 1,
+      "retry": {
+        "identityKey": "HW2300|843",
+        "productCode": "HW2300",
+        "colourCode": "843",
+        "requestedProductUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+        "aliasUrls": [
+          "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html"
+        ],
+        "transportHttpStatus": 200,
+        "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+        "failureReasons": [
+          "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+          "IDENTITY_CAPTURE_NOT_VALID"
+        ],
+        "fallbackError": null
+      },
+      "status": "ASSIGNED_REAL_RETRY"
+    },
+    {
+      "slot": "F03",
+      "index": 2,
+      "retry": {
+        "identityKey": "M1588|81B",
+        "productCode": "M1588",
+        "colourCode": "81B",
+        "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+        "aliasUrls": [
+          "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html"
+        ],
+        "transportHttpStatus": 200,
+        "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+        "failureReasons": [
+          "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+          "IDENTITY_CAPTURE_NOT_VALID"
+        ],
+        "fallbackError": null
+      },
+      "status": "ASSIGNED_REAL_RETRY"
+    },
+    {
+      "slot": "F04",
+      "index": 3,
+      "retry": {
+        "identityKey": "M1588|84B",
+        "productCode": "M1588",
+        "colourCode": "84B",
+        "requestedProductUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+        "aliasUrls": [
+          "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html"
+        ],
+        "transportHttpStatus": 200,
+        "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+        "failureReasons": [
+          "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+          "IDENTITY_CAPTURE_NOT_VALID"
+        ],
+        "fallbackError": null
+      },
+      "status": "ASSIGNED_REAL_RETRY"
+    },
+    {
+      "slot": "F05",
+      "index": 4,
+      "retry": {
+        "identityKey": "M4613|41A",
+        "productCode": "M4613",
+        "colourCode": "41A",
+        "requestedProductUrl": "https://www.fredperry.com/id-en/men/t-shirts/contrast-tape-ringer-t-shirt-m4613-41a.html",
+        "aliasUrls": [
+          "https://www.fredperry.com/id-en/men/t-shirts/contrast-tape-ringer-t-shirt-m4613-41a.html"
+        ],
+        "transportHttpStatus": 200,
+        "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+        "failureReasons": [
+          "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+          "IDENTITY_CAPTURE_NOT_VALID"
+        ],
+        "fallbackError": null
+      },
+      "status": "ASSIGNED_REAL_RETRY"
+    },
+    {
+      "slot": "F06",
+      "index": 5,
+      "retry": {
+        "identityKey": "SY3660|46A",
+        "productCode": "SY3660",
+        "colourCode": "46A",
+        "requestedProductUrl": "https://www.fredperry.com/id-en/kids/kids-twin-tipped-fred-perry-shirt-sy3660-46a.html",
+        "aliasUrls": [
+          "https://www.fredperry.com/id-en/kids/kids-twin-tipped-fred-perry-shirt-sy3660-46a.html"
+        ],
+        "transportHttpStatus": 200,
+        "sourceTransport": "JINA_READER_TRANSFORMED_OFFICIAL_SOURCE",
+        "failureReasons": [
+          "NO_MATCHING_OFFICIAL_PRODUCT_IMAGE",
+          "IDENTITY_CAPTURE_NOT_VALID"
+        ],
+        "fallbackError": null
+      },
+      "status": "ASSIGNED_REAL_RETRY"
+    },
+    {
+      "slot": "F07",
+      "index": 6,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F08",
+      "index": 7,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F09",
+      "index": 8,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F10",
+      "index": 9,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F11",
+      "index": 10,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F12",
+      "index": 11,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F13",
+      "index": 12,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F14",
+      "index": 13,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F15",
+      "index": 14,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F16",
+      "index": 15,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F17",
+      "index": 16,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F18",
+      "index": 17,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F19",
+      "index": 18,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F20",
+      "index": 19,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F21",
+      "index": 20,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F22",
+      "index": 21,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F23",
+      "index": 22,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F24",
+      "index": 23,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F25",
+      "index": 24,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F26",
+      "index": 25,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F27",
+      "index": 26,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F28",
+      "index": 27,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F29",
+      "index": 28,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F30",
+      "index": 29,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F31",
+      "index": 30,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F32",
+      "index": 31,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F33",
+      "index": 32,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F34",
+      "index": 33,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F35",
+      "index": 34,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F36",
+      "index": 35,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F37",
+      "index": 36,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F38",
+      "index": 37,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F39",
+      "index": 38,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F40",
+      "index": 39,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F41",
+      "index": 40,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F42",
+      "index": 41,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F43",
+      "index": 42,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F44",
+      "index": 43,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F45",
+      "index": 44,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F46",
+      "index": 45,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F47",
+      "index": 46,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F48",
+      "index": 47,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F49",
+      "index": 48,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    },
+    {
+      "slot": "F50",
+      "index": 49,
+      "retry": null,
+      "status": "AUDITED_IDLE_LANE"
+    }
+  ],
+  "uniqueOfficialAliasUrlCount": 6,
+  "completedOverlap": [],
+  "missingUrls": [],
+  "nonOfficialUrls": [],
+  "mismatchedUrls": [],
+  "duplicateIdentityAssignments": 0,
+  "planSha256": "a92cb1d3ae3037a9c7bd6ef603357b0738f4405748ef5ffe00c8ac30d727dad0",
+  "passed": true
+}

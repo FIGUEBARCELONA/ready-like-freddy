@@ -1,0 +1,138 @@
+name: RLF sequence 16 worker evidence patch
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence16-worker-evidence-patch.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/rlf-execution-backend-20260823
+          fetch-depth: 0
+      - name: Add exact code-colour category image fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          path = Path('scripts/execution/run-product-worker.mjs')
+          text = path.read_text(encoding='utf-8')
+
+          marker = 'function isSoft404(fields, content) {'
+          insertion = '''function collectCategoryEvidenceImages(candidate, productCode, colourCode) {
+            const evidence = candidate.categoryImageEvidence ?? null;
+            const references = evidence?.imageReferences ?? [];
+            const codePattern = productCode ? productCode.replaceAll("-", "[-_]") : null;
+            const identityPattern =
+              codePattern && colourCode
+                ? new RegExp(`${codePattern}[-_]${colourCode}(?:[-_.]|$)`, "i")
+                : null;
+            return references
+              .filter(reference => reference?.sourceUrl)
+              .filter(reference => isOfficialProductMedia(reference.sourceUrl, allowedHosts))
+              .filter(reference =>
+                !identityPattern ||
+                identityPattern.test(decodeURIComponent(new URL(reference.sourceUrl).pathname)),
+              )
+              .map(reference => ({
+                ...reference,
+                evidenceSource: "OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE",
+                evidenceSourcePageUrl: evidence.sourcePageUrl,
+                evidenceSourcePageSha256: evidence.sourcePageSha256,
+                evidenceArtifact: evidence.sourceArtifact,
+              }));
+          }
+
+          function mergeImageReferences(...groups) {
+            const byUrl = new Map();
+            for (const reference of groups.flat()) {
+              if (!reference?.sourceUrl) continue;
+              const existing = byUrl.get(reference.sourceUrl);
+              byUrl.set(reference.sourceUrl, existing ? { ...existing, ...reference } : reference);
+            }
+            return [...byUrl.values()];
+          }
+
+          function isSoft404(fields, content) {'''
+          if text.count(marker) != 1:
+              raise SystemExit(f'Expected one soft404 marker, found {text.count(marker)}')
+          text = text.replace(marker, insertion)
+
+          image_pattern = re.compile(
+              r'(?m)^(\s*)const imageReferences = response\.ok\n\s*\? collectProductImages\(content, productCode, colourCode\)\n\s*: \[\];$'
+          )
+          match = image_pattern.search(text)
+          if not match:
+              raise SystemExit('Image collection block not found structurally')
+          indent = match.group(1)
+          new_images = f'''{indent}const pageImageReferences = response.ok
+          {indent}  ? collectProductImages(content, productCode, colourCode)
+          {indent}  : [];
+          {indent}const categoryEvidenceImageReferences =
+          {indent}  response.ok && !isSoft404(fields, content)
+          {indent}    ? collectCategoryEvidenceImages(candidate, productCode, colourCode)
+          {indent}    : [];
+          {indent}const imageReferences = mergeImageReferences(
+          {indent}  pageImageReferences,
+          {indent}  categoryEvidenceImageReferences,
+          {indent});
+          {indent}const imageEvidenceSources = [
+          {indent}  ...(pageImageReferences.length
+          {indent}    ? ["OFFICIAL_PRODUCT_PAGE_MEDIA_CAPTURE"]
+          {indent}    : []),
+          {indent}  ...(categoryEvidenceImageReferences.length
+          {indent}    ? ["OFFICIAL_CATEGORY_PAGE_EXACT_CODE_COLOUR_MEDIA_CAPTURE"]
+          {indent}    : []),
+          {indent}];'''
+          text, count = image_pattern.subn(new_images, text, count=1)
+          if count != 1:
+              raise SystemExit(f'Expected one image block replacement, got {count}')
+
+          text, count = re.subn(
+              r'(?m)^(\s*)imageReferences,\n(\s*)validationReasons: reasons,$',
+              r'\1imageReferences,\n\1imageEvidenceSources,\n\2validationReasons: reasons,',
+              text,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit(f'Expected one current result replacement, got {count}')
+
+          text, count = re.subn(
+              r'(?m)^(\s*)imageReferences: result\.imageReferences \?\? \[\],\n(\s*)sourceTransport: fetched\?\.sourceTransport \?\? null,$',
+              r'\1imageReferences: result.imageReferences ?? [],\n\1imageEvidenceSources: result.imageEvidenceSources ?? [],\n\1categoryImageEvidence: candidate.categoryImageEvidence ?? null,\n\2sourceTransport: fetched?.sourceTransport ?? null,',
+              text,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit(f'Expected one persisted record replacement, got {count}')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+          node --check scripts/execution/run-product-worker.mjs
+      - name: Commit audited worker patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/execution/run-product-worker.mjs
+          git commit -m 'Allow exact official category image evidence in retry recovery'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1

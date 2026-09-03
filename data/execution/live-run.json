@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "indexedAt": "2026-08-25T05:09:15.560Z",
+  "sourceCommitSha": "d2f078cb4e9e91fa9d7c7ecdd6d06e17fb835f93",
+  "workflowName": "RLF sequence 18 identity transition archive gate",
+  "workflowId": 341780633,
+  "runId": "32810809315",
+  "runNumber": 1,
+  "runAttempt": 1,
+  "event": "push",
+  "status": "completed",
+  "conclusion": "success",
+  "createdAt": "2026-08-25T04:55:32Z",
+  "updatedAt": "2026-08-25T04:56:48Z",
+  "htmlUrl": "https://github.com/FIGUEBARCELONA/ready-like-freddy/actions/runs/32810809315",
+  "headBranch": "feature/rlf-execution-backend-20260823",
+  "headSha": "d2f078cb4e9e91fa9d7c7ecdd6d06e17fb835f93"
+}
+

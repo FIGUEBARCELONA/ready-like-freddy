@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 3,
+  "runId": "32783967794",
+  "acceptedAt": "2026-08-24T22:20:30.880Z",
+  "qualityGatePassed": true,
+  "strictQualityGatePassed": true,
+  "acceptance": "FULL_STRICT_EVIDENCE_0_COMPLETE",
+  "sourceEvidence": {
+    "productManifestSha256": "58bfce6e053a8a8682d6f85ca5fc383202c1c7857d41f33914cbb62c61b87f7b",
+    "productManifestFileSha256": "41ec116df7a3cb6d39f0fef7d6fd63ac346f4836d5bbdfce301a2aebbee217b7",
+    "sourceProgressDeltaSha256": "c2860270917dc1bb31e626bdca9702ffc0d1037ce3fc28784b60bfc707d69234",
+    "sourceProgressDeltaFileSha256": "b68929aed5d7af27908c4fd99c31faeb9a8f5038b8bc7579d31c4344032bc480",
+    "frontierFileSha256": "ec51826ee0f4a96db9638ca2a03df8c83a14c036d6e33c44d6a2fe369af8717e"
+  },
+  "frontier": {
+    "frontierId": "RLF-OFFICIAL-20260824221806209-PRODUCTS",
+    "candidateUrlCount": 425,
+    "candidateIdentityCount": 117,
+    "previouslyCompletedIdentityCount": 1354,
+    "remainingIdentityCountBeforeSelection": 0,
+    "selectedIdentityCount": 0,
+    "expectedProductCaptureCount": 0,
+    "retryIdentityCount": 0,
+    "frontierSha256": "28fcf415fef133c1ab786649d4a9a4b43349fc6dfd4b9d90674d41691bd4a653",
+    "selectedIdentitySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "priorLedgerSha256": "2a796480e8db88080fac020161b25b37e408631c77d2856353597f767496b114",
+    "priorDeltaCount": 9
+  },
+  "completedIdentityKeys": [],
+  "capturedProductUrlCount": 0,
+  "failedIdentities": [],
+  "counters": {
+    "successfulIdentityCaptureCount": 0,
+    "failedIdentityCaptureCount": 0,
+    "officialProductImageReferenceCount": 0,
+    "materialEvidenceCount": 0,
+    "manufacturingClaimCount": 0,
+    "factoryVerifiedCount": 0
+  },
+  "metadataGaps": {
+    "descriptionMissingIdentityCount": 0,
+    "priceMissingIdentityCount": 0,
+    "materialMissingIdentityCount": 0
+  },
+  "status": "FULL_STRICT_BATCH_ACCEPTED_NOT_GLOBAL_CANONICAL",
+  "ledgerDeltaSha256": "a32897eaf941304d885cf712bdf09596b83d640c8991a8ae91b6ee37114b7efe"
+}

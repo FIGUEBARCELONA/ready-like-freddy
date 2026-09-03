@@ -1,0 +1,958 @@
+{
+  "schemaVersion": 1,
+  "runId": "32862115918",
+  "planSha256": "83213579b078493e719a9159c97ac12651f605ba09130bb380b5d3a399dabd3f",
+  "verifiedMedia": [],
+  "records": [
+    {
+      "slot": "F01",
+      "identityKey": "HW2300|843",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/ae-en/accessories/twill-cap-hw2300-843.html",
+        "bytes": 5793,
+        "bodySha256": "078a8e11862b5667c6ac4960eafe0270459e3c1bc72cb3220516fff40dfe772d",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "65660641a81fbf870fb387d1297a4abb4e26f2b146b003ed66bb1bc9041ea005"
+    },
+    {
+      "slot": "F02",
+      "identityKey": "HW2300|843",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eg-en/accessories/twill-cap-hw2300-843.html",
+        "bytes": 5793,
+        "bodySha256": "76011948d1d0b9f356bf780e673e4fa7d03e6b1535a3e1e6bc58a522773378f4",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "01d45100b5cfc32958c0331732a13d5627c4b8b22c69aa5087ad1944f71c4638"
+    },
+    {
+      "slot": "F03",
+      "identityKey": "HW2300|843",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/sa-en/accessories/twill-cap-hw2300-843.html",
+        "bytes": 5793,
+        "bodySha256": "768aa3640b1b15243f4911e22143df2a5627f6409ccf43e8936e5dc19aeabc59",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "ae071f65d183087a5d11966a957d25bbbd50c6679fc1b218b284377f861bd295"
+    },
+    {
+      "slot": "F04",
+      "identityKey": "HW2300|843",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/sa-en/twill-cap-hw2300-843.html",
+        "bytes": 5757,
+        "bodySha256": "2efc85e40df020244a940bb2b23a2c10a471ac2aeecf3d5ce9308679f9d20409",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "6aabf9750283e43b0374604866f7253461167ad7dd0822ee63ace46770edc365"
+    },
+    {
+      "slot": "F05",
+      "identityKey": "M1588|81B",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-81b.html",
+        "bytes": 5896,
+        "bodySha256": "90d0618c4205606f88e4fd068344c199ed2c99d495b1e3ae0184627f7b6ed826",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "7593f883cc5b64c35a05070edc5d167bbc72881032e15a82bab03ed8d45bcc1e"
+    },
+    {
+      "slot": "F06",
+      "identityKey": "M1588|81B",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-81b.html",
+        "bytes": 5956,
+        "bodySha256": "2102d081a8ecf0c7109b265e12274e9ff04e6380c316b51d045a8e8f5b268518",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "70faa6aa45d71978141e93be8a635b67a40e25b9d58c2a2a41d967fc3b2cdb77"
+    },
+    {
+      "slot": "F07",
+      "identityKey": "M1588|84B",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-de/herren/t-shirts/t-shirt-mit-doppelstreifen-m1588-84b.html",
+        "bytes": 5896,
+        "bodySha256": "b26fd14374a4d357c69792063bb87a883f274fabf0411e9cc2069bedd5ca9698",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "65c727da78d010c7455c5480edc03d5d34c7edb63018afdc9407c0109904903b"
+    },
+    {
+      "slot": "F08",
+      "identityKey": "M1588|84B",
+      "probeType": "KNOWN_OFFICIAL_PRODUCT_PAGE",
+      "probeUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-es/hombre/camisetas/camiseta-con-el-ribete-con-dos-franjas-m1588-84b.html",
+        "bytes": 5956,
+        "bodySha256": "997e81f00dce9c1bdcf2468f5f7d5f118e2e79ba510df3eaa0eedb0ba352e9ef",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "cd047358ea00408358fe688bb52aaeff81f5c6506efa52a7df5a076a8feae2ea"
+    },
+    {
+      "slot": "F09",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300+843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 5799,
+        "bodySha256": "71ed42aef9f991ac3798e1cb4999bfd5cde0590c29e2cbbb4c1b9fb100511c05",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "de1b2607c16c1b4ef6f2c9018244b253075572b12f3fdba534c7cb9214e21f18"
+    },
+    {
+      "slot": "F10",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300-843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 5799,
+        "bodySha256": "4db31c459b8632e53142e70f09ebc44b9bba6176bbeb2c956dde677ada3d0b93",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "752482541d4a5a4938b490ee5e3b202a14d93d71981582712b1ca446c3e41e5f"
+    },
+    {
+      "slot": "F11",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300+843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 5799,
+        "bodySha256": "52507dab96503ee39ed36aa8e3de9cfd405f337844c052579efb185c24d0dff1",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "a73926dd10e28cba2220bf62eb28fc55c78682c5f14745d780905c62f9742582"
+    },
+    {
+      "slot": "F12",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300-843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eg-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 5799,
+        "bodySha256": "bea79612d1ece74f49ab7307a759625e50831bffbf7e487693ffccfccc9ffbb4",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "27110f04705dc82a30b1bad0e631a915403f697b5d1e30d4a336f7da78c94603"
+    },
+    {
+      "slot": "F13",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300+843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 5820,
+        "bodySha256": "615b21b64ceb5331f88a7b4818dbe71fe9b4ce9b6f344463f6d6164582893579",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "54bb912738f1a34c62ac52c3ec55f2f1c11f0d298c60029ec8a8749794142fcb"
+    },
+    {
+      "slot": "F14",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300-843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/sa-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 5799,
+        "bodySha256": "3439e54b7a61c20c16d1142583118f7e4684ed685c7cd63b20b475df540426e0",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "993a663b567769fca360e7f3dc016760fc9e5372fdbffe76d6e0e3047c26cdf1"
+    },
+    {
+      "slot": "F15",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300+843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 5799,
+        "bodySha256": "4bda6bbc00d9558442a2681b69afd3807d5cdb8733494f2a2d555674f7be3b06",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "03d52721bf431cd71c1849ded33cd6654599e3ca76ae9966bbc264fde0cfbf8e"
+    },
+    {
+      "slot": "F16",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300-843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 5799,
+        "bodySha256": "c04a8af8cd7d816f64d6790c2de32625a9d70701a8a1f5ec6eab24ed5b15f54d",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "b02f5db0e8b3a2be2d7562b88f7c49a6b8d58fa231b8e6cfc83d21e920afafd6"
+    },
+    {
+      "slot": "F17",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300+843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 5799,
+        "bodySha256": "1d4b25b3dbcadc57ab985748e25d01959786653f6a739a7118c84ab646cc59cb",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "d981d07eb2e3e0a573306b74e6ba22cc60cf836412a971a411cb4c23943dce0a"
+    },
+    {
+      "slot": "F18",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300-843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 5820,
+        "bodySha256": "9b220c0f4e9d7c60b89c2afae2d8cbf461bb3442f3bbd8c451c681e3d056aeb9",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "8c35613d366a082648b654d6bae2713962cb53cab5a88d2b9dc4c345a3dc641e"
+    },
+    {
+      "slot": "F19",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300+843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 5799,
+        "bodySha256": "e8720ee9495d4565f3458dc0aadd8faa3f230ece887404a0fc78cfe28448a25b",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "d800b4d430189fe135b18a59643f94667b111b25c9c48c99ab7f22b3cec7b665"
+    },
+    {
+      "slot": "F20",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300-843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 5799,
+        "bodySha256": "d6842863bce9d05b429a94f8c6d495997ff5e727c3a0e1f13b17c9e681c4d1af",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "7f4f1a421e755a0400583a64ae2ba7907007726e3d8436c7efdb93383899ced8"
+    },
+    {
+      "slot": "F21",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300+843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300+843",
+        "bytes": 5799,
+        "bodySha256": "516c4ac368e3fa51467c711cd4cdad4f7bb90457f9523e9d500a39f533dddfb4",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "54806c3eff76ec82fc5dff4a9bd136c904dc2e74c6d1abbe042a7a4aff08d0cd"
+    },
+    {
+      "slot": "F22",
+      "identityKey": "HW2300|843",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300-843",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=HW2300-843",
+        "bytes": 5799,
+        "bodySha256": "3312b8e0386f2051d82e734fb160ac1610cc0ccb03eaf0cab2660f2ccea7f2b0",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "fd44d443a89205d1655fb315cf11713eda29575b47a07dd20669db18a4086da1"
+    },
+    {
+      "slot": "F23",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+81B",
+        "bytes": 5796,
+        "bodySha256": "df2de904f0ed3d25fbdcdcd1ff56db893c41008c8abc45285c874c541e91c83e",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "4150cacad8a9527c57869030249b799870bf8b8087d68d6a6be32f38a3e15810"
+    },
+    {
+      "slot": "F24",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-81B",
+        "bytes": 5796,
+        "bodySha256": "f57199245c4d57da09e9dd3b6fdd59c7c732f808d5b2cfdade0bb26831a953cd",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "32d1303af1c773afdc7849b474c4bb1ff49122cce995f9c98e39579bd9098974"
+    },
+    {
+      "slot": "F25",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+81B",
+        "bytes": 5796,
+        "bodySha256": "a53ef31adcc8f6a6e283df42d265d7df58c13a956fb6dc60a106084e442a897a",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "a57cb135d7dcffb82834777fc83765c260a9aeff80e737694b8105ba06201602"
+    },
+    {
+      "slot": "F26",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-81B",
+        "bytes": 5796,
+        "bodySha256": "9516a13f72b1769ad055b8f3693daeded25f7d57de1ea48fc85f99bb4be2a231",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "175191315af3473c7246b5aac625e42ed24ed2c6b380c284ff928c072fb7b845"
+    },
+    {
+      "slot": "F27",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 5796,
+        "bodySha256": "fd85f0a688bebb0a3e36f7ff63e8cfb388c1d91d5ae04e7185b3cd2e0572bf5c",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "c2eb4d3754b3981fbf66912663fa4a3ab5b22baaf78e662b02eeb3fbc8da0e0a"
+    },
+    {
+      "slot": "F28",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 5796,
+        "bodySha256": "b4b599518c1b1636241fe217f73f9d61491b5f02b909e503769b94db6490dc82",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "01050ec59a17a6d172a1df6755ba477ba277113b66a4db8212564b5c7e9f4311"
+    },
+    {
+      "slot": "F29",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 5796,
+        "bodySha256": "ddf9764e52537b10e1f75f1ef97a15ae85a3a2f94bc25bf501f0352a47e3d521",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "ef528d6190e99d2debb52c197fe00186950b03875b19f4833af22798f701f657"
+    },
+    {
+      "slot": "F30",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 5796,
+        "bodySha256": "24bab04e5e47a898f8ff3a89e04f1a6ebddee7fc64caede860e4b3e2405f5248",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "0c5b1c8ece90193021ef35f6b5abb58e033a51afc30cbaff8582a7bdf2ef69ee"
+    },
+    {
+      "slot": "F31",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 5817,
+        "bodySha256": "d00287041fb00a5dcd6063ba3aeacc65b97f7e7cdb04f0a07e4d03d51445dc1b",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "e1127672630be53d325ff65ff6674ac8c5645280fde08fa84d5c2ebd26f586f6"
+    },
+    {
+      "slot": "F32",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 5796,
+        "bodySha256": "77f3c895113b37e713d455595c6e2078ade5bd0280a98600ebaf697a1186377d",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "bc4409038c999c2b22a5c8605b2d6749eff99e9b9ae97f865bc233d4fe06f3e2"
+    },
+    {
+      "slot": "F33",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 5796,
+        "bodySha256": "821ac4f377533dab6cb88dd9ef214c6f1818489634fabb699bf15afbd6cc0af1",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "a1f1af3c55fc87e4795c2d87e53a3467afd6639279d7f43db7060a58269c83d7"
+    },
+    {
+      "slot": "F34",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 5796,
+        "bodySha256": "6872d0bb1c070eef894403ee91de0f75e0a41743a41eec6a868b4b6ee604da4b",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "8292803503195a39e876f4899c29e73bbafd987b88617485ee52ed100abe5eed"
+    },
+    {
+      "slot": "F35",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+81B",
+        "bytes": 5796,
+        "bodySha256": "df9c1a654a049b8149046763a50471df4e9c6b67f9f9b69e2760a7b02025d9bc",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "1733ecf13ddca494a4a2e5885019ae23d38f5b9f681e8991aaa1be18376ea79b"
+    },
+    {
+      "slot": "F36",
+      "identityKey": "M1588|81B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-81B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-81B",
+        "bytes": 5796,
+        "bodySha256": "4c22cf0bd9ce0d9a7c215eb266e8d7fd5bcbe94309a2dd44373dfaea0eb44bab",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "d58d491ae81043b72fcc06f585d4ad9d5798d780eefdb3c372f37aadfa4588d9"
+    },
+    {
+      "slot": "F37",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588+84B",
+        "bytes": 5796,
+        "bodySha256": "16458611dd6fb75dde11d17bdea3e5462932ad751ed53cd4a27c3ee503e1f2b3",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "0cd9af74c19ee9278d6d474bc9aa2d245bc527b560b81a45ee424384a70c366b"
+    },
+    {
+      "slot": "F38",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-de/catalogsearch/result/?q=M1588-84B",
+        "bytes": 5796,
+        "bodySha256": "99d388939f236e60a36278f81e47fcdb98e9530e596efeeac816faecc59a73a1",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "a191c3ddbbedb2afc3618ed309b721a9f88d8db8872b85f9f5ccadde57f3ed38"
+    },
+    {
+      "slot": "F39",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588+84B",
+        "bytes": 5796,
+        "bodySha256": "7df98273b4e702faf0a65530a93c88c61866f9e1f17faa43675908344bf48456",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "2a8d052470e79448e1dff57b3cfe50f53126fa6c4504f23b53628bccb3aed56b"
+    },
+    {
+      "slot": "F40",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-es/catalogsearch/result/?q=M1588-84B",
+        "bytes": 5796,
+        "bodySha256": "46b199e0d020f3bc5ad90e8a7d0cdd07b3d22b5ee74e4c3f4555683e759fad96",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "0fc2c4f453db6d7689161d0d6f33536757996831adcd9dd06f19798e77c42cdb"
+    },
+    {
+      "slot": "F41",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 5796,
+        "bodySha256": "595970a82c5c43689d1c0fbf258546bf7d3c613ccab8026248ee9867c3249fab",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "9c1b8c5e71362a875dc8b458135d2e325518e1141691a4536120e0a758ecf3f0"
+    },
+    {
+      "slot": "F42",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/gb-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 5796,
+        "bodySha256": "ee8d38f450228010748e79d040dcbbee311e878c26669922971ba658835b70f7",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "72ac4d4cad14688a4ae268c2f38733198abf7ec7277ba6543e84b8f2bace33e6"
+    },
+    {
+      "slot": "F43",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 5817,
+        "bodySha256": "555f9eee368e36c85827c736ecd8bfb44c56bdb0e1ae9abb032a14a1b7ba7622",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "bfcb74ca2f2e3a3cb125a8d17eb5b9ca6a5e3d817ec7f492b527e1b9fb46a0a1"
+    },
+    {
+      "slot": "F44",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/eu-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 5796,
+        "bodySha256": "961a3f8038f28494a2e730fbaa526a85e71a796cd0759f286de7bd69a257e06b",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "872ea07e5db86ff4eca1efaba7dd4295bd73023ff7d97981b5ca3e64fda8ef57"
+    },
+    {
+      "slot": "F45",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 5796,
+        "bodySha256": "dd1897e58b022e46ca6d5af74b083d86bed4fc2393a71a5882f0de7b10d34fcf",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "868c9a2ba096d041abab43b90ee654ce64e5efd592b85ee12b92a59ca3714cfb"
+    },
+    {
+      "slot": "F46",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/us-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 5796,
+        "bodySha256": "1868ea2be927cba46da095b15c6f3eca2d1b576dcb0fe1054c04429dec62632a",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "215d93bb69dff39f83aa8dfe47b3892e9dc5ccb521b49c2874fb17b523f0f689"
+    },
+    {
+      "slot": "F47",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 5796,
+        "bodySha256": "1060aadf8713479cc91e6b9ccc51f03e1a1b703a4738c51124af6c1fafe93dc3",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "05cc7bcd41cc0c4174bfb71b95fd5cb3427f17a5ee10d0a8dff8f67db9e87789"
+    },
+    {
+      "slot": "F48",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/au-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 5796,
+        "bodySha256": "f2bd2b8f2d0ebf80b29279f5b53bb40bb11be9230900de28589e50d7d778e379",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "420780ef2b54d51ea91d61e0ee7cce49375722f02729b0adde12a3cf09ee8c7d"
+    },
+    {
+      "slot": "F49",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588+84B",
+        "bytes": 5796,
+        "bodySha256": "909f42c201eaed3ad0cef0c686936f715cbc2952af0355654f2f8ea260725e4c",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 0,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "a68209f3b475a0ec64f01a6dd664aff6f4df59be4067f1a763bc26fc41d2bbb6"
+    },
+    {
+      "slot": "F50",
+      "identityKey": "M1588|84B",
+      "probeType": "OFFICIAL_MAGENTO_CATALOG_SEARCH",
+      "probeUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-84B",
+      "response": {
+        "ok": false,
+        "status": 403,
+        "contentType": "text/html; charset=UTF-8",
+        "effectiveUrl": "https://www.fredperry.com/ae-en/catalogsearch/result/?q=M1588-84B",
+        "bytes": 5796,
+        "bodySha256": "e04318be770eaad72547c55fe50cd6c82fc999970989812e23ca2256ebc899b4",
+        "error": null
+      },
+      "exactTextOccurrenceCount": 3,
+      "observedCandidateMediaCount": 0,
+      "verifiedMediaCount": 0,
+      "recordSha256": "234abde79dda491c1f00588f73552866a1483fabe350d3870d2877236fc07e8d"
+    }
+  ]
+}

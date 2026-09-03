@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sourceRunId": "32754804084",
+  "recoveredAt": "2026-08-24T17:20:18.775Z",
+  "sourceHeadSha": "cdd8e0cd0521ebd5dce8b9599db36698ab8ab1c5",
+  "sourceArtifacts": {
+    "product": {
+      "id": 9530679835,
+      "digest": "sha256:9501521a11541212f6fda66b61919f96b8982ea36dc634df0bbaf7179fc899b7"
+    },
+    "discovery": {
+      "id": 9530611276,
+      "digest": "sha256:d9f11351a7f08578e23d4a6d69c7962ec1a00e0c178d398e5aa1a3416f890078"
+    }
+  },
+  "expected": {
+    "identityCount": 1054,
+    "productUrlCaptureCount": 1707,
+    "imageCount": 9271,
+    "materialCount": 1383,
+    "manufacturingClaimCount": 59,
+    "descriptionMissing": 523,
+    "priceMissing": 467,
+    "materialMissing": 68,
+    "retryKeys": [
+      "B2328|560",
+      "HW2300|843"
+    ],
+    "deltaCount": 5
+  },
+  "actual": {
+    "identityCount": 1054,
+    "productUrlCaptureCount": 1707,
+    "imageCount": 9271,
+    "materialCount": 1383,
+    "manufacturingClaimCount": 59,
+    "descriptionMissing": 523,
+    "priceMissing": 467,
+    "materialMissing": 68,
+    "retryKeys": [
+      "B2328|560",
+      "HW2300|843"
+    ],
+    "deltaCount": 5,
+    "latestRunId": "32754804084",
+    "factoryVerifiedCount": 0,
+    "globalCanonicalProductCount": 0,
+    "ledgerSha256": "a8cc70c9f14fa51466baaf6122bdd648bf66c00b3a982c354a400e18b7856cd5"
+  },
+  "mismatches": [],
+  "passed": true
+}

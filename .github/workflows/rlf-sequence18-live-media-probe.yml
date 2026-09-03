@@ -1,0 +1,236 @@
+name: RLF sequence 18 live official media probes
+
+on:
+  push:
+    branches:
+      - feature/rlf-execution-backend-20260823
+    paths:
+      - '.github/workflows/rlf-sequence18-live-media-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rlf-sequence18-live-media-probe
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare immutable 50-probe live plan
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      plan_sha: ${{ steps.plan.outputs.plan_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - id: plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFile, appendFile } from 'node:fs/promises';
+          const plan=JSON.parse(await readFile('data/execution/sequence18-live-media-preflight.json','utf8'));
+          if(!plan.passed || plan.targetSequence!==18 || plan.probeCount!==50 || plan.uniqueProbeUrlCount!==50) throw new Error('Sequence 18 preflight gate failed');
+          const slots=plan.assignments.map(item=>item.slot);
+          if(slots.length!==50 || new Set(slots).size!==50) throw new Error('Sequence 18 slot matrix invalid');
+          await appendFile(process.env.GITHUB_OUTPUT,`matrix=${JSON.stringify({slot:slots})}\nplan_sha=${plan.planSha256}\n`);
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence18-live-plan
+          path: data/execution/sequence18-live-media-preflight.json
+          retention-days: 30
+
+  probe:
+    name: Live F${{ matrix.slot }}
+    needs: prepare
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Probe one exclusive official URL and verify observed media
+        shell: bash
+        env:
+          SLOT: ${{ matrix.slot }}
+          EXPECTED_PLAN_SHA: ${{ needs.prepare.outputs.plan_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "execution/sequence18-workers/${SLOT}"
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readFile, writeFile } from 'node:fs/promises';
+
+          const slot=process.env.SLOT;
+          const plan=JSON.parse(await readFile('data/execution/sequence18-live-media-preflight.json','utf8'));
+          if(plan.planSha256!==process.env.EXPECTED_PLAN_SHA) throw new Error('Sequence 18 plan SHA mismatch');
+          const assignment=plan.assignments.find(item=>item.slot===slot);
+          if(!assignment) throw new Error(`No assignment for ${slot}`);
+          const allowedHost=host=>host==='fredperry.com'||host.endsWith('.fredperry.com');
+          const identityPattern=new RegExp(`${assignment.productCode}[-_]${assignment.colourCode}(?:[-_.]|$)`,'i');
+          const normalizeBody=text=>text.replace(/\\u002[fF]/g,'/').replace(/\\\//g,'/').replaceAll('&amp;','&');
+          const observedAt=new Date().toISOString();
+          let responseRecord;
+          let body=Buffer.alloc(0);
+          try{
+            const response=await fetch(assignment.probeUrl,{
+              redirect:'follow',
+              signal:AbortSignal.timeout(35000),
+              headers:{'user-agent':'Mozilla/5.0 (compatible; RLF-EvidenceBot/1.0; +https://readylikefreddy.shop)','accept':'text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8'},
+            });
+            const ab=await response.arrayBuffer();
+            body=Buffer.from(ab).subarray(0,8*1024*1024);
+            responseRecord={ok:response.ok,status:response.status,contentType:response.headers.get('content-type'),effectiveUrl:response.url,bytes:body.length,bodySha256:createHash('sha256').update(body).digest('hex'),error:null};
+          }catch(error){
+            responseRecord={ok:false,status:null,contentType:null,effectiveUrl:assignment.probeUrl,bytes:0,bodySha256:null,error:error instanceof Error?error.message:String(error)};
+          }
+          const text=normalizeBody(body.toString('utf8'));
+          const exactTextOccurrenceCount=(text.match(new RegExp(`${assignment.productCode}[-_]${assignment.colourCode}`,'gi'))??[]).length;
+          const rawUrls=[...(text.match(/https?:\/\/[^\s"'<>\\)]+/gi)??[])];
+          const relativeMedia=[...(text.match(/\/(?:media\/catalog\/product|media\/wysiwyg|static\/version[^\s"'<>\\)]*)\/[^\s"'<>\\)]+/gi)??[])];
+          const candidateUrls=[];
+          for(const value of [...rawUrls,...relativeMedia]){
+            try{
+              const url=new URL(value,responseRecord.effectiveUrl||assignment.probeUrl);
+              if(!allowedHost(url.hostname.toLowerCase())) continue;
+              const pathname=decodeURIComponent(url.pathname);
+              if(!identityPattern.test(pathname)) continue;
+              candidateUrls.push(url.toString().replace(/[),.;\]}]+$/g,''));
+            }catch{}
+          }
+          const uniqueCandidates=[...new Set(candidateUrls)].slice(0,30);
+          const verifiedMedia=[];
+          const mediaAttempts=[];
+          for(const candidateUrl of uniqueCandidates){
+            try{
+              const response=await fetch(candidateUrl,{redirect:'follow',signal:AbortSignal.timeout(25000),headers:{'user-agent':'Mozilla/5.0 (compatible; RLF-EvidenceBot/1.0; +https://readylikefreddy.shop)','accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'}});
+              const contentType=response.headers.get('content-type')??'';
+              const finalUrl=response.url;
+              const final=new URL(finalUrl);
+              const path=decodeURIComponent(final.pathname);
+              const valid=response.status===200&&contentType.toLowerCase().startsWith('image/')&&allowedHost(final.hostname.toLowerCase())&&identityPattern.test(path);
+              let bytes=0,sha256=null;
+              if(valid){const buffer=Buffer.from(await response.arrayBuffer()).subarray(0,12*1024*1024);bytes=buffer.length;sha256=createHash('sha256').update(buffer).digest('hex');}
+              const attempt={candidateUrl,finalUrl,status:response.status,contentType,valid,bytes,sha256};
+              mediaAttempts.push(attempt);
+              if(valid) verifiedMedia.push({identityKey:assignment.identityKey,productCode:assignment.productCode,colourCode:assignment.colourCode,sourceUrl:finalUrl,httpStatus:response.status,contentType,bytes,sha256,observedAt,sourceProbeUrl:assignment.probeUrl,sourceSlot:slot,verificationStatus:'DIRECT_OFFICIAL_HTTP_200_IMAGE_EXACT_CODE_COLOUR',rightsStatus:'UNKNOWN',ingestionStatus:'NOT_INGESTED'});
+            }catch(error){mediaAttempts.push({candidateUrl,finalUrl:null,status:null,contentType:null,valid:false,bytes:0,sha256:null,error:error instanceof Error?error.message:String(error)});}
+          }
+          const record={schemaVersion:1,slot,planSha256:plan.planSha256,assignment,response:responseRecord,exactTextOccurrenceCount,observedCandidateMediaCount:uniqueCandidates.length,observedCandidateMediaUrls:uniqueCandidates,mediaAttempts,verifiedMedia,verifiedMediaCount:verifiedMedia.length,observedAt};
+          record.recordSha256=createHash('sha256').update(JSON.stringify(record)).digest('hex');
+          const out=`execution/sequence18-workers/${slot}`;
+          await writeFile(`${out}/record.json`,`${JSON.stringify(record,null,2)}\n`);
+          await writeFile(`${out}/verified-media.json`,`${JSON.stringify(verifiedMedia,null,2)}\n`);
+          console.log(JSON.stringify({slot,identityKey:assignment.identityKey,probeType:assignment.probeType,status:responseRecord.status,contentType:responseRecord.contentType,bytes:responseRecord.bytes,exactTextOccurrenceCount,observedCandidateMediaCount:uniqueCandidates.length,verifiedMediaCount:verifiedMedia.length},null,2));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence18-live-worker-${{ matrix.slot }}
+          path: execution/sequence18-workers/${{ matrix.slot }}
+          retention-days: 30
+
+  consolidate:
+    name: Consolidate sequence 18 live official probes
+    needs: [prepare, probe]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rlf-sequence18-live-worker-*
+          path: /tmp/rlf-sequence18/workers
+      - name: Audit 50 exclusive live probes and consolidate verified media
+        shell: bash
+        env:
+          EXPECTED_PLAN_SHA: ${{ needs.prepare.outputs.plan_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p execution/sequence18-consolidated data/execution
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readdir, readFile, writeFile } from 'node:fs/promises';
+          import { join } from 'node:path';
+          const plan=JSON.parse(await readFile('data/execution/sequence18-live-media-preflight.json','utf8'));
+          if(plan.planSha256!==process.env.EXPECTED_PLAN_SHA) throw new Error('Sequence 18 consolidator plan mismatch');
+          async function walk(path){const out=[];for(const entry of await readdir(path,{withFileTypes:true})){const full=join(path,entry.name);if(entry.isDirectory())out.push(...await walk(full));else out.push(full);}return out;}
+          const files=await walk('/tmp/rlf-sequence18/workers');
+          const records=[];
+          for(const path of files.filter(path=>path.endsWith('/record.json'))) records.push(JSON.parse(await readFile(path,'utf8')));
+          const slots=records.map(item=>item.slot).sort();
+          const expectedSlots=Array.from({length:50},(_,i)=>`F${String(i+1).padStart(2,'0')}`);
+          if(records.length!==50||new Set(slots).size!==50||JSON.stringify(slots)!==JSON.stringify(expectedSlots)) throw new Error('Sequence 18 requires 50 unique records');
+          if(records.some(item=>item.planSha256!==plan.planSha256)) throw new Error('Sequence 18 worker plan SHA mismatch');
+          const probeUrls=records.map(item=>item.assignment.probeUrl);
+          if(new Set(probeUrls).size!==50||probeUrls.some(url=>!plan.assignments.some(item=>item.probeUrl===url))) throw new Error('Sequence 18 probe assignment mismatch');
+          const allowedHost=host=>host==='fredperry.com'||host.endsWith('.fredperry.com');
+          const verifiedRaw=records.flatMap(item=>item.verifiedMedia);
+          for(const item of verifiedRaw){
+            const url=new URL(item.sourceUrl);
+            const pattern=new RegExp(`${item.productCode}[-_]${item.colourCode}(?:[-_.]|$)`,'i');
+            if(!allowedHost(url.hostname.toLowerCase())||item.httpStatus!==200||!String(item.contentType).toLowerCase().startsWith('image/')||!pattern.test(decodeURIComponent(url.pathname))||!item.sha256||item.bytes<1) throw new Error(`Invalid verified media reached consolidation: ${item.sourceUrl}`);
+          }
+          const verified=[...new Map(verifiedRaw.map(item=>[`${item.identityKey}|${item.sourceUrl}|${item.sha256}`,item])).values()].sort((a,b)=>a.identityKey.localeCompare(b.identityKey)||a.sourceUrl.localeCompare(b.sourceUrl));
+          const identityResults=plan.targetIdentities.map(target=>({
+            ...target,
+            probeCount:records.filter(item=>item.assignment.identityKey===target.identityKey).length,
+            successfulHttpProbeCount:records.filter(item=>item.assignment.identityKey===target.identityKey&&item.response.ok).length,
+            exactTextOccurrenceProbeCount:records.filter(item=>item.assignment.identityKey===target.identityKey&&item.exactTextOccurrenceCount>0).length,
+            observedCandidateMediaCount:records.filter(item=>item.assignment.identityKey===target.identityKey).reduce((sum,item)=>sum+item.observedCandidateMediaCount,0),
+            verifiedMedia:verified.filter(item=>item.identityKey===target.identityKey),
+          }));
+          const totals={
+            probeCount:records.length,
+            uniqueProbeUrlCount:new Set(probeUrls).size,
+            httpOkCount:records.filter(item=>item.response.ok).length,
+            httpErrorCount:records.filter(item=>!item.response.ok).length,
+            exactTextOccurrenceProbeCount:records.filter(item=>item.exactTextOccurrenceCount>0).length,
+            observedCandidateMediaCount:records.reduce((sum,item)=>sum+item.observedCandidateMediaCount,0),
+            verifiedMediaRawCount:verifiedRaw.length,
+            verifiedMediaCount:verified.length,
+            identitiesWithVerifiedMedia:identityResults.filter(item=>item.verifiedMedia.length>0).length,
+          };
+          const manifest={schemaVersion:1,runId:process.env.GITHUB_RUN_ID,generatedAt:new Date().toISOString(),sourceCommitSha:process.env.GITHUB_SHA,phaseId:'LIVE_OFFICIAL_MEDIA_PROBE_01',planSha256:plan.planSha256,workerCount:50,orchestrationStatus:'FIFTY_OF_FIFTY_EXCLUSIVE_LIVE_PROBES_CONSOLIDATED',acceptancePolicy:plan.acceptancePolicy,totals,identityResults,status:verified.length?'DIRECT_OFFICIAL_MEDIA_VERIFIED_REQUIRES_RETRY_RECOVERY':'LIVE_OFFICIAL_PROBES_EXHAUSTED_NO_VERIFIED_MEDIA'};
+          manifest.passed=manifest.workerCount===50&&totals.probeCount===50&&totals.uniqueProbeUrlCount===50;
+          manifest.manifestSha256=createHash('sha256').update(JSON.stringify(manifest)).digest('hex');
+          await writeFile('execution/sequence18-consolidated/records.json',`${JSON.stringify(records,null,2)}\n`);
+          await writeFile('execution/sequence18-consolidated/verified-media.json',`${JSON.stringify(verified,null,2)}\n`);
+          await writeFile('execution/sequence18-consolidated/manifest.json',`${JSON.stringify(manifest,null,2)}\n`);
+          await writeFile('data/execution/sequence18-live-media-manifest.json',`${JSON.stringify(manifest,null,2)}\n`);
+          await writeFile('data/execution/sequence18-live-media-evidence.json',`${JSON.stringify({schemaVersion:1,runId:manifest.runId,planSha256:plan.planSha256,verifiedMedia:verified,records:records.map(item=>({slot:item.slot,identityKey:item.assignment.identityKey,probeType:item.assignment.probeType,probeUrl:item.assignment.probeUrl,response:item.response,exactTextOccurrenceCount:item.exactTextOccurrenceCount,observedCandidateMediaCount:item.observedCandidateMediaCount,verifiedMediaCount:item.verifiedMediaCount,recordSha256:item.recordSha256}))},null,2)}\n`);
+          console.log(JSON.stringify(manifest,null,2));
+          if(!manifest.passed) throw new Error('Sequence 18 consolidated audit failed');
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rlf-sequence18-live-media-${{ github.run_id }}
+          path: execution/sequence18-consolidated
+          retention-days: 30
+      - name: Persist sequence 18 live probe checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch='feature/rlf-execution-backend-20260823'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/execution/sequence18-live-media-manifest.json data/execution/sequence18-live-media-evidence.json
+          git commit -m "Persist sequence 18 live official media probes ${GITHUB_RUN_ID}"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$branch"
+            if git rebase "origin/$branch" && git push origin "HEAD:$branch"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1
