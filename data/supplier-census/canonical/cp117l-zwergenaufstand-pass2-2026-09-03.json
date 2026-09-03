@@ -1,0 +1,80 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117L",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "vat:DE455882262",
+  "canonical_identity_key": "de:hanna-wilke-zwergenaufstand-de455882262",
+  "trading_names": ["Zwergenaufstand"],
+  "legal_or_responsible_name": "Hanna Wilke",
+  "vat_id": "DE455882262",
+  "legal_address": "Lappenbergsallee 29, 20257 Hamburg, Germany",
+  "canonical_domain": "second-hand-zwergenaufstand.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL_RESPONSIBLE_OPERATOR",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "The current Hamburg shop, website and historical discovery observations are one supplier. The August 2025 transfer from former operator Lisa Käding to Hanna Wilke updates the responsible identity and does not create a second supplier count.",
+  "reason": "Independent PASS2 confirms a current Hamburg professional second-hand children's apparel operator. The current first-party site explicitly documents second-hand baby and children's clothing, a physical Hamburg-Eimsbuettel shop, intake of used goods and continuity of operation for more than 25 years, with Hanna Wilke taking over in August 2025. First-party contact information gives VAT DE455882262 and the Hamburg address, and the refund policy identifies Hanna Wilke and provides a 14-day withdrawal right for orders. Current item-level second-hand remote apparel inventory and ordinary delivery to Spain were not materialized in this review, so the operator is counted as VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_FIRST_PARTY_VAT_IDENTITY",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS",
+    "professional_contactability": "PASS",
+    "consumer_terms_and_compliance": "PASS",
+    "current_item_level_secondhand_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_NOT_SUFFICIENTLY_MATERIALIZED_FOR_SECONDHAND_APPAREL",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_OPERATOR_SUCCESSION_COLLAPSED_TO_CURRENT_IDENTITY",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://second-hand-zwergenaufstand.de/",
+      "kind": "first_party_current_secondhand_activity",
+      "finding": "Current site explicitly offers second-hand baby and children's fashion in Hamburg and states that Hanna Wilke took over the shop in August 2025."
+    },
+    {
+      "url": "https://second-hand-zwergenaufstand.de/policies/contact-information",
+      "kind": "first_party_legal_traceability",
+      "finding": "Current contact information gives trading name Zwergenaufstand, Hamburg address, telephone, email and VAT DE455882262."
+    },
+    {
+      "url": "https://second-hand-zwergenaufstand.de/policies/refund-policy",
+      "kind": "first_party_consumer_terms",
+      "finding": "Refund policy identifies Zwergenaufstand / Hanna Wilke at the Hamburg address and provides a 14-day withdrawal right."
+    },
+    {
+      "url": "https://www.hamburg.de/branchenbuch/hamburg/eintrag/10407116/",
+      "kind": "municipal_directory_corroboration",
+      "finding": "Hamburg's current directory corroborates Zwergenaufstand at Lappenbergsallee 29 as a children's second-hand clothing shop."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "Historical discovery evidence referred to the same shop under former operator Lisa Käding and was not a prior verified canonical promotion. The current responsible operator is Hanna Wilke; succession is treated as one continuing supplier identity for counting purposes.",
+    "current_repo_exact_search_result": "No prior CP117L canonical promotion existed before this write.",
+    "branch_counting_rule": "ONE_CURRENT_OPERATOR_LOCATION_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117l",
+  "canonical_counts_after_promotion": {
+    "verified": 425,
+    "eligible": 72,
+    "hold": 353,
+    "remaining_to_10000": 9575
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
