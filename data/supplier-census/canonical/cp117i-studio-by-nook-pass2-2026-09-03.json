@@ -1,0 +1,77 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117I",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L01",
+  "country_code": "AT",
+  "city": "Wien",
+  "territorial_zone": "AT_90001_G11",
+  "canonical_supplier_id": "fn:AT479703x",
+  "canonical_identity_key": "eu:nook-nuk-479703x",
+  "trading_names": ["STUDIO", "STUDIO by Nook", "Nook [nuk]"],
+  "legal_or_responsible_name": "Nook [nuk] e.U.",
+  "responsible_owner": "Nina Köffler, BA",
+  "company_number": "FN 479703x",
+  "vat_id": "ATU72680217",
+  "registered_address": "Altgasse 12, 1130 Wien, Austria",
+  "shop_address": "Altgasse 13, 1130 Wien, Austria",
+  "canonical_domain": "nookvienna.com",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "Nook café, STUDIO vintage shop and the shared Nook [nuk] e.U. identity are one operator for supplier counting; the retail sub-location is not counted separately from its legal operator.",
+  "reason": "Independent PASS2 confirms a current Vienna professional physical vintage/second-hand clothing operation. The first-party Nook site explicitly states that STUDIO at Altgasse 13 sells thoughtfully selected vintage and second-hand clothing, with current opening hours and apparel categories. Austria's official EVI/Firmenbuch record identifies Nook [nuk] e.U., FN 479703x, active at Altgasse 12 with Nina Köffler, BA as owner. No current item-level remote apparel catalogue, direct remote purchase path, or ordinary delivery to Spain was materialized in this review, so the operator is VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_OFFICIAL_FIRMENBUCH",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS",
+    "professional_contactability": "PASS",
+    "current_item_level_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_NOT_MATERIALIZED",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.nookvienna.com/about/",
+      "kind": "first_party_current_secondhand_activity",
+      "finding": "STUDIO at Altgasse 13 currently sells selected vintage and second-hand clothing, including jackets, blazers, shirts, skirts and dresses, with current opening hours."
+    },
+    {
+      "url": "https://www.evi.gv.at/f/479703x",
+      "kind": "official_austrian_company_registry",
+      "finding": "Nook [nuk] e.U. is registered and active under FN 479703x at Altgasse 12, Vienna; Nina Köffler, BA is the proprietor."
+    },
+    {
+      "url": "https://www.firmenabc.at/nook-nuk-e-u_ONkw",
+      "kind": "registry_corroboration",
+      "finding": "Corroborates FN 479703x, VAT ATU72680217, Altgasse 12 and proprietor Nina Köffler."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "No prior verified canonical Nook/STUDIO promotion was found in the 2026-08-28 expanded backup search; any current lane observation remains subordinate to the single legal operator.",
+    "current_repo_exact_search_result": "Exact search for nookvienna.com returned no prior canonical promotion before CP117I.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l01",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117i",
+  "canonical_counts_after_promotion": {
+    "verified": 422,
+    "eligible": 72,
+    "hold": 350,
+    "remaining_to_10000": 9578
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
