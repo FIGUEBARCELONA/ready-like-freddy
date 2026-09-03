@@ -1,0 +1,90 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117C",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "vat:DE179254584",
+  "canonical_identity_key": "ohg:vintage-rags-yeterian-hra90964",
+  "trading_names": ["Vintage & Rags", "Vintage + Rags"],
+  "legal_or_responsible_name": "Vintage + Rags Yeterian OHG",
+  "vat_id": "DE179254584",
+  "commercial_register": "HRA 90964, Amtsgericht Hamburg",
+  "legal_address": "Kurze Mühren 6, 20095 Hamburg, Germany",
+  "canonical_domain": "vintage-rags.de",
+  "outcome": "PASS2_VERIFIED_ELIGIBLE",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "ELIGIBLE_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_ELIGIBLE",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": true,
+  "counted_as_verified_hold": false,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "Hamburg, Cologne and any other branches or storefronts of the same legal operator are not counted separately. One legal operator equals one supplier.",
+  "reason": "Independent PASS2 confirms a current German professional vintage/second-hand apparel operator with a concordant first-party legal identity, live item-level unique vintage clothing catalogue, prices and condition data, direct add-to-cart checkout, consumer terms and 14-day returns. Current first-party shipping information covers Europe and the FAQ states worldwide shipping, so ordinary delivery to Spain is established. The pre-2026 expanded backup contains discovery-only branch records and no verified canonical promotion for this legal identity.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "current_item_level_apparel_catalogue": "PASS",
+    "direct_purchase_capability": "PASS",
+    "professional_contactability": "PASS",
+    "consumer_terms_and_compliance": "PASS",
+    "ordinary_delivery_to_spain": "PASS_EUROPE_AND_WORLDWIDE_SHIPPING",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_DISTINCT_OPERATOR_NO_PRIOR_CANONICAL_PROMOTION_FOUND",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.vintage-rags.de/policies/legal-notice",
+      "kind": "first_party_legal_identity",
+      "finding": "Vintage + Rags Yeterian OHG, HRA 90964, VAT DE179254584, Hamburg legal identity and contact details."
+    },
+    {
+      "url": "https://www.vintage-rags.de/products/vintage-2001-i-see-dumb-people-t-shirt-xl",
+      "kind": "current_item_level_apparel_checkout",
+      "finding": "Live unique vintage garment with price, size, condition, one-item inventory and Add to cart."
+    },
+    {
+      "url": "https://www.vintage-rags.de/products/vintage-ellesse-nylon-jacket-m",
+      "kind": "independent_current_item_level_apparel_checkout",
+      "finding": "Second live unique vintage garment with condition, material, price and Add to cart."
+    },
+    {
+      "url": "https://www.vintage-rags.de/pages/versand-retoure",
+      "kind": "shipping",
+      "finding": "Current first-party shipping terms cover shipping within Europe with stated cost and delivery time."
+    },
+    {
+      "url": "https://www.vintage-rags.de/pages/faq-english",
+      "kind": "shipping_and_contactability",
+      "finding": "First-party FAQ states worldwide shipping and provides return, payment and contact information."
+    },
+    {
+      "url": "https://www.vintage-rags.de/policies/refund-policy",
+      "kind": "consumer_terms",
+      "finding": "Current refund policy identifies Vintage + Rags Yeterian OHG and provides a 14-day withdrawal right."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "Secondella/Vintage & Rags-era backup review found Vintage & Rags only as not_verified discovery records, including multiple branch observations; no branch is counted separately.",
+    "current_repo_exact_search_result": "Exact searches for vintage-rags.de and Vintage Rags returned no prior canonical promotion before CP117C.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117c",
+  "canonical_counts_after_promotion": {
+    "verified": 416,
+    "eligible": 71,
+    "hold": 345,
+    "remaining_to_10000": 9584
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
