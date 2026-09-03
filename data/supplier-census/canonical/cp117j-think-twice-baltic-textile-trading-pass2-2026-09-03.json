@@ -1,0 +1,79 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP117J",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L02",
+  "country_code": "BE",
+  "city": "Antwerpen / Anvers",
+  "territorial_zone": "BE_11002_G12",
+  "canonical_supplier_id": "vat:BE0887678177",
+  "canonical_identity_key": "be:baltic-textile-trading-0887678177",
+  "trading_names": ["Think Twice", "T2 Think Twice", "Think Twice Belgium"],
+  "legal_or_responsible_name": "BALTIC TEXTILE TRADING BVBA",
+  "vat_id": "BE 0887678177",
+  "legal_address": "Jezusstraat 16-18 box 12, 2000 Antwerp, Belgium",
+  "canonical_domain": "thinktwice-secondhand.be",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All Think Twice Belgium physical stores operated under the same Belgian legal identity count as one supplier. Antwerp Nationalestraat, Lange Klarenstraat, Jezusstraat, Kammenstraat and other Belgian branches are not counted separately. Think2.eu is described as a sister company and is not silently merged or separately promoted here.",
+  "reason": "Independent PASS2 confirms a current Belgian professional second-hand/vintage clothing operator. First-party privacy information identifies THINK TWICE / BALTIC TEXTILE TRADING BVBA, Belgian VAT BE0887678177 and Antwerp address. Current first-party pages document a multi-store Belgian second-hand network, daily/regular vintage activity, sourcing through textile collection and 14 Belgian stores. The same site explicitly distinguishes the physical Belgian operator from sister-company Think2.eu, which handles online European delivery. Because direct remote purchase and ordinary Spain delivery are not established for this Belgian legal operator itself, it is counted as VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_FIRST_PARTY_VAT_IDENTITY",
+    "professional_secondhand_activity": "PASS",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS",
+    "professional_contactability": "PASS",
+    "current_secondhand_apparel_assortment": "PASS",
+    "direct_remote_purchase_capability": "HOLD_SISTER_COMPANY_ONLINE_NOT_SAME_OPERATOR",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED_FOR_THIS_LEGAL_OPERATOR",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_BELGIAN_OPERATOR_ACROSS_BRANCHES",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://thinktwice-secondhand.be/privacy-policy/",
+      "kind": "first_party_legal_identity",
+      "finding": "Website manager identified as THINK TWICE / BALTIC TEXTILE TRADING BVBA, Jezusstraat 16-18 box 12, Antwerp, BE 0887678177."
+    },
+    {
+      "url": "https://thinktwice-secondhand.be/about-us/",
+      "kind": "first_party_professional_secondhand_activity",
+      "finding": "Current page documents second-hand/pre-loved apparel operations since 2007, 14 Belgian stores, garment sorting and circular-fashion model."
+    },
+    {
+      "url": "https://thinktwice-secondhand.be/shops/",
+      "kind": "first_party_current_store_network",
+      "finding": "Current Belgian store network with addresses, contacts and opening hours, including multiple Antwerp locations."
+    },
+    {
+      "url": "https://thinktwice-secondhand.be/",
+      "kind": "operator_boundary_and_online_gap",
+      "finding": "Current site distinguishes Think Twice Belgium physical stores from sister company Think2.eu, which provides online European delivery."
+    }
+  ],
+  "dedup_audit": {
+    "expanded_backup_result": "Multiple Think Twice/T2 branch observations exist in the 2026-08-28 backup as discovery-only not_verified records. They are consolidated under one Belgian legal operator; no branch receives a separate supplier count.",
+    "current_repo_exact_search_result": "Exact search for thinktwice-secondhand.be returned no prior canonical promotion before CP117J.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp117-first-party-enrichment-l02",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp117j",
+  "canonical_counts_after_promotion": {
+    "verified": 423,
+    "eligible": 72,
+    "hold": 351,
+    "remaining_to_10000": 9577
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
