@@ -1,0 +1,88 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP119A",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "register:DE-BREMEN-HRB41851HB",
+  "canonical_identity_key": "de:picknweight-ug-hrb41851hb",
+  "trading_names": ["PICKNWEIGHT", "PICKNWEIGHT Vintage Kilo Store"],
+  "legal_or_responsible_name": "PICKNWEIGHT UG",
+  "register_number": "HRB 41851 HB, Amtsgericht Bremen",
+  "legal_address": "Am Tabakquartier 60-62, LOFT No. 64, 28197 Bremen, Germany",
+  "management": "Murat Karabas",
+  "hamburg_shop_address": "Beim Grünen Jäger 16, 20359 Hamburg, Germany",
+  "canonical_domain": "picknweight.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "All current PICKNWEIGHT branches operated by the same legal operator count as one supplier. Hamburg, Berlin, Cologne, Munich, Stuttgart, Heidelberg and Bremen stores are not counted separately.",
+  "reason": "Independent PASS2 confirms a current German professional second-hand/vintage fashion operator. The current first-party FAQ states that PICKNWEIGHT UG operates nine stores with approximately 300,000 clothing, shoe and accessory items and describes the company as one of Europe's largest second-hand fashion suppliers; it also explicitly states that its vintage fashion has already been worn and is not new. The current legal notice identifies PICKNWEIGHT UG, Bremen HRB 41851 HB and managing director Murat Karabas, while the current Hamburg page confirms the active Beim Grünen Jäger 16 store. The site retains Shopify checkout infrastructure, historical item-level one-of-a-kind vintage product pages and a country selector including Spain, but the current live online assortment exposed in review is largely sold out and ordinary Spain delivery for a currently purchasable second-hand garment was not independently materialized. Therefore the operator is VERIFIED_HOLD rather than operationally eligible.",
+  "gates": {
+    "legal_identity_and_eu_country": "PASS_FIRST_PARTY_IMPRINT",
+    "professional_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "legal_or_fiscal_traceability": "PASS",
+    "physical_operation_and_current_activity": "PASS_9_STORES",
+    "professional_contactability": "PASS",
+    "current_secondhand_apparel_assortment": "PASS_PHYSICAL_300000_ITEMS",
+    "historical_item_level_secondhand_catalogue": "PASS",
+    "current_item_level_remote_apparel_stock": "HOLD_LIVE_STOCK_NOT_SUFFICIENTLY_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_SHOPIFY_PRESENT_BUT_CURRENT_SECONDHAND_PURCHASE_NOT_CONFIRMED",
+    "ordinary_delivery_to_spain": "HOLD_COUNTRY_SELECTOR_PRESENT_BUT_LIVE_SECONDHAND_DELIVERY_NOT_CONFIRMED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_OPERATOR_ACROSS_ALL_BRANCHES",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://picknweight.de/pages/faq",
+      "kind": "first_party_current_secondhand_activity",
+      "finding": "Current FAQ states PICKNWEIGHT UG operates nine stores, holds about 300,000 garments/shoes/accessories, is one of Europe's largest second-hand fashion suppliers, and explicitly describes the vintage merchandise as already worn rather than new."
+    },
+    {
+      "url": "https://picknweight.de/policies/legal-notice",
+      "kind": "first_party_legal_identity",
+      "finding": "Current legal notice identifies PICKNWEIGHT UG, Am Tabakquartier 60-62 LOFT 64, Bremen, Amtsgericht Bremen HRB 41851 HB and Management Board Murat Karabas."
+    },
+    {
+      "url": "https://picknweight.de/pages/hamburg",
+      "kind": "first_party_current_hamburg_operation",
+      "finding": "Current Hamburg store page lists Beim Grünen Jäger 16, 20359 Hamburg, opening hours, telephone and contact email."
+    },
+    {
+      "url": "https://picknweight.de/products/90s-short-1",
+      "kind": "first_party_historical_item_level_secondhand_catalogue",
+      "finding": "Item-level unique vintage garment page supplies price, article number, weight, size, material, brand and one-of-a-kind used-garment disclosure."
+    },
+    {
+      "url": "https://picknweight.de/policies/legal-notice",
+      "kind": "remote_commerce_and_country_selector",
+      "finding": "Current site exposes cart/checkout infrastructure and a localization country selector including Spain, but this alone is not treated as proof of ordinary delivery of a live second-hand garment."
+    }
+  ],
+  "dedup_audit": {
+    "current_repo_exact_search_result": "Exact repository search for picknweight.de returned no prior canonical promotion before CP119A.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER",
+    "legal_identity_note": "A current cookie notice still contains an older PICKNWEIGHT GmbH address reference; the current first-party legal notice and current FAQ consistently identify PICKNWEIGHT UG and are treated as authoritative for this checkpoint."
+  },
+  "reviewer_1": "openai:cp119-parallel27-deepening-l11",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp119a",
+  "canonical_counts_after_promotion": {
+    "verified": 430,
+    "eligible": 72,
+    "hold": 358,
+    "remaining_to_10000": 9570
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
