@@ -26,7 +26,7 @@ jobs:
             -o cp112/LAU_RG_01M_2024_4326.geojson
           # France special-source canon: Paris municipal arrondissements are not GISCO LAU rows.
           # Primary geometry is the City of Paris official Arrondissements dataset.
-          curl --fail --location --retry 4 --retry-delay 2 \
+          curl --compressed --fail --location --retry 4 --retry-delay 2 \
             'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/arrondissements/exports/geojson?lang=fr&timezone=Europe%2FParis' \
             -o cp112/paris_arrondissements_official.geojson
           # Independent administrative-boundary cross-check, sourced from data.gouv/IGN AdminExpress.
@@ -62,7 +62,6 @@ jobs:
           if paris_geom.is_empty or not paris_geom.is_valid:
               raise SystemExit('PARIS_75101_PRIMARY_GEOMETRY_INVALID')
 
-          # Secondary exact-code cross-check from current data.gouv administrative contours.
           fr=json.load(open('cp112/france_communes_100m.geojson',encoding='utf-8'))
           etalab=[]
           for f in fr.get('features',[]):
@@ -178,7 +177,7 @@ jobs:
               for attempt in range(4):
                   ep=endpoints[(int(lane[1:])+vi+attempt)%len(endpoints)]
                   try:
-                      req=urllib.request.Request(ep,data=urllib.parse.urlencode({'data':q}).encode(),headers={'User-Agent':'RLF-EU27-CP112/1.1'})
+                      req=urllib.request.Request(ep,data=urllib.parse.urlencode({'data':q}).encode(),headers={'User-Agent':'RLF-EU27-CP112/1.2'})
                       with urllib.request.urlopen(req,timeout=95) as r:
                           body=r.read(); record['http_status']=getattr(r,'status',200); record['endpoint']=ep
                       data=json.loads(body); break
