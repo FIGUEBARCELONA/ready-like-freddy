@@ -1,0 +1,77 @@
+{
+  "schema": "RLF_SUPPLIER_CANONICAL_PASS2_V1",
+  "checkpoint": "CP121H",
+  "phase": "FASE_1_CENS_PROVEIDORS_UE",
+  "evaluated_at": "2026-09-03",
+  "lane_id": "L11",
+  "country_code": "DE",
+  "city": "Hamburg, Freie und Hansestadt",
+  "territorial_zone": "DE_02000000_G13",
+  "canonical_supplier_id": "register:DE-HAMBURG-VR18335",
+  "canonical_identity_key": "de:contrazt-ev-vr18335-umsonstladen-harburg",
+  "trading_names": ["Umsonst & viel für wenig", "Umsonstladen Harburg", "MehrWertKultur"],
+  "legal_or_responsible_name": "contraZt e.V.",
+  "register_court": "Hamburg",
+  "register_number": "VR 18335",
+  "responsible_person": "André Jobst",
+  "legal_address": "Nobléestraße 13a, 21075 Hamburg, Germany",
+  "secondhand_shop_address": "Haakestraße 22, 21073 Hamburg, Germany",
+  "canonical_domain": "umsonstladen-harburg.de",
+  "outcome": "PASS2_VERIFIED_HOLD",
+  "identity_status": "CANONICAL",
+  "verification_status": "VERIFIED",
+  "operational_status": "HOLD_OPERATIONAL",
+  "freshness_status": "CURRENT_2026",
+  "lifecycle_status": "VERIFIED_HOLD",
+  "counted_as_verified": true,
+  "counted_as_operationally_eligible": false,
+  "counted_as_verified_hold": true,
+  "canonical_promotion": true,
+  "count_delta": 1,
+  "operator_level_dedup": "Umsonst & viel für wenig and MehrWertKultur are both operated by contraZt e.V. and count as one supplier operator. The media-focused MehrWertKultur location is not counted separately from the clothing second-hand shop.",
+  "reason": "Independent PASS2 confirms a current Hamburg nonprofit second-hand shop operator. contraZt e.V.'s current first-party site explicitly states it operates the Umsonstladen 'Umsonst & viel für wenig', where the public can obtain second-hand clothing for adults and children together with textiles and household goods; March 2026 pages confirm current operation and donation intake. The first-party imprint identifies contraZt e.V., Hamburg Vereinsregister 18335 and representative André Jobst. The operation is public-facing but no current item-level remote apparel catalogue, direct remote checkout or ordinary delivery to Spain is established, so the operator is VERIFIED_HOLD rather than ELIGIBLE.",
+  "gates": {
+    "eu_legal_identity": "PASS_FIRST_PARTY_REGISTER",
+    "professional_or_organized_secondhand_activity": "PASS_EXPLICIT_FIRST_PARTY",
+    "current_hamburg_operation": "PASS_2026",
+    "current_secondhand_clothing_activity": "PASS",
+    "ordinary_public_access": "PASS",
+    "current_item_level_remote_apparel_catalogue": "HOLD_NOT_MATERIALIZED",
+    "direct_remote_purchase_capability": "HOLD_PHYSICAL_ONLY",
+    "ordinary_delivery_to_spain": "HOLD_NOT_ESTABLISHED",
+    "technical_integrity": "PASS",
+    "deduplication_identity_network": "PASS_ONE_ASSOCIATION_OPERATOR",
+    "second_review": "PASS_INDEPENDENT"
+  },
+  "evidence": [
+    {
+      "url": "https://www.umsonstladen-harburg.de/",
+      "kind": "first_party_current_secondhand_activity",
+      "finding": "Current site states contraZt e.V. operates Umsonst & viel für wenig and offers second-hand clothing for adults and children, textiles, household goods and small electrical items."
+    },
+    {
+      "url": "https://www.umsonstladen-harburg.de/umsonst-viel-fuer-wenig-neu/",
+      "kind": "first_party_current_2026_shop",
+      "finding": "Page updated 29 March 2026 confirms current donation rules, second-hand positioning and the Haakestraße 22 Hamburg location."
+    },
+    {
+      "url": "https://www.umsonstladen-harburg.de/startseite/impressum/",
+      "kind": "first_party_legal_identity",
+      "finding": "Imprint identifies contraZt e.V., Nobléestraße 13a, representative André Jobst, Hamburg Vereinsregister 18335."
+    }
+  ],
+  "dedup_audit": {
+    "cp121_lane_packet": "L11 surfaced MehrWertKultur; independent operator-level review linked it to the same contraZt e.V. that operates the relevant clothing second-hand shop.",
+    "current_repo_exact_search_result": "Exact repository search for register number 18335 returned no prior canonical promotion before CP121H.",
+    "branch_counting_rule": "ONE_LEGAL_OPERATOR_EQUALS_ONE_SUPPLIER"
+  },
+  "reviewer_1": "openai:cp121-l11-fresh-discovery-resolution",
+  "reviewer_2": "openai:independent-web-ledger-pass2-cp121h",
+  "canonical_counts_after_promotion": {
+    "verified": 446,
+    "eligible": 74,
+    "hold": 372,
+    "remaining_to_10000": 9554
+  },
+  "quality": "AAA_FAIL_CLOSED"
+}
